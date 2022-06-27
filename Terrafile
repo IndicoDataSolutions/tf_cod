@@ -1,0 +1,54 @@
+argo-registration:
+  source: "git@github.com:IndicoDataSolutions/tf-mod-indico-argo-registration.git"
+  version: "1.0.1"
+
+cluster:
+  source: "git@github.com:IndicoDataSolutions/tf-mod-indico-aws-eks-cluster.git"
+  version: "6.3.2"
+
+cluster-manager:
+  source: "git@github.com:IndicoDataSolutions/tf-mod-indico-aws-cluster-manager.git"
+  version: "1.1.1"
+
+database:
+  source: "git@github.com:IndicoDataSolutions/tf-mod-indico-aws-database.git"
+  version: "4.0.1"
+
+fsx:
+  source: "git@github.com:IndicoDataSolutions/tf-mod-indico-aws-fsx.git"
+  version: "1.4.1"
+
+kms:
+  source: "git@github.com:IndicoDataSolutions/tf-mod-indico-aws-kms.git"
+  version: "1.1.0"
+
+public_networking:
+  source:  "git@github.com:IndicoDataSolutions/tf-mod-indico-aws-network.git"
+  version: "1.0.1"
+
+private_networking:
+  source: "git@github.com:IndicoDataSolutions/tf-mod-indico-aws-dc-network.git"
+  version: "1.0.0"
+
+s3-storage:
+  source: "git@github.com:IndicoDataSolutions/tf-mod-indico-aws-buckets.git"
+  version: "1.1.0"
+
+security-group:
+  source: "git@github.com:IndicoDataSolutions/tf-mod-indico-aws-security-group.git"
+  version: "1.0.0"
+
+storage:
+  source: "git@github.com:IndicoDataSolutions/tf-mod-indico-aws-storage.git"
+  version: "1.0.1"
+
+sqs-sns:
+  source: "git@github.com:IndicoDataSolutions/tf-mod-indico-aws-sqs-sns.git"
+  version: "1.0.3"
+
+
+
+
+
+
+
