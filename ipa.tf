@@ -55,9 +55,8 @@ resource "helm_release" "ipa-crds" {
   namespace        = "default"
   repository       = var.ipa_repo
   chart            = "ipa-crds"
-  version          = var.ipa_version
+  version          = var.ipa_crds_version
   wait             = true
-
 
   values = [<<EOF
   crunchy-pgo:
@@ -90,7 +89,7 @@ resource "helm_release" "ipa-pre-requisites" {
   namespace        = "default"
   repository       = var.ipa_repo
   chart            = "ipa-pre-requisites"
-  version          = var.ipa_version
+  version          = var.ipa_pre_reqs_version
   wait             = true
   timeout          = "1800" # 30 minutes
 
@@ -427,100 +426,9 @@ resource "argocd_application" "ipa" {
     create = "30m"
     delete = "30m"
   }
-
 }
-/*
-resource "null_resource" "cluster-pods-cleanup-hook" {
-  depends_on = [
-    argocd_application.ipa
-  ]
-
-  triggers = {
-    kubeconfig = base64encode(module.cluster.kubectl_config)
-  }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = "echo ${self.triggers.kubeconfig} | base64 -d > $HOME/kubeconfig && cat $HOME/kubeconfig || true"
-  }
-
-  provisioner "local-exec" {
-    command = "pwd && env|sort && mkdir -p $HOME/bin && ls -l $HOME/bin && ls -l $HOME|| true"
-    when    = destroy
-  }
-
-  provisioner "local-exec" {
-    command = "curl -o $HOME/bin/aws-iam-authenticator https://s3.us-west-2.amazonaws.com/amazon-eks/1.21.2/2021-07-05/bin/linux/amd64/aws-iam-authenticator && chmod +x $HOME/bin/aws-iam-authenticator"
-    when    = destroy
-  }
-
-  provisioner "local-exec" {
-    command = "curl -L -o $HOME/bin/kubectl https://dl.k8s.io/release/v1.20.0/bin/linux/amd64/kubectl && chmod +x $HOME/bin/kubectl"
-    when    = destroy
-  }
-
-  provisioner "local-exec" {
-    command = "KUBECONFIG=$HOME/kubeconfig PATH=$PATH:$HOME/bin && ls -l $HOME && ls -l $HOME/bin && cat $HOME/kubeconfig && kubectl --kubeconfig=$HOME/kubeconfig config view"
-    when    = destroy
-  }
-
-  # if we dont do this the pvc gets stuck terminating
-  provisioner "local-exec" {
-    command = "KUBECONFIG=$HOME/kubeconfig PATH=$PATH:$HOME/bin && kubectl --kubeconfig=$HOME/kubeconfig patch pvc read-write -p '{\"metadata\":{\"finalizers\":null}}' || true"
-    when    = destroy
-  }
-
-  # kubectl patch pvc read-write -p '{"metadata":{"finalizers":null}}'
-
-  provisioner "local-exec" {
-    command = "KUBECONFIG=$HOME/kubeconfig PATH=$PATH:$HOME/bin && kubectl --kubeconfig=$HOME/kubeconfig get service -A | grep LoadBalancer | awk '{print \"kubectl --kubeconfig=$HOME/kubeconfig delete service -n \" $1 \" \" $2}' >> ./cleanup.sh && cat ./cleanup.sh && sh ./cleanup.sh || true"
-    when    = destroy
-  }
-
-}
-
-
-
-resource "null_resource" "pre-reqs-cleanup-hook" {
-  depends_on = [
-    helm_release.ipa-pre-requisites
-  ]
-
-  triggers = {
-    kubeconfig = base64encode(module.cluster.kubectl_config)
-  }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = "echo ${self.triggers.kubeconfig} | base64 -d > $HOME/kubeconfig && cat $HOME/kubeconfig || true"
-  }
-
-
-  provisioner "local-exec" {
-    command = "curl -o $HOME/bin/aws-iam-authenticator https://s3.us-west-2.amazonaws.com/amazon-eks/1.21.2/2021-07-05/bin/linux/amd64/aws-iam-authenticator && chmod +x $HOME/bin/aws-iam-authenticator"
-    when    = destroy
-  }
-
-  provisioner "local-exec" {
-    command = "curl -L -o $HOME/bin/kubectl https://dl.k8s.io/release/v1.20.0/bin/linux/amd64/kubectl && chmod +x $HOME/bin/kubectl"
-    when    = destroy
-  }
-
-  provisioner "local-exec" {
-    command = "KUBECONFIG=$HOME/kubeconfig PATH=$PATH:$HOME/bin && ls -l $HOME && ls -l $HOME/bin && cat $HOME/kubeconfig && kubectl --kubeconfig=$HOME/kubeconfig config view"
-    when    = destroy
-  }
-
-  # if we dont do this the pvc gets stuck terminating
-  provisioner "local-exec" {
-    command = "KUBECONFIG=$HOME/kubeconfig PATH=$PATH:$HOME/bin && kubectl --kubeconfig=$HOME/kubeconfig patch pvc read-write -p '{\"metadata\":{\"finalizers\":null}}' || true"
-    when    = destroy
-  }
-}
-*/
 
 resource "argocd_application" "argo-application" {
-
   depends_on = [
     module.argo-registration,
     helm_release.ipa-pre-requisites

@@ -294,7 +294,17 @@ variable "ipa_repo" {
 
 variable "ipa_version" {
   type    = string
-  default = "0.1.0-dop-432-all-84e563d1"
+  default = "0.1.2"
+}
+
+variable "ipa_pre_reqs_version" {
+  type    = string
+  default = "0.1.1"
+}
+
+variable "ipa_crds_version" {
+  type    = string
+  default = "0.1.0"
 }
 
 variable "ipa_enabled" {
