@@ -86,7 +86,7 @@ deletion_protection_enabled = false
 skip_final_snapshot         = true
 #fsx
 per_unit_storage_throughput = 50
-include_rox                 = true
+include_rox                 = false
 #cluster
 node_group_multi_az = false
 assumed_roles = [
