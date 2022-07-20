@@ -475,9 +475,9 @@ spec:
   source:
     chart: ${each.value.chart}
     repoURL: ${each.value.repo}
-    releaseName: ${each.value.name}
     targetRevision: ${each.value.version}
     helm:
+      releaseName: ${each.value.name}
       values: |
         ${base64decode(each.value.values)}    
 EOT
