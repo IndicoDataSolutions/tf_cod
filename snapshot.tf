@@ -83,7 +83,7 @@ resource "kubernetes_job" "snapshot-restore-job" {
           name              = "restore"
           image             = "harbor.devops.indico.io/indico/cod-snapshot:latest"
           image_pull_policy = "Always"
-          command           = ["bash", "/app/restore.sh", "${var.restore_snapshot_name}", "${lower(var.aws_access_key)}"]
+          command           = ["bash", "/app/restore.sh", "${var.restore_snapshot_name}", "${lower(var.aws_account)}"]
           env {
             name = "DB_NAME"
             value_from {
