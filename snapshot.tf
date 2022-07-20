@@ -2,7 +2,7 @@ resource "kubectl_manifest" "snapshot-service-account" {
   depends_on = [
     helm_release.ipa-pre-requisites
   ]
-  count = var.restore_snapshot_enabled == true ? 1 : 0
+  count     = var.restore_snapshot_enabled == true ? 1 : 0
   yaml_body = <<YAML
 apiVersion: v1
 kind: ServiceAccount
@@ -17,7 +17,7 @@ resource "kubectl_manifest" "snapshot-cluster-role" {
   depends_on = [
     helm_release.ipa-pre-requisites
   ]
-  count = var.restore_snapshot_enabled == true ? 1 : 0
+  count     = var.restore_snapshot_enabled == true ? 1 : 0
   yaml_body = <<YAML
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -38,7 +38,7 @@ resource "kubectl_manifest" "snapshot-cluster-role-binding" {
   depends_on = [
     helm_release.ipa-pre-requisites
   ]
-  count = var.restore_snapshot_enabled == true ? 1 : 0
+  count     = var.restore_snapshot_enabled == true ? 1 : 0
   yaml_body = <<YAML
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -67,7 +67,7 @@ resource "kubernetes_job" "snapshot-restore-job" {
 
   count = var.restore_snapshot_enabled == true ? 1 : 0
   metadata {
-    name = "cod-restore-snapshot"
+    name      = "cod-restore-snapshot"
     namespace = "default"
   }
   spec {
@@ -80,10 +80,10 @@ resource "kubernetes_job" "snapshot-restore-job" {
           name = "harbor-pull-secret"
         }
         container {
-          name = "restore"
-          image = "harbor.devops.indico.io/indico/cod-snapshot:latest"
+          name              = "restore"
+          image             = "harbor.devops.indico.io/indico/cod-snapshot:latest"
           image_pull_policy = "Always"
-          command = ["bash", "/app/restore.sh", "${var.restore_snapshot_name}"]
+          command           = ["bash", "/app/restore.sh", "${var.restore_snapshot_name}", "${lower(var.aws_access_key)}"]
           env {
             name = "DB_NAME"
             value_from {
@@ -175,9 +175,9 @@ resource "kubernetes_job" "snapshot-restore-job" {
             }
           }
           volume_mount {
-            name = "root-nfs"
+            name       = "root-nfs"
             mount_path = "/indicoapidata"
-          } 
+          }
         }
         restart_policy = "Never"
         volume {
@@ -190,7 +190,7 @@ resource "kubernetes_job" "snapshot-restore-job" {
     }
   }
   wait_for_completion = true
-  
+
   # up to 30 minutes to
   timeouts {
     create = "30m"
