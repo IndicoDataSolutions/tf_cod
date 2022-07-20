@@ -454,7 +454,7 @@ resource "github_repository_file" "custom-application-yaml" {
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${each.value.name}
+  name: ${lower("${var.aws_account}-${var.region}-${var.name}-${each.value.name}")} 
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
@@ -462,8 +462,6 @@ metadata:
     region: ${var.region}
     account: ${var.aws_account}
     name: ${var.label}
-  annotations:
-    avp.kubernetes.io/path: tools/argo/data/ipa-deploy
 spec:
   destination:
     server: ${module.cluster.kubernetes_host}
@@ -477,66 +475,11 @@ spec:
   source:
     chart: ${each.value.chart}
     repoURL: ${each.value.repo}
+    releaseName: ${each.value.name}
     targetRevision: ${each.value.version}
-    plugin:
-      name: argocd-vault-plugin-helm-values-expand-no-build
-      env:
-        - name: RELEASE_NAME
-          value: ${each.value.name}
-
-        - name: HELM_VALUES         
-          value: |
-            ${base64decode(each.value.values)}    
+    helm:
+      values: |
+        ${base64decode(each.value.values)}    
 EOT
-}
-
-# Argo App for each App
-resource "argocd_application" "argo-application" {
-  depends_on = [
-    module.argo-registration,
-    helm_release.ipa-pre-requisites
-  ]
-
-  for_each = var.applications
-
-  wait = true
-
-  metadata {
-    name      = lower("${var.aws_account}-${var.region}-${var.name}-${each.value.name}")
-    namespace = "argo"
-    labels = {
-      test = "true"
-    }
-  }
-
-  spec {
-
-    project = module.argo-registration.argo_project_name
-
-    source {
-      repo_url        = each.value.repo
-      chart           = each.value.chart
-      target_revision = each.value.version
-
-      helm {
-        values       = base64decode(each.value.values)
-        release_name = each.value.name
-      }
-    }
-
-    sync_policy {
-      sync_options = ["CreateNamespace=${each.value.createNamespace}"]
-      automated = {
-        prune       = true
-        self_heal   = false
-        allow_empty = false
-      }
-    }
-
-    destination {
-      server    = module.cluster.kubernetes_host
-      namespace = each.value.namespace
-    }
-  }
 }
 
