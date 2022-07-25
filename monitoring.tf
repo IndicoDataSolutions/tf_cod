@@ -36,7 +36,8 @@ resource "aws_route53_record" "alertmanager-caa" {
 
 
 resource "random_password" "monitoring-password" {
-  length = 16
+  length  = 16
+  special = false
 }
 
 output "monitoring-username" {
