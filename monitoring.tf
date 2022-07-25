@@ -43,7 +43,7 @@ resource "random_password" "monitoring-password" {
 
 output "monitoring-password" {
   sensitive = true
-  value     = random_password.monitoring-password
+  value     = random_password.monitoring-password.result
 }
 
 resource "helm_release" "monitoring" {
