@@ -34,6 +34,18 @@ resource "aws_route53_record" "alertmanager-caa" {
   ]
 }
 
+
+resource "random_password" "monitoring_password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}"
+}
+
+output "monitoring_password" {
+  sensitive = true
+  value     = random_password.monitoring_password
+}
+
 resource "helm_release" "monitoring" {
   count = var.monitoring_enabled == true ? 1 : 0
   depends_on = [
@@ -56,6 +68,10 @@ resource "helm_release" "monitoring" {
   values = [<<EOF
   global:
     host: "${local.dns_name}"
+  
+  authentication:
+    ingressUsername: monitoring
+    ingressPassword: ${random_password.monitoring-password}
 
  EOF
   ]
