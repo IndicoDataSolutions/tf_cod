@@ -35,15 +35,15 @@ resource "aws_route53_record" "alertmanager-caa" {
 }
 
 
-resource "random_password" "monitoring_password" {
+resource "random_password" "monitoring-password" {
   length           = 16
   special          = true
   override_special = "!#$%&*()-_=+[]{}"
 }
 
-output "monitoring_password" {
+output "monitoring-password" {
   sensitive = true
-  value     = random_password.monitoring_password
+  value     = random_password.monitoring-password
 }
 
 resource "helm_release" "monitoring" {
