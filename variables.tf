@@ -386,6 +386,11 @@ variable "oidc_username_claim" {
   default = "sub"
 }
 
+variable "monitoring_enabled" {
+  type    = bool
+  default = true
+}
+
 variable "hibernation_enabled" {
   type    = bool
   default = false

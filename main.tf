@@ -78,17 +78,7 @@ data "aws_caller_identity" "current" {}
 locals {
   network = var.direct_connect == true ? module.private_networking : module.public_networking
   aws_usernames = [
-    "dan.mepham@indico.io",
     "eric.fontana@indico.io",
-    "nathan.okolita@indico.io",
-    "astha.patni@indico.io",
-    "jerry.genser@indico.io",
-    "dov.turner@indico.io",
-    "anil.kumar@indico.io",
-    "manoj.ettedi@indico.io",
-    "liz.lemon@indico.io",
-    "blazej.boczek@indico.io",
-    "ryan.snyder@indico.io",
     "svc_jenkins",
     "terraform-sa"
   ]
