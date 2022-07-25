@@ -41,6 +41,10 @@ resource "random_password" "monitoring-password" {
   override_special = "!#$%&*()-_=+[]{}"
 }
 
+output "monitoring-username" {
+  value = "monitoring"
+}
+
 output "monitoring-password" {
   sensitive = true
   value     = random_password.monitoring-password.result
@@ -71,7 +75,7 @@ resource "helm_release" "monitoring" {
   
   authentication:
     ingressUsername: monitoring
-    ingressPassword: ${random_password.monitoring-password.result}
+    ingressPassword: junk
 
  EOF
   ]
