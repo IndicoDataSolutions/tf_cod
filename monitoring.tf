@@ -36,9 +36,7 @@ resource "aws_route53_record" "alertmanager-caa" {
 
 
 resource "random_password" "monitoring-password" {
-  length           = 16
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}"
+  length = 16
 }
 
 output "monitoring-username" {
@@ -75,7 +73,7 @@ resource "helm_release" "monitoring" {
   
   authentication:
     ingressUsername: monitoring
-    ingressPassword: junk
+    ingressPassword: ${random_password.monitoring-password.result}
 
  EOF
   ]
