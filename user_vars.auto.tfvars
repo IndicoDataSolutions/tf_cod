@@ -32,7 +32,7 @@ node_groups = [
   },
   {
     min_size         = 1
-    max_size         = 15
+    max_size         = 20
     instance_types   = ["m5.xlarge"]
     name             = "static-workers" # for pods that need to be on stable nodes.
     type             = "cpu"
@@ -41,11 +41,20 @@ node_groups = [
   },
   {
     min_size         = 0
-    max_size         = 0
+    max_size         = 3
+    instance_types   = ["m5.xlarge"]
+    name             = "pdf-workers" # for pods that need to be on stable nodes.
+    type             = "cpu"
+    spot             = false
+    desired_capacity = "1"
+  },
+  {
+    min_size         = 0
+    max_size         = 3
     instance_types   = ["m5.2xlarge"]
     name             = "highmem-workers" # for autoscaling pods that have high memory demands.
     type             = "cpu"
-    spot             = true
+    spot             = false
     desired_capacity = "0"
   },
   {
@@ -55,7 +64,7 @@ node_groups = [
     name             = "monitoring-workers" # for autoscaling pods that have high memory demands.
     type             = "cpu"
     spot             = false
-    desired_capacity = "1"
+    desired_capacity = "3"
   },
   {
     min_size         = 2
@@ -77,10 +86,10 @@ default_tags = {
   "indico/cluster"     = "dop-832",    #This should match the label variable
   "indico/environment" = "dev"         # Choices are dev , stage , prod
 }
-user_ip = "" # set this to the external IP address if deployment server has no outbound access; else, leave as empty string or remove
-#cluster_node_policies = ["AWSWAFReadOnlyAccess", "CloudWatchLogsFullAccess", "AmazonSQSFullAccess", "AmazonSNSFullAccess"]
-submission_expiry = 30 # days
-uploads_expiry    = 30 # days
+user_ip               = "" # set this to the external IP address if deployment server has no outbound access; else, leave as empty string or remove
+cluster_node_policies = ["AWSWAFReadOnlyAccess", "CloudWatchLogsFullAccess", "AmazonSQSFullAccess", "AmazonSNSFullAccess"]
+submission_expiry     = 30 # days
+uploads_expiry        = 30 # days
 #RDS Stuff
 deletion_protection_enabled = false
 skip_final_snapshot         = true
