@@ -71,7 +71,7 @@ resource "helm_release" "monitoring" {
   
   authentication:
     ingressUsername: monitoring
-    ingressPassword: ${random_password.monitoring-password}
+    ingressPassword: ${random_password.monitoring-password.result}
 
  EOF
   ]
