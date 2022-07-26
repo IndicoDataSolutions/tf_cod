@@ -150,6 +150,7 @@ storage:
 crunchy-postgres:
   enabled: true
   postgres-data:
+    enabled: true
     metadata:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
@@ -229,6 +230,7 @@ crunchy-postgres:
       name: indico
       options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   postgres-metrics:
+    enabled: true
     metadata:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
