@@ -113,15 +113,15 @@ apiModels:
 
 external-dns:
   enabled: true
-  provider: aws
-  aws:
-    zoneType: public
-    region: ${var.region}
+  #provider: aws
+  #aws:
+  #  zoneType: public
+  #  region: ${var.region}
 
-  policy: sync
-  sources:
-    - service
-    - ingress
+  #policy: sync
+  #sources:
+  #  - service
+  #  - ingress
 
 cluster-autoscaler:
   cluster-autoscaler:
@@ -369,7 +369,7 @@ spec:
             
             external-dns:
               enabled: false
-              
+
             secrets:
               ocr_license_key: <OCR_LICENSE_KEY>
 
