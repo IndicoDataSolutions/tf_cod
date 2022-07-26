@@ -276,6 +276,7 @@ provider "kubectl" {
 
 
 provider "helm" {
+  debug = true
   kubernetes {
     host                   = module.cluster.kubernetes_host
     cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
