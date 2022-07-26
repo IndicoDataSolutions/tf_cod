@@ -143,6 +143,10 @@ storage:
 crunchy-postgres:
   enabled: true
   postgres-data:
+    metadata:
+      annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
     instances:
     - affinity:
         nodeAffinity:
@@ -218,6 +222,10 @@ crunchy-postgres:
       name: indico
       options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   postgres-metrics:
+    metadata:
+      annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
     instances:
     - affinity:
         nodeAffinity:
