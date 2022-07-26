@@ -367,6 +367,9 @@ spec:
               appDomains:
                 - "${local.dns_name}"
             
+            external-dns:
+              enabled: false
+              
             secrets:
               ocr_license_key: <OCR_LICENSE_KEY>
 
