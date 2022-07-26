@@ -20,7 +20,8 @@ terraform {
       source = "gavinbunney/kubectl"
     }
     helm = {
-      source = "hashicorp/helm"
+      source  = "hashicorp/helm"
+      version = ">= 2.6.0"
     }
     random = {
       source  = "hashicorp/random"
