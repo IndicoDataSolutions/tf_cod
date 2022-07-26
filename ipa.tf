@@ -76,15 +76,15 @@ resource "helm_release" "ipa-crds" {
   ]
 }
 
-resource "time_sleep" "wait_5_minutes_after_crds" {
+resource "time_sleep" "wait_1_minutes_after_crds" {
   depends_on = [helm_release.ipa-crds]
 
-  create_duration = "5m"
+  create_duration = "1m"
 }
 
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
-    time_sleep.wait_5_minutes_after_crds,
+    time_sleep.wait_1_minutes_after_crds,
     module.cluster,
     module.fsx-storage,
     helm_release.ipa-crds
