@@ -76,6 +76,12 @@ resource "helm_release" "monitoring" {
     ingressUsername: monitoring
     ingressPassword: ${random_password.monitoring-password.result}
 
+  kube-prometheus-stack:
+    prometheus:
+      prometheusSpec:
+        nodeSelector:
+          node_group: static-workers
+
  EOF
   ]
 }
