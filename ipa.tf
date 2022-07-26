@@ -166,6 +166,10 @@ crunchy-postgres:
                 values:
                 - pgha1
             topologyKey: kubernetes.io/hostname
+      metadata:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
       dataVolumeClaimSpec:
         storageClassName: encrypted-gp2
         accessModes:
@@ -237,6 +241,10 @@ crunchy-postgres:
                 values:
                 - pgha1
             topologyKey: kubernetes.io/hostname
+      metadata:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
       dataVolumeClaimSpec:
         storageClassName: encrypted-gp2
         accessModes:
