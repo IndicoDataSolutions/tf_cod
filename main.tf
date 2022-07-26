@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 3.74.3"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "0.7.2"
+    }
     http = {
       source  = "hashicorp/http"
       version = "~> 1.2"
@@ -14,13 +18,14 @@ terraform {
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.11.0"
+      version = ">= 2.12.1"
     }
     kubectl = {
       source = "gavinbunney/kubectl"
     }
     helm = {
-      source = "hashicorp/helm"
+      source  = "hashicorp/helm"
+      version = ">= 2.6.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -35,6 +40,9 @@ terraform {
       version = "3.6.0"
     }
   }
+}
+
+provider "time" {
 }
 
 provider "vault" {
@@ -78,17 +86,7 @@ data "aws_caller_identity" "current" {}
 locals {
   network = var.direct_connect == true ? module.private_networking : module.public_networking
   aws_usernames = [
-    "dan.mepham@indico.io",
     "eric.fontana@indico.io",
-    "nathan.okolita@indico.io",
-    "astha.patni@indico.io",
-    "jerry.genser@indico.io",
-    "dov.turner@indico.io",
-    "anil.kumar@indico.io",
-    "manoj.ettedi@indico.io",
-    "liz.lemon@indico.io",
-    "blazej.boczek@indico.io",
-    "ryan.snyder@indico.io",
     "svc_jenkins",
     "terraform-sa"
   ]
@@ -278,6 +276,7 @@ provider "kubectl" {
 
 
 provider "helm" {
+  debug = true
   kubernetes {
     host                   = module.cluster.kubernetes_host
     cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate

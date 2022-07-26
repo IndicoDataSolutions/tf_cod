@@ -32,7 +32,7 @@ node_groups = [
   },
   {
     min_size         = 1
-    max_size         = 15
+    max_size         = 20
     instance_types   = ["m5.xlarge"]
     name             = "static-workers" # for pods that need to be on stable nodes.
     type             = "cpu"
@@ -41,11 +41,20 @@ node_groups = [
   },
   {
     min_size         = 0
-    max_size         = 0
+    max_size         = 3
+    instance_types   = ["m5.xlarge"]
+    name             = "pdf-workers" # for pods that need to be on stable nodes.
+    type             = "cpu"
+    spot             = false
+    desired_capacity = "1"
+  },
+  {
+    min_size         = 0
+    max_size         = 3
     instance_types   = ["m5.2xlarge"]
     name             = "highmem-workers" # for autoscaling pods that have high memory demands.
     type             = "cpu"
-    spot             = true
+    spot             = false
     desired_capacity = "0"
   },
   {
@@ -55,7 +64,7 @@ node_groups = [
     name             = "monitoring-workers" # for autoscaling pods that have high memory demands.
     type             = "cpu"
     spot             = false
-    desired_capacity = "1"
+    desired_capacity = "3"
   },
   {
     min_size         = 2

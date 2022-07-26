@@ -76,8 +76,15 @@ resource "helm_release" "ipa-crds" {
   ]
 }
 
+resource "time_sleep" "wait_1_minutes_after_crds" {
+  depends_on = [helm_release.ipa-crds]
+
+  create_duration = "1m"
+}
+
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
+    time_sleep.wait_1_minutes_after_crds,
     module.cluster,
     module.fsx-storage,
     helm_release.ipa-crds
@@ -143,6 +150,10 @@ storage:
 crunchy-postgres:
   enabled: true
   postgres-data:
+    metadata:
+      annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
     instances:
     - affinity:
         nodeAffinity:
@@ -166,6 +177,10 @@ crunchy-postgres:
                 values:
                 - pgha1
             topologyKey: kubernetes.io/hostname
+      metadata:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
       dataVolumeClaimSpec:
         storageClassName: encrypted-gp2
         accessModes:
@@ -214,6 +229,10 @@ crunchy-postgres:
       name: indico
       options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   postgres-metrics:
+    metadata:
+      annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
     instances:
     - affinity:
         nodeAffinity:
@@ -237,6 +256,10 @@ crunchy-postgres:
                 values:
                 - pgha1
             topologyKey: kubernetes.io/hostname
+      metadata:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
       dataVolumeClaimSpec:
         storageClassName: encrypted-gp2
         accessModes:
@@ -428,52 +451,58 @@ resource "argocd_application" "ipa" {
   }
 }
 
-resource "argocd_application" "argo-application" {
-  depends_on = [
-    module.argo-registration,
-    helm_release.ipa-pre-requisites
-  ]
+
+# Create Argo Application YAML for each user supplied application
+
+
+resource "github_repository_file" "custom-application-yaml" {
 
   for_each = var.applications
 
-  wait = true
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/${each.value.name}_application.yaml"
+  commit_message      = var.message
+  overwrite_on_create = true
 
-  metadata {
-    name      = lower("${var.aws_account}-${var.region}-${var.name}-${each.value.name}")
-    namespace = "argo"
-    labels = {
-      test = "true"
-    }
-  }
+  #TODO:
+  # this allows people to make edits to the file so we don't overwrite it.
+  #lifecycle {
+  #  ignore_changes = [
+  #    content
+  #  ]
+  #}
 
-  spec {
-
-    project = module.argo-registration.argo_project_name
-
-    source {
-      repo_url        = each.value.repo
-      chart           = each.value.chart
-      target_revision = each.value.version
-
-      helm {
-        values       = base64decode(each.value.values)
-        release_name = each.value.name
-      }
-    }
-
-    sync_policy {
-      sync_options = ["CreateNamespace=${each.value.createNamespace}"]
-      automated = {
-        prune       = true
-        self_heal   = false
-        allow_empty = false
-      }
-    }
-
-    destination {
-      server    = module.cluster.kubernetes_host
-      namespace = each.value.namespace
-    }
-  }
+  content = <<EOT
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ${lower("${var.aws_account}-${var.region}-${var.name}-${each.value.name}")} 
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app: ${each.value.name}
+    region: ${var.region}
+    account: ${var.aws_account}
+    name: ${var.label}
+spec:
+  destination:
+    server: ${module.cluster.kubernetes_host}
+    namespace: ${each.value.namespace}
+  project: ${module.argo-registration.argo_project_name}
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
+  source:
+    chart: ${each.value.chart}
+    repoURL: ${each.value.repo}
+    targetRevision: ${each.value.version}
+    helm:
+      releaseName: ${each.value.name}
+      values: |
+        ${base64decode(each.value.values)}    
+EOT
 }
 

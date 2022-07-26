@@ -297,6 +297,11 @@ variable "ipa_version" {
   default = "0.1.2"
 }
 
+variable "monitoring_version" {
+  type    = string
+  default = "0.0.1"
+}
+
 variable "ipa_pre_reqs_version" {
   type    = string
   default = "0.1.1"
@@ -379,6 +384,11 @@ variable "oidc_username_prefix" {
 
 variable "oidc_username_claim" {
   default = "sub"
+}
+
+variable "monitoring_enabled" {
+  type    = bool
+  default = false
 }
 
 variable "hibernation_enabled" {
