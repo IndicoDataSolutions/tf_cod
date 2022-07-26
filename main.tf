@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 3.74.3"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "0.7.2"
+    }
     http = {
       source  = "hashicorp/http"
       version = "~> 1.2"
@@ -36,6 +40,9 @@ terraform {
       version = "3.6.0"
     }
   }
+}
+
+provider "time" {
 }
 
 provider "vault" {
