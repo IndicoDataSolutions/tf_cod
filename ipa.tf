@@ -98,10 +98,8 @@ resource "helm_release" "ipa-pre-requisites" {
   chart            = "ipa-pre-requisites"
   version          = var.ipa_pre_reqs_version
   wait             = true
-  wait_for_jobs    = true
   timeout          = "1800" # 30 minutes
-  atomic           = true
-
+  disable_webhooks = true
 
   values = [<<EOF
 
