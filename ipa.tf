@@ -99,7 +99,7 @@ resource "helm_release" "ipa-pre-requisites" {
   version          = var.ipa_pre_reqs_version
   wait             = true
   timeout          = "1800" # 30 minutes
-  disable_webhooks = true
+  disable_webhooks = false
 
   values = [<<EOF
 
