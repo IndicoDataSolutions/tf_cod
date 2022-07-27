@@ -120,6 +120,8 @@ external-dns:
   logLevel: debug
   policy: sync
   txtOwnerId: "${var.label}-${var.region}"
+  domainFilters:
+    - ${lower(var.aws_account)}.indico.io.
 
   provider: aws
   aws:

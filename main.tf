@@ -25,7 +25,7 @@ terraform {
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.4.1" # pin here to avoid https://github.com/hashicorp/terraform-provider-helm/issues/854
+      version = ">= 2.6.0"
     }
     random = {
       source  = "hashicorp/random"
