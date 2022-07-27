@@ -66,7 +66,7 @@ resource "helm_release" "monitoring" {
   repository       = var.ipa_repo
   chart            = "monitoring"
   version          = var.monitoring_version
-  wait             = true
+  wait             = false
   timeout          = "900" # 15 minutes
 
   values = [<<EOF
