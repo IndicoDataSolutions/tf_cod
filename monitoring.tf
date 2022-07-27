@@ -73,6 +73,19 @@ resource "helm_release" "monitoring" {
   global:
     host: "${local.dns_name}"
   
+  ingress-nginx:
+    enabled: true
+
+    rbac:
+      create: true
+
+    admissionWebhooks:
+      patch:
+        nodeSelector.beta.kubernetes.io/os: linux
+  
+    defaultBackend:
+      nodeSelector.beta.kubernetes.io/os: linux
+  
   authentication:
     ingressUsername: monitoring
     ingressPassword: ${random_password.monitoring-password.result}
