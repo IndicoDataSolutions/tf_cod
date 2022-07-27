@@ -117,10 +117,6 @@ apiModels:
 external-dns:
   enabled: true
   logLevel: debug
-  domainFilters:
-    - ${local.dns_name}
-    - ${lower("${var.region}.${var.aws_account}.indico.io")}
-  
   policy: sync
   txtOwnerId: "${var.label}-${var.region}"
 
