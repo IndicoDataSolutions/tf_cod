@@ -104,6 +104,7 @@ resource "helm_release" "ipa-pre-requisites" {
 
 
   values = [<<EOF
+
 secrets:
   rabbitmq:
     create: true
@@ -113,6 +114,8 @@ secrets:
 
 apiModels:
   enabled: ${var.restore_snapshot_enabled == true ? false : true}
+  nodeSelector:
+    node_group: static-workers
 
 external-dns:
   enabled: true
