@@ -99,7 +99,8 @@ resource "helm_release" "ipa-pre-requisites" {
   version          = var.ipa_pre_reqs_version
   wait             = true
   timeout          = "1800" # 30 minutes
-  cleanup_on_fail  = true
+  atomic           = true
+
 
   values = [<<EOF
 secrets:
