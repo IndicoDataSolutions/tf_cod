@@ -226,9 +226,11 @@ crunchy-postgres:
       - elnino
       - sunbow
       - doctor
+      - meteor
       name: indico
       options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   postgres-metrics:
+    enabled: false
     metadata:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
