@@ -97,7 +97,7 @@ resource "helm_release" "ipa-pre-requisites" {
   repository       = var.ipa_repo
   chart            = "ipa-pre-requisites"
   version          = var.ipa_pre_reqs_version
-  wait             = true
+  wait             = false
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
 
@@ -318,6 +318,11 @@ crunchy-postgres:
   ]
 }
 
+resource "time_sleep" "wait_10_minutes_after_pre_reqs" {
+  depends_on = [helm_release.ipa-pre-requisites]
+
+  create_duration = "10m"
+}
 
 data "github_repository" "argo-github-repo" {
   full_name = "IndicoDataSolutions/${var.argo_repo}"
@@ -411,6 +416,7 @@ resource "argocd_application" "ipa" {
   depends_on = [
     local_file.kubeconfig,
     helm_release.ipa-pre-requisites,
+    time_sleep.wait_10_minutes_after_pre_reqs,
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
     github_repository_file.argocd-application-yaml,

@@ -95,6 +95,9 @@ resource "helm_release" "monitoring" {
       prometheusSpec:
         nodeSelector:
           node_group: static-workers
+  prometheus-adapter:
+    prometheus:
+      path: "/prometheus"
 
  EOF
   ]
