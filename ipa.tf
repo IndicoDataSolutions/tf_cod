@@ -99,8 +99,10 @@ resource "helm_release" "ipa-pre-requisites" {
   version          = var.ipa_pre_reqs_version
   wait             = true
   timeout          = "1800" # 30 minutes
+  disable_webhooks = false
 
   values = [<<EOF
+
 secrets:
   rabbitmq:
     create: true
@@ -110,9 +112,17 @@ secrets:
 
 apiModels:
   enabled: ${var.restore_snapshot_enabled == true ? false : true}
+  nodeSelector:
+    node_group: static-workers
 
 external-dns:
   enabled: true
+  logLevel: debug
+  policy: sync
+  txtOwnerId: "${var.label}-${var.region}"
+  domainFilters:
+    - ${lower(var.aws_account)}.indico.io.
+
   provider: aws
   aws:
     zoneType: public
@@ -150,6 +160,7 @@ storage:
 crunchy-postgres:
   enabled: true
   postgres-data:
+    enabled: true
     metadata:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
@@ -230,7 +241,7 @@ crunchy-postgres:
       name: indico
       options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   postgres-metrics:
-    enabled: false
+    enabled: true
     metadata:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
@@ -367,6 +378,9 @@ spec:
               appDomains:
                 - "${local.dns_name}"
             
+            external-dns:
+              enabled: false
+
             secrets:
               ocr_license_key: <OCR_LICENSE_KEY>
 
