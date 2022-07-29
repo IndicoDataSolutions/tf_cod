@@ -98,6 +98,24 @@ resource "helm_release" "monitoring" {
   prometheus-adapter:
     prometheus:
       path: "/prometheus"
+    rules:
+      default: false
+      external:
+      - seriesQuery: '{__name__=~"rabbitmq_queue_messages"}'
+        seriesFilters: []
+        resources:
+          template: <<.Resource>>
+        name:
+          matches: ""
+          as: "rabbitmq_queue_depth"
+        metricsQuery: 'avg_over_time(rabbitmq_queue_messages{<<.LabelMatchers>>}[2m])'
+      - seriesQuery: '{__name__=~"rabbitmq_queue_messages"}'
+        resources:
+          template: <<.Resource>>
+        name:
+          matches: ""
+          as: "rabbitmq_queue_depth_2"
+        metricsQuery: 'avg_over_time(rabbitmq_queue_messages{<<.LabelMatchers>>}[2m])'
 
  EOF
   ]
