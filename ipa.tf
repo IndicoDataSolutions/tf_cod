@@ -42,7 +42,13 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
+data "aws_route53_zone" "aws-zone" {
+  name = lower("${var.region}.${var.aws_account}.indico.io")
+}
 
+output "ns" {
+  value = data.aws_route53_zone.aws-zone.name_servers
+}
 
 resource "helm_release" "ipa-crds" {
   depends_on = [
@@ -62,6 +68,8 @@ resource "helm_release" "ipa-crds" {
   crunchy-pgo:
     enabled: true
   cert-manager:
+    extraArgs:
+      - --acme-http01-solver-nameservers="ns-1474.awsdns-56.org:53"
     nodeSelector:
       kubernetes.io/os: linux
     webhook:
