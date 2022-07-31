@@ -43,7 +43,7 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 }
 
 data "aws_route53_zone" "aws-zone" {
-  name = lower("${var.region}.${var.aws_account}.indico.io.")
+  name = lower("${var.aws_account}.indico.io")
 }
 
 output "ns" {
