@@ -69,7 +69,7 @@ resource "helm_release" "ipa-crds" {
     enabled: true
   cert-manager:
     extraArgs:
-      - --acme-http01-solver-nameservers="ns-1474.awsdns-56.org:53"
+      - --acme-http01-solver-nameservers="${data.aws_route53_zone.aws-zone.name_servers[0]}:53"
     nodeSelector:
       kubernetes.io/os: linux
     webhook:
