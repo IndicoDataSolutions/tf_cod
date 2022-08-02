@@ -6,7 +6,7 @@ resource "aws_route53_record" "grafana-caa" {
   type    = "CAA"
   ttl     = 300
   records = [
-    "0 issue \"letsencrypt.org\""
+    "0 issue \"sectigo.com\""
   ]
 }
 
@@ -18,7 +18,7 @@ resource "aws_route53_record" "prometheus-caa" {
   type    = "CAA"
   ttl     = 300
   records = [
-    "0 issue \"letsencrypt.org\""
+    "0 issue \"sectigo.com\""
   ]
 }
 
@@ -30,7 +30,7 @@ resource "aws_route53_record" "alertmanager-caa" {
   type    = "CAA"
   ttl     = 300
   records = [
-    "0 issue \"letsencrypt.org\""
+    "0 issue \"sectigo.com\""
   ]
 }
 
