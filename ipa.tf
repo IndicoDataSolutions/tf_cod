@@ -127,7 +127,7 @@ secrets:
     zerossl:
       create: true
       eabEmail: devops-sa@indico.io
-      eabKid: "B0mfuwtyEs9sLtFJ3QSAKQ"
+      eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
      
 
