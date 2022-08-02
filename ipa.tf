@@ -42,7 +42,13 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
+data "aws_route53_zone" "aws-zone" {
+  name = lower("${var.aws_account}.indico.io")
+}
 
+output "ns" {
+  value = data.aws_route53_zone.aws-zone.name_servers
+}
 
 resource "helm_release" "ipa-crds" {
   depends_on = [
@@ -61,7 +67,13 @@ resource "helm_release" "ipa-crds" {
   values = [<<EOF
   crunchy-pgo:
     enabled: true
+  
   cert-manager:
+    extraArgs:
+      - --dns01-recursive-nameservers-only
+      - --dns01-recursive-nameservers='${data.aws_route53_zone.aws-zone.name_servers[0]}:53,${data.aws_route53_zone.aws-zone.name_servers[1]}:53,${data.aws_route53_zone.aws-zone.name_servers[2]}:53'
+      - --acme-http01-solver-nameservers='${data.aws_route53_zone.aws-zone.name_servers[0]}:53,${data.aws_route53_zone.aws-zone.name_servers[1]}:53,${data.aws_route53_zone.aws-zone.name_servers[2]}:53'
+     
     nodeSelector:
       kubernetes.io/os: linux
     webhook:
@@ -87,7 +99,8 @@ resource "helm_release" "ipa-pre-requisites" {
     time_sleep.wait_1_minutes_after_crds,
     module.cluster,
     module.fsx-storage,
-    helm_release.ipa-crds
+    helm_release.ipa-crds,
+    data.vault_kv_secret_v2.zerossl_data
   ]
 
   verify           = false
@@ -97,10 +110,12 @@ resource "helm_release" "ipa-pre-requisites" {
   repository       = var.ipa_repo
   chart            = "ipa-pre-requisites"
   version          = var.ipa_pre_reqs_version
-  wait             = true
+  wait             = false
   timeout          = "1800" # 30 minutes
+  disable_webhooks = false
 
   values = [<<EOF
+
 secrets:
   rabbitmq:
     create: true
@@ -108,11 +123,27 @@ secrets:
   general:
     create: true
 
+  clusterIssuer:
+    zerossl:
+      create: true
+      eabEmail: devops-sa@indico.io
+      eabKid: "B0mfuwtyEs9sLtFJ3QSAKQ"
+      eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
+     
+
 apiModels:
   enabled: ${var.restore_snapshot_enabled == true ? false : true}
+  nodeSelector:
+    node_group: static-workers
 
 external-dns:
   enabled: true
+  logLevel: debug
+  policy: sync
+  txtOwnerId: "${var.label}-${var.region}"
+  domainFilters:
+    - ${lower(var.aws_account)}.indico.io.
+
   provider: aws
   aws:
     zoneType: public
@@ -150,6 +181,7 @@ storage:
 crunchy-postgres:
   enabled: true
   postgres-data:
+    enabled: true
     metadata:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
@@ -226,9 +258,11 @@ crunchy-postgres:
       - elnino
       - sunbow
       - doctor
+      - meteor
       name: indico
       options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   postgres-metrics:
+    enabled: false
     metadata:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
@@ -305,6 +339,11 @@ crunchy-postgres:
   ]
 }
 
+resource "time_sleep" "wait_10_minutes_after_pre_reqs" {
+  depends_on = [helm_release.ipa-pre-requisites]
+
+  create_duration = "10m"
+}
 
 data "github_repository" "argo-github-repo" {
   full_name = "IndicoDataSolutions/${var.argo_repo}"
@@ -365,6 +404,9 @@ spec:
               appDomains:
                 - "${local.dns_name}"
             
+            external-dns:
+              enabled: false
+
             secrets:
               ocr_license_key: <OCR_LICENSE_KEY>
 
@@ -391,10 +433,21 @@ resource "local_file" "kubeconfig" {
 }
 
 
+data "vault_kv_secret_v2" "zerossl_data" {
+  mount = "tools/argo"
+  name  = "zerossl"
+}
+
+output "zerossl" {
+  sensitive = true
+  value     = data.vault_kv_secret_v2.zerossl_data.data_json
+}
+
 resource "argocd_application" "ipa" {
   depends_on = [
     local_file.kubeconfig,
     helm_release.ipa-pre-requisites,
+    time_sleep.wait_10_minutes_after_pre_reqs,
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
     github_repository_file.argocd-application-yaml,

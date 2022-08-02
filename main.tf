@@ -14,7 +14,7 @@ terraform {
     }
     argocd = {
       source  = "oboukili/argocd"
-      version = "3.0.1"
+      version = "3.1.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
@@ -37,7 +37,7 @@ terraform {
     }
     vault = {
       source  = "hashicorp/vault"
-      version = "3.6.0"
+      version = "3.8.0"
     }
   }
 }
@@ -295,7 +295,7 @@ module "argo-registration" {
     argocd     = argocd
   }
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.0.41"
+  version                      = "1.0.42"
   label                        = var.label
   region                       = var.region
   argo_password                = var.argo_password
