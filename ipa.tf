@@ -99,7 +99,8 @@ resource "helm_release" "ipa-pre-requisites" {
     time_sleep.wait_1_minutes_after_crds,
     module.cluster,
     module.fsx-storage,
-    helm_release.ipa-crds
+    helm_release.ipa-crds,
+    data.vault_kv_secret_v2.zerossl_data
   ]
 
   verify           = false
@@ -127,7 +128,7 @@ secrets:
       create: true
       eabEmail: devops-sa@indico.io
       eabKid: "B0mfuwtyEs9sLtFJ3QSAKQ"
-      eabHmacKey: ""
+      eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
      
 
 apiModels:
