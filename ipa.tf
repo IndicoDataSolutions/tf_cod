@@ -438,7 +438,8 @@ data "vault_kv_secret_v2" "zerossl_data" {
 }
 
 output "zerossl" {
-  value = data.vault_kv_secret_v2.zerossl_data.data_json
+  sensitive = true
+  value     = data.vault_kv_secret_v2.zerossl_data.data_json
 }
 
 resource "argocd_application" "ipa" {
