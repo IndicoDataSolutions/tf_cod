@@ -67,9 +67,13 @@ resource "helm_release" "ipa-crds" {
   values = [<<EOF
   crunchy-pgo:
     enabled: true
+  
   cert-manager:
     extraArgs:
-      - --acme-http01-solver-nameservers="${data.aws_route53_zone.aws-zone.name_servers[0]}:53"
+      - --dns01-recursive-nameservers-only
+      - --dns01-recursive-nameservers='${data.aws_route53_zone.aws-zone.name_servers[0]}:53,${data.aws_route53_zone.aws-zone.name_servers[1]}:53,${data.aws_route53_zone.aws-zone.name_servers[2]}:53'
+      - --acme-http01-solver-nameservers='${data.aws_route53_zone.aws-zone.name_servers[0]}:53,${data.aws_route53_zone.aws-zone.name_servers[1]}:53,${data.aws_route53_zone.aws-zone.name_servers[2]}:53'
+     
     nodeSelector:
       kubernetes.io/os: linux
     webhook:
@@ -117,6 +121,14 @@ secrets:
   
   general:
     create: true
+
+  clusterIssuer:
+    zerossl:
+      create: true
+      eabEmail: devops-sa@indico.io
+      eabKid: "B0mfuwtyEs9sLtFJ3QSAKQ"
+      eabHmacKey: ""
+     
 
 apiModels:
   enabled: ${var.restore_snapshot_enabled == true ? false : true}
@@ -419,6 +431,15 @@ resource "local_file" "kubeconfig" {
   filename = "${path.module}/module.kubeconfig"
 }
 
+
+data "vault_kv_secret_v2" "zerossl_data" {
+  mount = "tools/argo"
+  name  = "zerossl"
+}
+
+output "zerossl" {
+  value = data.vault_kv_secret_v2.data_json
+}
 
 resource "argocd_application" "ipa" {
   depends_on = [
