@@ -23,7 +23,8 @@ resource "aws_eks_identity_provider_config" "oidc-auth" {
 
 resource "null_resource" "enable-oidc" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    module.fsx-storage
   ]
 
   provisioner "local-exec" {
