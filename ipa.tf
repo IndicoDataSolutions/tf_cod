@@ -177,7 +177,6 @@ storage:
     parameters:
       securityGroupIds: ${local.security_group_id}
       subnetId: ${module.fsx-storage.fsx-rwx.subnet_ids[0]}
-metricsPostgresSecret: postgres-data-pguser-indico
 crunchy-postgres:
   enabled: true
   postgres-data:
