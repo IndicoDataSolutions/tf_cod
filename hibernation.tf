@@ -6,7 +6,7 @@ resource "aws_route53_record" "monitoring-caa" {
   type    = "CAA"
   ttl     = 300
   records = [
-    "0 issue \"letsencrypt.org\""
+    "0 issue \"sectigo.com\""
   ]
 }
 
@@ -204,7 +204,7 @@ spec:
                 ingress:
                   annotations:
                     kubernetes.io/ingress.class: "nginx"
-                    cert-manager.io/cluster-issuer: letsencrypt  
+                    cert-manager.io/cluster-issuer: zerossl  
                   hosts:
                     - ${lower("monitoring.${local.dns_name}")}
                   tls:
@@ -218,7 +218,7 @@ spec:
                 ingress:
                   annotations:
                     kubernetes.io/ingress.class: "nginx"
-                    cert-manager.io/cluster-issuer: letsencrypt
+                    cert-manager.io/cluster-issuer: zerossl
                   hosts:
                     - ${lower("monitoring.${local.dns_name}")}
                   tls:
@@ -229,7 +229,7 @@ spec:
                 ingress:
                   annotations:
                     kubernetes.io/ingress.class: "nginx"
-                    cert-manager.io/cluster-issuer: letsencrypt
+                    cert-manager.io/cluster-issuer: zerossl
                   hosts:
                     - ${lower("monitoring.${local.dns_name}")}
                   tls:

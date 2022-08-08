@@ -37,7 +37,7 @@ terraform {
     }
     vault = {
       source  = "hashicorp/vault"
-      version = "3.6.0"
+      version = "3.8.0"
     }
   }
 }
@@ -321,7 +321,7 @@ resource "aws_route53_record" "ipa-app-caa" {
   type    = "CAA"
   ttl     = 300
   records = [
-    "0 issue \"letsencrypt.org\""
+    "0 issue \"sectigo.com\""
   ]
 }
 
