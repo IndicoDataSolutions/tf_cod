@@ -230,6 +230,7 @@ module "cluster" {
   key_pair                   = aws_key_pair.kp.key_name
   snapshot_id                = var.snapshot_id
   default_tags               = var.default_tags
+  s3_data_bucket_name        = "indico-pgbackup-${var.label}"
 }
 
 resource "aws_security_group" "indico_allow_access" {
