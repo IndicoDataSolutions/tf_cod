@@ -403,58 +403,7 @@ spec:
             global:
               appDomains:
                 - "${local.dns_name}"
-            server:
-              services:
-                meteor:
-                  env:
-                    POSTGRES_HOST:
-                      valueFrom:
-                        secretKeyRef:
-                          name: postgres-data-pguser-indico
-                          key: host
-                          optional: false
-                    POSTGRES_PASSWORD:
-                      valueFrom:
-                        secretKeyRef:
-                          name: postgres-data-pguser-indico
-                          key: password
-                          optional: false
-                        external-dns:
-                          enabled: false
-            cronjob:
-              services:
-                kafka-connect-supervisor:
-                  env:
-                    POSTGRES_HOST:
-                      valueFrom:
-                        secretKeyRef:
-                          name: postgres-data-pguser-indico
-                          key: host
-                          optional: false
-                    POSTGRES_PASSWORD:
-                      valueFrom:
-                        secretKeyRef:
-                          name: postgres-data-pguser-indico
-                          key: password
-                          optional: false
-                meteor-refresh:
-                  env:
-                    POSTGRES_DB: meteor
-                    POSTGRES_HOST:
-                      valueFrom:
-                        secretKeyRef:
-                          name: postgres-data-pguser-indico
-                          key: host
-                          optional: false
-                    POSTGRES_PASSWORD:
-                      valueFrom:
-                        secretKeyRef:
-                          name: postgres-data-pguser-indico
-                          key: password
-                          optional: false
-            kafka-strimzi:
-                metrics:
-                  host: postgres-data-primary.default.svc
+            
             secrets:
               ocr_license_key: <OCR_LICENSE_KEY>
 
