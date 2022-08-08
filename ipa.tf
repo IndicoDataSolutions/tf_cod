@@ -69,10 +69,10 @@ resource "helm_release" "ipa-crds" {
     enabled: true
   
   cert-manager:
-    extraArgs:
-      - --dns01-recursive-nameservers-only
-      - --dns01-recursive-nameservers='${data.aws_route53_zone.aws-zone.name_servers[0]}:53,${data.aws_route53_zone.aws-zone.name_servers[1]}:53,${data.aws_route53_zone.aws-zone.name_servers[2]}:53'
-      - --acme-http01-solver-nameservers='${data.aws_route53_zone.aws-zone.name_servers[0]}:53,${data.aws_route53_zone.aws-zone.name_servers[1]}:53,${data.aws_route53_zone.aws-zone.name_servers[2]}:53'
+    #extraArgs:
+    #  - --dns01-recursive-nameservers-only
+    #  - --dns01-recursive-nameservers='${data.aws_route53_zone.aws-zone.name_servers[0]}:53,${data.aws_route53_zone.aws-zone.name_servers[1]}:53,${data.aws_route53_zone.aws-zone.name_servers[2]}:53'
+    #  - --acme-http01-solver-nameservers='${data.aws_route53_zone.aws-zone.name_servers[0]}:53,${data.aws_route53_zone.aws-zone.name_servers[1]}:53,${data.aws_route53_zone.aws-zone.name_servers[2]}:53'
      
     nodeSelector:
       kubernetes.io/os: linux
@@ -127,7 +127,7 @@ secrets:
     zerossl:
       create: true
       eabEmail: devops-sa@indico.io
-      eabKid: "B0mfuwtyEs9sLtFJ3QSAKQ"
+      eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
      
 
