@@ -67,13 +67,13 @@ node_groups = [
     desired_capacity = "3"
   },
   {
-    min_size         = 2
+    min_size         = 1
     max_size         = 4
     instance_types   = ["m5.large"]
     name             = "pgo-workers" # for pods that we want to autoscale
     type             = "cpu"
     spot             = false
-    desired_capacity = "2"
+    desired_capacity = "1"
     taints           = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
   }
 ]
