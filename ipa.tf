@@ -220,7 +220,7 @@ crunchy-postgres:
           requests:
             storage: 30Gi
       name: pgha1
-      replicas: 2
+      replicas: 1
       resources:
         requests:
           cpu: 500m
