@@ -177,7 +177,6 @@ storage:
     parameters:
       securityGroupIds: ${local.security_group_id}
       subnetId: ${module.fsx-storage.fsx-rwx.subnet_ids[0]}
-
 crunchy-postgres:
   enabled: true
   postgres-data:
@@ -221,7 +220,7 @@ crunchy-postgres:
           requests:
             storage: 30Gi
       name: pgha1
-      replicas: 2
+      replicas: 1
       resources:
         requests:
           cpu: 500m
@@ -404,9 +403,6 @@ spec:
               appDomains:
                 - "${local.dns_name}"
             
-            external-dns:
-              enabled: false
-
             secrets:
               ocr_license_key: <OCR_LICENSE_KEY>
 
