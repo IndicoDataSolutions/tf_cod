@@ -129,51 +129,7 @@ resource "kubernetes_job" "snapshot-restore-job" {
               }
             }
           }
-          env {
-            name = "METRICS_DB_NAME"
-            value_from {
-              secret_key_ref {
-                name = "postgres-metrics-pguser-indico"
-                key  = "dbname"
-              }
-            }
-          }
-          env {
-            name = "METRICS_DB_HOST"
-            value_from {
-              secret_key_ref {
-                name = "postgres-metrics-pguser-indico"
-                key  = "host"
-              }
-            }
-          }
-          env {
-            name = "METRICS_DB_PORT"
-            value_from {
-              secret_key_ref {
-                name = "postgres-metrics-pguser-indico"
-                key  = "port"
-              }
-            }
-          }
-          env {
-            name = "METRICS_DB_USER"
-            value_from {
-              secret_key_ref {
-                name = "postgres-metrics-pguser-indico"
-                key  = "user"
-              }
-            }
-          }
-          env {
-            name = "METRICS_DB_PASSWORD"
-            value_from {
-              secret_key_ref {
-                name = "postgres-metrics-pguser-indico"
-                key  = "password"
-              }
-            }
-          }
+
           volume_mount {
             name       = "root-nfs"
             mount_path = "/indicoapidata"
