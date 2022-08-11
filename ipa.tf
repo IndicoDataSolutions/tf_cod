@@ -391,8 +391,6 @@ spec:
     chart: ipa
     repoURL: ${var.ipa_repo}
     targetRevision: ${var.ipa_version}
-    directory:
-      recurse: false
     plugin:
       name: argocd-vault-plugin-helm-values-expand-no-build
       env:
@@ -459,11 +457,6 @@ resource "argocd_application" "ipa" {
       repo_url        = "https://github.com/IndicoDataSolutions/${var.argo_repo}.git"
       path            = var.argo_path
       target_revision = var.argo_branch
-
-      # don't go into sub-folders
-      directory {
-        recurse = false
-      }
     }
 
     sync_policy {
