@@ -530,7 +530,24 @@ spec:
     helm:
       releaseName: ${each.value.name}
       values: |
+        global:
+          appDomains:
+            - "${local.dns_name}"
+        
+        secrets:
+          ocr_license_key: <OCR_LICENSE_KEY>
+        rabbitmq:
+          enabled: true
+        configs:
+          allowed_origins: "ALLOW_ALL"
+          postgres:
+            app:
+              user: "indico"
+            metrics:
+              user: "indico"
+
         ${base64decode(each.value.values)}    
+
 EOT
 }
 
