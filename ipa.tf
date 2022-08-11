@@ -452,8 +452,6 @@ resource "argocd_application" "ipa" {
 
     project = module.argo-registration.argo_project_name
 
-
-
     source {
       plugin {
         name = "argocd-vault-plugin"
@@ -462,6 +460,7 @@ resource "argocd_application" "ipa" {
       path            = var.argo_path
       target_revision = var.argo_branch
 
+      # don't go into sub-folders
       directory {
         recurse = false
       }
