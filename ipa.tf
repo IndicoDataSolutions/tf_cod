@@ -391,6 +391,8 @@ spec:
     chart: ipa
     repoURL: ${var.ipa_repo}
     targetRevision: ${var.ipa_version}
+    directory:
+      recurse: false
     plugin:
       name: argocd-vault-plugin-helm-values-expand-no-build
       env:
