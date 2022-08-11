@@ -132,7 +132,7 @@ secrets:
      
 
 apiModels:
-  enabled: ${var.restore_snapshot_enabled == true ? false : true}
+  enabled: true
   nodeSelector:
     node_group: static-workers
 
