@@ -461,6 +461,7 @@ resource "argocd_application" "ipa" {
       repo_url        = "https://github.com/IndicoDataSolutions/${var.argo_repo}.git"
       path            = var.argo_path
       target_revision = var.argo_branch
+      recurse         = false
     }
 
     sync_policy {
