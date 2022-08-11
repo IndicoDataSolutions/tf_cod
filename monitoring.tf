@@ -56,7 +56,8 @@ resource "helm_release" "monitoring" {
     helm_release.ipa-pre-requisites,
     aws_route53_record.alertmanager-caa,
     aws_route53_record.grafana-caa,
-    aws_route53_record.prometheus-caa
+    aws_route53_record.prometheus-caa,
+    time_sleep.wait_10_minutes_after_pre_reqs
   ]
 
   verify           = false
