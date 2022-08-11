@@ -438,7 +438,7 @@ resource "argocd_application" "ipa" {
 
   count = var.ipa_enabled == true ? 1 : 0
 
-  wait = true
+  wait = false
 
   metadata {
     name      = lower("${var.aws_account}-${var.region}-${var.name}-deploy-ipa")
