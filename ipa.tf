@@ -382,7 +382,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
   source:
-    chart: cod-smoketest
+    chart: cod-smoketests
     repoURL: ${var.ipa_smoketest_repo}
     targetRevision: ${var.ipa_smoketest_version}
     helm:
