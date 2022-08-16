@@ -272,6 +272,8 @@ variable "argo_repo" {
   description = "Argo Github Repository containing the IPA Application"
 }
 
+
+
 variable "argo_branch" {
   description = "Branch to use on argo_repo"
 }
@@ -289,12 +291,23 @@ variable "argo_github_team_owner" {
 
 variable "ipa_repo" {
   type    = string
-  default = "https://harbor.devops.indico.io/chartrepo/indico-charts-dev"
+  default = "https://harbor.devops.indico.io/chartrepo/indico-charts"
 }
 
 variable "ipa_version" {
   type    = string
   default = "0.1.2"
+}
+
+
+variable "ipa_smoketest_repo" {
+  type    = string
+  default = "https://harbor.devops.indico.io/chartrepo/indico-charts"
+}
+
+variable "ipa_smoketest_version" {
+  type    = string
+  default = "latest"
 }
 
 variable "monitoring_version" {

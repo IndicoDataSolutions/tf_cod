@@ -98,8 +98,9 @@ locals {
     }
   }
 
-  argo_app_name     = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
-  argo_cluster_name = "${var.aws_account}.${var.region}.${var.label}"
+  argo_app_name           = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
+  argo_smoketest_app_name = lower("${var.aws_account}.${var.region}.${var.label}-smoketest")
+  argo_cluster_name       = "${var.aws_account}.${var.region}.${var.label}"
 }
 
 resource "tls_private_key" "pk" {
