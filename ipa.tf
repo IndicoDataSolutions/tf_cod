@@ -370,6 +370,7 @@ metadata:
     name: ${var.label}
   annotations:
     avp.kubernetes.io/path: tools/argo/data/ipa-deploy
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   destination:
     server: ${module.cluster.kubernetes_host}
