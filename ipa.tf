@@ -132,7 +132,7 @@ secrets:
      
 
 apiModels:
-  enabled: ${var.restore_snapshot_enabled == true ? false : true}
+  enabled: true
   nodeSelector:
     node_group: static-workers
 
@@ -399,25 +399,6 @@ spec:
 
         - name: HELM_VALUES
           value: |
-            global:
-              appDomains:
-                - "${local.dns_name}"
-            
-            secrets:
-              ocr_license_key: <OCR_LICENSE_KEY>
-
-            rabbitmq:
-              enabled: true
-
-            configs:
-              allowed_origins: "ALLOW_ALL"
-              postgres:
-                app:
-                  user: "indico"
-                metrics:
-                  user: "indico"
-
-                                    
             ${base64decode(var.ipa_values)}    
 EOT
 }
@@ -468,8 +449,6 @@ resource "argocd_application" "ipa" {
   spec {
 
     project = module.argo-registration.argo_project_name
-
-
 
     source {
       plugin {
@@ -552,6 +531,7 @@ spec:
       releaseName: ${each.value.name}
       values: |
         ${base64decode(each.value.values)}    
+
 EOT
 }
 
