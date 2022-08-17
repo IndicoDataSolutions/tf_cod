@@ -511,7 +511,8 @@ resource "argocd_application" "ipa" {
     }
 
     destination {
-      server    = "https://kubernetes.default.svc"
+      #server    = "https://kubernetes.default.svc"
+      name      = "in-cluster"
       namespace = "argo"
     }
   }
