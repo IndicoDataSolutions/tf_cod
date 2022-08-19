@@ -356,6 +356,12 @@ resource "github_repository_file" "smoketest-application-yaml" {
   commit_message      = var.message
   overwrite_on_create = true
 
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+
   content = <<EOT
 apiVersion: argoproj.io/v1alpha1
 kind: Application
