@@ -13,13 +13,15 @@ ipa_values = ""
 #label                = "dop-832" # will be used for resource naming. should be unique within the AWS account
 node_groups = [
   {
-    min_size         = 0
-    max_size         = 5
-    instance_types   = ["g4dn.xlarge"]
-    name             = "gpu-workers" # for gpu workloads
-    type             = "gpu"
-    spot             = false
-    desired_capacity = "0"
+    min_size               = 0
+    max_size               = 5
+    instance_types         = ["g4dn.xlarge"]
+    name                   = "gpu-workers" # for gpu workloads
+    type                   = "gpu"
+    spot                   = false
+    desired_capacity       = "0"
+    additional_node_labels = "group=gpu-enabled"
+    taints                 = "--register-with-taints=nvidia.com/gpu=true:NoSchedule"
   },
   {
     min_size         = 0
