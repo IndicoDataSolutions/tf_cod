@@ -389,7 +389,7 @@ spec:
       releaseName: smoketest
       values: |
         host: ${local.dns_name}
-        tests: "1,2,3,4,5"
+        tests: "1,2,3,4,5,6"
 EOT
 }
 
