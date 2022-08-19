@@ -70,7 +70,6 @@ node_groups = [
     type             = "cpu"
     spot             = false
     desired_capacity = "3"
-    taints           = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
   },
   {
     min_size         = 1
