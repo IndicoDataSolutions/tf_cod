@@ -31,6 +31,7 @@ node_groups = [
     type             = "cpu"
     spot             = true
     desired_capacity = "0"
+    taints           = "--register-with-taints=indico.io/celery=true:NoSchedule"
   },
   {
     min_size         = 1
@@ -49,6 +50,7 @@ node_groups = [
     type             = "cpu"
     spot             = false
     desired_capacity = "1"
+    taints           = "--register-with-taints=indico.io/pdfextraction=true:NoSchedule"
   },
   {
     min_size         = 0
@@ -58,6 +60,7 @@ node_groups = [
     type             = "cpu"
     spot             = false
     desired_capacity = "0"
+    taints           = "--register-with-taints=indico.io/highmem=true:NoSchedule"
   },
   {
     min_size         = 1
@@ -67,6 +70,7 @@ node_groups = [
     type             = "cpu"
     spot             = false
     desired_capacity = "3"
+    taints           = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
   },
   {
     min_size         = 1
