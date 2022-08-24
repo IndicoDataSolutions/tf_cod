@@ -307,7 +307,7 @@ variable "ipa_smoketest_repo" {
 
 variable "ipa_smoketest_version" {
   type    = string
-  default = "0.1.2"
+  default = "0.1.3"
 }
 
 variable "monitoring_version" {
