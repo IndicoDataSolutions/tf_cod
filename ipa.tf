@@ -559,6 +559,8 @@ metadata:
   name: ${lower("${var.aws_account}-${var.region}-${var.name}-${each.value.name}")} 
   finalizers:
     - resources-finalizer.argocd.argoproj.io
+  annotations:
+     avp.kubernetes.io/path: ${each.value.vaultpath}
   labels:
     app: ${each.value.name}
     region: ${var.region}
@@ -573,7 +575,7 @@ spec:
     automated:
       prune: true
     syncOptions:
-      - CreateNamespace=true
+      - CreateNamespace=${each.value.createnamespace}
   source:
     chart: ${each.value.chart}
     repoURL: ${each.value.repo}
