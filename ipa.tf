@@ -560,7 +560,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:
-     avp.kubernetes.io/path: ${each.value.vaultpath}
+     avp.kubernetes.io/path: ${each.value.vaultPath}
   labels:
     app: ${each.value.name}
     region: ${var.region}
@@ -575,7 +575,7 @@ spec:
     automated:
       prune: true
     syncOptions:
-      - CreateNamespace=${each.value.createnamespace}
+      - CreateNamespace=${each.value.createNamespace}
   source:
     chart: ${each.value.chart}
     repoURL: ${each.value.repo}
