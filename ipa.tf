@@ -559,8 +559,6 @@ metadata:
   name: ${lower("${var.aws_account}-${var.region}-${var.name}-${each.value.name}")} 
   finalizers:
     - resources-finalizer.argocd.argoproj.io
-  #annotations:
-  #   avp.kubernetes.io/path: ${each.value.vaultPath}
   labels:
     app: ${each.value.name}
     region: ${var.region}
