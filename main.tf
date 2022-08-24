@@ -266,14 +266,25 @@ provider "argocd" {
 provider "kubernetes" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  token                  = module.cluster.kubernetes_token
+  #token                  = module.cluster.kubernetes_token
+  exec {
+    api_version = "client.authentication.k8s.io/v1alpha1"
+    args        = ["eks", "get-token", "--cluster-name", var.label]
+    command     = "aws"
+  }
+
 }
 
 provider "kubectl" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  token                  = module.cluster.kubernetes_token
-  load_config_file       = false
+  #token                  = module.cluster.kubernetes_token
+  load_config_file = false
+  exec {
+    api_version = "client.authentication.k8s.io/v1alpha1"
+    args        = ["eks", "get-token", "--cluster-name", var.label]
+    command     = "aws"
+  }
 }
 
 
@@ -282,9 +293,13 @@ provider "helm" {
   kubernetes {
     host                   = module.cluster.kubernetes_host
     cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-    token                  = module.cluster.kubernetes_token
+    #token                  = module.cluster.kubernetes_token
+    exec {
+      api_version = "client.authentication.k8s.io/v1alpha1"
+      args        = ["eks", "get-token", "--cluster-name", var.label]
+      command     = "aws"
+    }
   }
-
 }
 
 module "argo-registration" {
