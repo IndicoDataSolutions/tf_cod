@@ -125,7 +125,7 @@ module "public_networking" {
 }
 
 module "sqs_sns" {
-  count   = var.sqs_sns == true ? 0 : 1
+  count   = var.sqs_sns == true ? 1 : 0
   source  = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
   version = "1.1.1"
   region  = var.region
