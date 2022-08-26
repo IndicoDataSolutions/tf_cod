@@ -387,10 +387,11 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
-  chart: cod-smoketests
-  repoURL: ${var.ipa_smoketest_repo}
-  targetRevision: ${var.ipa_smoketest_version}
+
   source:
+    chart: cod-smoketests
+    repoURL: ${var.ipa_smoketest_repo}
+    targetRevision: ${var.ipa_smoketest_version}
     plugin:
       name: argocd-vault-plugin-helm-values-expand-no-build
       env:
