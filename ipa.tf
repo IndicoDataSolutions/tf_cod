@@ -387,15 +387,23 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
+  chart: cod-smoketests
+  repoURL: ${var.ipa_smoketest_repo}
+  targetRevision: ${var.ipa_smoketest_version}
   source:
-    chart: cod-smoketests
-    repoURL: ${var.ipa_smoketest_repo}
-    targetRevision: ${var.ipa_smoketest_version}
-    helm:
-      releaseName: smoketest
-      values: |
-        host: ${local.dns_name}
-        tests: "1,2,3,4,5,6"
+    plugin:
+      name: argocd-vault-plugin-helm-values-expand-no-build
+      env:
+        - name: RELEASE_NAME
+          value: smoketest
+      
+        - name: HELM_VALUES
+          value: |
+            cluster:
+              name: ${var.label}
+              region: ${var.region}
+              account: ${var.aws_account}
+            host: ${local.dns_name}
 EOT
 }
 
