@@ -350,6 +350,8 @@ data "github_repository" "argo-github-repo" {
 
 
 resource "github_repository_file" "smoketest-application-yaml" {
+  count = var.ipa_smoketest_enabled == true ? 1 : 0
+
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
   file                = "${var.argo_path}/ipa_smoketest.yaml"
@@ -396,7 +398,7 @@ spec:
       name: argocd-vault-plugin-helm-values-expand-no-build
       env:
         - name: RELEASE_NAME
-          value: smoketest
+          value: run
       
         - name: HELM_VALUES
           value: |
@@ -405,6 +407,8 @@ spec:
               region: ${var.region}
               account: ${var.aws_account}
             host: ${local.dns_name}
+            slack:
+              channel: ${var.ipa_smoketest_slack_channel}
 EOT
 }
 

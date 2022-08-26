@@ -308,7 +308,17 @@ variable "ipa_smoketest_repo" {
 
 variable "ipa_smoketest_version" {
   type    = string
-  default = "0.1.3"
+  default = "0.1.4"
+}
+
+variable "ipa_smoketest_slack_channel" {
+  type    = string
+  default = "cod-smoketest-results"
+}
+
+variable "ipa_smoketest_enabled" {
+  type    = bool
+  default = true
 }
 
 variable "monitoring_version" {
