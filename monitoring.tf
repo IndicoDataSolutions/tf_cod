@@ -109,7 +109,7 @@ resource "helm_release" "keda-monitoring" {
     helm_release.monitoring
   ]
 
-  name             = "keda-monitoring"
+  name             = "keda"
   create_namespace = true
   namespace        = "default"
   repository       = "https://kedacore.github.io/charts"
@@ -119,8 +119,18 @@ resource "helm_release" "keda-monitoring" {
 
   values = [<<EOF
     crds:
-      install: false
-      
+      install: true
+    
+    podAnnotations:
+      keda:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8080"
+      metricsAdapter: 
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "9022"
+
     prometheus:
       metricServer:
         enabled: true
