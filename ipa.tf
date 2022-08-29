@@ -131,6 +131,34 @@ secrets:
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
      
 
+monitoring:
+  enabled: true
+  global:
+      host: "${local.dns_name}"
+    
+    ingress-nginx:
+      enabled: true
+
+      rbac:
+        create: true
+
+      admissionWebhooks:
+        patch:
+          nodeSelector.beta.kubernetes.io/os: linux
+    
+      defaultBackend:
+        nodeSelector.beta.kubernetes.io/os: linux
+    
+    authentication:
+      ingressUsername: monitoring
+      ingressPassword: ${random_password.monitoring-password.result}
+
+    kube-prometheus-stack:
+      prometheus:
+        prometheusSpec:
+          nodeSelector:
+            node_group: static-workers
+
 apiModels:
   enabled: true
   nodeSelector:

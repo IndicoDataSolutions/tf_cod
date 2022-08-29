@@ -49,6 +49,7 @@ output "monitoring-password" {
   value     = random_password.monitoring-password.result
 }
 
+/*
 resource "helm_release" "monitoring" {
   count = var.monitoring_enabled == true ? 1 : 0
   depends_on = [
@@ -100,4 +101,5 @@ resource "helm_release" "monitoring" {
  EOF
   ]
 }
+*/
 
