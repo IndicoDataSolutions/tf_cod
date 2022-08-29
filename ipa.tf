@@ -364,10 +364,10 @@ crunchy-postgres:
   ]
 }
 
-resource "time_sleep" "wait_10_minutes_after_pre_reqs" {
+resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
   depends_on = [helm_release.ipa-pre-requisites]
 
-  create_duration = "10m"
+  create_duration = "1m"
 }
 
 data "github_repository" "argo-github-repo" {
@@ -513,14 +513,15 @@ resource "argocd_application" "ipa" {
   depends_on = [
     local_file.kubeconfig,
     helm_release.ipa-pre-requisites,
-    time_sleep.wait_10_minutes_after_pre_reqs,
+    time_sleep.wait_1_minutes_after_pre_reqs,
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
     github_repository_file.argocd-application-yaml,
     github_repository_file.hibernation-autoscaler-yaml,
     github_repository_file.hibernation-exporter-yaml,
     github_repository_file.hibernation-prometheus-yaml,
-    github_repository_file.hibernation-secrets-yaml
+    github_repository_file.hibernation-secrets-yaml,
+    helm_release.monitoring
   ]
 
   count = var.ipa_enabled == true ? 1 : 0
