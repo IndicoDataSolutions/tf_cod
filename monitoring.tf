@@ -118,6 +118,9 @@ resource "helm_release" "keda-monitoring" {
 
 
   values = [<<EOF
+    crds:
+      install: false
+      
     prometheus:
       metricServer:
         enabled: true
