@@ -49,7 +49,7 @@ output "monitoring-password" {
   value     = random_password.monitoring-password.result
 }
 
-/*
+
 resource "helm_release" "monitoring" {
   count = var.monitoring_enabled == true ? 1 : 0
   depends_on = [
@@ -101,5 +101,34 @@ resource "helm_release" "monitoring" {
  EOF
   ]
 }
-*/
+
+resource "helm_release" "keda-monitoring" {
+  count = var.monitoring_enabled == true ? 1 : 0
+  depends_on = [
+    module.cluster,
+    helm_release.monitoring
+  ]
+
+  name             = "keda"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://kedacore.github.io/charts"
+  chart            = "keda"
+  version          = "2.8.1"
+
+
+  values = [<<EOF
+    prometheus:
+      metricServer:
+        enabled: true
+        podMonitor:
+          enabled: true
+      operator:
+        enabled: true
+        podMonitor:
+          enabled: true
+ EOF
+  ]
+}
+
 
