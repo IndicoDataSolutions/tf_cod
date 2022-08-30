@@ -114,7 +114,7 @@ resource "helm_release" "keda-monitoring" {
   namespace        = "default"
   repository       = "https://kedacore.github.io/charts"
   chart            = "keda"
-  version          = "2.8.1"
+  version          = var.keda_version
 
 
   values = [<<EOF

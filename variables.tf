@@ -419,3 +419,7 @@ variable "hibernation_enabled" {
   type    = bool
   default = false
 }
+
+variable "keda_version" {
+  default = "2.8.1"
+}
