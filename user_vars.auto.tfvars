@@ -91,10 +91,9 @@ default_tags = {
   "indico/cluster"     = "dop-832",    #This should match the label variable
   "indico/environment" = "dev"         # Choices are dev , stage , prod
 }
-user_ip               = "" # set this to the external IP address if deployment server has no outbound access; else, leave as empty string or remove
-cluster_node_policies = ["AWSWAFReadOnlyAccess", "CloudWatchLogsFullAccess", "AmazonSQSFullAccess", "AmazonSNSFullAccess"]
-submission_expiry     = 30 # days
-uploads_expiry        = 30 # days
+user_ip           = "" # set this to the external IP address if deployment server has no outbound access; else, leave as empty string or remove
+submission_expiry = 30 # days
+uploads_expiry    = 30 # days
 #RDS Stuff
 deletion_protection_enabled = false
 skip_final_snapshot         = true
