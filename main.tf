@@ -213,7 +213,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "6.7.1"
+  version                    = "6.7.2"
   label                      = var.label
   additional_tags            = var.additional_tags
   map_roles                  = [{ rolearn = module.cluster-manager.cluster_manager_iam_role_arn, username = "admin", groups = ["system:masters"] }]
@@ -232,6 +232,7 @@ module "cluster" {
   snapshot_id                = var.snapshot_id
   default_tags               = var.default_tags
   s3_data_bucket_name        = "indico-pgbackup-${var.label}"
+  sqs_sns                    = var.sqs_sns
 }
 
 resource "aws_security_group" "indico_allow_access" {
