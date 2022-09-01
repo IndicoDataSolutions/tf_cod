@@ -233,6 +233,7 @@ module "cluster" {
   default_tags               = var.default_tags
   s3_data_bucket_name        = "indico-pgbackup-${var.label}"
   sqs_sns                    = var.sqs_sns
+  cluster_version            = var.cluster_version
 }
 
 resource "aws_security_group" "indico_allow_access" {
