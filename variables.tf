@@ -321,6 +321,16 @@ variable "ipa_smoketest_enabled" {
   default = true
 }
 
+variable "ipa_smoketest_cronjob_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "ipa_smoketest_cronjob_schedule" {
+  type    = string
+  default = "0 0 * * *" # every night at midnight
+}
+
 variable "monitoring_version" {
   type    = string
   default = "0.0.1"

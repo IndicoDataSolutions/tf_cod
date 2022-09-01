@@ -428,6 +428,9 @@ spec:
       
         - name: HELM_VALUES
           value: |
+            cronjob:
+              enabled: ${var.ipa_smoketest_cronjob_enabled}
+              schedule: "${var.ipa_smoketest_cronjob_schedule}"
             cluster:
               name: ${var.label}
               region: ${var.region}
