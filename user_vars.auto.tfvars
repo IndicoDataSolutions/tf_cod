@@ -11,7 +11,7 @@ ipa_values = ""
 #name                 = "dop-832"
 #cluster_name         = "dop-832"
 #label                = "dop-832" # will be used for resource naming. should be unique within the AWS account
-cluster_version = "1.23"
+cluster_version = "1.20"
 node_groups = [
   {
     min_size               = 0
