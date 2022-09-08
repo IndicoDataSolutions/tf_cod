@@ -152,6 +152,12 @@ variable "cluster_name" {
   description = "Name of the EKS cluster"
 }
 
+variable "cluster_version" {
+  type        = string
+  default     = "1.20"
+  description = "The EKS version to use"
+}
+
 variable "node_groups" {
 }
 

@@ -97,6 +97,18 @@ resource "helm_release" "monitoring" {
       prometheusSpec:
         nodeSelector:
           node_group: static-workers
+  tempo:
+    tempo:
+      backend:
+        s3:
+          bucket: indico-pgbackup-${var.name}
+          endpoint: s3.${var.region}.amazonaws.com
+      storage:
+        trace:
+          backend: s3
+          s3:
+            bucket: indico-pgbackup-${var.name}
+            endpoint: s3.${var.region}.amazonaws.com
 
  EOF
   ]
