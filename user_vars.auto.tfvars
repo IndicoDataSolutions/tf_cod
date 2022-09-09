@@ -65,12 +65,13 @@ node_groups = [
   },
   {
     min_size         = 1
-    max_size         = 9
-    instance_types   = ["t2.medium"]
+    max_size         = 4
+    instance_types   = ["m5.large"]
     name             = "monitoring-workers" # for autoscaling pods that have high memory demands.
     type             = "cpu"
     spot             = false
-    desired_capacity = "3"
+    desired_capacity = "1"
+    taints           = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
   },
   {
     min_size         = 1
