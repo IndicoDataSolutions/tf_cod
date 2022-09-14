@@ -69,6 +69,7 @@ resource "helm_release" "monitoring" {
   chart            = "monitoring"
   version          = var.monitoring_version
   wait             = false
+  max_history      = "1"
   timeout          = "900" # 15 minutes
 
   values = [<<EOF
