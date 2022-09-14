@@ -24,7 +24,8 @@ variable "applications" {
     version         = string
     values          = string,
     namespace       = string,
-    createNamespace = bool
+    createNamespace = bool,
+    vaultPath       = string
   }))
   default = {}
 }
@@ -151,6 +152,12 @@ variable "cluster_name" {
   description = "Name of the EKS cluster"
 }
 
+variable "cluster_version" {
+  type        = string
+  default     = "1.20"
+  description = "The EKS version to use"
+}
+
 variable "node_groups" {
 }
 
@@ -272,6 +279,8 @@ variable "argo_repo" {
   description = "Argo Github Repository containing the IPA Application"
 }
 
+
+
 variable "argo_branch" {
   description = "Branch to use on argo_repo"
 }
@@ -289,12 +298,43 @@ variable "argo_github_team_owner" {
 
 variable "ipa_repo" {
   type    = string
-  default = "https://harbor.devops.indico.io/chartrepo/indico-charts-dev"
+  default = "https://harbor.devops.indico.io/chartrepo/indico-charts"
 }
 
 variable "ipa_version" {
   type    = string
   default = "0.1.2"
+}
+
+
+variable "ipa_smoketest_repo" {
+  type    = string
+  default = "https://harbor.devops.indico.io/chartrepo/indico-charts"
+}
+
+variable "ipa_smoketest_version" {
+  type    = string
+  default = "0.1.8"
+}
+
+variable "ipa_smoketest_slack_channel" {
+  type    = string
+  default = "cod-smoketest-results"
+}
+
+variable "ipa_smoketest_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "ipa_smoketest_cronjob_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "ipa_smoketest_cronjob_schedule" {
+  type    = string
+  default = "0 0 * * *" # every night at midnight
 }
 
 variable "monitoring_version" {
@@ -394,4 +434,8 @@ variable "monitoring_enabled" {
 variable "hibernation_enabled" {
   type    = bool
   default = false
+}
+
+variable "keda_version" {
+  default = "2.8.1"
 }

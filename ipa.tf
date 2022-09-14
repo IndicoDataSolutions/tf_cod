@@ -115,7 +115,6 @@ resource "helm_release" "ipa-pre-requisites" {
   disable_webhooks = false
 
   values = [<<EOF
-
 secrets:
   rabbitmq:
     create: true
@@ -130,6 +129,33 @@ secrets:
       eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
      
+monitoring:
+  enabled: true
+  global:
+      host: "${local.dns_name}"
+    
+  ingress-nginx:
+    enabled: true
+
+    rbac:
+      create: true
+
+    admissionWebhooks:
+      patch:
+        nodeSelector.beta.kubernetes.io/os: linux
+  
+    defaultBackend:
+      nodeSelector.beta.kubernetes.io/os: linux
+  
+  authentication:
+    ingressUsername: monitoring
+    ingressPassword: ${random_password.monitoring-password.result}
+
+  kube-prometheus-stack:
+    prometheus:
+      prometheusSpec:
+        nodeSelector:
+          node_group: static-workers
 
 apiModels:
   enabled: true
@@ -338,14 +364,81 @@ crunchy-postgres:
   ]
 }
 
-resource "time_sleep" "wait_10_minutes_after_pre_reqs" {
+resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
   depends_on = [helm_release.ipa-pre-requisites]
 
-  create_duration = "10m"
+  create_duration = "1m"
 }
 
 data "github_repository" "argo-github-repo" {
   full_name = "IndicoDataSolutions/${var.argo_repo}"
+}
+
+
+resource "github_repository_file" "smoketest-application-yaml" {
+  count = var.ipa_smoketest_enabled == true ? 1 : 0
+
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/ipa_smoketest.yaml"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+
+  content = <<EOT
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ${local.argo_smoketest_app_name}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app: cod
+    region: ${var.region}
+    account: ${var.aws_account}
+    name: ${var.label}
+  annotations:
+    avp.kubernetes.io/path: tools/argo/data/ipa-deploy
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  destination:
+    server: ${module.cluster.kubernetes_host}
+    namespace: default
+  project: ${module.argo-registration.argo_project_name}
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
+
+  source:
+    chart: cod-smoketests
+    repoURL: ${var.ipa_smoketest_repo}
+    targetRevision: ${var.ipa_smoketest_version}
+    plugin:
+      name: argocd-vault-plugin-helm-values-expand-no-build
+      env:
+        - name: RELEASE_NAME
+          value: run
+      
+        - name: HELM_VALUES
+          value: |
+            cronjob:
+              enabled: ${var.ipa_smoketest_cronjob_enabled}
+              schedule: "${var.ipa_smoketest_cronjob_schedule}"
+            cluster:
+              name: ${var.label}
+              region: ${var.region}
+              account: ${var.aws_account}
+            host: ${local.dns_name}
+            slack:
+              channel: ${var.ipa_smoketest_slack_channel}
+EOT
 }
 
 resource "github_repository_file" "argocd-application-yaml" {
@@ -355,13 +448,11 @@ resource "github_repository_file" "argocd-application-yaml" {
   commit_message      = var.message
   overwrite_on_create = true
 
-  #TODO:
-  # this allows people to make edits to the file so we don't overwrite it.
-  #lifecycle {
-  #  ignore_changes = [
-  #    content
-  #  ]
-  #}
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
 
   content = <<EOT
 apiVersion: argoproj.io/v1alpha1
@@ -377,6 +468,7 @@ metadata:
     name: ${var.label}
   annotations:
     avp.kubernetes.io/path: tools/argo/data/ipa-deploy
+    argocd.argoproj.io/sync-wave: "-2"
 spec:
   destination:
     server: ${module.cluster.kubernetes_host}
@@ -424,14 +516,15 @@ resource "argocd_application" "ipa" {
   depends_on = [
     local_file.kubeconfig,
     helm_release.ipa-pre-requisites,
-    time_sleep.wait_10_minutes_after_pre_reqs,
+    time_sleep.wait_1_minutes_after_pre_reqs,
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
     github_repository_file.argocd-application-yaml,
     github_repository_file.hibernation-autoscaler-yaml,
     github_repository_file.hibernation-exporter-yaml,
     github_repository_file.hibernation-prometheus-yaml,
-    github_repository_file.hibernation-secrets-yaml
+    github_repository_file.hibernation-secrets-yaml,
+    helm_release.monitoring
   ]
 
   count = var.ipa_enabled == true ? 1 : 0
@@ -468,7 +561,8 @@ resource "argocd_application" "ipa" {
     }
 
     destination {
-      server    = "https://kubernetes.default.svc"
+      #server    = "https://kubernetes.default.svc"
+      name      = "in-cluster"
       namespace = "argo"
     }
   }
@@ -508,6 +602,8 @@ metadata:
   name: ${lower("${var.aws_account}-${var.region}-${var.name}-${each.value.name}")} 
   finalizers:
     - resources-finalizer.argocd.argoproj.io
+  annotations:
+     avp.kubernetes.io/path: ${each.value.vaultPath}
   labels:
     app: ${each.value.name}
     region: ${var.region}
@@ -522,7 +618,7 @@ spec:
     automated:
       prune: true
     syncOptions:
-      - CreateNamespace=true
+      - CreateNamespace=${each.value.createNamespace}
   source:
     chart: ${each.value.chart}
     repoURL: ${each.value.repo}

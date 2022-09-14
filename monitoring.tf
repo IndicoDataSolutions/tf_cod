@@ -49,6 +49,7 @@ output "monitoring-password" {
   value     = random_password.monitoring-password.result
 }
 
+
 resource "helm_release" "monitoring" {
   count = var.monitoring_enabled == true ? 1 : 0
   depends_on = [
@@ -57,7 +58,7 @@ resource "helm_release" "monitoring" {
     aws_route53_record.alertmanager-caa,
     aws_route53_record.grafana-caa,
     aws_route53_record.prometheus-caa,
-    time_sleep.wait_10_minutes_after_pre_reqs
+    time_sleep.wait_1_minutes_after_pre_reqs
   ]
 
   verify           = false
@@ -96,8 +97,63 @@ resource "helm_release" "monitoring" {
       prometheusSpec:
         nodeSelector:
           node_group: static-workers
+  tempo:
+    tempo:
+      backend:
+        s3:
+          bucket: indico-pgbackup-${var.name}
+          endpoint: s3.${var.region}.amazonaws.com
+      storage:
+        trace:
+          backend: s3
+          s3:
+            bucket: indico-pgbackup-${var.name}
+            endpoint: s3.${var.region}.amazonaws.com
 
  EOF
   ]
 }
+
+resource "helm_release" "keda-monitoring" {
+  count = var.monitoring_enabled == true ? 1 : 0
+  depends_on = [
+    module.cluster,
+    helm_release.monitoring
+  ]
+
+  name             = "keda"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://kedacore.github.io/charts"
+  chart            = "keda"
+  version          = var.keda_version
+
+
+  values = [<<EOF
+    crds:
+      install: true
+    
+    podAnnotations:
+      keda:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8080"
+      metricsAdapter: 
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "9022"
+
+    prometheus:
+      metricServer:
+        enabled: true
+        podMonitor:
+          enabled: true
+      operator:
+        enabled: true
+        podMonitor:
+          enabled: true
+ EOF
+  ]
+}
+
 

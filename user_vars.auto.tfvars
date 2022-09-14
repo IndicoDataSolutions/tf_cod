@@ -11,15 +11,18 @@ ipa_values = ""
 #name                 = "dop-832"
 #cluster_name         = "dop-832"
 #label                = "dop-832" # will be used for resource naming. should be unique within the AWS account
+cluster_version = "1.20"
 node_groups = [
   {
-    min_size         = 0
-    max_size         = 5
-    instance_types   = ["g4dn.xlarge"]
-    name             = "gpu-workers" # for gpu workloads
-    type             = "gpu"
-    spot             = false
-    desired_capacity = "0"
+    min_size               = 0
+    max_size               = 5
+    instance_types         = ["g4dn.xlarge"]
+    name                   = "gpu-workers" # for gpu workloads
+    type                   = "gpu"
+    spot                   = false
+    desired_capacity       = "0"
+    additional_node_labels = "group=gpu-enabled"
+    taints                 = "--register-with-taints=nvidia.com/gpu=true:NoSchedule"
   },
   {
     min_size         = 0
@@ -29,6 +32,7 @@ node_groups = [
     type             = "cpu"
     spot             = true
     desired_capacity = "0"
+    taints           = "--register-with-taints=indico.io/celery=true:NoSchedule"
   },
   {
     min_size         = 1
@@ -47,6 +51,7 @@ node_groups = [
     type             = "cpu"
     spot             = false
     desired_capacity = "1"
+    taints           = "--register-with-taints=indico.io/pdfextraction=true:NoSchedule"
   },
   {
     min_size         = 0
@@ -56,15 +61,17 @@ node_groups = [
     type             = "cpu"
     spot             = false
     desired_capacity = "0"
+    taints           = "--register-with-taints=indico.io/highmem=true:NoSchedule"
   },
   {
     min_size         = 1
-    max_size         = 9
-    instance_types   = ["t2.medium"]
+    max_size         = 4
+    instance_types   = ["m5.large"]
     name             = "monitoring-workers" # for autoscaling pods that have high memory demands.
     type             = "cpu"
     spot             = false
-    desired_capacity = "3"
+    desired_capacity = "1"
+    taints           = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
   },
   {
     min_size         = 1
@@ -86,8 +93,7 @@ default_tags = {
   "indico/cluster"     = "dop-832",    #This should match the label variable
   "indico/environment" = "dev"         # Choices are dev , stage , prod
 }
-user_ip = "" # set this to the external IP address if deployment server has no outbound access; else, leave as empty string or remove
-#cluster_node_policies = ["AWSWAFReadOnlyAccess", "CloudWatchLogsFullAccess", "AmazonSQSFullAccess", "AmazonSNSFullAccess"]
+user_ip           = "" # set this to the external IP address if deployment server has no outbound access; else, leave as empty string or remove
 submission_expiry = 30 # days
 uploads_expiry    = 30 # days
 #RDS Stuff
