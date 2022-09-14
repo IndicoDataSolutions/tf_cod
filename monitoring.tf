@@ -69,7 +69,6 @@ resource "helm_release" "monitoring" {
   chart            = "monitoring"
   version          = var.monitoring_version
   wait             = false
-  max_history      = "1"
   timeout          = "900" # 15 minutes
 
   values = [<<EOF
@@ -157,4 +156,53 @@ resource "helm_release" "keda-monitoring" {
   ]
 }
 
+resource "helm_release" "opentelemetry-collector" {
+  count = var.monitoring_enabled == true ? 1 : 0
+  depends_on = [
+    module.cluster,
+    helm_release.monitoring
+  ]
+
+  name             = "opentelemetry-collector"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
+  chart            = "opentelemetry-collector"
+  version          = var.opentelemetry-collector_version
+
+
+  values = [<<EOF
+    enabled: true
+    mode: deployment
+    tolerations:
+    - effect: NoSchedule
+      key: indico.io/monitoring
+      operator: Exists
+    nodeSelector:
+      node_group: monitoring-workers
+    ports:
+      jaeger-compact:
+        enabled: false
+      jaeger-thrift:
+        enabled: false
+      jaeger-grpc:
+        enabled: false
+      zipkin:
+        enabled: false
+
+    config:
+      receivers:
+        jaeger: null
+        prometheus: null
+        zipkin: null
+      service:
+        pipelines:
+          traces:
+            receivers:
+              - otlp
+          metrics: null
+          logs: null
+ EOF
+  ]
+}
 
