@@ -197,11 +197,10 @@ resource "helm_release" "opentelemetry-collector" {
             thrift_compact:
         prometheus: null
         zipkin: null
-      processors:
-        batch:
       exporters:
         otlp:
           endpoint: monitoring-tempo.monitoring.svc:3100
+          insecure: true
       service:
         pipelines:
           traces:
