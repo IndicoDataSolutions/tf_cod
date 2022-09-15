@@ -200,7 +200,8 @@ resource "helm_release" "opentelemetry-collector" {
       exporters:
         otlp:
           endpoint: monitoring-tempo.monitoring.svc:3100
-          insecure: true
+          tls:
+            insecure: true
       service:
         pipelines:
           traces:
