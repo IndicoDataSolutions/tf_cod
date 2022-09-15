@@ -192,13 +192,24 @@ resource "helm_release" "opentelemetry-collector" {
 
     config:
       receivers:
-        jaeger: null
+        jaeger: 
+          protocols:
+            thrift_compact:
         prometheus: null
         zipkin: null
+      processors:
+        batch:
+      exporters:
+        otlp:
+          endpoint: monitoring-tempo.monitoring.svc:3100
       service:
         pipelines:
           traces:
             receivers:
+              - jaeger
+            processors:
+              - batch
+            exporters:
               - otlp
           metrics: null
           logs: null
