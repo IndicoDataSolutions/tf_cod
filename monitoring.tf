@@ -198,7 +198,7 @@ resource "helm_release" "opentelemetry-collector" {
         zipkin: null
       exporters:
         otlp:
-          endpoint: monitoring-tempo.monitoring.svc:3100
+          endpoint: monitoring-tempo.monitoring.svc:4317
           tls:
             insecure: true
       service:
