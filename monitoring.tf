@@ -173,6 +173,7 @@ resource "helm_release" "opentelemetry-collector" {
 
   values = [<<EOF
     enabled: true
+    fullnameOverride: "collector-collector"
     mode: deployment
     tolerations:
     - effect: NoSchedule
@@ -192,9 +193,7 @@ resource "helm_release" "opentelemetry-collector" {
 
     config:
       receivers:
-        jaeger: 
-          protocols:
-            thrift_compact:
+        jaeger: null
         prometheus: null
         zipkin: null
       exporters:
@@ -206,7 +205,7 @@ resource "helm_release" "opentelemetry-collector" {
         pipelines:
           traces:
             receivers:
-              - jaeger
+              - otlp
             processors:
               - batch
             exporters:
