@@ -97,18 +97,6 @@ resource "helm_release" "monitoring" {
       prometheusSpec:
         nodeSelector:
           node_group: static-workers
-  tempo:
-    tempo:
-      backend:
-        s3:
-          bucket: indico-pgbackup-${var.name}
-          endpoint: s3.${var.region}.amazonaws.com
-      storage:
-        trace:
-          backend: s3
-          s3:
-            bucket: indico-pgbackup-${var.name}
-            endpoint: s3.${var.region}.amazonaws.com
 
  EOF
   ]
@@ -156,4 +144,63 @@ resource "helm_release" "keda-monitoring" {
   ]
 }
 
+resource "helm_release" "opentelemetry-collector" {
+  count = var.monitoring_enabled == true ? 1 : 0
+  depends_on = [
+    module.cluster,
+    helm_release.monitoring
+  ]
+
+  name             = "opentelemetry-collector"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
+  chart            = "opentelemetry-collector"
+  version          = var.opentelemetry-collector_version
+
+
+  values = [<<EOF
+    enabled: true
+    fullnameOverride: "collector-collector"
+    mode: deployment
+    tolerations:
+    - effect: NoSchedule
+      key: indico.io/monitoring
+      operator: Exists
+    nodeSelector:
+      node_group: monitoring-workers
+    ports:
+      jaeger-compact:
+        enabled: false
+      jaeger-thrift:
+        enabled: false
+      jaeger-grpc:
+        enabled: false
+      zipkin:
+        enabled: false
+
+    config:
+      receivers:
+        jaeger: null
+        prometheus: null
+        zipkin: null
+      exporters:
+        otlp:
+          endpoint: monitoring-tempo.monitoring.svc:4317
+          tls:
+            insecure: true
+      service:
+        pipelines:
+          traces:
+            receivers:
+              - otlp
+            processors:
+              - batch
+            exporters:
+              - otlp
+          metrics: null
+          logs: null
+ EOF
+  ]
+}
 
