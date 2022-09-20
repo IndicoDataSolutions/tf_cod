@@ -312,6 +312,11 @@ variable "ipa_smoketest_repo" {
   default = "https://harbor.devops.indico.io/chartrepo/indico-charts"
 }
 
+variable "ipa_smoketest_container_tag" {
+  type    = string
+  default = "IPA-5.4-e1c5af3d"
+}
+
 variable "ipa_smoketest_version" {
   type    = string
   default = "0.1.8"

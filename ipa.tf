@@ -428,6 +428,8 @@ spec:
       
         - name: HELM_VALUES
           value: |
+            image:
+              tag: ${var.ipa_smoketest_container_tag}
             cronjob:
               enabled: ${var.ipa_smoketest_cronjob_enabled}
               schedule: "${var.ipa_smoketest_cronjob_schedule}"
