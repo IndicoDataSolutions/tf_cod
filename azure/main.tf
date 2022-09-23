@@ -76,7 +76,7 @@ module "cluster-manager" {
   version             = "2.0.7"
   label               = var.label
   subnet_id           = module.networking.subnet_id
-  public_key_path     = tls_private_key.pk.public_key_openssh
+  public_key          = tls_private_key.pk.public_key_openssh
   region              = var.region
   vm_size             = var.cluster_manager_vm_size
   external_ip         = var.external_ip
