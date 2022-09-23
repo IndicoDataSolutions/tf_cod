@@ -34,7 +34,7 @@ provider "random" {}
 
 locals {
   resource_group_name = "${var.label}-${var.region}"
-  public_key_path = "${path.module}/key.pub"
+  public_key_path = abspath("key.pub")
 }
 
 resource "tls_private_key" "pk" {
