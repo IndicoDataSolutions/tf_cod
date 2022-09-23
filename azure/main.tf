@@ -72,6 +72,9 @@ module "asq_eventgrid" {
 */
 
 module "cluster-manager" {
+  depends_on = [
+    azurerm_resource_group.cod-cluster
+  ]
   source              = "app.terraform.io/indico/indico-azure-cluster-manager/mod"
   version             = "2.0.7"
   label               = var.label
@@ -92,6 +95,9 @@ module "key_vault_key" {
 }*/
 
 module "blob-storage" {
+  depends_on = [
+    azurerm_resource_group.cod-cluster
+  ]
   source               = "app.terraform.io/indico/indico-azure-blob/mod"
   version              = "0.0.8"
   label                = var.label
@@ -109,6 +115,9 @@ module "security-group" {
 }*/
 
 module "file-storage" {
+  depends_on = [
+    azurerm_resource_group.cod-cluster
+  ]
   source               = "app.terraform.io/indico/indico-azure-file-shares/mod"
   version              = "1.0.0"
   label                = "${var.label}-dcm"
@@ -121,6 +130,9 @@ module "file-storage" {
 }
 
 module "cluster" {
+  depends_on = [
+    azurerm_resource_group.cod-cluster
+  ]
   source                  = "app.terraform.io/indico/indico-azure-cluster/mod"
   version                 = "2.0.7"
   label                   = var.label
