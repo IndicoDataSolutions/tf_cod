@@ -124,7 +124,7 @@ module "cluster" {
   source                  = "app.terraform.io/indico/indico-azure-cluster/mod"
   version                 = "2.0.7"
   label                   = var.label
-  public_key_path         = tls_private_key.pk.public_key_openssh
+  public_key              = tls_private_key.pk.public_key_openssh
   region                  = var.region
   svp_client_id           = var.svp_client_id
   svp_client_secret       = var.svp_client_secret
