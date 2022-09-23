@@ -42,7 +42,7 @@ locals {
 
 resource "azurerm_resource_group" "cod-cluster" {
   name     = local.resource_group_name
-  location = var.regionf
+  location = var.region
 }
 
 module "networking" {
@@ -94,6 +94,7 @@ module "blob-storage" {
   submission_expiry    = var.submission_expiry
   uploads_expiry       = var.uploads_expiry
   include_rox          = var.include_rox
+  resource_group_name  = local.resource_group_name
 }
 
 /*
