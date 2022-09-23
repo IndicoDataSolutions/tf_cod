@@ -1,24 +1,4 @@
 # top level variable declarations
-variable "subscription_id" {
-  type        = string
-  description = "Azure subscription ID is a GUID that identifies your subscription and underlying services"
-}
-
-variable "tenant_id" {
-  type        = string
-  description = "Tenant ID is the unique identifier of the Azure Active Directory instance"
-}
-
-variable "client_id" {
-  type        = string
-  description = "Client ID is the unique identifier of an application created in Active Directory"
-}
-
-variable "client_secret" {
-  type        = string
-  description = "Client secret is the secret that comes with the client ID"
-}
-
 variable "label" {
   type        = string
   default     = "indico"
