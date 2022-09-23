@@ -122,7 +122,7 @@ module "file-storage" {
   version              = "1.0.0"
   label                = "${var.label}-dcm"
   region               = var.region
-  storage_account_name = "${var.label}-file"
+  storage_account_name = "${var.label}file"
   vnet_cidr            = var.vnet_cidr
   external_ip          = var.external_ip
   subnet_id            = module.networking.subnet_id
