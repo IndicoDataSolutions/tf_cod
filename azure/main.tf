@@ -88,7 +88,7 @@ module "key_vault_key" {
 
 module "blob-storage" {
   source               = "app.terraform.io/indico/indico-azure-blob/mod"
-  version              = "0.0.6"
+  version              = "0.0.7"
   force_destroy        = true # allows terraform to destroy non-empty buckets.
   label                = var.label
   region               = var.region
