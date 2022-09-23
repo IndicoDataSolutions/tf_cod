@@ -91,6 +91,7 @@ module "blob-storage" {
   version              = "0.0.1"
   force_destroy        = true # allows terraform to destroy non-empty buckets.
   label                = var.label
+  region               = var.region
   resource_group_name  = local.resource_group_name
 }
 
