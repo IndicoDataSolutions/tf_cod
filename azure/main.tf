@@ -37,7 +37,7 @@ provider "github" {
 provider "random" {}
 
 locals {
-  reource_group_name = "${var.label}-${var.region}"
+  resource_group_name = "${var.label}-${var.region}"
 }
 
 resource "azurerm_resource_group" "cod-cluster" {
