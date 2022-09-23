@@ -15,6 +15,8 @@ provider "azurerm" {
   features {}
 }
 
+provider "http" {}
+
 provider "time" {}
 
 provider "vault" {
@@ -29,6 +31,11 @@ provider "vault" {
   }
 }
 
+data "http" "workstation-external-ip" {
+  url = "http://ipv4.icanhazip.com"
+}
+
+
 provider "github" {
   token = var.git_pat
   owner = "IndicoDataSolutions"
@@ -38,6 +45,7 @@ provider "local" {}
 
 locals {
   resource_group_name = "${var.label}-${var.region}"
+  current_ip = "${chomp(data.http.workstation-external-ip.body)}"
 }
 
 resource "tls_private_key" "pk" {
@@ -99,9 +107,11 @@ module "blob-storage" {
     azurerm_resource_group.cod-cluster
   ]
   source               = "app.terraform.io/indico/indico-azure-blob/mod"
-  version              = "0.0.11"
+  version              = "0.0.12"
   label                = var.label
   region               = var.region
+  current_ip           = local.current_ip
+  external_ip          = var.external_ip
   resource_group_name  = local.resource_group_name
 }
 
@@ -119,11 +129,12 @@ module "file-storage" {
     azurerm_resource_group.cod-cluster
   ]
   source               = "app.terraform.io/indico/indico-azure-file-shares/mod"
-  version              = "2.0.0"
+  version              = "2.0.1"
   label                = "${var.label}-dcm"
   region               = var.region
   storage_account_name = "${var.label}file"
   vnet_cidr            = var.vnet_cidr
+  current_ip           = local.current_ip
   external_ip          = var.external_ip
   subnet_id            = module.networking.subnet_id
   resource_group_name  = local.resource_group_name
