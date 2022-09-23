@@ -45,11 +45,6 @@ resource "tls_private_key" "pk" {
   rsa_bits  = 4096
 }
 
-resource "local_file" "public-key" {
-  content = tls_private_key.pk.public_key_openssh
-  filename = "pub.key"
-}
-
 resource "azurerm_resource_group" "cod-cluster" {
   name     = local.resource_group_name
   location = var.region
@@ -78,10 +73,10 @@ module "asq_eventgrid" {
 
 module "cluster-manager" {
   source              = "app.terraform.io/indico/indico-azure-cluster-manager/mod"
-  version             = "2.0.6"
+  version             = "2.0.7"
   label               = var.label
   subnet_id           = module.networking.subnet_id
-  public_key_path     = abspath("pub.key")
+  public_key_path     = tls_private_key.pk.public_key_openssh
   region              = var.region
   vm_size             = var.cluster_manager_vm_size
   external_ip         = var.external_ip
@@ -127,9 +122,9 @@ module "file-storage" {
 
 module "cluster" {
   source                  = "app.terraform.io/indico/indico-azure-cluster/mod"
-  version                 = "2.0.6"
+  version                 = "2.0.7"
   label                   = var.label
-  public_key_path         = abspath("pub.key")
+  public_key_path         = tls_private_key.pk.public_key_openssh
   region                  = var.region
   svp_client_id           = var.svp_client_id
   svp_client_secret       = var.svp_client_secret
