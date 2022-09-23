@@ -112,6 +112,7 @@ module "blob-storage" {
   region               = var.region
   current_ip           = local.current_ip
   external_ip          = var.external_ip
+  subnet_id            = module.networking.subnet_id
   resource_group_name  = local.resource_group_name
 }
 
