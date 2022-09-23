@@ -47,7 +47,7 @@ resource "tls_private_key" "pk" {
 
 resource "local_file" "public-key" {
   content = tls_private_key.pk.public_key_openssh
-  filepath = "pub.key"
+  filename = "pub.key"
 }
 
 resource "azurerm_resource_group" "cod-cluster" {
