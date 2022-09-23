@@ -53,12 +53,6 @@ variable "cluster_manager_vm_size" {
   description = "The cluster manager instance size"
 }
 
-variable "public_key_path" {
-  type        = string
-  description = "The path of a public key with which to connect to the cluster manager instance"
-}
-
-
 ### cluster variables
 variable "private_cluster_enabled" {
   type        = bool

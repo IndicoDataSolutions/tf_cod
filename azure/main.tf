@@ -34,6 +34,17 @@ provider "random" {}
 
 locals {
   resource_group_name = "${var.label}-${var.region}"
+  public_key_path = "${path.module}/key.pub"
+}
+
+resource "tls_private_key" "pk" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "local_file" "public_key" {
+    sensitive_content  = tls_private_key.pk.public_key_openssh
+    filename = local.public_key_path
 }
 
 resource "azurerm_resource_group" "cod-cluster" {
@@ -67,7 +78,7 @@ module "cluster-manager" {
   version             = "1.0.0"
   label               = var.label
   subnet_id           = module.networking.subnet_id
-  public_key_path     = var.public_key_path
+  public_key_path     = local.public_key_path
   region              = var.region
   vm_size             = var.cluster_manager_vm_size
   external_ip         = var.external_ip
@@ -115,7 +126,7 @@ module "cluster" {
   source                  = "app.terraform.io/indico/indico-azure-cluster/mod"
   version                 = "1.1.0"
   label                   = var.label
-  public_key_path         = var.public_key_path
+  public_key_path         = local.public_key_path
   region                  = var.region
   svp_client_id           = var.svp_client_id
   svp_client_secret       = var.svp_client_secret
