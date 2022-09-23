@@ -73,7 +73,7 @@ module "asq_eventgrid" {
 
 module "cluster-manager" {
   source              = "app.terraform.io/indico/indico-azure-cluster-manager/mod"
-  version             = "2.0.1"
+  version             = "2.0.2"
   label               = var.label
   subnet_id           = module.networking.subnet_id
   public_key          = tls_private_key.pk.public_key_openssh
@@ -122,7 +122,7 @@ module "file-storage" {
 
 module "cluster" {
   source                  = "app.terraform.io/indico/indico-azure-cluster/mod"
-  version                 = "2.0.1"
+  version                 = "2.0.2"
   label                   = var.label
   public_key              = tls_private_key.pk.public_key_openssh
   region                  = var.region
