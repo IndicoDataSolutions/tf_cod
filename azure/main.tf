@@ -78,7 +78,7 @@ module "asq_eventgrid" {
 
 module "cluster-manager" {
   source              = "app.terraform.io/indico/indico-azure-cluster-manager/mod"
-  version             = "2.0.5"
+  version             = "2.0.6"
   label               = var.label
   subnet_id           = module.networking.subnet_id
   public_key_path     = abspath("pub.key")
