@@ -107,7 +107,7 @@ module "blob-storage" {
     azurerm_resource_group.cod-cluster
   ]
   source               = "app.terraform.io/indico/indico-azure-blob/mod"
-  version              = "0.0.13"
+  version              = "0.0.14"
   label                = var.label
   region               = var.region
   current_ip           = local.current_ip
