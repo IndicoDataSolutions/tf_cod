@@ -1,7 +1,6 @@
 # fill out this file with desired values and reference it 
 
 label                   = "example-label"
-resource_group_name     = "indico-data"
 region                  = "eastus"
 vnet_cidr               = "192.168.0.0/20"
 subnet_cidrs            = ["192.168.0.0/22"]

@@ -66,7 +66,7 @@ module "networking" {
   vnet_cidr            = var.vnet_cidr
   subnet_cidrs         = var.subnet_cidrs
   database_subnet_cidr = var.database_subnet_cidr
-  resource_group_name  = var.resource_group_name
+  resource_group_name  = local.resource_group_name
 }
 
 /*
@@ -107,7 +107,7 @@ module "blob-storage" {
     azurerm_resource_group.cod-cluster
   ]
   source               = "app.terraform.io/indico/indico-azure-blob/mod"
-  version              = "0.0.14"
+  version              = "0.0.15"
   label                = var.label
   region               = var.region
   current_ip           = local.current_ip

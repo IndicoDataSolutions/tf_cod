@@ -5,12 +5,6 @@ variable "label" {
   description = "The unique string to be prepended to resources names"
 }
 
-variable "resource_group_name" {
-  type        = string
-  default     = "indico-data"
-  description = "The name of the resource group to which all indico components will belong"
-}
-
 variable "region" {
   type        = string
   default     = "eastus"
