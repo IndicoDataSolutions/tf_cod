@@ -65,7 +65,6 @@ module "networking" {
   app_subnet_name      = "${var.label}-subnet" # remove me
   vnet_cidr            = var.vnet_cidr
   subnet_cidrs         = var.subnet_cidrs
-  database_subnet_cidr = var.database_subnet_cidr
   resource_group_name  = local.resource_group_name
   current_ip           = local.current_ip
 }
