@@ -62,11 +62,9 @@ module "networking" {
   source               = "app.terraform.io/indico/indico-azure-network/mod"
   version              = "3.0.4"
   label                = var.label
-  app_subnet_name      = "${var.label}-subnet" # remove me
   vnet_cidr            = var.vnet_cidr
   subnet_cidrs         = var.subnet_cidrs
   resource_group_name  = local.resource_group_name
-  current_ip           = local.current_ip
 }
 
 /*
