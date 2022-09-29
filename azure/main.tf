@@ -45,7 +45,7 @@ provider "local" {}
 
 locals {
   resource_group_name = "${var.label}-${var.region}"
-  current_ip = "${chomp(data.http.workstation-external-ip.response_body)}"
+  current_ip = "${chomp(data.http.workstation-external-ip.response_body)}/20"
 }
 
 resource "tls_private_key" "pk" {
