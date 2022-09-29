@@ -45,7 +45,7 @@ provider "local" {}
 
 locals {
   resource_group_name = "${var.label}-${var.region}"
-  current_ip = "${chomp(data.http.workstation-external-ip.body)}"
+  current_ip = "${chomp(data.http.workstation-external-ip.response_body)}"
 }
 
 resource "tls_private_key" "pk" {
@@ -60,7 +60,7 @@ resource "azurerm_resource_group" "cod-cluster" {
 
 module "networking" {
   source               = "app.terraform.io/indico/indico-azure-network/mod"
-  version              = "3.0.2"
+  version              = "3.0.3"
   label                = var.label
   app_subnet_name      = "${var.label}-subnet" # remove me
   vnet_cidr            = var.vnet_cidr
