@@ -127,7 +127,7 @@ module "file-storage" {
     azurerm_resource_group.cod-cluster
   ]
   source               = "app.terraform.io/indico/indico-azure-file-shares/mod"
-  version              = "2.0.2"
+  version              = "2.0.3"
   label                = "${var.label}-dcm"
   region               = var.region
   storage_account_name = "${var.label}file"
