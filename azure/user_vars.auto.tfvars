@@ -7,7 +7,6 @@ subnet_cidrs            = ["192.168.0.0/22"]
 database_subnet_cidr    = ["192.168.4.0/26"]
 storage_account_name    = "indicodatatest"
 cluster_manager_vm_size = "Standard_F2s"
-public_key_path         = "./example_key.pub"
 private_cluster_enabled = true
 
 default_node_pool = {
