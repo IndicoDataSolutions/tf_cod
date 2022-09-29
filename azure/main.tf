@@ -107,12 +107,9 @@ module "blob-storage" {
     azurerm_resource_group.cod-cluster
   ]
   source               = "app.terraform.io/indico/indico-azure-blob/mod"
-  version              = "0.0.18"
+  version              = "0.0.19"
   label                = var.label
   region               = var.region
-  current_ip           = local.current_ip
-  external_ip          = var.external_ip
-  subnet_id            = module.networking.subnet_id
   resource_group_name  = local.resource_group_name
 }
 
@@ -130,14 +127,11 @@ module "file-storage" {
     azurerm_resource_group.cod-cluster
   ]
   source               = "app.terraform.io/indico/indico-azure-file-shares/mod"
-  version              = "2.0.1"
+  version              = "2.0.2"
   label                = "${var.label}-dcm"
   region               = var.region
   storage_account_name = "${var.label}file"
   vnet_cidr            = var.vnet_cidr
-  current_ip           = local.current_ip
-  external_ip          = var.external_ip
-  subnet_id            = module.networking.subnet_id
   resource_group_name  = local.resource_group_name
 }
 
