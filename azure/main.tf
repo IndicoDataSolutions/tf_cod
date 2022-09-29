@@ -60,7 +60,7 @@ resource "azurerm_resource_group" "cod-cluster" {
 
 module "networking" {
   source               = "app.terraform.io/indico/indico-azure-network/mod"
-  version              = "3.0.3"
+  version              = "3.0.4"
   label                = var.label
   app_subnet_name      = "${var.label}-subnet" # remove me
   vnet_cidr            = var.vnet_cidr
