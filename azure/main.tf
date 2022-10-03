@@ -100,12 +100,12 @@ module "key_vault_key" {
   additional_tags = var.additional_tags
 }*/
 
-module "blob-storage" {
+module "storage" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
   source               = "app.terraform.io/indico/indico-azure-blob/mod"
-  version              = "0.0.27"
+  version              = "0.0.29"
   label                = var.label
   region               = var.region
   resource_group_name  = local.resource_group_name
@@ -119,19 +119,6 @@ module "security-group" {
   vpc_cidr = var.vpc_cidr
   vpc_id   = local.network[0].indico_vpc_id
 }*/
-
-module "file-storage" {
-  depends_on = [
-    azurerm_resource_group.cod-cluster
-  ]
-  source               = "app.terraform.io/indico/indico-azure-file-shares/mod"
-  version              = "2.0.3"
-  label                = "${var.label}-dcm"
-  region               = var.region
-  storage_account_name = "${var.label}file"
-  vnet_cidr            = var.vnet_cidr
-  resource_group_name  = local.resource_group_name
-}
 
 module "cluster" {
   depends_on = [
