@@ -59,6 +59,9 @@ resource "azurerm_resource_group" "cod-cluster" {
 }
 
 module "networking" {
+  depends_on = [
+    azurerm_resource_group.cod-cluster
+  ]
   source               = "app.terraform.io/indico/indico-azure-network/mod"
   version              = "3.0.5"
   label                = var.label
