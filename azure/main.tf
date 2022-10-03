@@ -60,7 +60,7 @@ resource "azurerm_resource_group" "cod-cluster" {
 
 module "networking" {
   source               = "app.terraform.io/indico/indico-azure-network/mod"
-  version              = "3.0.4"
+  version              = "3.0.5"
   label                = var.label
   vnet_cidr            = var.vnet_cidr
   subnet_cidrs         = var.subnet_cidrs
