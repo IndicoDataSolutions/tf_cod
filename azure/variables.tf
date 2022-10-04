@@ -5,6 +5,12 @@ variable "label" {
   description = "The unique string to be prepended to resources names"
 }
 
+variable "message" {
+  type        = string
+  default     = "Managed by Terraform"
+  description = "The commit message for updates"
+}
+
 variable "region" {
   type        = string
   default     = "eastus"
@@ -38,6 +44,11 @@ variable "storage_account_name" {
   type        = string
   default     = "indicodatatest"
   description = "Name of the indico storage account"
+}
+
+variable "vault_address" {
+  type    = string
+  default = "https://vault.devops.indico.io"
 }
 
 variable "argo_host" {
@@ -169,4 +180,17 @@ variable "additional_node_pools" {
     cluster_auto_scaling_min_count = number
     cluster_auto_scaling_max_count = number
   }))
+}
+
+variable "applications" {
+  type = map(object({
+    name            = string
+    repo            = string
+    chart           = string
+    version         = string
+    values          = string,
+    namespace       = string,
+    createNamespace = bool
+  }))
+  default = {}
 }

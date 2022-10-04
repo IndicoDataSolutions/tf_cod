@@ -68,7 +68,7 @@ provider "kubernetes" {
   username               = module.cluster.kubernetes_username
   password               = module.cluster.kubernetes_password
   client_certificate     = module.cluster.kubernetes_client_certificate
-  client_key             = module.cluster.kubernetes.client_key
+  client_key             = module.cluster.kubernetes_client_key
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
 }
 
@@ -77,7 +77,7 @@ provider "kubectl" {
   username               = module.cluster.kubernetes_username
   password               = module.cluster.kubernetes_password
   client_certificate     = module.cluster.kubernetes_client_certificate
-  client_key             = module.cluster.kubernetes.client_key
+  client_key             = module.cluster.kubernetes_client_key
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
   load_config_file       = false
 }
@@ -90,7 +90,7 @@ provider "helm" {
     username               = module.cluster.kubernetes_username
     password               = module.cluster.kubernetes_password
     client_certificate     = module.cluster.kubernetes_client_certificate
-    client_key             = module.cluster.kubernetes.client_key
+    client_key             = module.cluster.kubernetes_client_key
     cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
   }
 
@@ -120,6 +120,9 @@ provider "local" {}
 locals {
   resource_group_name = "${var.label}-${var.region}"
   current_ip = "${chomp(data.http.workstation-external-ip.response_body)}/20"
+
+  argo_app_name     = lower("azure.${var.region}.${var.label}-ipa")
+  argo_cluster_name = "azure.${var.region}.${var.label}"
 }
 
 resource "tls_private_key" "pk" {
