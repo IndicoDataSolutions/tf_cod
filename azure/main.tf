@@ -57,7 +57,7 @@ provider "kubernetes" {
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
 }
 
-provider "kubernetes" {
+provider "kubectl" {
   host                   = module.cluster.kubernetes_host
   username               = module.cluster.kubernetes_username
   password               = module.cluster.kubernetes_password
