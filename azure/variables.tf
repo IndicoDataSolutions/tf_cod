@@ -195,9 +195,20 @@ variable "applications" {
   default = {}
 }
 
-
 variable "harbor_pull_secret_b64" {
   sensitive   = true
   type        = string
   description = "Harbor pull secret from Vault"
+}
+
+variable "restore_snapshot_enabled" {
+  default     = false
+  type        = bool
+  description = "Flag for restoring cluster from snapshot"
+}
+
+variable "restore_snapshot_name" {
+  type        = string
+  default     = ""
+  description = "Name of snapshot in account's s3 bucket"
 }
