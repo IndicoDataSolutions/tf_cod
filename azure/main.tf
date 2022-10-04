@@ -119,10 +119,12 @@ provider "local" {}
 
 locals {
   resource_group_name = "${var.label}-${var.region}"
-  current_ip = "${chomp(data.http.workstation-external-ip.response_body)}/20"
+  current_ip          = "${chomp(data.http.workstation-external-ip.response_body)}/20"
 
-  argo_app_name     = lower("azure.${var.region}.${var.label}-ipa")
-  argo_cluster_name = "azure.${var.region}.${var.label}"
+  argo_app_name       = lower("azure.${var.region}.${var.label}-ipa")
+  argo_cluster_name   = "azure.${var.region}.${var.label}"
+
+  cluster_name        = var.label
 }
 
 resource "tls_private_key" "pk" {
