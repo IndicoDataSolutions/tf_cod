@@ -8,6 +8,21 @@ terraform {
       source  = "hashicorp/local"
       version = "=2.2.3"
     }
+    argocd = {
+      source  = "oboukili/argocd"
+      version = "3.1.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.12.1"
+    }
+    kubectl = {
+      source = "gavinbunney/kubectl"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">= 2.6.0"
+    }
   }
 }
 
