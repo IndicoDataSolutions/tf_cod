@@ -164,16 +164,16 @@ storage:
     csi:
       driver: fsx.csi.aws.com
       volumeAttributes:
-        dnsname: ${module.fsx-storage.fsx-rwx.dns_name} TODO
-        mountname: ${module.fsx-storage.fsx-rwx.mount_name} TODO
-      volumeHandle: ${module.fsx-storage.fsx-rwx.id} TODO
+        dnsname: $#{module.fsx-storage.fsx-rwx.dns_name} TODO
+        mountname: $#{module.fsx-storage.fsx-rwx.mount_name} TODO
+      volumeHandle: $#{module.fsx-storage.fsx-rwx.id} TODO
   indicoStorageClass:
     enabled: true
     name: indico-sc
     provisioner: fsx.csi.aws.com TODO
     parameters:
-      securityGroupIds: ${local.security_group_id} TODO
-      subnetId: ${module.fsx-storage.fsx-rwx.subnet_ids[0]} TODO
+      securityGroupIds: $#{local.security_group_id} TODO
+      subnetId: $#{module.fsx-storage.fsx-rwx.subnet_ids[0]} TODO
 crunchy-postgres:
   enabled: true
   postgres-data:
@@ -231,12 +231,12 @@ crunchy-postgres:
         repo1-path: /pgbackrest/postgres-data/repo1
         repo1-retention-full: '5'
         repo1-s3-key-type: auto
-        repo1-s3-kms-key-id: "${module.kms_key.key_arn}" TODO
-        repo1-s3-role: ${module.cluster.s3_role_id} TODO
+        repo1-s3-kms-key-id: "$#{module.kms_key.key_arn}" TODO
+        repo1-s3-role: $#{module.cluster.s3_role_id} TODO
       repos:
       - name: repo1
         s3:
-          bucket: ${module.s3-storage.pgbackup_s3_bucket_name} TODO
+          bucket: $#{module.s3-storage.pgbackup_s3_bucket_name} TODO
           endpoint: s3.${var.region}.amazonaws.com TODO
           region: ${var.region} TODO
         schedules:
@@ -312,12 +312,12 @@ crunchy-postgres:
         repo1-path: /pgbackrest/postgres-metrics/repo1
         repo1-retention-full: '5'
         repo1-s3-key-type: auto
-        repo1-s3-kms-key-id: "${module.kms_key.key_arn}" TODO
-        repo1-s3-role: ${module.cluster.s3_role_id} TODO
+        repo1-s3-kms-key-id: "$#{module.kms_key.key_arn}" TODO
+        repo1-s3-role: $#{module.cluster.s3_role_id} TODO
       repos:
       - name: repo1
         s3: TODO
-          bucket: ${module.s3-storage.pgbackup_s3_bucket_name} TODO
+          bucket: $#{module.s3-storage.pgbackup_s3_bucket_name} TODO
           endpoint: s3.${var.region}.amazonaws.com TODO
           region: ${var.region} TODO
         schedules:
