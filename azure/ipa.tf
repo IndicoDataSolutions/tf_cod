@@ -68,8 +68,8 @@ resource "helm_release" "ipa-crds" {
   cert-manager:
     #extraArgs:
     #  - --dns01-recursive-nameservers-only
-    #  - --dns01-recursive-nameservers='${data.azurerm_dns_zone.azure_zone.name_servers[0]}:53,${data.azurerm_dns_zone.azure_zone.name_servers[1]}:53,${dataazurerm_dns_zone.azure_zone.name_servers[2]}:53'
-    #  - --acme-http01-solver-nameservers='${data.azurerm_dns_zone.azure_zone.name_servers[0]}:53,${data.azurerm_dns_zone.azure_zone.name_servers[1]}:53,${data.azurerm_dns_zone.azure_zone.name_servers[2]}:53'
+    #  - --dns01-recursive-nameservers='$#{data.azurerm_dns_zone.azure_zone.name_servers[0]}:53,$#{data.azurerm_dns_zone.azure_zone.name_servers[1]}:53,$#{dataazurerm_dns_zone.azure_zone.name_servers[2]}:53'
+    #  - --acme-http01-solver-nameservers='$#{data.azurerm_dns_zone.azure_zone.name_servers[0]}:53,$#{data.azurerm_dns_zone.azure_zone.name_servers[1]}:53,$#{data.azurerm_dns_zone.azure_zone.name_servers[2]}:53'
      
     nodeSelector:
       kubernetes.io/os: linux
@@ -508,7 +508,7 @@ metadata:
   labels:
     app: ${each.value.name}
     region: ${var.region}
-    account: ${var.aws_account}
+    account: azure
     name: ${var.label}
 spec:
   destination:

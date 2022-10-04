@@ -194,3 +194,10 @@ variable "applications" {
   }))
   default = {}
 }
+
+
+variable "harbor_pull_secret_b64" {
+  sensitive   = true
+  type        = string
+  description = "Harbor pull secret from Vault"
+}
