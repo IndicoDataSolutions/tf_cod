@@ -1,5 +1,5 @@
 
-resource "aws_route53_record" "monitoring-caa" {
+resource "azurerm_dns_a_record" "monitoring-caa" {
   count   = var.hibernation_enabled == true ? 1 : 0
   zone_id = data.azurerm_dns_zone.primary.id
   name    = lower("monitoring.${local.dns_name}")
