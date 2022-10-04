@@ -11,10 +11,16 @@ variable "region" {
   description = "The Azure region in which to launch the indico stack"
 }
 
+variable "git_pat" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
 variable "external_ip" {
   type        = string
   default     = "35.174.218.89"
-  description = "The external IP which is allowed to connect to the cluster through ssh"
+  description = "The external IP which is allowed to connect to the cluster through ssh (AWS SSO VPN)"
 }
 
 variable "vnet_cidr" {

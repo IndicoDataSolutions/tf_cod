@@ -41,6 +41,65 @@ provider "github" {
   owner = "IndicoDataSolutions"
 }
 
+# argo 
+provider "argocd" {
+  server_addr = var.argo_host
+  username    = var.argo_username
+  password    = var.argo_password
+}
+
+provider "kubernetes" {
+  host                   = module.cluster.kubernetes_host
+  username               = module.cluster.kubernetes_username
+  password               = module.cluster.kubernetes_password
+  client_certificate     = module.cluster.kubernetes_client_certificate
+  client_key             = module.cluster.kubernetes.client_key
+  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+}
+
+provider "kubernetes" {
+  host                   = module.cluster.kubernetes_host
+  username               = module.cluster.kubernetes_username
+  password               = module.cluster.kubernetes_password
+  client_certificate     = module.cluster.kubernetes_client_certificate
+  client_key             = module.cluster.kubernetes.client_key
+  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+  load_config_file       = false
+}
+
+
+provider "helm" {
+  debug = true
+  kubernetes {
+    host                   = module.cluster.kubernetes_host
+    username               = module.cluster.kubernetes_username
+    password               = module.cluster.kubernetes_password
+    client_certificate     = module.cluster.kubernetes_client_certificate
+    client_key             = module.cluster.kubernetes.client_key
+    cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+  }
+
+}
+
+module "argo-registration" {
+  depends_on = [
+    module.cluster
+  ]
+
+  providers = {
+    kubernetes = kubernetes,
+    argocd     = argocd
+  }
+  source                       = "app.terraform.io/indico/indico-argo-registration/mod"
+  version                      = "1.0.42"
+  label                        = var.label
+  region                       = var.region
+  argo_password                = var.argo_password
+  argo_username                = var.argo_username
+  aws_account                  = "azure"
+  argo_github_team_admin_group = var.argo_github_team_owner
+}
+
 provider "local" {}
 
 locals {
