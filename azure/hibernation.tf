@@ -62,7 +62,7 @@ resource "github_repository_file" "hibernation-autoscaler-yaml" {
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${lower("azure-${var.region}-${var.name}-hibernation-autoscaler")}
+  name: ${lower("azure-${var.region}-${var.label}-hibernation-autoscaler")}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
@@ -132,7 +132,7 @@ resource "github_repository_file" "hibernation-exporter-yaml" {
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${lower("azure-${var.region}-${var.name}-hibernation-exporter")}
+  name: ${lower("azure-${var.region}-${var.label}-hibernation-exporter")}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
@@ -173,7 +173,7 @@ resource "github_repository_file" "hibernation-prometheus-yaml" {
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${lower("azure-${var.region}-${var.name}-hibernation-prometheus")}
+  name: ${lower("azure-${var.region}-${var.label}-hibernation-prometheus")}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
@@ -263,7 +263,7 @@ resource "github_repository_file" "hibernation-secrets-yaml" {
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${lower("azure-${var.region}-${var.name}-hibernation-secrets")}
+  name: ${lower("azure-${var.region}-${var.label}-hibernation-secrets")}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:

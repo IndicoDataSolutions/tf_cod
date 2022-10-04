@@ -212,3 +212,8 @@ variable "restore_snapshot_name" {
   default     = ""
   description = "Name of snapshot in account's s3 bucket"
 }
+
+variable "hibernation_enabled" {
+  type    = bool
+  default = false
+}

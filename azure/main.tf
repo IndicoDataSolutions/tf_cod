@@ -125,6 +125,7 @@ locals {
   argo_cluster_name   = "azure.${var.region}.${var.label}"
 
   cluster_name        = var.label
+  dns_name            = lower("${var.label}.${var.region}.azure.indico.io")
 }
 
 resource "tls_private_key" "pk" {
