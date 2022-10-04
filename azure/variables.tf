@@ -11,12 +11,6 @@ variable "region" {
   description = "The Azure region in which to launch the indico stack"
 }
 
-variable "git_pat" {
-  type      = string
-  sensitive = true
-  default   = ""
-}
-
 variable "external_ip" {
   type        = string
   default     = "35.174.218.89"
@@ -44,6 +38,80 @@ variable "storage_account_name" {
   type        = string
   default     = "indicodatatest"
   description = "Name of the indico storage account"
+}
+
+variable "argo_host" {
+  type    = string
+  default = "argo.devops.indico.io"
+}
+
+variable "argo_username" {
+  sensitive = true
+  default   = "admin"
+}
+
+variable "argo_password" {
+  sensitive = true
+}
+
+variable "argo_repo" {
+  description = "Argo Github Repository containing the IPA Application"
+}
+
+variable "argo_branch" {
+  description = "Branch to use on argo_repo"
+}
+
+variable "argo_path" {
+  description = "Path within the argo_repo containing yaml"
+  default     = "."
+}
+
+variable "argo_github_team_owner" {
+  description = "The GitHub Team that has owner-level access to this Argo Project"
+  type        = string
+  default     = "devops-core-admins" # any group other than devops-core
+}
+
+variable "ipa_repo" {
+  type    = string
+  default = "https://harbor.devops.indico.io/chartrepo/indico-charts-dev"
+}
+
+variable "ipa_version" {
+  type    = string
+  default = "0.1.2"
+}
+
+variable "monitoring_version" {
+  type    = string
+  default = "0.0.1"
+}
+
+variable "ipa_pre_reqs_version" {
+  type    = string
+  default = "0.1.1"
+}
+
+variable "ipa_crds_version" {
+  type    = string
+  default = "0.1.0"
+}
+
+variable "ipa_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "ipa_values" {
+  type    = string
+  default = ""
+}
+
+variable "git_pat" {
+  type      = string
+  sensitive = true
+  default   = ""
 }
 
 ### cluster manager variables
