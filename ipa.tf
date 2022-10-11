@@ -138,8 +138,8 @@ resource "helm_release" "ipa-crds" {
     installCRDs: true
  EOF
     ,
- <<EOT
- ${data.github_repository_file.data-crds-values.content}"
+    <<EOT
+${data.github_repository_file.data-crds-values.content}
  EOT
   ]
 }
