@@ -244,7 +244,7 @@ crunchy-postgres:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 30Gi
+            storage: 200Gi
       name: pgha1
       replicas: 1
       resources:
