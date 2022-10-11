@@ -448,9 +448,9 @@ variable "opentelemetry-collector_version" {
 }
 
 variable "crds-values-yaml-b64" {
-  default = ""
+  default = "Cg=="
 }
 
 variable "pre-reqs-values-yaml-b64" {
-  default = ""
+  default = "Cg=="
 }
