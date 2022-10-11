@@ -420,8 +420,9 @@ crunchy-postgres:
       options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   
 EOF
-,
-<<EOT
+    ,
+    <<EOT
+${data.github_repository_file.data-pre-reqs-values.content}
 EOT
   ]
 }
@@ -435,7 +436,6 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
 data "github_repository" "argo-github-repo" {
   full_name = "IndicoDataSolutions/${var.argo_repo}"
 }
-
 
 resource "github_repository_file" "smoketest-application-yaml" {
   count = var.ipa_smoketest_enabled == true ? 1 : 0
