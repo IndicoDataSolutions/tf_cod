@@ -138,7 +138,7 @@ resource "helm_release" "ipa-crds" {
     enabled: true
     installCRDs: true
 EOF
-,
+    ,
     <<EOT
 ${data.github_repository_file.data-crds-values.content}
 EOT
@@ -172,7 +172,8 @@ resource "helm_release" "ipa-pre-requisites" {
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
 
-  values = [<<EOF
+  values = [
+<<EOF
 secrets:
   rabbitmq:
     create: true
@@ -419,9 +420,11 @@ crunchy-postgres:
       options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   
   EOF
-    ,
-    "${data.github_repository_file.data-crds-values.content}"
-  ]
+  ,
+  <<EOT 
+${data.github_repository_file.data-crds-values.content}
+EOT
+]
 }
 
 resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
