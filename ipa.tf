@@ -89,7 +89,7 @@ data "github_repository_file" "data-crds-values" {
 }
 
 
-data "github_repository_file" "pre-reqs-values" {
+data "github_repository_file" "data-pre-reqs-values" {
   repository = data.github_repository.argo-github-repo.name
   branch     = var.argo_branch
   file       = "${var.argo_path}/pre-reqs-values.yaml"
@@ -147,7 +147,7 @@ resource "helm_release" "ipa-pre-requisites" {
     module.fsx-storage,
     helm_release.ipa-crds,
     data.vault_kv_secret_v2.zerossl_data,
-     data.github_repository_file.data-pre-reqs-values
+    data.github_repository_file.data-pre-reqs-values
   ]
 
   verify           = false
