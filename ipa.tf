@@ -50,9 +50,43 @@ output "ns" {
   value = data.aws_route53_zone.aws-zone.name_servers
 }
 
+
+resource "github_repository_file" "pre-reqs-values-yaml" {
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/pre-reqs-values.yaml"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+   content = base64decode(var.pre-reqs-values-yaml-b64)
+}
+
+
+resource "github_repository_file" "crds-values-yaml" {
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/crds-values.yaml"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+   content = base64decode(var.crds-values-yaml-b64)
+}
+
+
 resource "helm_release" "ipa-crds" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    github_repository_file.crds-values-yaml
   ]
 
   verify           = false
@@ -100,7 +134,8 @@ resource "helm_release" "ipa-pre-requisites" {
     module.cluster,
     module.fsx-storage,
     helm_release.ipa-crds,
-    data.vault_kv_secret_v2.zerossl_data
+    data.vault_kv_secret_v2.zerossl_data,
+     github_repository_file.pre-reqs-values-yaml
   ]
 
   verify           = false
