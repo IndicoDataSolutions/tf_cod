@@ -136,11 +136,11 @@ resource "helm_release" "ipa-crds" {
         kubernetes.io/os: linux
     enabled: true
     installCRDs: true
- EOF
+EOF
     ,
     <<EOT
 ${data.github_repository_file.data-crds-values.content}
- EOT
+EOT
   ]
 }
 
