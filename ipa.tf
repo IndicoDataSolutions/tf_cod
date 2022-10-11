@@ -137,8 +137,10 @@ resource "helm_release" "ipa-crds" {
     enabled: true
     installCRDs: true
  EOF
- ,
- ${data.github_repository_file.data-crds-values.content}
+    ,
+ <<EOT
+ ${data.github_repository_file.data-crds-values.content}"
+ EOT
   ]
 }
 
@@ -416,8 +418,8 @@ crunchy-postgres:
       options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   
   EOF
-  ,
-  "${data.github_repository_file.data-crds-values.content}"
+    ,
+    "${data.github_repository_file.data-crds-values.content}"
   ]
 }
 
