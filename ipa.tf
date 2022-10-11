@@ -63,7 +63,7 @@ resource "github_repository_file" "pre-reqs-values-yaml" {
       content
     ]
   }
-   content = base64decode(var.pre-reqs-values-yaml-b64)
+  content = base64decode(var.pre-reqs-values-yaml-b64)
 }
 
 
@@ -79,14 +79,26 @@ resource "github_repository_file" "crds-values-yaml" {
       content
     ]
   }
-   content = base64decode(var.crds-values-yaml-b64)
+  content = base64decode(var.crds-values-yaml-b64)
 }
 
+data "github_repository_file" "data-crds-values" {
+  repository = data.github_repository.argo-github-repo.name
+  branch     = var.argo_branch
+  file       = "${var.argo_path}/crds-values.yaml"
+}
+
+
+data "github_repository_file" "pre-reqs-values" {
+  repository = data.github_repository.argo-github-repo.name
+  branch     = var.argo_branch
+  file       = "${var.argo_path}/pre-reqs-values.yaml"
+}
 
 resource "helm_release" "ipa-crds" {
   depends_on = [
     module.cluster,
-    github_repository_file.crds-values-yaml
+    data.github_repository_file.data-crds-values
   ]
 
   verify           = false
@@ -135,7 +147,7 @@ resource "helm_release" "ipa-pre-requisites" {
     module.fsx-storage,
     helm_release.ipa-crds,
     data.vault_kv_secret_v2.zerossl_data,
-     github_repository_file.pre-reqs-values-yaml
+     data.github_repository_file.data-pre-reqs-values
   ]
 
   verify           = false
