@@ -116,7 +116,8 @@ resource "helm_release" "ipa-crds" {
   version          = var.ipa_crds_version
   wait             = true
 
-  values = [<<EOF
+  values = [
+    <<EOF
   crunchy-pgo:
     enabled: true
   
@@ -137,7 +138,7 @@ resource "helm_release" "ipa-crds" {
     enabled: true
     installCRDs: true
 EOF
-    ,
+,
     <<EOT
 ${data.github_repository_file.data-crds-values.content}
 EOT
