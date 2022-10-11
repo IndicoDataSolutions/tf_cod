@@ -173,7 +173,7 @@ resource "helm_release" "ipa-pre-requisites" {
   disable_webhooks = false
 
   values = [
-<<EOF
+    <<EOF
 secrets:
   rabbitmq:
     create: true
@@ -419,12 +419,11 @@ crunchy-postgres:
       name: indico
       options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   
-  EOF
-  ,
-  <<EOT 
-${data.github_repository_file.data-crds-values.content}
+EOF
+,
+<<EOT
 EOT
-]
+  ]
 }
 
 resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
