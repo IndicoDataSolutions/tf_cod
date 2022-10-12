@@ -54,7 +54,7 @@ output "ns" {
 resource "github_repository_file" "pre-reqs-values-yaml" {
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
-  file                = "${var.argo_path}/pre-reqs-values.yaml"
+  file                = "${var.argo_path}/helm/pre-reqs-values.yaml"
   commit_message      = var.message
   overwrite_on_create = true
 
@@ -70,7 +70,7 @@ resource "github_repository_file" "pre-reqs-values-yaml" {
 resource "github_repository_file" "crds-values-yaml" {
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
-  file                = "${var.argo_path}/crds-values.yaml"
+  file                = "${var.argo_path}/helm/crds-values.yaml"
   commit_message      = var.message
   overwrite_on_create = true
 
@@ -88,7 +88,7 @@ data "github_repository_file" "data-crds-values" {
   ]
   repository = data.github_repository.argo-github-repo.name
   branch     = var.argo_branch
-  file       = "${var.argo_path}/crds-values.yaml"
+  file       = "${var.argo_path}/helm/crds-values.yaml"
 }
 
 
@@ -98,7 +98,7 @@ data "github_repository_file" "data-pre-reqs-values" {
   ]
   repository = data.github_repository.argo-github-repo.name
   branch     = var.argo_branch
-  file       = "${var.argo_path}/pre-reqs-values.yaml"
+  file       = "${var.argo_path}/helm/pre-reqs-values.yaml"
 }
 
 resource "helm_release" "ipa-crds" {
