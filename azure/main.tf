@@ -106,13 +106,13 @@ module "argo-registration" {
     argocd     = argocd
   }
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.1.0"
+  version                      = "1.1.1"
   cluster_name                 = var.label
   region                       = var.region
   argo_password                = var.argo_password
   argo_username                = var.argo_username
   account                      = "azure"
-  provider                     = "azure"
+  cloud_provider               = "azure"
   argo_github_team_admin_group = var.argo_github_team_owner
 }
 
