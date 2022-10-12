@@ -213,7 +213,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "6.7.4"
+  version                    = "6.7.3"
   label                      = var.label
   additional_tags            = var.additional_tags
   map_roles                  = [{ rolearn = module.cluster-manager.cluster_manager_iam_role_arn, username = "admin", groups = ["system:masters"] }]
@@ -268,12 +268,7 @@ provider "argocd" {
 provider "kubernetes" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  #token                  = module.cluster.kubernetes_token
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--cluster-name", var.label]
-    command     = "aws"
-  }
+  token                  = module.cluster.kubernetes_token
 }
 
 provider "kubectl" {
@@ -313,7 +308,7 @@ module "argo-registration" {
     argocd     = argocd
   }
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.0.45"
+  version                      = "1.0.46"
   label                        = var.label
   region                       = var.region
   argo_password                = var.argo_password
