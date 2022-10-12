@@ -114,6 +114,7 @@ module "argo-registration" {
   account                      = "azure"
   cloud_provider               = "azure"
   argo_github_team_admin_group = var.argo_github_team_owner
+  resource_group_name          = local.resource_group_name
 }
 
 provider "local" {}
