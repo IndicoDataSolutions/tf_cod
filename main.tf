@@ -187,7 +187,7 @@ module "s3-storage" {
 
 module "efs-storage" {
   count              = var.include_efs ? 1 : 0
-  source             = "app.terraform.io/indico/efs-storage/mod"
+  source             = "app.terraform.io/indico/indico-aws-efs/mod"
   version           = "0.0.1"
   label              = var.label
   additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage" })
