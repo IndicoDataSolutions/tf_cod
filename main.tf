@@ -185,7 +185,20 @@ module "s3-storage" {
   include_rox       = var.include_rox
 }
 
+module "efs-storage" {
+  count              = var.include_efs ? 1 : 0
+  source             = "app.terraform.io/indico/efs-storage/mod"
+  version           = "0.0.1"
+  label              = var.label
+  additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage" })
+  security_groups    = [module.security-group.all_subnets_sg_id]
+  private_subnet_ids = flatten([local.network[0].private_subnet_ids])
+  kms_key_arn        = module.kms_key.key_arn
+
+}
+
 module "fsx-storage" {
+  count                       = var.include_fsx ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-fsx/mod"
   version                     = "1.4.1"
   label                       = var.label
@@ -213,7 +226,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "6.7.4"
+  version                    = "7.2.0-test"
   label                      = var.label
   additional_tags            = var.additional_tags
   map_roles                  = [{ rolearn = module.cluster-manager.cluster_manager_iam_role_arn, username = "admin", groups = ["system:masters"] }]
@@ -224,16 +237,16 @@ module "cluster" {
   node_groups                = var.node_groups
   cluster_node_policies      = var.cluster_node_policies
   eks_cluster_iam_role       = var.eks_cluster_iam_role
-  eks_cluster_nodes_iam_role = var.eks_cluster_nodes_iam_role
+  eks_cluster_nodes_iam_role = "${var.label}-${var.region}-node-role"
   fsx_arns                   = var.include_rox ? [module.fsx-storage.fsx-rox.arn, module.fsx-storage.fsx-rwx.arn] : [module.fsx-storage.fsx-rwx.arn]
   kms_key_arn                = module.kms_key.key_arn
   multi_az                   = var.node_group_multi_az
   key_pair                   = aws_key_pair.kp.key_name
   snapshot_id                = var.snapshot_id
   default_tags               = var.default_tags
-  s3_data_bucket_name        = "indico-pgbackup-${var.label}"
-  sqs_sns                    = var.sqs_sns
+  s3_buckets                 = [ module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots") ]
   cluster_version            = var.cluster_version
+  efs_filesystem_id          = [ var.include_efs ? module.efs-storage[0].efs_filesystem_id :  "" ]
 }
 
 resource "aws_security_group" "indico_allow_access" {

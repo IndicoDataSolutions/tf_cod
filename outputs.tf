@@ -14,14 +14,18 @@ output "cluster_manager_ip" {
   value       = module.cluster-manager.cluster_manager_ip
 }
 
+output "efs_filesystem_id" {
+  description = "ID of the EFS filesystem"
+  value       = var.include_efs ? module.efs-storage[0].efs_filesystem_id :  ""
+}
 output "fsx-rwx" {
   description = "Read write filesystem"
-  value       = module.fsx-storage.fsx-rwx
+  value       = var.include_fsx ? module.fsx-storage[0].fsx-rwx : ""
 }
 
 output "fsx-rox" {
   description = "Read only filesystem"
-  value       = module.fsx-storage.fsx-rox
+  value       = var.include_rox ? module.fsx-storage[0].fsx-rox : ""
 }
 
 output "indico_allow_access" {
@@ -43,19 +47,19 @@ output "key_pem" {
 
 # Outputs for Argo
 output "fsx_storage_fsx_rwx_dns_name" {
-  value = module.fsx-storage.fsx-rwx.dns_name
+  value = module.fsx-storage[0].fsx-rwx.dns_name
 }
 
 output "fsx_storage_fsx_rwx_mount_name" {
-  value = module.fsx-storage.fsx-rwx.mount_name
+  value = module.fsx-storage[0].fsx-rwx.mount_name
 }
 
 output "fsx_storage_fsx_rwx_volume_handle" {
-  value = module.fsx-storage.fsx-rwx.id
+  value = module.fsx-storage[0].fsx-rwx.id
 }
 
 output "fsx_storage_fsx_rwx_subnet_id" {
-  value = module.fsx-storage.fsx-rwx.subnet_ids[0]
+  value = module.fsx-storage[0].fsx-rwx.subnet_ids[0]
 }
 
 output "cluster_name" {
