@@ -145,8 +145,8 @@ external-dns:
   
   azure:
     resourceGroup: ${var.common_resource_group}
-    tenantId: ${var.tenant_id}
-    subscriptionId: ${var.subscription_id}
+    tenantId: ${data.azurerm_client_config.current.tenant_id}
+    subscriptionId: ${data.azurerm_subscription.primary.id}
     useManagedIdentityExtension: true
     userAssignedIdentityID: "MIClientIDTODO" 
 
@@ -156,12 +156,7 @@ external-dns:
     - ingress
 
 cluster-autoscaler:
-  cluster-autoscaler:
-    awsRegion: ${var.region} TODO
-    image:
-      tag: "v1.20.0"
-    autoDiscovery:
-      clusterName: "${local.cluster_name}" TODO 
+  enabled: false
       
 storage:
   pvcSpec:

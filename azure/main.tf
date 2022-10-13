@@ -46,6 +46,9 @@ provider "vault" {
   }
 }
 
+data "azurerm_subscription" "primary" {}
+data "azurerm_client_config" "current" {}
+
 data "http" "workstation-external-ip" {
   url = "http://ipv4.icanhazip.com"
 }
