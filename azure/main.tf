@@ -124,11 +124,11 @@ locals {
   resource_group_name = "${var.label}-${var.region}"
   current_ip          = "${chomp(data.http.workstation-external-ip.response_body)}/20"
 
-  argo_app_name       = lower("azure.${var.region}.${var.label}-ipa")
-  argo_cluster_name   = "azure.${var.region}.${var.label}"
+  argo_app_name     = lower("azure.${var.region}.${var.label}-ipa")
+  argo_cluster_name = "azure.${var.region}.${var.label}"
 
-  cluster_name        = var.label
-  dns_name            = lower("${var.label}.${var.region}.azure.indico.io")
+  cluster_name = var.label
+  dns_name     = lower("${var.label}.${var.region}.azure.indico.io")
 }
 
 resource "tls_private_key" "pk" {
@@ -149,12 +149,12 @@ module "networking" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  source               = "app.terraform.io/indico/indico-azure-network/mod"
-  version              = "3.0.5"
-  label                = var.label
-  vnet_cidr            = var.vnet_cidr
-  subnet_cidrs         = var.subnet_cidrs
-  resource_group_name  = local.resource_group_name
+  source              = "app.terraform.io/indico/indico-azure-network/mod"
+  version             = "3.0.5"
+  label               = var.label
+  vnet_cidr           = var.vnet_cidr
+  subnet_cidrs        = var.subnet_cidrs
+  resource_group_name = local.resource_group_name
 }
 
 /*
@@ -194,11 +194,11 @@ module "storage" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  source               = "app.terraform.io/indico/indico-azure-blob/mod"
-  version              = "0.1.0"
-  label                = var.label
-  region               = var.region
-  resource_group_name  = local.resource_group_name
+  source              = "app.terraform.io/indico/indico-azure-blob/mod"
+  version             = "0.1.0"
+  label               = var.label
+  region              = var.region
+  resource_group_name = local.resource_group_name
 }
 
 /*
@@ -215,7 +215,7 @@ module "cluster" {
     azurerm_resource_group.cod-cluster
   ]
   source                  = "app.terraform.io/indico/indico-azure-cluster/mod"
-  version                 = "2.0.8"
+  version                 = "2.0.9"
   label                   = var.label
   public_key              = tls_private_key.pk.public_key_openssh
   region                  = var.region

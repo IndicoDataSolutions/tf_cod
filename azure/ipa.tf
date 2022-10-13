@@ -43,8 +43,8 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 }
 
 data "azurerm_dns_zone" "azure_zone" {
-  name                 = lower("azure.indico.io")
-  resource_group_name  = local.resource_group_name
+  name                = lower("azure.indico.io")
+  resource_group_name = local.resource_group_name
 }
 
 resource "helm_release" "ipa-crds" {
@@ -141,10 +141,14 @@ external-dns:
   domainFilters:
     - azure.indico.io.
 
-  provider: aws TODO
-  aws: TODO
-    zoneType: public
-    region: ${var.region}
+  provider: azure
+  
+  azure:
+    resourceGroup: ${var.common_resource_group}
+    tenantId: ${var.tenant_id}
+    subscriptionId: ${var.subscription_id}
+    useManagedIdentityExtension: true
+    userAssignedIdentityID: ${local.MiClientId}
 
   policy: sync
   sources:
@@ -164,16 +168,16 @@ storage:
     csi:
       driver: fsx.csi.aws.com
       volumeAttributes:
-        dnsname: $#{module.fsx-storage.fsx-rwx.dns_name} TODO
-        mountname: $#{module.fsx-storage.fsx-rwx.mount_name} TODO
-      volumeHandle: $#{module.fsx-storage.fsx-rwx.id} TODO
+        dnsname: ${module.fsx-storage.fsx-rwx.dns_name} TODO
+        mountname: ${module.fsx-storage.fsx-rwx.mount_name} TODO
+      volumeHandle: ${module.fsx-storage.fsx-rwx.id} TODO
   indicoStorageClass:
     enabled: true
     name: indico-sc
     provisioner: fsx.csi.aws.com TODO
     parameters:
       securityGroupIds: $#{local.security_group_id} TODO
-      subnetId: $#{module.fsx-storage.fsx-rwx.subnet_ids[0]} TODO
+      subnetId: ${module.fsx-storage.fsx-rwx.subnet_ids[0]} TODO
 crunchy-postgres:
   enabled: true
   postgres-data:
@@ -498,7 +502,7 @@ resource "github_repository_file" "custom-application-yaml" {
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${lower("azure-${var.region}-${var.label }-${each.value.name}")} 
+  name: ${lower("azure-${var.region}-${var.label}-${each.value.name}")} 
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
