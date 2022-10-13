@@ -70,9 +70,9 @@ output "dns_name" {
   value = local.dns_name
 }
 
-output "kubeconfig" {
-  value = module.cluster.kubectl_config
-}
+# output "kubeconfig" {
+#   value = module.cluster.kubectl_config
+# }
 
 
 output "kube_host" {
