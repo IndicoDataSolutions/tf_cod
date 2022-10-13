@@ -1,4 +1,16 @@
 # top level variable declarations
+variable "common_resource_group" {
+  type        = string
+  default     = "indico"
+  description = "The common resource group name"
+}
+
+variable "domain_suffix" {
+  type        = string
+  default     = "azure.indico.io"
+  description = "Domain suffix"
+}
+
 variable "label" {
   type        = string
   default     = "indico"
@@ -151,7 +163,7 @@ variable "svp_client_secret" {
 
 variable "k8s_version" {
   type        = string
-  default     = "1.24.3"
+  default     = "1.22.15"
   description = "The version of the kubernetes cluster"
 }
 

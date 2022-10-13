@@ -228,3 +228,5 @@ module "cluster" {
   private_cluster_enabled = var.private_cluster_enabled
   resource_group_name     = local.resource_group_name
 }
+
+
