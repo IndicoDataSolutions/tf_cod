@@ -1,11 +1,10 @@
 data "azurerm_resource_group" "domain" {
-  name     = var.common_resource_group
-  location = var.region
+  name = var.common_resource_group
 }
 
 data "azurerm_dns_zone" "domain" {
   name                = var.domain_suffix
-  resource_group_name = azurerm_resource_group.domain.name
+  resource_group_name = data.azurerm_resource_group.domain.name
 }
 
 resource "azurerm_dns_caa_record" "fqdn" {
