@@ -238,7 +238,7 @@ module "cluster" {
   cluster_node_policies      = var.cluster_node_policies
   eks_cluster_iam_role       = var.eks_cluster_iam_role
   eks_cluster_nodes_iam_role = "${var.label}-${var.region}-node-role"
-  fsx_arns                   = var.include_rox ? [module.fsx-storage[0].fsx-rox.arn, module.fsx-storage[0].fsx-rwx.arn] : [module.fsx-storage[0].fsx-rwx.arn]
+  fsx_arns                   = [ var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx ? module.fsx-storage[0].fsx-rwx.arn : "" ]
   kms_key_arn                = module.kms_key.key_arn
   multi_az                   = var.node_group_multi_az
   key_pair                   = aws_key_pair.kp.key_name
@@ -326,7 +326,7 @@ module "argo-registration" {
 }
 
 locals {
-  security_group_id = tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0]
+  security_group_id = include_fsx ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : []
   cluster_name      = var.label
   dns_name          = lower("${var.label}.${var.region}.${var.aws_account}.indico.io")
 }
