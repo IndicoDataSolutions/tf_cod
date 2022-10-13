@@ -279,8 +279,6 @@ variable "argo_repo" {
   description = "Argo Github Repository containing the IPA Application"
 }
 
-
-
 variable "argo_branch" {
   description = "Branch to use on argo_repo"
 }
@@ -443,4 +441,16 @@ variable "hibernation_enabled" {
 
 variable "keda_version" {
   default = "2.8.1"
+}
+
+variable "opentelemetry-collector_version" {
+  default = "0.30.0"
+}
+
+variable "crds-values-yaml-b64" {
+  default = "Cg=="
+}
+
+variable "pre-reqs-values-yaml-b64" {
+  default = "Cg=="
 }

@@ -11,7 +11,7 @@ ipa_values = ""
 #name                 = "dop-832"
 #cluster_name         = "dop-832"
 #label                = "dop-832" # will be used for resource naming. should be unique within the AWS account
-cluster_version = "1.20"
+cluster_version = "1.22"
 node_groups = [
   {
     min_size               = 0
@@ -67,7 +67,7 @@ node_groups = [
     min_size         = 1
     max_size         = 4
     instance_types   = ["m5.large"]
-    name             = "monitoring-workers" # for autoscaling pods that have high memory demands.
+    name             = "monitoring-workers" # for monitoring pods
     type             = "cpu"
     spot             = false
     desired_capacity = "1"
