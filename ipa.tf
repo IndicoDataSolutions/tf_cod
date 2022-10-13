@@ -500,10 +500,10 @@ EOT
 }
 
 
-resource "local_file" "kubeconfig" {
-  content  = module.cluster.kubectl_config
-  filename = "${path.module}/module.kubeconfig"
-}
+# resource "local_file" "kubeconfig" {
+#   content  = module.cluster.kubectl_config
+#   filename = "${path.module}/module.kubeconfig"
+# }
 
 
 data "vault_kv_secret_v2" "zerossl_data" {
@@ -518,7 +518,7 @@ output "zerossl" {
 
 resource "argocd_application" "ipa" {
   depends_on = [
-    local_file.kubeconfig,
+    # local_file.kubeconfig,
     helm_release.ipa-pre-requisites,
     time_sleep.wait_1_minutes_after_pre_reqs,
     module.argo-registration,
