@@ -148,7 +148,7 @@ external-dns:
     tenantId: ${var.tenant_id}
     subscriptionId: ${var.subscription_id}
     useManagedIdentityExtension: true
-    userAssignedIdentityID: ${local.MiClientId}
+    userAssignedIdentityID: "MIClientIDTODO" 
 
   policy: sync
   sources:
@@ -168,16 +168,16 @@ storage:
     csi:
       driver: fsx.csi.aws.com
       volumeAttributes:
-        dnsname: ${module.fsx-storage.fsx-rwx.dns_name} TODO
-        mountname: ${module.fsx-storage.fsx-rwx.mount_name} TODO
-      volumeHandle: ${module.fsx-storage.fsx-rwx.id} TODO
+        dnsname: $#{module.fsx-storage.fsx-rwx.dns_name} TODO
+        mountname: $#{module.fsx-storage.fsx-rwx.mount_name} TODO
+      volumeHandle: $#{module.fsx-storage.fsx-rwx.id} TODO
   indicoStorageClass:
     enabled: true
     name: indico-sc
     provisioner: fsx.csi.aws.com TODO
     parameters:
       securityGroupIds: $#{local.security_group_id} TODO
-      subnetId: ${module.fsx-storage.fsx-rwx.subnet_ids[0]} TODO
+      subnetId: $#{module.fsx-storage.fsx-rwx.subnet_ids[0]} TODO
 crunchy-postgres:
   enabled: true
   postgres-data:
