@@ -326,7 +326,7 @@ module "argo-registration" {
 }
 
 locals {
-  security_group_id = include_fsx ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : []
+  security_group_id = var.include_fsx ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : []
   cluster_name      = var.label
   dns_name          = lower("${var.label}.${var.region}.${var.aws_account}.indico.io")
 }
