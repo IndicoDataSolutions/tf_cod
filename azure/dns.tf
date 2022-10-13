@@ -1,4 +1,4 @@
-resource "azurerm_resource_group" "domain" {
+data "azurerm_resource_group" "domain" {
   name     = var.common_resource_group
   location = var.region
 }
@@ -8,7 +8,7 @@ data "azurerm_dns_zone" "domain" {
   resource_group_name = azurerm_resource_group.domain.name
 }
 
-resource "azurerm_dns_caa_record" "example" {
+resource "azurerm_dns_caa_record" "fqdn" {
   name                = "${var.label}.${var.region}.${var.domain_suffix}"
   zone_name           = data.azurerm_dns_zone.domain.name
   resource_group_name = local.resource_group_name
