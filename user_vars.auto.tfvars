@@ -30,7 +30,7 @@ node_groups = [
     instance_types   = ["m5.xlarge"]
     name             = "celery-workers" # for pods that we want to autoscale
     type             = "cpu"
-    spot             = true
+    spot             = false
     desired_capacity = "0"
     taints           = "--register-with-taints=indico.io/celery=true:NoSchedule"
   },
