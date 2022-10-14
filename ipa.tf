@@ -264,7 +264,7 @@ crunchy-postgres:
         repo1-retention-full: '5'
         repo1-s3-key-type: auto
         repo1-s3-kms-key-id: "${module.kms_key.key_arn}"
-        repo1-s3-role: ${module.cluster.s3_role_id[0].iam_role_name}
+        repo1-s3-role: ${module.cluster.s3_role_id}
       repos:
       - name: repo1
         s3:
@@ -345,7 +345,7 @@ crunchy-postgres:
         repo1-retention-full: '5'
         repo1-s3-key-type: auto
         repo1-s3-kms-key-id: "${module.kms_key.key_arn}"
-        repo1-s3-role: ${module.cluster.s3_role_id[0].iam_role_name}
+        repo1-s3-role: ${module.cluster.s3_role_id}
       repos:
       - name: repo1
         s3:
