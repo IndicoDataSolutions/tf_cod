@@ -191,6 +191,7 @@ cluster-autoscaler:
 storage:
   pvcSpec:
     volumeMode: Filesystem
+    mountOptions: []
     csi:
       driver: efs.csi.aws.com
       volumeHandle: ${module.efs-storage[0].efs_filesystem_id}

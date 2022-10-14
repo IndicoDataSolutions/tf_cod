@@ -12,78 +12,71 @@ ipa_values = ""
 #cluster_name         = "dop-832"
 #label                = "dop-832" # will be used for resource naming. should be unique within the AWS account
 cluster_version = "1.22"
-node_groups = [
-  {
+node_groups = {
+  gpu-workers = {
     min_size               = 0
     max_size               = 5
     instance_types         = ["g4dn.xlarge"]
-    name                   = "gpu-workers" # for gpu workloads
     type                   = "gpu"
     spot                   = false
     desired_capacity       = "0"
     additional_node_labels = "group=gpu-enabled"
     taints                 = "--register-with-taints=nvidia.com/gpu=true:NoSchedule"
   },
-  {
+  celery-workers = {
     min_size         = 0
     max_size         = 20
     instance_types   = ["m5.xlarge"]
-    name             = "celery-workers" # for pods that we want to autoscale
     type             = "cpu"
     spot             = false
     desired_capacity = "0"
     taints           = "--register-with-taints=indico.io/celery=true:NoSchedule"
   },
-  {
+  static-workers = {
     min_size         = 1
     max_size         = 20
     instance_types   = ["m5.xlarge"]
-    name             = "static-workers" # for pods that need to be on stable nodes.
     type             = "cpu"
     spot             = false
     desired_capacity = "0"
   },
-  {
+  pdf-workers = {
     min_size         = 0
     max_size         = 3
     instance_types   = ["m5.xlarge"]
-    name             = "pdf-workers" # for pods that need to be on stable nodes.
     type             = "cpu"
     spot             = false
     desired_capacity = "1"
     taints           = "--register-with-taints=indico.io/pdfextraction=true:NoSchedule"
   },
-  {
+  highmem-workers = {
     min_size         = 0
     max_size         = 3
     instance_types   = ["m5.2xlarge"]
-    name             = "highmem-workers" # for autoscaling pods that have high memory demands.
     type             = "cpu"
     spot             = false
     desired_capacity = "0"
     taints           = "--register-with-taints=indico.io/highmem=true:NoSchedule"
   },
-  {
+  monitoring-workers = {
     min_size         = 1
     max_size         = 4
     instance_types   = ["m5.large"]
-    name             = "monitoring-workers" # for autoscaling pods that have high memory demands.
     type             = "cpu"
     spot             = false
     desired_capacity = "1"
     taints           = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
   },
-  {
+  pgo-workers = {
     min_size         = 1
     max_size         = 4
     instance_types   = ["m5.large"]
-    name             = "pgo-workers" # for pods that we want to autoscale
     type             = "cpu"
     spot             = false
     desired_capacity = "1"
     taints           = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
   }
-]
+}
 # additional_tags = { # delete this if no additional tags needed
 #   foo = "bar",
 #   baz = "qux"
