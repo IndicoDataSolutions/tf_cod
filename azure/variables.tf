@@ -188,6 +188,7 @@ variable "additional_node_pools" {
     node_os                        = string
     pool_name                      = string
     taints                         = list(string)
+    labels                         = map(string)
     cluster_auto_scaling           = bool
     cluster_auto_scaling_min_count = number
     cluster_auto_scaling_max_count = number
@@ -223,4 +224,22 @@ variable "restore_snapshot_name" {
   type        = string
   default     = ""
   description = "Name of snapshot in account's s3 bucket"
+}
+
+variable "monitoring_enabled" {
+  type        = bool
+  default     = true
+  description = "Variable to enable the monitoring stack/keda"
+}
+
+variable "keda_version" {
+  type        = string
+  default     = "2.8.1"
+  description = "Version of keda helm chart"
+}
+
+variable "opentelemetry-collector_version" {
+  type        = string
+  default     = "0.30.0"
+  description = "Version of opentelemetry-collector helm chart"
 }

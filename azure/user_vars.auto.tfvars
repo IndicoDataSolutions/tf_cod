@@ -23,93 +23,102 @@ default_node_pool = {
 }
 
 additional_node_pools = {
-  gpupool = {
-    node_count                     = 3
-    pool_name                      = "gpupool"
-    vm_size                        = "Standard_NC4as_T4_v3"
-    zones                          = ["1", "2"]
-    node_os                        = "Linux"
-    taints                         = null
-    cluster_auto_scaling           = false
-    cluster_auto_scaling_min_count = null
-    cluster_auto_scaling_max_count = null
+  gpuworkers = {
+    node_count = 0
+    pool_name  = "gpu"
+    vm_size    = "Standard_NC4as_T4_v3"
+    node_os    = "Linux"
+    zones      = ["1", "2"]
+    taints     = ["nvidia.com/gpu=true:NoSchedule"]
+    labels = {
+      "node_group" : "gpu-workers"
+    }
+    cluster_auto_scaling           = true
+    cluster_auto_scaling_min_count = 0
+    cluster_auto_scaling_max_count = 5
+  },
+  celeryworkers = {
+    node_count = 0
+    pool_name  = "celery"
+    vm_size    = "Standard_D16_v3"
+    node_os    = "Linux"
+    zones      = ["1", "2"]
+    taints     = ["indico.io/celery=true:NoSchedule"]
+    labels = {
+      "node_group" : "celery-workers"
+    }
+    cluster_auto_scaling           = true
+    cluster_auto_scaling_min_count = 0
+    cluster_auto_scaling_max_count = 20
+  },
+  staticworkers = {
+    node_count = 1
+    pool_name  = "static"
+    vm_size    = "Standard_D16_v3"
+    node_os    = "Linux"
+    zones      = ["1", "2"]
+    taints     = []
+    labels = {
+      "node_group" : "static-workers"
+    }
+    cluster_auto_scaling           = true
+    cluster_auto_scaling_min_count = 1
+    cluster_auto_scaling_max_count = 20
+  },
+  pdfworkers = {
+    node_count = 1
+    pool_name  = "pdf"
+    vm_size    = "Standard_D16_v3"
+    node_os    = "Linux"
+    zones      = ["1", "2"]
+    taints     = ["indico.io/pdfextraction=true:NoSchedule"]
+    labels = {
+      "node_group" : "pdf-workers"
+    }
+    cluster_auto_scaling           = true
+    cluster_auto_scaling_min_count = 0
+    cluster_auto_scaling_max_count = 5
+  },
+  highmemworkers = {
+    node_count = 0
+    pool_name  = "highmem"
+    vm_size    = "Standard_D16_v3"
+    node_os    = "Linux"
+    zones      = ["1", "2"]
+    taints     = ["indico.io/highmem=true:NoSchedule"]
+    labels = {
+      "node_group" : "highmem-workers"
+    }
+    cluster_auto_scaling           = true
+    cluster_auto_scaling_min_count = 0
+    cluster_auto_scaling_max_count = 3
+  },
+  monitoringworkers = {
+    node_count = 1
+    pool_name  = "monitoring"
+    vm_size    = "Standard_d11_v2"
+    node_os    = "Linux"
+    zones      = ["1", "2"]
+    taints     = ["indico.io/monitoring=true:NoSchedule"]
+    labels = {
+      "node_group" : "monitoring-workers"
+    }
+    cluster_auto_scaling           = true
+    cluster_auto_scaling_min_count = 1
+    cluster_auto_scaling_max_count = 4
+  },
+  pgoworkers = {
+    node_count = 1
+    pool_name  = "pgo"
+    vm_size    = "Standard_D16_v3"
+    node_os    = "Linux"
+    zones      = ["1", "2"]
+    taints     = ["indico.io/crunchy=true:NoSchedule"]
+    labels = {
+      "node_group" : "pgo-workers"
+    }
+    cluster_auto_scaling           = true
+    cluster_auto_scaling_min_count = 1
+    cluster_auto_scaling_max_count = 4
   }
-  /*
-  node_groups = [
-  {
-    min_size         = 0
-    max_size         = 5
-    instance_types   = ["g4dn.xlarge"]
-    name             = "gpu-workers" # for gpu workloads
-    type             = "gpu"
-    spot             = false
-    desired_capacity = "0"
-  },
-  {
-    min_size         = 0
-    max_size         = 20
-    instance_types   = ["m5.xlarge"]
-    name             = "celery-workers" # for pods that we want to autoscale
-    type             = "cpu"
-    spot             = true
-    desired_capacity = "0"
-  },
-  {
-    min_size         = 1
-    max_size         = 20
-    instance_types   = ["m5.xlarge"]
-    name             = "static-workers" # for pods that need to be on stable nodes.
-    type             = "cpu"
-    spot             = false
-    desired_capacity = "0"
-  },
-  {
-    min_size         = 0
-    max_size         = 3
-    instance_types   = ["m5.xlarge"]
-    name             = "pdf-workers" # for pods that need to be on stable nodes.
-    type             = "cpu"
-    spot             = false
-    desired_capacity = "1"
-  },
-  {
-    min_size         = 0
-    max_size         = 3
-    instance_types   = ["m5.2xlarge"]
-    name             = "highmem-workers" # for autoscaling pods that have high memory demands.
-    type             = "cpu"
-    spot             = false
-    desired_capacity = "0"
-  },
-  {
-    min_size         = 1
-    max_size         = 9
-    instance_types   = ["t2.medium"]
-    name             = "monitoring-workers" # for autoscaling pods that have high memory demands.
-    type             = "cpu"
-    spot             = false
-    desired_capacity = "3"
-  },
-  {
-    min_size         = 1
-    max_size         = 4
-    instance_types   = ["m5.large"]
-    name             = "pgo-workers" # for pods that we want to autoscale
-    type             = "cpu"
-    spot             = false
-    desired_capacity = "1"
-    taints           = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
-  }
-  */
-  ## an example additonal node pool
-  #   pool3 = {
-  #     node_count                     = 4
-  #     vm_size                        = "Standard_E4_v3"
-  #     zones                          = ["1", "2", "3"]
-  #     node_os                        = "Linux"
-  #     taints                         = null
-  #     cluster_auto_scaling           = true
-  #     cluster_auto_scaling_min_count = 4
-  #     cluster_auto_scaling_max_count = 12
-  #   }
 }

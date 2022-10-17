@@ -131,7 +131,7 @@ locals {
   argo_cluster_name = "azure.${var.region}.${var.label}"
 
   cluster_name = var.label
-  dns_name     = lower("${var.label}.${var.region}.azure.indico.io")
+  dns_name     = lower("${var.label}-${var.region}.${var.domain_suffix}")
 }
 
 resource "tls_private_key" "pk" {
@@ -218,7 +218,7 @@ module "cluster" {
     azurerm_resource_group.cod-cluster
   ]
   source                  = "app.terraform.io/indico/indico-azure-cluster/mod"
-  version                 = "2.0.11"
+  version                 = "2.0.13"
   label                   = var.label
   public_key              = tls_private_key.pk.public_key_openssh
   region                  = var.region
