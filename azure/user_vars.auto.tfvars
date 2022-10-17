@@ -1,6 +1,8 @@
+
+
+
 # fill out this file with desired values and reference it 
 
-label                   = "example-label"
 region                  = "eastus"
 vnet_cidr               = "192.168.0.0/20"
 subnet_cidrs            = ["192.168.0.0/22"]
@@ -32,6 +34,73 @@ additional_node_pools = {
     cluster_auto_scaling_min_count = null
     cluster_auto_scaling_max_count = null
   }
+  /*
+  node_groups = [
+  {
+    min_size         = 0
+    max_size         = 5
+    instance_types   = ["g4dn.xlarge"]
+    name             = "gpu-workers" # for gpu workloads
+    type             = "gpu"
+    spot             = false
+    desired_capacity = "0"
+  },
+  {
+    min_size         = 0
+    max_size         = 20
+    instance_types   = ["m5.xlarge"]
+    name             = "celery-workers" # for pods that we want to autoscale
+    type             = "cpu"
+    spot             = true
+    desired_capacity = "0"
+  },
+  {
+    min_size         = 1
+    max_size         = 20
+    instance_types   = ["m5.xlarge"]
+    name             = "static-workers" # for pods that need to be on stable nodes.
+    type             = "cpu"
+    spot             = false
+    desired_capacity = "0"
+  },
+  {
+    min_size         = 0
+    max_size         = 3
+    instance_types   = ["m5.xlarge"]
+    name             = "pdf-workers" # for pods that need to be on stable nodes.
+    type             = "cpu"
+    spot             = false
+    desired_capacity = "1"
+  },
+  {
+    min_size         = 0
+    max_size         = 3
+    instance_types   = ["m5.2xlarge"]
+    name             = "highmem-workers" # for autoscaling pods that have high memory demands.
+    type             = "cpu"
+    spot             = false
+    desired_capacity = "0"
+  },
+  {
+    min_size         = 1
+    max_size         = 9
+    instance_types   = ["t2.medium"]
+    name             = "monitoring-workers" # for autoscaling pods that have high memory demands.
+    type             = "cpu"
+    spot             = false
+    desired_capacity = "3"
+  },
+  {
+    min_size         = 1
+    max_size         = 4
+    instance_types   = ["m5.large"]
+    name             = "pgo-workers" # for pods that we want to autoscale
+    type             = "cpu"
+    spot             = false
+    desired_capacity = "1"
+    taints           = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
+  }
+  */
   ## an example additonal node pool
   #   pool3 = {
   #     node_count                     = 4

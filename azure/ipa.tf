@@ -42,11 +42,6 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
-data "azurerm_dns_zone" "azure_zone" {
-  name                = lower("azure.indico.io")
-  resource_group_name = local.resource_group_name
-}
-
 resource "helm_release" "ipa-crds" {
   depends_on = [
     module.cluster
@@ -91,13 +86,51 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
   create_duration = "1m"
 }
 
+resource "azurerm_role_assignment" "external_dns" {
+  scope                = data.azurerm_dns_zone.domain.id
+  role_definition_name = "DNS Zone Contributor"
+  principal_id         = module.cluster.kubelet_identity.object_id
+}
+
+resource "kubernetes_secret" "azure_storage_key" {
+  metadata {
+    name = "azure-storage-key"
+  }
+
+  data = {
+    azurestorageaccountname = module.storage.storage_account_name
+    azurestorageaccountkey  = module.storage.storage_account_primary_access_key
+  }
+}
+
+resource "kubernetes_config_map" "azure_dns_credentials" {
+
+  metadata {
+    name = "dns-credentials-config"
+  }
+
+  data = {
+    "azure.json" = <<EOF
+{
+  "tenantId" : "${data.azurerm_client_config.current.tenant_id}",
+  "subscriptionId" : "${split("/", data.azurerm_subscription.primary.id)[2]}",
+  "resourceGroup" : "${var.common_resource_group}",
+  "useManagedIdentityExtension" : true,
+  "userAssignedIdentityID" : "${module.cluster.kubelet_identity.client_id}"
+}
+    EOF
+  }
+}
+
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
     time_sleep.wait_1_minutes_after_crds,
     module.cluster,
     module.storage,
     helm_release.ipa-crds,
-    data.vault_kv_secret_v2.zerossl_data
+    data.vault_kv_secret_v2.zerossl_data,
+    kubernetes_secret.azure_storage_key,
+    kubernetes_config_map.azure_dns_credentials
   ]
 
   verify           = false
@@ -143,12 +176,15 @@ external-dns:
 
   provider: azure
   
-  azure:
-    resourceGroup: ${var.common_resource_group}
-    tenantId: ${data.azurerm_client_config.current.tenant_id}
-    subscriptionId: ${data.azurerm_subscription.primary.id}
-    useManagedIdentityExtension: true
-    userAssignedIdentityID: "MIClientIDTODO" 
+  extraVolumes: 
+    - name: azure-config
+      configMap:
+        name: dns-credentials-config
+
+  extraVolumeMounts: 
+    - name: azure-config
+      mountPath: /etc/kubernetes/azure.json
+      subPath: azure.json
 
   policy: sync
   sources:
@@ -159,177 +195,33 @@ cluster-autoscaler:
   enabled: false
       
 storage:
-  pvcSpec:
-    csi:
-      driver: fsx.csi.aws.com
-      volumeAttributes:
-        dnsname: $#{module.fsx-storage.fsx-rwx.dns_name} TODO
-        mountname: $#{module.fsx-storage.fsx-rwx.mount_name} TODO
-      volumeHandle: $#{module.fsx-storage.fsx-rwx.id} TODO
+  existingPVC: false
+  ebsStorageClass:
+    enabled: false
   indicoStorageClass:
-    enabled: true
-    name: indico-sc
-    provisioner: fsx.csi.aws.com TODO
-    parameters:
-      securityGroupIds: $#{local.security_group_id} TODO
-      subnetId: $#{module.fsx-storage.fsx-rwx.subnet_ids[0]} TODO
+    enabled: false
+    name: "default"
+  pvcSpec:
+    azureFile:
+      readOnly: false
+      secretName: "azure-storage-key"
+      secretNamespace: null
+      shareName: ${module.storage.fileshare_name}
+    mountOptions:
+      - dir_mode=0777
+      - file_mode=0777
+      - uid=1000
+      - gid=1000
+    csi: null
+    persistentVolumeReclaimPolicy: Retain
+    volumeMode: Filesystem
+
 crunchy-postgres:
   enabled: true
-  postgres-data:
-    enabled: true
-    metadata:
-      annotations:
-        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-    instances:
-    - affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node_group
-                operator: In
-                values:
-                - pgo-workers TODO
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: postgres-operator.crunchydata.com/cluster
-                operator: In
-                values:
-                - postgres-data
-              - key: postgres-operator.crunchydata.com/instance-set
-                operator: In
-                values:
-                - pgha1
-            topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      dataVolumeClaimSpec:
-        storageClassName: encrypted-gp2
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 30Gi
-      name: pgha1
-      replicas: 1
-      resources:
-        requests:
-          cpu: 500m
-          memory: 3000Mi
-      tolerations:
-        - effect: NoSchedule
-          key: indico.io/crunchy
-          operator: Exists
-    pgBackRestConfig:
-      global:
-        repo1-path: /pgbackrest/postgres-data/repo1
-        repo1-retention-full: '5'
-        repo1-s3-key-type: auto
-        repo1-s3-kms-key-id: "$#{module.kms_key.key_arn}" TODO
-        repo1-s3-role: $#{module.cluster.s3_role_id} TODO
-      repos:
-      - name: repo1
-        s3:
-          bucket: $#{module.s3-storage.pgbackup_s3_bucket_name} TODO
-          endpoint: s3.${var.region}.amazonaws.com TODO
-          region: ${var.region} TODO
-        schedules:
-          full: 30 4 * * *
-          incremental: 0 */1 * * *
-    imagePullSecrets:
-      - name: harbor-pull-secret
-    users:
-    - databases:
-      - noct
-      - cyclone
-      - crowdlabel
-      - moonbow
-      - elmosfire
-      - elnino
-      - sunbow
-      - doctor
-      - meteor
-      name: indico
-      options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
-  postgres-metrics:
-    enabled: false
-    metadata:
-      annotations:
-        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-    instances:
-    - affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node_group
-                operator: In
-                values:
-                - pgo-workers
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: postgres-operator.crunchydata.com/cluster
-                operator: In
-                values:
-                - postgres-metrics
-              - key: postgres-operator.crunchydata.com/instance-set
-                operator: In
-                values:
-                - pgha1
-            topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      dataVolumeClaimSpec:
-        storageClassName: encrypted-gp2
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 30Gi
-      name: pgha1
-      replicas: 2
-      resources:
-        requests:
-          cpu: 500m
-          memory: 3000Mi
-      tolerations:
-        - effect: NoSchedule
-          key: indico.io/crunchy
-          operator: Exists
-    pgBackRestConfig:
-      global:
-        repo1-path: /pgbackrest/postgres-metrics/repo1
-        repo1-retention-full: '5'
-        repo1-s3-key-type: auto
-        repo1-s3-kms-key-id: "$#{module.kms_key.key_arn}" TODO
-        repo1-s3-role: $#{module.cluster.s3_role_id} TODO
-      repos:
-      - name: repo1
-        s3: TODO
-          bucket: $#{module.s3-storage.pgbackup_s3_bucket_name} TODO
-          endpoint: s3.${var.region}.amazonaws.com TODO
-          region: ${var.region} TODO
-        schedules:
-          full: 30 4 * * *
-          incremental: 0 */1 * * *
-    imagePullSecrets:
-      - name: harbor-pull-secret
-    users:
-    - databases:
-      - meteor
-      name: indico
-      options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
-  
+aws-fsx-csi-driver:
+  enabled: false
+metrics-server:
+  enabled: false
   EOF
   ]
 }
@@ -337,7 +229,7 @@ crunchy-postgres:
 resource "time_sleep" "wait_10_minutes_after_pre_reqs" {
   depends_on = [helm_release.ipa-pre-requisites]
 
-  create_duration = "10m"
+  create_duration = "1m" #TODO, make 10 min again
 }
 
 data "github_repository" "argo-github-repo" {

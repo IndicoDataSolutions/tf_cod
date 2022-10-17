@@ -109,7 +109,7 @@ module "argo-registration" {
     argocd     = argocd
   }
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.1.5"
+  version                      = "1.1.6"
   cluster_name                 = var.label
   region                       = var.region
   argo_password                = var.argo_password
@@ -198,7 +198,7 @@ module "storage" {
     azurerm_resource_group.cod-cluster
   ]
   source              = "app.terraform.io/indico/indico-azure-blob/mod"
-  version             = "0.1.0"
+  version             = "0.1.3"
   label               = var.label
   region              = var.region
   resource_group_name = local.resource_group_name
@@ -218,7 +218,7 @@ module "cluster" {
     azurerm_resource_group.cod-cluster
   ]
   source                  = "app.terraform.io/indico/indico-azure-cluster/mod"
-  version                 = "2.0.9"
+  version                 = "2.0.11"
   label                   = var.label
   public_key              = tls_private_key.pk.public_key_openssh
   region                  = var.region
