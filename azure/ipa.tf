@@ -146,7 +146,7 @@ external-dns:
   azure:
     resourceGroup: ${var.common_resource_group}
     tenantId: ${data.azurerm_client_config.current.tenant_id}
-    subscriptionId: ${data.azurerm_subscription.primary.id}
+    subscriptionId: ${data.azurerm_client_config.subscription_id}
     useManagedIdentityExtension: true
     userAssignedIdentityID: "MIClientIDTODO" 
 
