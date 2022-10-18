@@ -248,6 +248,7 @@ module "cluster" {
   s3_buckets                 = [ module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots") ]
   cluster_version            = var.cluster_version
   efs_filesystem_id          = [ var.include_efs ? module.efs-storage[0].efs_filesystem_id :  "" ]
+  access_security_group = module.cluster-manager.cluster_manager_sg
 }
 
 resource "aws_security_group" "indico_allow_access" {
