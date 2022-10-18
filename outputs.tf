@@ -14,6 +14,13 @@ output "cluster_manager_ip" {
   value       = module.cluster-manager.cluster_manager_ip
 }
 
+
+output "s3_role_id" {
+  description = "ID of the S3 role"
+  value       = module.cluster.s3_role_id
+}
+
+
 output "efs_filesystem_id" {
   description = "ID of the EFS filesystem"
   value       = var.include_efs ? module.efs-storage[0].efs_filesystem_id :  ""
