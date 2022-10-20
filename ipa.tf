@@ -1,3 +1,43 @@
+locals {
+  efs_values = var.include_efs ? [<<EOF
+    pvcSpec:
+      volumeMode: Filesystem
+      mountOptions: []
+      csi:
+        driver: efs.csi.aws.com
+        volumeHandle: ${module.efs-storage[0].efs_filesystem_id}
+    indicoStorageClass:
+      enabled: true
+      name: indico-sc
+      provisioner: efs.csi.aws.com
+      parameters:
+        provisioningMode: efs-ap
+        fileSystemId: ${module.efs-storage[0].efs_filesystem_id}
+        directoryPerms: "700"
+        gidRangeStart: "1000" # optional
+        gidRangeEnd: "2000" # optional
+        basePath: "/dynamic_provisioning" # optional
+ EOF
+  ] : ""
+  fsx_values = var.include_fsx ?[<<EOF
+    pvcSpec:
+      csi:
+        driver: fsx.csi.aws.com
+        volumeAttributes:
+          dnsname: ${module.fsx-storage.fsx-rwx.dns_name}
+          mountname: ${module.fsx-storage.fsx-rwx.mount_name}
+        volumeHandle: ${module.fsx-storage.fsx-rwx.id}
+    indicoStorageClass:
+      enabled: true
+      name: indico-sc
+      provisioner: fsx.csi.aws.com
+      parameters:
+        securityGroupIds: ${local.security_group_id}
+        subnetId: ${module.fsx-storage.fsx-rwx.subnet_ids[0]}
+ EOF
+  ] : ""
+  storage_spec = var.include_fsx ? local.efs_values : local.fsx_values
+}
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
     module.cluster
@@ -189,23 +229,7 @@ cluster-autoscaler:
       clusterName: "${local.cluster_name}"
       
 storage:
-  pvcSpec:
-    volumeMode: Filesystem
-    mountOptions: []
-    csi:
-      driver: efs.csi.aws.com
-      volumeHandle: ${module.efs-storage[0].efs_filesystem_id}
-  indicoStorageClass:
-    enabled: true
-    name: indico-sc
-    provisioner: efs.csi.aws.com
-    parameters:
-      provisioningMode: efs-ap
-      fileSystemId: ${module.efs-storage[0].efs_filesystem_id}
-      directoryPerms: "700"
-      gidRangeStart: "1000" # optional
-      gidRangeEnd: "2000" # optional
-      basePath: "/dynamic_provisioning" # optional
+  ${local.storage_spec}
 crunchy-postgres:
   enabled: true
   postgres-data:

@@ -96,6 +96,7 @@ skip_final_snapshot         = true
 per_unit_storage_throughput = 50
 include_rox                 = false
 include_fsx                 = false
+include_efs                 = true
 #cluster
 node_group_multi_az = false
 assumed_roles = [
