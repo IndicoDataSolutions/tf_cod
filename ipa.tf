@@ -36,7 +36,7 @@ locals {
         subnetId: ${module.fsx-storage.fsx-rwx.subnet_ids[0]}
  EOF
   ] : []
-  storage_spec = var.include_fsx ? local.efs_values : local.fsx_values
+  storage_spec = var.include_fsx ? local.fsx_values : local.efs_values
 }
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
