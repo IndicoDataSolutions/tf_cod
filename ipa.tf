@@ -1,5 +1,6 @@
 locals {
   efs_values = var.include_efs ? [<<EOF
+  storage:
     pvcSpec:
       volumeMode: Filesystem
       mountOptions: []
@@ -20,6 +21,7 @@ locals {
  EOF
   ] : []
   fsx_values = var.include_fsx ? [<<EOF
+  storage:
     pvcSpec:
       csi:
         driver: fsx.csi.aws.com
@@ -228,8 +230,8 @@ cluster-autoscaler:
     autoDiscovery:
       clusterName: "${local.cluster_name}"
       
-storage:
-  ${local.storage_spec}
+
+${local.storage_spec}
 crunchy-postgres:
   enabled: true
   postgres-data:
