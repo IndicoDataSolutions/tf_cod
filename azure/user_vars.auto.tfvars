@@ -31,7 +31,8 @@ additional_node_pools = {
     zones      = ["1", "2"]
     taints     = ["nvidia.com/gpu=true:NoSchedule"]
     labels = {
-      "node_group" : "gpu-workers"
+      "node_group" : "gpu-workers",
+      "k8s.amazonaws.com/accelerator" : "nvidia"
     }
     cluster_auto_scaling           = true
     cluster_auto_scaling_min_count = 0

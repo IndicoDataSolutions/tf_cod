@@ -68,8 +68,6 @@ provider "argocd" {
 
 provider "kubernetes" {
   host                   = module.cluster.kubernetes_host
-  username               = module.cluster.kubernetes_username
-  password               = module.cluster.kubernetes_password
   client_certificate     = module.cluster.kubernetes_client_certificate
   client_key             = module.cluster.kubernetes_client_key
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
@@ -77,8 +75,6 @@ provider "kubernetes" {
 
 provider "kubectl" {
   host                   = module.cluster.kubernetes_host
-  username               = module.cluster.kubernetes_username
-  password               = module.cluster.kubernetes_password
   client_certificate     = module.cluster.kubernetes_client_certificate
   client_key             = module.cluster.kubernetes_client_key
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
@@ -90,13 +86,10 @@ provider "helm" {
   debug = true
   kubernetes {
     host                   = module.cluster.kubernetes_host
-    username               = module.cluster.kubernetes_username
-    password               = module.cluster.kubernetes_password
     client_certificate     = module.cluster.kubernetes_client_certificate
     client_key             = module.cluster.kubernetes_client_key
     cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
   }
-
 }
 
 module "argo-registration" {
@@ -218,7 +211,7 @@ module "cluster" {
     azurerm_resource_group.cod-cluster
   ]
   source                  = "app.terraform.io/indico/indico-azure-cluster/mod"
-  version                 = "2.0.13"
+  version                 = "2.0.19"
   label                   = var.label
   public_key              = tls_private_key.pk.public_key_openssh
   region                  = var.region

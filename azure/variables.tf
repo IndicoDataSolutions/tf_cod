@@ -103,22 +103,22 @@ variable "ipa_repo" {
 
 variable "ipa_version" {
   type    = string
-  default = "0.1.2"
+  default = "0.12.1"
 }
 
 variable "monitoring_version" {
   type    = string
-  default = "0.0.1"
+  default = "0.3.3"
 }
 
 variable "ipa_pre_reqs_version" {
   type    = string
-  default = "0.1.1"
+  default = "0.4.0"
 }
 
 variable "ipa_crds_version" {
   type    = string
-  default = "0.1.0"
+  default = "0.2.1"
 }
 
 variable "ipa_enabled" {

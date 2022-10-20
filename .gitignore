@@ -1,5 +1,5 @@
 .terraform*
-
+.andrey*
 vendor
 dont_check_in*
 terraform.tfstate*

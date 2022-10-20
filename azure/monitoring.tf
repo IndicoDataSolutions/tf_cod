@@ -104,7 +104,13 @@ resource "helm_release" "monitoring" {
       prometheusSpec:
         nodeSelector:
           node_group: static-workers
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: default
 
+  prometheus-adapter:
+    enabled: false
  EOF
   ]
 }
