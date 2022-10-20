@@ -18,8 +18,8 @@ locals {
         gidRangeEnd: "2000" # optional
         basePath: "/dynamic_provisioning" # optional
  EOF
-  ] : ""
-  fsx_values = var.include_fsx ?[<<EOF
+  ] : []
+  fsx_values = var.include_fsx ? [<<EOF
     pvcSpec:
       csi:
         driver: fsx.csi.aws.com
@@ -35,7 +35,7 @@ locals {
         securityGroupIds: ${local.security_group_id}
         subnetId: ${module.fsx-storage.fsx-rwx.subnet_ids[0]}
  EOF
-  ] : ""
+  ] : []
   storage_spec = var.include_fsx ? local.efs_values : local.fsx_values
 }
 resource "kubernetes_secret" "issuer-secret" {
