@@ -156,7 +156,7 @@ resource "helm_release" "ipa-pre-requisites" {
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
 
-  values = [<<EOF
+  values = concat(local.storage_spec, [<<EOF
 secrets:
   rabbitmq:
     create: true
@@ -229,9 +229,6 @@ cluster-autoscaler:
       tag: "v1.20.0"
     autoDiscovery:
       clusterName: "${local.cluster_name}"
-      
-
-${local.storage_spec}
 crunchy-postgres:
   enabled: true
   postgres-data:
@@ -390,7 +387,7 @@ crunchy-postgres:
       options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   
   EOF
-  ]
+  ])
 }
 
 resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
