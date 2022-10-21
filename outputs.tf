@@ -23,11 +23,11 @@ output "s3_role_id" {
 
 output "efs_filesystem_id" {
   description = "ID of the EFS filesystem"
-  value       = var.include_efs ? module.efs-storage[0].efs_filesystem_id :  ""
+  value       = var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""
 }
 output "fsx-rwx" {
   description = "Read write filesystem"
-  value       = var.include_fsx ? module.fsx-storage[0].fsx-rwx : ""
+  value       = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx : ""
 }
 
 output "fsx-rox" {
@@ -54,19 +54,19 @@ output "key_pem" {
 
 # Outputs for Argo
 output "fsx_storage_fsx_rwx_dns_name" {
-  value = var.include_fsx ? module.fsx-storage[0].fsx-rwx.dns_name : ""
+  value = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.dns_name : ""
 }
 
 output "fsx_storage_fsx_rwx_mount_name" {
-  value = var.include_fsx ? module.fsx-storage[0].fsx-rwx.mount_name : ""
+  value = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.mount_name : ""
 }
 
 output "fsx_storage_fsx_rwx_volume_handle" {
-  value = var.include_fsx ? module.fsx-storage[0].fsx-rwx.id : ""
+  value = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.id : ""
 }
 
 output "fsx_storage_fsx_rwx_subnet_id" {
-  value = var.include_fsx ? module.fsx-storage[0].fsx-rwx.subnet_ids[0] : ""
+  value = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.subnet_ids[0] : ""
 }
 
 output "cluster_name" {

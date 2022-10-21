@@ -1,5 +1,5 @@
 locals {
-  efs_values = var.include_efs ? [<<EOF
+  efs_values = var.include_efs == true ? [<<EOF
   storage:
     pvcSpec:
       volumeMode: Filesystem
@@ -20,7 +20,7 @@ locals {
         basePath: "/dynamic_provisioning" # optional
  EOF
   ] : []
-  fsx_values = var.include_fsx ? [<<EOF
+  fsx_values = var.include_fsx == true ? [<<EOF
   storage:
     pvcSpec:
       csi:
@@ -38,7 +38,7 @@ locals {
         subnetId: ${module.fsx-storage[0].fsx-rwx.subnet_ids[0]}
  EOF
   ] : []
-  storage_spec = var.include_fsx ? local.fsx_values : local.efs_values
+  storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
 }
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
