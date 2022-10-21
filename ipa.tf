@@ -126,7 +126,7 @@ resource "github_repository_file" "crds-values-yaml" {
 
 data "github_repository_file" "data-crds-values" {
   depends_on = [
-    github_repository_file.pre-reqs-values-yaml
+    github_repository_file.crds-values-yaml
   ]
   repository = data.github_repository.argo-github-repo.name
   branch     = var.argo_branch
@@ -136,7 +136,7 @@ data "github_repository_file" "data-crds-values" {
 
 data "github_repository_file" "data-pre-reqs-values" {
   depends_on = [
-    github_repository_file.crds-values-yaml
+    github_repository_file.pre-reqs-values-yaml
   ]
   repository = data.github_repository.argo-github-repo.name
   branch     = var.argo_branch
