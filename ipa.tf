@@ -92,9 +92,61 @@ output "ns" {
   value = data.aws_route53_zone.aws-zone.name_servers
 }
 
+
+resource "github_repository_file" "pre-reqs-values-yaml" {
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/helm/pre-reqs-values.yaml"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+  content = base64decode(var.pre-reqs-values-yaml-b64)
+}
+
+
+resource "github_repository_file" "crds-values-yaml" {
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/helm/crds-values.yaml"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+  content = base64decode(var.crds-values-yaml-b64)
+}
+
+data "github_repository_file" "data-crds-values" {
+  depends_on = [
+    github_repository_file.pre-reqs-values-yaml
+  ]
+  repository = data.github_repository.argo-github-repo.name
+  branch     = var.argo_branch
+  file       = "${var.argo_path}/helm/crds-values.yaml"
+}
+
+
+data "github_repository_file" "data-pre-reqs-values" {
+  depends_on = [
+    github_repository_file.crds-values-yaml
+  ]
+  repository = data.github_repository.argo-github-repo.name
+  branch     = var.argo_branch
+  file       = "${var.argo_path}/helm/pre-reqs-values.yaml"
+}
+
 resource "helm_release" "ipa-crds" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    data.github_repository_file.data-crds-values
   ]
 
   verify           = false
@@ -106,7 +158,8 @@ resource "helm_release" "ipa-crds" {
   version          = var.ipa_crds_version
   wait             = true
 
-  values = [<<EOF
+  values = [
+    <<EOF
   crunchy-pgo:
     enabled: true
   
@@ -126,7 +179,11 @@ resource "helm_release" "ipa-crds" {
         kubernetes.io/os: linux
     enabled: true
     installCRDs: true
- EOF
+EOF
+    ,
+    <<EOT
+${data.github_repository_file.data-crds-values.content}
+EOT
   ]
 }
 
@@ -142,7 +199,8 @@ resource "helm_release" "ipa-pre-requisites" {
     module.cluster,
     module.fsx-storage,
     helm_release.ipa-crds,
-    data.vault_kv_secret_v2.zerossl_data
+    data.vault_kv_secret_v2.zerossl_data,
+    data.github_repository_file.data-pre-reqs-values
   ]
 
   verify           = false
@@ -270,7 +328,7 @@ crunchy-postgres:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 30Gi
+            storage: 200Gi
       name: pgha1
       replicas: 1
       resources:
@@ -386,7 +444,11 @@ crunchy-postgres:
       name: indico
       options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   
-  EOF
+EOF
+    ,
+    <<EOT
+${data.github_repository_file.data-pre-reqs-values.content}
+EOT
   ])
 }
 
@@ -399,7 +461,6 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
 data "github_repository" "argo-github-repo" {
   full_name = "IndicoDataSolutions/${var.argo_repo}"
 }
-
 
 resource "github_repository_file" "smoketest-application-yaml" {
   count = var.ipa_smoketest_enabled == true ? 1 : 0
@@ -578,6 +639,9 @@ resource "argocd_application" "ipa" {
       repo_url        = "https://github.com/IndicoDataSolutions/${var.argo_repo}.git"
       path            = var.argo_path
       target_revision = var.argo_branch
+      directory {
+        recurse = false
+      }
     }
 
     sync_policy {

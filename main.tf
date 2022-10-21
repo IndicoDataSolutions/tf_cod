@@ -283,14 +283,24 @@ provider "argocd" {
 provider "kubernetes" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  token                  = module.cluster.kubernetes_token
+  #token                  = module.cluster.kubernetes_token
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", var.label]
+    command     = "aws"
+  }
 }
 
 provider "kubectl" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  token                  = module.cluster.kubernetes_token
-  load_config_file       = false
+  #token                  = module.cluster.kubernetes_token
+  load_config_file = false
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", var.label]
+    command     = "aws"
+  }
 }
 
 
@@ -318,7 +328,7 @@ module "argo-registration" {
     argocd     = argocd
   }
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.0.45"
+  version                      = "1.0.46"
   label                        = var.label
   region                       = var.region
   argo_password                = var.argo_password
