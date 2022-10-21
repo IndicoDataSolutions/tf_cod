@@ -186,7 +186,7 @@ module "s3-storage" {
 }
 
 module "efs-storage" {
-  count              = var.include_efs ? 1 : 0
+  count              = var.include_efs == true ? 1 : 0
   source             = "app.terraform.io/indico/indico-aws-efs/mod"
   version            = "0.0.1"
   label              = var.label
@@ -198,7 +198,7 @@ module "efs-storage" {
 }
 
 module "fsx-storage" {
-  count                       = var.include_fsx ? 1 : 0
+  count                       = var.include_fsx == true ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-fsx/mod"
   version                     = "1.4.1"
   label                       = var.label

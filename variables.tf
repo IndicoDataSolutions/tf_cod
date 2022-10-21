@@ -461,7 +461,7 @@ variable "include_pgbackup" {
 
 variable "include_efs" {
   type        = bool
-  default     = true
+  default     = false
   description = "Create efs"
 }
 
