@@ -27,7 +27,7 @@ output "efs_filesystem_id" {
 }
 output "fsx-rwx" {
   description = "Read write filesystem"
-  value       = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx : {}
+  value       = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx : null
 }
 
 output "fsx-rox" {
