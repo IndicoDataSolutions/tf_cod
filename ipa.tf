@@ -42,7 +42,7 @@ locals {
       name: indico-sc
       provisioner: fsx.csi.aws.com
       parameters:
-        securityGroupIds: [${local.security_group_id}]
+        securityGroupIds: ${local.security_group_id}
         subnetId: ${module.fsx-storage[0].fsx-rwx.subnet_ids[0]}
  EOF
   ] : []
