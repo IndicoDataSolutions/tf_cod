@@ -1,5 +1,9 @@
 locals {
   efs_values = var.include_efs == true ? [<<EOF
+  aws-fsx-csi-driver:
+    enabled: false
+  aws-efs-csi-driver:
+    enabled: true
   storage:
     pvcSpec:
       volumeMode: Filesystem
@@ -21,6 +25,10 @@ locals {
  EOF
   ] : []
   fsx_values = var.include_fsx == true ? [<<EOF
+  aws-fsx-csi-driver:
+    enabled: true
+  aws-efs-csi-driver:
+    enabled: false
   storage:
     pvcSpec:
       csi:
