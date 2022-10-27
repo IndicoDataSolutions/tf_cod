@@ -236,6 +236,74 @@ data "github_repository" "argo-github-repo" {
   full_name = "IndicoDataSolutions/${var.argo_repo}"
 }
 
+resource "github_repository_file" "smoketest-application-yaml" {
+  count = var.ipa_smoketest_enabled == true ? 1 : 0
+
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/ipa_smoketest.yaml"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+
+  content = <<EOT
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ${local.argo_smoketest_app_name}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app: cod
+    region: ${var.region}
+    account: azure
+    name: ${var.label}
+  annotations:
+    avp.kubernetes.io/path: tools/argo/data/ipa-deploy
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  destination:
+    server: ${module.cluster.kubernetes_host}
+    namespace: default
+  project: ${module.argo-registration.argo_project_name}
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
+  source:
+    chart: cod-smoketests
+    repoURL: ${var.ipa_smoketest_repo}
+    targetRevision: ${var.ipa_smoketest_version}
+    plugin:
+      name: argocd-vault-plugin-helm-values-expand-no-build
+      env:
+        - name: RELEASE_NAME
+          value: run
+      
+        - name: HELM_VALUES
+          value: |
+            image:
+              tag: ${var.ipa_smoketest_container_tag}
+            cronjob:
+              enabled: ${var.ipa_smoketest_cronjob_enabled}
+              schedule: "${var.ipa_smoketest_cronjob_schedule}"
+            cluster:
+              name: ${var.label}
+              region: ${var.region}
+              account: azure
+            host: ${local.dns_name}
+            slack:
+              channel: ${var.ipa_smoketest_slack_channel}
+EOT
+}
+
+
 resource "github_repository_file" "argocd-application-yaml" {
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
@@ -315,6 +383,7 @@ resource "argocd_application" "ipa" {
     time_sleep.wait_1_minutes_after_pre_reqs,
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
+    github_repository_file.smoketest-application-yaml,
     github_repository_file.argocd-application-yaml,
     helm_release.keda-monitoring
   ]

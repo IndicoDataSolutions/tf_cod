@@ -4,13 +4,9 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "=3.23.0"
     }
-    local = {
-      source  = "hashicorp/local"
-      version = "=2.2.3"
-    }
-    argocd = {
-      source  = "oboukili/argocd"
-      version = "3.1.0"
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "~> 2.15.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
@@ -23,11 +19,22 @@ terraform {
       source  = "hashicorp/helm"
       version = ">= 2.6.0"
     }
+    argocd = {
+      source  = "oboukili/argocd"
+      version = "3.1.0"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = "=2.2.3"
+    }
   }
 }
 
 provider "azurerm" {
   features {}
+}
+
+provider "azuread" {
 }
 
 provider "http" {}
@@ -120,8 +127,9 @@ locals {
   resource_group_name = "${var.label}-${var.region}"
   current_ip          = "${chomp(data.http.workstation-external-ip.response_body)}/20"
 
-  argo_app_name     = lower("azure.${var.region}.${var.label}-ipa")
-  argo_cluster_name = "azure.${var.region}.${var.label}"
+  argo_app_name           = lower("azure.${var.region}.${var.label}-ipa")
+  argo_cluster_name       = "azure.${var.region}.${var.label}"
+  argo_smoketest_app_name = lower("azure.${var.region}.${var.label}-smoketest")
 
   cluster_name = var.label
   dns_name     = lower("${var.label}-${var.region}.${var.domain_suffix}")
