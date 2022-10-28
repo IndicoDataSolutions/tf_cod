@@ -159,6 +159,7 @@ module "networking" {
   vnet_cidr           = var.vnet_cidr
   subnet_cidrs        = var.subnet_cidrs
   resource_group_name = local.resource_group_name
+  region              = var.region
 }
 
 /*
