@@ -8,7 +8,7 @@ data "azurerm_dns_zone" "domain" {
 }
 
 resource "azurerm_dns_caa_record" "fqdn" {
-  name                = local.dns_name
+  name                = local.dns_prefix
   zone_name           = data.azurerm_dns_zone.domain.name
   resource_group_name = var.common_resource_group
   ttl                 = 300

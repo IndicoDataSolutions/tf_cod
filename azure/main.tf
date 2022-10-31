@@ -133,6 +133,7 @@ locals {
 
   cluster_name = var.label
   dns_name     = lower("${var.label}-${var.region}.${var.domain_suffix}")
+  dns_prefix   = lower("${var.label}-${var.region}")
 }
 
 resource "tls_private_key" "pk" {
