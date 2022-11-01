@@ -447,6 +447,24 @@ variable "opentelemetry-collector_version" {
   default = "0.30.0"
 }
 
+variable "include_fsx" {
+  type        = bool
+  default     = true
+  description = "Create a fsx file system(s)"
+}
+
+variable "include_pgbackup" {
+  type        = bool
+  default     = true
+  description = "Create a read only FSx file system"
+}
+
+variable "include_efs" {
+  type        = bool
+  default     = false
+  description = "Create efs"
+}
+
 variable "crds-values-yaml-b64" {
   default = "Cg=="
 }
