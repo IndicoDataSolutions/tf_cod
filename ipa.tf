@@ -1,3 +1,53 @@
+locals {
+  efs_values = var.include_efs == true ? [<<EOF
+  aws-fsx-csi-driver:
+    enabled: false
+  aws-efs-csi-driver:
+    enabled: true
+  storage:
+    pvcSpec:
+      volumeMode: Filesystem
+      mountOptions: []
+      csi:
+        driver: efs.csi.aws.com
+        volumeHandle: ${module.efs-storage[0].efs_filesystem_id}
+    indicoStorageClass:
+      enabled: true
+      name: indico-sc
+      provisioner: efs.csi.aws.com
+      parameters:
+        provisioningMode: efs-ap
+        fileSystemId: ${module.efs-storage[0].efs_filesystem_id}
+        directoryPerms: "700"
+        gidRangeStart: "1000" # optional
+        gidRangeEnd: "2000" # optional
+        basePath: "/dynamic_provisioning" # optional
+ EOF
+  ] : []
+  fsx_values = var.include_fsx == true ? [<<EOF
+  aws-fsx-csi-driver:
+    enabled: true
+  aws-efs-csi-driver:
+    enabled: false
+  storage:
+    pvcSpec:
+      csi:
+        driver: fsx.csi.aws.com
+        volumeAttributes:
+          dnsname: ${module.fsx-storage[0].fsx-rwx.dns_name}
+          mountname: ${module.fsx-storage[0].fsx-rwx.mount_name}
+        volumeHandle: ${module.fsx-storage[0].fsx-rwx.id}
+    indicoStorageClass:
+      enabled: true
+      name: indico-sc
+      provisioner: fsx.csi.aws.com
+      parameters:
+        securityGroupIds: ${local.security_group_id}
+        subnetId: ${module.fsx-storage[0].fsx-rwx.subnet_ids[0]}
+ EOF
+  ] : []
+  storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
+}
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
     module.cluster
@@ -84,21 +134,21 @@ resource "github_repository_file" "crds-values-yaml" {
 
 data "github_repository_file" "data-crds-values" {
   depends_on = [
-    github_repository_file.pre-reqs-values-yaml
+    github_repository_file.crds-values-yaml
   ]
   repository = data.github_repository.argo-github-repo.name
   branch     = var.argo_branch
-  file       = "${var.argo_path}/helm/crds-values.yaml"
+  file       = var.argo_path == "." ? "helm/crds-values.yaml" : "${var.argo_path}/helm/crds-values.yaml"
 }
 
 
 data "github_repository_file" "data-pre-reqs-values" {
   depends_on = [
-    github_repository_file.crds-values-yaml
+    github_repository_file.pre-reqs-values-yaml
   ]
   repository = data.github_repository.argo-github-repo.name
   branch     = var.argo_branch
-  file       = "${var.argo_path}/helm/pre-reqs-values.yaml"
+  file       = var.argo_path == "." ? "helm/pre-reqs-values.yaml" : "${var.argo_path}/helm/pre-reqs-values.yaml"
 }
 
 resource "helm_release" "ipa-crds" {
@@ -172,8 +222,7 @@ resource "helm_release" "ipa-pre-requisites" {
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
 
-  values = [
-    <<EOF
+  values = concat(local.storage_spec, [<<EOF
 secrets:
   rabbitmq:
     create: true
@@ -246,22 +295,6 @@ cluster-autoscaler:
       tag: "v1.20.0"
     autoDiscovery:
       clusterName: "${local.cluster_name}"
-      
-storage:
-  pvcSpec:
-    csi:
-      driver: fsx.csi.aws.com
-      volumeAttributes:
-        dnsname: ${module.fsx-storage.fsx-rwx.dns_name}
-        mountname: ${module.fsx-storage.fsx-rwx.mount_name}
-      volumeHandle: ${module.fsx-storage.fsx-rwx.id}
-  indicoStorageClass:
-    enabled: true
-    name: indico-sc
-    provisioner: fsx.csi.aws.com
-    parameters:
-      securityGroupIds: ${local.security_group_id}
-      subnetId: ${module.fsx-storage.fsx-rwx.subnet_ids[0]}
 crunchy-postgres:
   enabled: true
   postgres-data:
@@ -424,7 +457,7 @@ EOF
     <<EOT
 ${data.github_repository_file.data-pre-reqs-values.content}
 EOT
-  ]
+  ])
 }
 
 resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
@@ -560,10 +593,10 @@ EOT
 }
 
 
-resource "local_file" "kubeconfig" {
-  content  = module.cluster.kubectl_config
-  filename = "${path.module}/module.kubeconfig"
-}
+# resource "local_file" "kubeconfig" {
+#   content  = module.cluster.kubectl_config
+#   filename = "${path.module}/module.kubeconfig"
+# }
 
 
 data "vault_kv_secret_v2" "zerossl_data" {
@@ -578,7 +611,7 @@ output "zerossl" {
 
 resource "argocd_application" "ipa" {
   depends_on = [
-    local_file.kubeconfig,
+    # local_file.kubeconfig,
     helm_release.ipa-pre-requisites,
     time_sleep.wait_1_minutes_after_pre_reqs,
     module.argo-registration,
