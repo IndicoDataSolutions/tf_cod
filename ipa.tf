@@ -427,11 +427,7 @@ resource "argocd_application" "ipa" {
     time_sleep.wait_10_minutes_after_pre_reqs,
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
-    github_repository_file.argocd-application-yaml,
-    github_repository_file.hibernation-autoscaler-yaml,
-    github_repository_file.hibernation-exporter-yaml,
-    github_repository_file.hibernation-prometheus-yaml,
-    github_repository_file.hibernation-secrets-yaml
+    github_repository_file.argocd-application-yaml
   ]
 
   count = var.ipa_enabled == true ? 1 : 0

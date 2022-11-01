@@ -35,7 +35,6 @@ output "key_pem" {
   sensitive   = true
 }
 
-# Outputs for Argo
 output "fsx_storage_fsx_rwx_dns_name" {
   value = module.fsx-storage.fsx-rwx.dns_name
 }

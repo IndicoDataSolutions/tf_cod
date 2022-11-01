@@ -100,6 +100,9 @@ resource "kubernetes_secret" "azure_storage_key" {
   data = {
     azurestorageaccountname = module.storage.storage_account_name
     azurestorageaccountkey  = module.storage.storage_account_primary_access_key
+    AZURE_ACCOUNT_NAME      = module.storage.storage_account_name
+    AZURE_ACCOUNT_KEY       = module.storage.storage_account_primary_access_key
+    AZURE_CONTAINER         = module.storage.blob_store_name
   }
 }
 
