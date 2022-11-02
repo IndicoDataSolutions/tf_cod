@@ -133,7 +133,8 @@ resource "helm_release" "ipa-pre-requisites" {
     helm_release.ipa-crds,
     data.vault_kv_secret_v2.zerossl_data,
     kubernetes_secret.azure_storage_key,
-    kubernetes_config_map.azure_dns_credentials
+    kubernetes_config_map.azure_dns_credentials,
+    kubernetes_service_account.workload_identity
   ]
 
   verify           = false

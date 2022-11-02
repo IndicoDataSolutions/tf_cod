@@ -17,3 +17,20 @@ resource "azurerm_role_assignment" "storage_account_role_assignment" {
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
 
+resource "kubernetes_service_account" "workload_identity" {
+  depends_on = [
+    module.cluster
+  ]
+
+  metadata {
+    name = "workload_identity_storage_account"
+    namespace = "default"
+    annotations = {
+      "azure.workload.identity/client-id" = azuread_application.workload_identity.object_id
+    }
+    labels = {
+       "azure.workload.identity/use" = "true"
+    }
+  }
+}
+
