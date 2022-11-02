@@ -235,6 +235,7 @@ module "cluster" {
   resource_group_name     = local.resource_group_name
   # this feature can be checked using:
   # az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/EnableWorkloadIdentityPreview')].{Name:name,State:properties.state}"
+  # az provider register --namespace Microsoft.ContainerService
   enable_workload_identity = true # requires: az feature register --namespace "Microsoft.ContainerService" --name "EnableWorkloadIdentityPreview"
   enable_oidc_issuer       = true
 }
