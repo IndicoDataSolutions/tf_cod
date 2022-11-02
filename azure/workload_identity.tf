@@ -34,3 +34,12 @@ resource "kubernetes_service_account" "workload_identity" {
   }
 }
 
+resource "azuread_application_federated_identity_credential" "workload_identity" {
+  application_object_id = azuread_application.workload_identity.object_id
+  display_name          = "${var.label}-${var.region}-workload-identity"
+  description           = "Initial workload identity for cluster"
+  audiences             = ["api://AzureADTokenExchange"]
+  issuer                = module.cluster.oidc_issuer_url
+  subject               = "system:serviceaccount:default:workload_identity_storage_account"
+}
+
