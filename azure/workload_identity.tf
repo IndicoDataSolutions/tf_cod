@@ -23,13 +23,13 @@ resource "kubernetes_service_account" "workload_identity" {
   ]
 
   metadata {
-    name = "workload_identity_storage_account"
+    name      = "workload-identity-storage-account"
     namespace = "default"
     annotations = {
       "azure.workload.identity/client-id" = azuread_application.workload_identity.object_id
     }
     labels = {
-       "azure.workload.identity/use" = "true"
+      "azure.workload.identity/use" = "true"
     }
   }
 }
@@ -40,6 +40,6 @@ resource "azuread_application_federated_identity_credential" "workload_identity"
   description           = "Initial workload identity for cluster"
   audiences             = ["api://AzureADTokenExchange"]
   issuer                = module.cluster.oidc_issuer_url
-  subject               = "system:serviceaccount:default:workload_identity_storage_account"
+  subject               = "system:serviceaccount:default:workload-identity-storage-account"
 }
 
