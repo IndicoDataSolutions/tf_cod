@@ -26,7 +26,7 @@ resource "kubernetes_service_account" "workload_identity" {
     name      = "workload-identity-storage-account"
     namespace = "default"
     annotations = {
-      "azure.workload.identity/client-id" = azuread_application.workload_identity.object_id
+      "azure.workload.identity/client-id" = azuread_application.workload_identity.application_id
     }
     labels = {
       "azure.workload.identity/use" = "true"
