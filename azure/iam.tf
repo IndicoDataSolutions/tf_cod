@@ -19,7 +19,7 @@ resource "azuread_group" "default_admin" {
 resource "azurerm_role_assignment" "default_admin" {
   scope                = "${module.cluster.id}/namespaces/default"
   role_definition_name = "Azure Kubernetes Service RBAC Admin"
-  principal_id         = azuread_group.cluster_admin.default_admin
+  principal_id         = azuread_group.default_admin.object_id
 }
 
 resource "azuread_group" "default_write" {
@@ -31,7 +31,7 @@ resource "azuread_group" "default_write" {
 resource "azurerm_role_assignment" "default_write" {
   scope                = "${module.cluster.id}/namespaces/default"
   role_definition_name = "Azure Kubernetes Service RBAC Writer"
-  principal_id         = azuread_group.cluster_admin.default_write
+  principal_id         = azuread_group.default_write.object_id
 }
 
 resource "azuread_group" "default_read" {
@@ -43,5 +43,5 @@ resource "azuread_group" "default_read" {
 resource "azurerm_role_assignment" "default_read" {
   scope                = "${module.cluster.id}/namespaces/default"
   role_definition_name = "Azure Kubernetes Service RBAC Reader"
-  principal_id         = azuread_group.cluster_admin.default_read
+  principal_id         = azuread_group.default_read.object_id
 }
