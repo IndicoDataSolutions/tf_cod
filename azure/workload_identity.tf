@@ -11,19 +11,19 @@ resource "azuread_service_principal" "workload_identity" {
   owners                       = [data.azuread_client_config.current.object_id]
 }
 
-resource "azurerm_role_assignment" "storage_account_role_assignment" {
+resource "azurerm_role_assignment" "storage_account_owner" {
   scope                = module.storage.storage_account_id
   role_definition_name = "Owner"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
 
-resource "azurerm_role_assignment" "storage_account_role_assignment" {
+resource "azurerm_role_assignment" "storage_account_blob_contributer" {
   scope                = module.storage.storage_account_id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
 
-resource "azurerm_role_assignment" "storage_account_role_assignment" {
+resource "azurerm_role_assignment" "storage_account_queue_contributer" {
   scope                = module.storage.storage_account_id
   role_definition_name = "Storage Queue Data Contributor"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
