@@ -221,7 +221,7 @@ module "cluster" {
     azurerm_resource_group.cod-cluster
   ]
   source                  = "app.terraform.io/indico/indico-azure-cluster/mod"
-  version                 = "2.0.21"
+  version                 = "2.0.22"
   label                   = var.label
   public_key              = tls_private_key.pk.public_key_openssh
   region                  = var.region

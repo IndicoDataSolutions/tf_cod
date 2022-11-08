@@ -17,6 +17,18 @@ resource "azurerm_role_assignment" "storage_account_role_assignment" {
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
 
+resource "azurerm_role_assignment" "storage_account_role_assignment" {
+  scope                = module.storage.storage_account_id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = resource.azuread_service_principal.workload_identity.object_id
+}
+
+resource "azurerm_role_assignment" "storage_account_role_assignment" {
+  scope                = module.storage.storage_account_id
+  role_definition_name = "Storage Queue Data Contributor"
+  principal_id         = resource.azuread_service_principal.workload_identity.object_id
+}
+
 resource "kubernetes_service_account" "workload_identity" {
   depends_on = [
     module.cluster
