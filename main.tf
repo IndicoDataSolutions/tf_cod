@@ -86,8 +86,9 @@ locals {
     }
   }
 
-  argo_app_name     = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
-  argo_cluster_name = "${var.aws_account}.${var.region}.${var.label}"
+  argo_app_name           = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
+  argo_smoketest_app_name = lower("${var.aws_account}.${var.region}.${var.label}-smoketest")
+  argo_cluster_name       = "${var.aws_account}.${var.region}.${var.label}"
 }
 
 resource "tls_private_key" "pk" {
@@ -172,7 +173,20 @@ module "s3-storage" {
   include_rox       = var.include_rox
 }
 
+module "efs-storage" {
+  count              = var.include_efs == true ? 1 : 0
+  source             = "app.terraform.io/indico/indico-aws-efs/mod"
+  version            = "0.0.1"
+  label              = var.label
+  additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage" })
+  security_groups    = [module.security-group.all_subnets_sg_id]
+  private_subnet_ids = flatten([local.network[0].private_subnet_ids])
+  kms_key_arn        = module.kms_key.key_arn
+
+}
+
 module "fsx-storage" {
+  count                       = var.include_fsx == true ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-fsx/mod"
   version                     = "1.4.1"
   label                       = var.label
@@ -194,9 +208,10 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "6.5.5"
+  version                    = "7.2.0"
   label                      = var.label
   additional_tags            = var.additional_tags
+  region                     = var.region
   map_roles                  = [{ rolearn = module.cluster-manager.cluster_manager_iam_role_arn, username = "admin", groups = ["system:masters"] }]
   map_users                  = values(local.eks_users)
   vpc_id                     = local.network[0].indico_vpc_id
@@ -205,14 +220,17 @@ module "cluster" {
   node_groups                = var.node_groups
   cluster_node_policies      = var.cluster_node_policies
   eks_cluster_iam_role       = var.eks_cluster_iam_role
-  eks_cluster_nodes_iam_role = var.eks_cluster_nodes_iam_role
-  fsx_arns                   = var.include_rox ? [module.fsx-storage.fsx-rox.arn, module.fsx-storage.fsx-rwx.arn] : [module.fsx-storage.fsx-rwx.arn]
+  eks_cluster_nodes_iam_role = "${var.label}-${var.region}-node-role"
+  fsx_arns                   = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
   kms_key_arn                = module.kms_key.key_arn
   multi_az                   = var.node_group_multi_az
   key_pair                   = aws_key_pair.kp.key_name
   snapshot_id                = var.snapshot_id
   default_tags               = var.default_tags
-  s3_data_bucket_name        = "indico-pgbackup-${var.label}"
+  s3_buckets                 = [module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots")]
+  cluster_version            = var.cluster_version
+  efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
+  access_security_group      = module.cluster-manager.cluster_manager_sg
 }
 
 resource "aws_security_group" "indico_allow_access" {
@@ -246,14 +264,24 @@ provider "argocd" {
 provider "kubernetes" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  token                  = module.cluster.kubernetes_token
+  #token                  = module.cluster.kubernetes_token
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", var.label]
+    command     = "aws"
+  }
 }
 
 provider "kubectl" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  token                  = module.cluster.kubernetes_token
-  load_config_file       = false
+  #token                  = module.cluster.kubernetes_token
+  load_config_file = false
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", var.label]
+    command     = "aws"
+  }
 }
 
 
@@ -262,9 +290,13 @@ provider "helm" {
   kubernetes {
     host                   = module.cluster.kubernetes_host
     cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-    token                  = module.cluster.kubernetes_token
+    #token                  = module.cluster.kubernetes_token
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      args        = ["eks", "get-token", "--cluster-name", var.label]
+      command     = "aws"
+    }
   }
-
 }
 
 module "argo-registration" {
@@ -277,7 +309,7 @@ module "argo-registration" {
     argocd     = argocd
   }
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.0.42"
+  version                      = "1.0.46"
   label                        = var.label
   region                       = var.region
   argo_password                = var.argo_password
@@ -287,7 +319,7 @@ module "argo-registration" {
 }
 
 locals {
-  security_group_id = tolist(module.fsx-storage.fsx-rwx.security_group_ids)[0]
+  security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
   cluster_name      = var.label
   dns_name          = lower("${var.label}.${var.region}.${var.aws_account}.indico.io")
 }

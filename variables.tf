@@ -24,7 +24,8 @@ variable "applications" {
     version         = string
     values          = string,
     namespace       = string,
-    createNamespace = bool
+    createNamespace = bool,
+    vaultPath       = string
   }))
   default = {}
 }
@@ -149,6 +150,12 @@ variable "cluster_name" {
   type        = string
   default     = "indico-cluster"
   description = "Name of the EKS cluster"
+}
+
+variable "cluster_version" {
+  type        = string
+  default     = "1.20"
+  description = "The EKS version to use"
 }
 
 variable "node_groups" {
@@ -289,12 +296,48 @@ variable "argo_github_team_owner" {
 
 variable "ipa_repo" {
   type    = string
-  default = "https://harbor.devops.indico.io/chartrepo/indico-charts-dev"
+  default = "https://harbor.devops.indico.io/chartrepo/indico-charts"
 }
 
 variable "ipa_version" {
   type    = string
   default = "0.12.1"
+}
+
+
+variable "ipa_smoketest_repo" {
+  type    = string
+  default = "https://harbor.devops.indico.io/chartrepo/indico-charts"
+}
+
+variable "ipa_smoketest_container_tag" {
+  type    = string
+  default = "IPA-5.4-e1c5af3d"
+}
+
+variable "ipa_smoketest_version" {
+  type    = string
+  default = "0.1.8"
+}
+
+variable "ipa_smoketest_slack_channel" {
+  type    = string
+  default = "cod-smoketest-results"
+}
+
+variable "ipa_smoketest_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "ipa_smoketest_cronjob_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "ipa_smoketest_cronjob_schedule" {
+  type    = string
+  default = "0 0 * * *" # every night at midnight
 }
 
 variable "monitoring_version" {
@@ -390,3 +433,43 @@ variable "monitoring_enabled" {
   type    = bool
   default = true
 }
+
+variable "hibernation_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "keda_version" {
+  default = "2.8.1"
+}
+
+variable "opentelemetry-collector_version" {
+  default = "0.30.0"
+}
+
+variable "include_fsx" {
+  type        = bool
+  default     = true
+  description = "Create a fsx file system(s)"
+}
+
+variable "include_pgbackup" {
+  type        = bool
+  default     = true
+  description = "Create a read only FSx file system"
+}
+
+variable "include_efs" {
+  type        = bool
+  default     = false
+  description = "Create efs"
+}
+
+variable "crds-values-yaml-b64" {
+  default = "Cg=="
+}
+
+variable "pre-reqs-values-yaml-b64" {
+  default = "Cg=="
+}
+

@@ -11,72 +11,72 @@ ipa_values = ""
 #name                 = "dop-832"
 #cluster_name         = "dop-832"
 #label                = "dop-832" # will be used for resource naming. should be unique within the AWS account
-node_groups = [
-  {
-    min_size         = 0
-    max_size         = 5
-    instance_types   = ["g4dn.xlarge"]
-    name             = "gpu-workers" # for gpu workloads
-    type             = "gpu"
-    spot             = false
-    desired_capacity = "0"
+cluster_version = "1.22"
+node_groups = {
+  gpu-workers = {
+    min_size               = 0
+    max_size               = 5
+    instance_types         = ["g4dn.xlarge"]
+    type                   = "gpu"
+    spot                   = false
+    desired_capacity       = "0"
+    additional_node_labels = "group=gpu-enabled"
+    taints                 = "--register-with-taints=nvidia.com/gpu=true:NoSchedule"
   },
-  {
+  celery-workers = {
     min_size         = 0
     max_size         = 20
     instance_types   = ["m5.xlarge"]
-    name             = "celery-workers" # for pods that we want to autoscale
     type             = "cpu"
-    spot             = true
+    spot             = false
     desired_capacity = "0"
+    taints           = "--register-with-taints=indico.io/celery=true:NoSchedule"
   },
-  {
+  static-workers = {
     min_size         = 1
     max_size         = 20
     instance_types   = ["m5.xlarge"]
-    name             = "static-workers" # for pods that need to be on stable nodes.
     type             = "cpu"
     spot             = false
     desired_capacity = "0"
   },
-  {
+  pdf-workers = {
     min_size         = 0
     max_size         = 3
     instance_types   = ["m5.xlarge"]
-    name             = "pdf-workers" # for pods that need to be on stable nodes.
     type             = "cpu"
     spot             = false
     desired_capacity = "1"
+    taints           = "--register-with-taints=indico.io/pdfextraction=true:NoSchedule"
   },
-  {
+  highmem-workers = {
     min_size         = 0
     max_size         = 3
     instance_types   = ["m5.2xlarge"]
-    name             = "highmem-workers" # for autoscaling pods that have high memory demands.
     type             = "cpu"
     spot             = false
     desired_capacity = "0"
+    taints           = "--register-with-taints=indico.io/highmem=true:NoSchedule"
   },
-  {
-    min_size         = 1
-    max_size         = 9
-    instance_types   = ["t2.medium"]
-    name             = "monitoring-workers" # for autoscaling pods that have high memory demands.
-    type             = "cpu"
-    spot             = false
-    desired_capacity = "3"
-  },
-  {
+  monitoring-workers = {
     min_size         = 1
     max_size         = 4
     instance_types   = ["m5.large"]
-    name             = "pgo-workers" # for pods that we want to autoscale
+    type             = "cpu"
+    spot             = false
+    desired_capacity = "1"
+    taints           = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
+  },
+  pgo-workers = {
+    min_size         = 1
+    max_size         = 4
+    instance_types   = ["m5.large"]
     type             = "cpu"
     spot             = false
     desired_capacity = "1"
     taints           = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
   }
-]
+}
 # additional_tags = { # delete this if no additional tags needed
 #   foo = "bar",
 #   baz = "qux"
@@ -86,8 +86,7 @@ default_tags = {
   "indico/cluster"     = "dop-832",    #This should match the label variable
   "indico/environment" = "dev"         # Choices are dev , stage , prod
 }
-user_ip = "" # set this to the external IP address if deployment server has no outbound access; else, leave as empty string or remove
-#cluster_node_policies = ["AWSWAFReadOnlyAccess", "CloudWatchLogsFullAccess", "AmazonSQSFullAccess", "AmazonSNSFullAccess"]
+user_ip           = "" # set this to the external IP address if deployment server has no outbound access; else, leave as empty string or remove
 submission_expiry = 30 # days
 uploads_expiry    = 30 # days
 #RDS Stuff
@@ -96,6 +95,8 @@ skip_final_snapshot         = true
 #fsx
 per_unit_storage_throughput = 50
 include_rox                 = false
+include_fsx                 = true
+include_efs                 = false
 #cluster
 node_group_multi_az = false
 assumed_roles = [

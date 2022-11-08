@@ -1,3 +1,53 @@
+locals {
+  efs_values = var.include_efs == true ? [<<EOF
+  aws-fsx-csi-driver:
+    enabled: false
+  aws-efs-csi-driver:
+    enabled: true
+  storage:
+    pvcSpec:
+      volumeMode: Filesystem
+      mountOptions: []
+      csi:
+        driver: efs.csi.aws.com
+        volumeHandle: ${module.efs-storage[0].efs_filesystem_id}
+    indicoStorageClass:
+      enabled: true
+      name: indico-sc
+      provisioner: efs.csi.aws.com
+      parameters:
+        provisioningMode: efs-ap
+        fileSystemId: ${module.efs-storage[0].efs_filesystem_id}
+        directoryPerms: "700"
+        gidRangeStart: "1000" # optional
+        gidRangeEnd: "2000" # optional
+        basePath: "/dynamic_provisioning" # optional
+ EOF
+  ] : []
+  fsx_values = var.include_fsx == true ? [<<EOF
+  aws-fsx-csi-driver:
+    enabled: true
+  aws-efs-csi-driver:
+    enabled: false
+  storage:
+    pvcSpec:
+      csi:
+        driver: fsx.csi.aws.com
+        volumeAttributes:
+          dnsname: ${module.fsx-storage[0].fsx-rwx.dns_name}
+          mountname: ${module.fsx-storage[0].fsx-rwx.mount_name}
+        volumeHandle: ${module.fsx-storage[0].fsx-rwx.id}
+    indicoStorageClass:
+      enabled: true
+      name: indico-sc
+      provisioner: fsx.csi.aws.com
+      parameters:
+        securityGroupIds: ${local.security_group_id}
+        subnetId: ${module.fsx-storage[0].fsx-rwx.subnet_ids[0]}
+ EOF
+  ] : []
+  storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
+}
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
     module.cluster
@@ -50,9 +100,61 @@ output "ns" {
   value = data.aws_route53_zone.aws-zone.name_servers
 }
 
+
+resource "github_repository_file" "pre-reqs-values-yaml" {
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/helm/pre-reqs-values.yaml"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+  content = base64decode(var.pre-reqs-values-yaml-b64)
+}
+
+
+resource "github_repository_file" "crds-values-yaml" {
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/helm/crds-values.yaml"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+  content = base64decode(var.crds-values-yaml-b64)
+}
+
+data "github_repository_file" "data-crds-values" {
+  depends_on = [
+    github_repository_file.crds-values-yaml
+  ]
+  repository = data.github_repository.argo-github-repo.name
+  branch     = var.argo_branch
+  file       = var.argo_path == "." ? "helm/crds-values.yaml" : "${var.argo_path}/helm/crds-values.yaml"
+}
+
+
+data "github_repository_file" "data-pre-reqs-values" {
+  depends_on = [
+    github_repository_file.pre-reqs-values-yaml
+  ]
+  repository = data.github_repository.argo-github-repo.name
+  branch     = var.argo_branch
+  file       = var.argo_path == "." ? "helm/pre-reqs-values.yaml" : "${var.argo_path}/helm/pre-reqs-values.yaml"
+}
+
 resource "helm_release" "ipa-crds" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    data.github_repository_file.data-crds-values
   ]
 
   verify           = false
@@ -64,7 +166,8 @@ resource "helm_release" "ipa-crds" {
   version          = var.ipa_crds_version
   wait             = true
 
-  values = [<<EOF
+  values = [
+    <<EOF
   crunchy-pgo:
     enabled: true
   
@@ -84,7 +187,11 @@ resource "helm_release" "ipa-crds" {
         kubernetes.io/os: linux
     enabled: true
     installCRDs: true
- EOF
+EOF
+    ,
+    <<EOT
+${data.github_repository_file.data-crds-values.content}
+EOT
   ]
 }
 
@@ -100,7 +207,8 @@ resource "helm_release" "ipa-pre-requisites" {
     module.cluster,
     module.fsx-storage,
     helm_release.ipa-crds,
-    data.vault_kv_secret_v2.zerossl_data
+    data.vault_kv_secret_v2.zerossl_data,
+    data.github_repository_file.data-pre-reqs-values
   ]
 
   verify           = false
@@ -114,8 +222,7 @@ resource "helm_release" "ipa-pre-requisites" {
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
 
-  values = [<<EOF
-
+  values = concat(local.storage_spec, [<<EOF
 secrets:
   rabbitmq:
     create: true
@@ -130,6 +237,33 @@ secrets:
       eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
      
+monitoring:
+  enabled: true
+  global:
+      host: "${local.dns_name}"
+    
+  ingress-nginx:
+    enabled: true
+
+    rbac:
+      create: true
+
+    admissionWebhooks:
+      patch:
+        nodeSelector.beta.kubernetes.io/os: linux
+  
+    defaultBackend:
+      nodeSelector.beta.kubernetes.io/os: linux
+  
+  authentication:
+    ingressUsername: monitoring
+    ingressPassword: ${random_password.monitoring-password.result}
+
+  kube-prometheus-stack:
+    prometheus:
+      prometheusSpec:
+        nodeSelector:
+          node_group: static-workers
 
 apiModels:
   enabled: true
@@ -161,22 +295,6 @@ cluster-autoscaler:
       tag: "v1.20.0"
     autoDiscovery:
       clusterName: "${local.cluster_name}"
-      
-storage:
-  pvcSpec:
-    csi:
-      driver: fsx.csi.aws.com
-      volumeAttributes:
-        dnsname: ${module.fsx-storage.fsx-rwx.dns_name}
-        mountname: ${module.fsx-storage.fsx-rwx.mount_name}
-      volumeHandle: ${module.fsx-storage.fsx-rwx.id}
-  indicoStorageClass:
-    enabled: true
-    name: indico-sc
-    provisioner: fsx.csi.aws.com
-    parameters:
-      securityGroupIds: ${local.security_group_id}
-      subnetId: ${module.fsx-storage.fsx-rwx.subnet_ids[0]}
 crunchy-postgres:
   enabled: true
   postgres-data:
@@ -218,7 +336,7 @@ crunchy-postgres:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 30Gi
+            storage: 200Gi
       name: pgha1
       replicas: 1
       resources:
@@ -334,18 +452,90 @@ crunchy-postgres:
       name: indico
       options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   
-  EOF
-  ]
+EOF
+    ,
+    <<EOT
+${data.github_repository_file.data-pre-reqs-values.content}
+EOT
+  ])
 }
 
-resource "time_sleep" "wait_10_minutes_after_pre_reqs" {
+resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
   depends_on = [helm_release.ipa-pre-requisites]
 
-  create_duration = "10m"
+  create_duration = "1m"
 }
 
 data "github_repository" "argo-github-repo" {
   full_name = "IndicoDataSolutions/${var.argo_repo}"
+}
+
+resource "github_repository_file" "smoketest-application-yaml" {
+  count = var.ipa_smoketest_enabled == true ? 1 : 0
+
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/ipa_smoketest.yaml"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+
+  content = <<EOT
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ${local.argo_smoketest_app_name}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app: cod
+    region: ${var.region}
+    account: ${var.aws_account}
+    name: ${var.label}
+  annotations:
+    avp.kubernetes.io/path: tools/argo/data/ipa-deploy
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  destination:
+    server: ${module.cluster.kubernetes_host}
+    namespace: default
+  project: ${module.argo-registration.argo_project_name}
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
+
+  source:
+    chart: cod-smoketests
+    repoURL: ${var.ipa_smoketest_repo}
+    targetRevision: ${var.ipa_smoketest_version}
+    plugin:
+      name: argocd-vault-plugin-helm-values-expand-no-build
+      env:
+        - name: RELEASE_NAME
+          value: run
+      
+        - name: HELM_VALUES
+          value: |
+            image:
+              tag: ${var.ipa_smoketest_container_tag}
+            cronjob:
+              enabled: ${var.ipa_smoketest_cronjob_enabled}
+              schedule: "${var.ipa_smoketest_cronjob_schedule}"
+            cluster:
+              name: ${var.label}
+              region: ${var.region}
+              account: ${var.aws_account}
+            host: ${local.dns_name}
+            slack:
+              channel: ${var.ipa_smoketest_slack_channel}
+EOT
 }
 
 resource "github_repository_file" "argocd-application-yaml" {
@@ -355,13 +545,11 @@ resource "github_repository_file" "argocd-application-yaml" {
   commit_message      = var.message
   overwrite_on_create = true
 
-  #TODO:
-  # this allows people to make edits to the file so we don't overwrite it.
-  #lifecycle {
-  #  ignore_changes = [
-  #    content
-  #  ]
-  #}
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
 
   content = <<EOT
 apiVersion: argoproj.io/v1alpha1
@@ -377,6 +565,7 @@ metadata:
     name: ${var.label}
   annotations:
     avp.kubernetes.io/path: tools/argo/data/ipa-deploy
+    argocd.argoproj.io/sync-wave: "-2"
 spec:
   destination:
     server: ${module.cluster.kubernetes_host}
@@ -404,10 +593,10 @@ EOT
 }
 
 
-resource "local_file" "kubeconfig" {
-  content  = module.cluster.kubectl_config
-  filename = "${path.module}/module.kubeconfig"
-}
+# resource "local_file" "kubeconfig" {
+#   content  = module.cluster.kubectl_config
+#   filename = "${path.module}/module.kubeconfig"
+# }
 
 
 data "vault_kv_secret_v2" "zerossl_data" {
@@ -422,12 +611,17 @@ output "zerossl" {
 
 resource "argocd_application" "ipa" {
   depends_on = [
-    local_file.kubeconfig,
+    # local_file.kubeconfig,
     helm_release.ipa-pre-requisites,
-    time_sleep.wait_10_minutes_after_pre_reqs,
+    time_sleep.wait_1_minutes_after_pre_reqs,
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
-    github_repository_file.argocd-application-yaml
+    github_repository_file.argocd-application-yaml,
+    github_repository_file.hibernation-autoscaler-yaml,
+    github_repository_file.hibernation-exporter-yaml,
+    github_repository_file.hibernation-prometheus-yaml,
+    github_repository_file.hibernation-secrets-yaml,
+    helm_release.monitoring
   ]
 
   count = var.ipa_enabled == true ? 1 : 0
@@ -453,6 +647,9 @@ resource "argocd_application" "ipa" {
       repo_url        = "https://github.com/IndicoDataSolutions/${var.argo_repo}.git"
       path            = var.argo_path
       target_revision = var.argo_branch
+      directory {
+        recurse = false
+      }
     }
 
     sync_policy {
@@ -464,7 +661,8 @@ resource "argocd_application" "ipa" {
     }
 
     destination {
-      server    = "https://kubernetes.default.svc"
+      #server    = "https://kubernetes.default.svc"
+      name      = "in-cluster"
       namespace = "argo"
     }
   }
@@ -504,6 +702,8 @@ metadata:
   name: ${lower("${var.aws_account}-${var.region}-${var.name}-${each.value.name}")} 
   finalizers:
     - resources-finalizer.argocd.argoproj.io
+  annotations:
+     avp.kubernetes.io/path: ${each.value.vaultPath}
   labels:
     app: ${each.value.name}
     region: ${var.region}
@@ -518,7 +718,7 @@ spec:
     automated:
       prune: true
     syncOptions:
-      - CreateNamespace=true
+      - CreateNamespace=${each.value.createNamespace}
   source:
     chart: ${each.value.chart}
     repoURL: ${each.value.repo}

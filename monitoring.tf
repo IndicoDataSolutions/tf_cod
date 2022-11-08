@@ -49,6 +49,7 @@ output "monitoring-password" {
   value     = random_password.monitoring-password.result
 }
 
+
 resource "helm_release" "monitoring" {
   count = var.monitoring_enabled == true ? 1 : 0
   depends_on = [
@@ -57,7 +58,7 @@ resource "helm_release" "monitoring" {
     aws_route53_record.alertmanager-caa,
     aws_route53_record.grafana-caa,
     aws_route53_record.prometheus-caa,
-    time_sleep.wait_10_minutes_after_pre_reqs
+    time_sleep.wait_1_minutes_after_pre_reqs
   ]
 
   verify           = false
@@ -97,6 +98,108 @@ resource "helm_release" "monitoring" {
         nodeSelector:
           node_group: static-workers
 
+ EOF
+  ]
+}
+
+resource "helm_release" "keda-monitoring" {
+  count = var.monitoring_enabled == true ? 1 : 0
+  depends_on = [
+    module.cluster,
+    helm_release.monitoring
+  ]
+
+  name             = "keda"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://kedacore.github.io/charts"
+  chart            = "keda"
+  version          = var.keda_version
+
+
+  values = [<<EOF
+    crds:
+      install: true
+    
+    podAnnotations:
+      keda:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8080"
+      metricsAdapter: 
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "9022"
+
+    prometheus:
+      metricServer:
+        enabled: true
+        podMonitor:
+          enabled: true
+      operator:
+        enabled: true
+        podMonitor:
+          enabled: true
+ EOF
+  ]
+}
+
+resource "helm_release" "opentelemetry-collector" {
+  count = var.monitoring_enabled == true ? 1 : 0
+  depends_on = [
+    module.cluster,
+    helm_release.monitoring
+  ]
+
+  name             = "opentelemetry-collector"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
+  chart            = "opentelemetry-collector"
+  version          = var.opentelemetry-collector_version
+
+
+  values = [<<EOF
+    enabled: true
+    fullnameOverride: "collector-collector"
+    mode: deployment
+    tolerations:
+    - effect: NoSchedule
+      key: indico.io/monitoring
+      operator: Exists
+    nodeSelector:
+      node_group: monitoring-workers
+    ports:
+      jaeger-compact:
+        enabled: false
+      jaeger-thrift:
+        enabled: false
+      jaeger-grpc:
+        enabled: false
+      zipkin:
+        enabled: false
+
+    config:
+      receivers:
+        jaeger: null
+        prometheus: null
+        zipkin: null
+      exporters:
+        otlp:
+          endpoint: monitoring-tempo.monitoring.svc:4317
+          tls:
+            insecure: true
+      service:
+        pipelines:
+          traces:
+            receivers:
+              - otlp
+            processors:
+              - batch
+            exporters:
+              - otlp
+          metrics: null
+          logs: null
  EOF
   ]
 }
