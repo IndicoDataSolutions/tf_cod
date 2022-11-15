@@ -40,19 +40,12 @@ output "indico_allow_access" {
   description = "The ID of the indico indico_allow_access security group used for configuring HAproxy."
 }
 
-output "db_password" {
-  value       = random_password.db_password.result
-  description = "Generated DB password"
-  sensitive   = true
-}
-
 output "key_pem" {
   value       = tls_private_key.pk.private_key_pem
   description = "Generated private key for key pair"
   sensitive   = true
 }
 
-# Outputs for Argo
 output "fsx_storage_fsx_rwx_dns_name" {
   value = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.dns_name : ""
 }

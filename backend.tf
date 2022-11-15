@@ -3,7 +3,7 @@ terraform {
   cloud {
     organization = "indico"
     workspaces {
-      name = "Indico-Dev-us-west-1-liz-test-1"
+      name = "Indico-Dev-us-west-1-begonia-stage"
     }
   }
 }
