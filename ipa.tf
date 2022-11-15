@@ -365,19 +365,6 @@ crunchy-postgres:
           incremental: 0 */1 * * *
     imagePullSecrets:
       - name: harbor-pull-secret
-    users:
-    - databases:
-      - noct
-      - cyclone
-      - crowdlabel
-      - moonbow
-      - elmosfire
-      - elnino
-      - sunbow
-      - doctor
-      - meteor
-      name: indico
-      options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   postgres-metrics:
     enabled: false
     metadata:
@@ -446,11 +433,6 @@ crunchy-postgres:
           incremental: 0 */1 * * *
     imagePullSecrets:
       - name: harbor-pull-secret
-    users:
-    - databases:
-      - meteor
-      name: indico
-      options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   
 EOF
     ,
