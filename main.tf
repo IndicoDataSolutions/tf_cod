@@ -8,10 +8,6 @@ terraform {
       source  = "hashicorp/time"
       version = "0.7.2"
     }
-    http = {
-      source  = "hashicorp/http"
-      version = "~> 1.2"
-    }
     argocd = {
       source  = "oboukili/argocd"
       version = "3.1.0"
@@ -42,8 +38,7 @@ terraform {
   }
 }
 
-provider "time" {
-}
+provider "time" {}
 
 provider "vault" {
   address          = var.vault_address
@@ -63,9 +58,7 @@ provider "github" {
   owner = "IndicoDataSolutions"
 }
 
-provider "random" {
-
-}
+provider "random" {}
 
 provider "aws" {
   access_key = var.aws_access_key
@@ -76,17 +69,12 @@ provider "aws" {
   }
 }
 
-
-
-provider "http" {} # for getting local ip
-
 data "aws_caller_identity" "current" {}
 
 # define the networking module we're using locally
 locals {
   network = var.direct_connect == true ? module.private_networking : module.public_networking
   aws_usernames = [
-    "eric.fontana@indico.io",
     "svc_jenkins",
     "terraform-sa"
   ]
@@ -124,14 +112,6 @@ module "public_networking" {
   subnet_az_zones      = var.subnet_az_zones
 }
 
-module "sqs_sns" {
-  count   = var.sqs_sns == true ? 1 : 0
-  source  = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
-  version = "1.1.1"
-  region  = var.region
-  label   = var.label
-}
-
 module "private_networking" {
   count                = var.direct_connect == true ? 1 : 0
   source               = "app.terraform.io/indico/indico-aws-dc-network/mod"
@@ -139,6 +119,14 @@ module "private_networking" {
   vpc_cidr             = var.vpc_cidr
   private_subnet_cidrs = var.private_subnet_cidrs
   subnet_az_zones      = var.subnet_az_zones
+}
+
+module "sqs_sns" {
+  count   = var.sqs_sns == true ? 0 : 1
+  source  = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
+  version = "1.1.1"
+  region  = var.region
+  label   = var.label
 }
 
 module "cluster-manager" {
@@ -214,12 +202,6 @@ module "fsx-storage" {
   include_rox                 = var.include_rox
 }
 
-resource "random_password" "db_password" {
-  length           = 16
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}"
-}
-
 module "cluster" {
   cod_snapshots_enabled      = true
   allow_dns_management       = true
@@ -271,7 +253,6 @@ resource "aws_security_group" "indico_allow_access" {
   }
 
 }
-
 
 # argo 
 provider "argocd" {
