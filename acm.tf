@@ -10,7 +10,6 @@ resource "aws_acm_certificate" "alb" {
 }
 
 resource "aws_route53_record" "alb" {
-  count    = var.use_acm == true ? 1 : 0
   for_each = {
     for dvo in aws_acm_certificate.alb[0].domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
