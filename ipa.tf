@@ -701,11 +701,14 @@ spec:
     chart: ${each.value.chart}
     repoURL: ${each.value.repo}
     targetRevision: ${each.value.version}
-    helm:
-      releaseName: ${each.value.name}
-      values: |
-        ${base64decode(each.value.values)}    
-
+    plugin:
+      name: argocd-vault-plugin-helm-values-expand-no-build
+      env:
+        - RELEASE_NAME
+          value: ${each.value.name}
+        - HELM_VALUES
+          value: |
+            ${base64decode(each.value.values)}   
 EOT
 }
 
