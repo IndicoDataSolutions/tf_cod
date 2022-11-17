@@ -104,7 +104,7 @@ output "ns" {
 resource "github_repository_file" "pre-reqs-values-yaml" {
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
-  file                = "${var.argo_path}/helm/pre-reqs-values.yaml"
+  file                = "${var.argo_path}/helm/pre-reqs-values.values"
   commit_message      = var.message
   overwrite_on_create = true
 
@@ -120,7 +120,7 @@ resource "github_repository_file" "pre-reqs-values-yaml" {
 resource "github_repository_file" "crds-values-yaml" {
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
-  file                = "${var.argo_path}/helm/crds-values.yaml"
+  file                = "${var.argo_path}/helm/crds-values.values"
   commit_message      = var.message
   overwrite_on_create = true
 
@@ -138,7 +138,7 @@ data "github_repository_file" "data-crds-values" {
   ]
   repository = data.github_repository.argo-github-repo.name
   branch     = var.argo_branch
-  file       = var.argo_path == "." ? "helm/crds-values.yaml" : "${var.argo_path}/helm/crds-values.yaml"
+  file       = var.argo_path == "." ? "helm/crds-values.values" : "${var.argo_path}/helm/crds-values.values"
 }
 
 
@@ -148,7 +148,7 @@ data "github_repository_file" "data-pre-reqs-values" {
   ]
   repository = data.github_repository.argo-github-repo.name
   branch     = var.argo_branch
-  file       = var.argo_path == "." ? "helm/pre-reqs-values.yaml" : "${var.argo_path}/helm/pre-reqs-values.yaml"
+  file       = var.argo_path == "." ? "helm/pre-reqs-values.values" : "${var.argo_path}/helm/pre-reqs-values.values"
 }
 
 resource "helm_release" "ipa-crds" {
@@ -365,19 +365,6 @@ crunchy-postgres:
           incremental: 0 */1 * * *
     imagePullSecrets:
       - name: harbor-pull-secret
-    users:
-    - databases:
-      - noct
-      - cyclone
-      - crowdlabel
-      - moonbow
-      - elmosfire
-      - elnino
-      - sunbow
-      - doctor
-      - meteor
-      name: indico
-      options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   postgres-metrics:
     enabled: false
     metadata:
@@ -446,11 +433,6 @@ crunchy-postgres:
           incremental: 0 */1 * * *
     imagePullSecrets:
       - name: harbor-pull-secret
-    users:
-    - databases:
-      - meteor
-      name: indico
-      options: SUPERUSER CREATEROLE CREATEDB REPLICATION BYPASSRLS
   
 EOF
     ,
@@ -617,10 +599,6 @@ resource "argocd_application" "ipa" {
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
     github_repository_file.argocd-application-yaml,
-    github_repository_file.hibernation-autoscaler-yaml,
-    github_repository_file.hibernation-exporter-yaml,
-    github_repository_file.hibernation-prometheus-yaml,
-    github_repository_file.hibernation-secrets-yaml,
     helm_release.monitoring
   ]
 
@@ -723,11 +701,14 @@ spec:
     chart: ${each.value.chart}
     repoURL: ${each.value.repo}
     targetRevision: ${each.value.version}
-    helm:
-      releaseName: ${each.value.name}
-      values: |
-        ${base64decode(each.value.values)}    
-
+    plugin:
+      name: argocd-vault-plugin-helm-values-expand-no-build
+      env:
+        - RELEASE_NAME
+          value: ${each.value.name}
+        - HELM_VALUES
+          value: |
+            ${base64decode(each.value.values)}
 EOT
 }
 
