@@ -335,7 +335,11 @@ resource "aws_route53_record" "ipa-app-caa" {
   type    = "CAA"
   ttl     = 300
   records = [
-    "0 issue \"sectigo.com\""
+    "0 issue \"sectigo.com\"",
+    "0 issue \"amazontrust.com\"",
+    "0 issue \"amazon.com\"",
+    "0 issue \"amazonaws.com\"",
+    "0 issue \"awstrust.com\""
   ]
 }
 

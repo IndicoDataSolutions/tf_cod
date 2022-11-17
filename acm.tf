@@ -1,5 +1,5 @@
 module "acm" {
-  count    = var.use_acm == true ? 0 : 1
+  count    = var.use_acm == true ? 1 : 0
   source  = "terraform-aws-modules/acm/aws"
   version = "~> 4.0"
 
