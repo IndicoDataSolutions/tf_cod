@@ -708,7 +708,7 @@ spec:
           value: ${each.value.name}
         - HELM_VALUES
           value: |
-            ${base64decode(each.value.values)}   
+            ${base64decode(each.value.values)}
 EOT
 }
 
