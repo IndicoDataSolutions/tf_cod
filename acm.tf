@@ -29,5 +29,5 @@ resource "aws_route53_record" "alb" {
 resource "aws_acm_certificate_validation" "alb" {
   count    = var.use_acm == true ? 1 : 0
   certificate_arn         = aws_acm_certificate.alb[0].arn
-  validation_record_fqdns = [for record in aws_route53_record.alb[0] : record.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.alb : record.fqdn]
 }
