@@ -473,3 +473,8 @@ variable "pre-reqs-values-yaml-b64" {
   default = "Cg=="
 }
 
+variable "use_acm" {
+  type        = bool
+  default     = false
+  description = "create cluster that will use acm"
+}
