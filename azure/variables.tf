@@ -7,7 +7,7 @@ variable "common_resource_group" {
 
 variable "domain_suffix" {
   type        = string
-  default     = "azure.indico.io"
+  default     = "indico.io"
   description = "Domain suffix"
 }
 
