@@ -114,7 +114,7 @@ module "argo-registration" {
   region                       = var.region
   argo_password                = var.argo_password
   argo_username                = var.argo_username
-  account                      = "azure"
+  account                      = var.account
   cloud_provider               = "azure"
   argo_github_team_admin_group = var.argo_github_team_owner
   endpoint                     = module.cluster.kubernetes_host
@@ -127,9 +127,9 @@ locals {
   resource_group_name = "${var.label}-${var.region}"
   current_ip          = "${chomp(data.http.workstation-external-ip.response_body)}/20"
 
-  argo_app_name           = lower("azure.${var.region}.${var.label}-ipa")
-  argo_cluster_name       = "azure.${var.region}.${var.label}"
-  argo_smoketest_app_name = lower("azure.${var.region}.${var.label}-smoketest")
+  argo_app_name           = lower("${var.account}.${var.region}.${var.label}-ipa")
+  argo_cluster_name       = "${var.account}.${var.region}.${var.label}"
+  argo_smoketest_app_name = lower("${var.account}.${var.region}.${var.label}-smoketest")
 
   cluster_name = var.label
   dns_name     = lower("${var.label}-${var.region}.${var.domain_suffix}")
@@ -147,7 +147,7 @@ resource "azurerm_resource_group" "cod-cluster" {
 }
 
 data "azurerm_dns_zone" "primary" {
-  name = lower("azure.indico.io")
+  name = lower("${var.account}.indico.io")
 }
 
 module "networking" {
