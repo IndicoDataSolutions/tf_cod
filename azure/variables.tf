@@ -23,6 +23,12 @@ variable "message" {
   description = "The commit message for updates"
 }
 
+variable "account" {
+  type = string
+  default = "Azure-Dev"
+  description = "The name of the subscription that this cluster falls under"
+}
+
 variable "region" {
   type        = string
   default     = "eastus"
