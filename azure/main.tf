@@ -234,6 +234,7 @@ module "cluster" {
   k8s_version             = var.k8s_version
   private_cluster_enabled = var.private_cluster_enabled
   resource_group_name     = local.resource_group_name
+  admin_group_name        = var.admin_group_name
   # this feature can be checked using:
   # az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/EnableWorkloadIdentityPreview')].{Name:name,State:properties.state}"
   # az provider register --namespace Microsoft.ContainerService
