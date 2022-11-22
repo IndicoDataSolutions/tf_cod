@@ -70,7 +70,7 @@ locals {
           name: app-edge
           port: 443
         hosts:
-          - host: ${local.dns}
+          - host: ${local.dns_name}
             paths:
               - path: /
                 pathType: Prefix
