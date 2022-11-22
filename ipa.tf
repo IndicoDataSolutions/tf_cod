@@ -47,6 +47,35 @@ locals {
  EOF
   ] : []
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
+  acm_ipa_values = var.use_acm == true ? [<<EOF
+  app-edge:
+    service:
+      type: "NodePort"
+      ports:
+        http_port: 31755
+        https_port: 31756
+        http_api_port: 31270
+    aws-load-balancer-controller:
+      enabled: true
+      aws-load-balancer-controller:
+        clusterName: ${var.label}
+        vpcId: ${local.network[0].indico_vpc_id}
+        region: ${var.region}
+      ingress:
+        enabled: true
+        alb:
+          publicSubnets: ${flatten([local.network[0].public_subnet_ids])}
+          acmArn: ${aws_acm_certificate_validation.alb[0].certificate_arn}
+        service:
+          name: app-edge
+          port: 443
+        hosts:
+          - host: ${local.dns}
+            paths:
+              - path: /
+                pathType: Prefix
+ EOF
+  ] : []
 }
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
@@ -532,6 +561,9 @@ resource "github_repository_file" "argocd-application-yaml" {
       content
     ]
   }
+  depends_on = [
+    module.cluster
+  ]
 
   content = <<EOT
 apiVersion: argoproj.io/v1alpha1
@@ -567,6 +599,10 @@ spec:
       env:
         - name: RELEASE_NAME
           value: ipa
+        
+        - name: HELM_TF_COD_VALUES
+          value: |
+            ${local.acm_ipa_values}         
 
         - name: HELM_VALUES
           value: |
