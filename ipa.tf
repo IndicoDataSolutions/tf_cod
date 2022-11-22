@@ -48,32 +48,32 @@ locals {
   ] : []
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
   acm_ipa_values = var.use_acm == true ? (<<EOT
-            app-edge:
-              service:
-                type: "NodePort"
-                ports:
-                  http_port: 31755
-                  https_port: 31756
-                  http_api_port: 31270
-              aws-load-balancer-controller:
-                enabled: true
-                aws-load-balancer-controller:
-                  clusterName: ${var.label}
-                  vpcId: ${local.network[0].indico_vpc_id}
-                  region: ${var.region}
-                ingress:
-                  enabled: true
-                  alb:
-                    publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
-                    acmArn: ${aws_acm_certificate_validation.alb[0].certificate_arn}
-                  service:
-                    name: app-edge
-                    port: 443
-                  hosts:
-                    - host: ${local.dns_name}
-                      paths:
-                        - path: /
-                          pathType: Prefix
+app-edge:
+  service:
+    type: "NodePort"
+    ports:
+      http_port: 31755
+      https_port: 31756
+      http_api_port: 31270
+  aws-load-balancer-controller:
+    enabled: true
+    aws-load-balancer-controller:
+      clusterName: ${var.label}
+      vpcId: ${local.network[0].indico_vpc_id}
+      region: ${var.region}
+    ingress:
+      enabled: true
+      alb:
+        publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
+        acmArn: ${aws_acm_certificate_validation.alb[0].certificate_arn}
+      service:
+        name: app-edge
+        port: 443
+      hosts:
+        - host: ${local.dns_name}
+          paths:
+            - path: /
+              pathType: Prefix
   EOT
   ) : ""
 }
@@ -618,8 +618,7 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
-# Do not indent the line below. It is sensitive to spacing.
-${local.acm_ipa_values}         
+            ${indent(12, local.acm_ipa_values)}         
 
         - name: HELM_VALUES
           value: |
