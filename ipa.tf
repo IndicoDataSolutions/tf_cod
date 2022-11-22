@@ -64,7 +64,7 @@ locals {
       ingress:
         enabled: true
         alb:
-          publicSubnets: ${toset(local.network[0].public_subnet_ids)}
+          publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
           acmArn: ${aws_acm_certificate_validation.alb[0].certificate_arn}
         service:
           name: app-edge
