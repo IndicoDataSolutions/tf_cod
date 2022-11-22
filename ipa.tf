@@ -201,11 +201,6 @@ resource "helm_release" "ipa-crds" {
     enabled: true
   
   cert-manager:
-    #extraArgs:
-    #  - --dns01-recursive-nameservers-only
-    #  - --dns01-recursive-nameservers='${data.aws_route53_zone.aws-zone.name_servers[0]}:53,${data.aws_route53_zone.aws-zone.name_servers[1]}:53,${data.aws_route53_zone.aws-zone.name_servers[2]}:53'
-    #  - --acme-http01-solver-nameservers='${data.aws_route53_zone.aws-zone.name_servers[0]}:53,${data.aws_route53_zone.aws-zone.name_servers[1]}:53,${data.aws_route53_zone.aws-zone.name_servers[2]}:53'
-     
     nodeSelector:
       kubernetes.io/os: linux
     webhook:
@@ -549,6 +544,26 @@ spec:
 EOT
 }
 
+resource "github_repository_file" "alb-values-yaml" {
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/helm/alb.values"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+  depends_on = [
+    module.cluster,
+    aws_acm_certificate_validation.alb[0]
+  ]
+
+  content = local.acm_ipa_values
+}
+
 resource "github_repository_file" "argocd-application-yaml" {
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
@@ -562,7 +577,8 @@ resource "github_repository_file" "argocd-application-yaml" {
     ]
   }
   depends_on = [
-    module.cluster
+    module.cluster,
+    aws_acm_certificate_validation.alb[0]
   ]
 
   content = <<EOT
