@@ -11,7 +11,7 @@ resource "aws_acm_certificate" "alb" {
     aws_route53_record.ipa-app-caa
   ]
 }
-}
+
 
 resource "aws_route53_record" "alb" {
   for_each = var.use_acm ? {
