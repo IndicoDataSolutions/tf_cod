@@ -284,3 +284,9 @@ variable "ipa_smoketest_cronjob_schedule" {
   type    = string
   default = "0 0 * * *" # every night at midnight
 }
+
+variable "admin_group_name" {
+  type = string
+  default = "DevOps"
+  description = "Name of group that will own the cluster"
+}
