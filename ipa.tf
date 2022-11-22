@@ -618,7 +618,8 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
-            ${local.acm_ipa_values}         
+# Do not indent the line below. It is sensitive to spacing.
+${local.acm_ipa_values}         
 
         - name: HELM_VALUES
           value: |
