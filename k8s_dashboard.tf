@@ -1,7 +1,8 @@
 
 resource "helm_release" "k8s-dashboard" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    helm_release.ipa-crds
   ]
   count            = var.enable_k8s_dashboard == true ? 1 : 0
   name             = "k8s"
