@@ -322,6 +322,7 @@ locals {
   security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
   cluster_name      = var.label
   dns_name          = lower("${var.label}.${var.region}.${var.aws_account}.indico.io")
+  dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
 }
 
 

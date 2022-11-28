@@ -473,3 +473,11 @@ variable "pre-reqs-values-yaml-b64" {
   default = "Cg=="
 }
 
+variable "k8s_dashboard_chart_version" {
+  default = "0.1.0"
+}
+
+variable "enable_k8s_dashboard" {
+  type = bool
+  default = true
+}
