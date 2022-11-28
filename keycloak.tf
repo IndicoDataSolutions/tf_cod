@@ -9,6 +9,8 @@ resource "keycloak_openid_client" "k8s-keycloak-client" {
   name      = local.dns_name
   enabled   = true
 
+  standard_flow_enabled = true
+  
   access_type = "CONFIDENTIAL"
   valid_redirect_uris = [
     "k8s.${local.dns_name}/oauth2/callback" # k8s dashboard
