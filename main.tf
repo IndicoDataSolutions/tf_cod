@@ -45,8 +45,8 @@ terraform {
 provider "time" {}
 
 provider "keycloak" {
-   # these values are provided by the keycloak varset from terraform cloud
-   initial_login =f alse
+  # these values are provided by the keycloak varset from terraform cloud
+  initial_login = false
 }
 
 provider "vault" {
