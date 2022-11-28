@@ -114,7 +114,7 @@ module "argo-registration" {
   region                       = var.region
   argo_password                = var.argo_password
   argo_username                = var.argo_username
-  account                      = "azure"
+  account                      = var.account
   cloud_provider               = "azure"
   argo_github_team_admin_group = var.argo_github_team_owner
   endpoint                     = module.cluster.kubernetes_host
@@ -127,13 +127,14 @@ locals {
   resource_group_name = "${var.label}-${var.region}"
   current_ip          = "${chomp(data.http.workstation-external-ip.response_body)}/20"
 
-  argo_app_name           = lower("azure.${var.region}.${var.label}-ipa")
-  argo_cluster_name       = "azure.${var.region}.${var.label}"
-  argo_smoketest_app_name = lower("azure.${var.region}.${var.label}-smoketest")
+  argo_app_name           = lower("${var.account}.${var.region}.${var.label}-ipa")
+  argo_cluster_name       = "${var.account}.${var.region}.${var.label}"
+  argo_smoketest_app_name = lower("${var.account}.${var.region}.${var.label}-smoketest")
 
   cluster_name = var.label
-  dns_name     = lower("${var.label}-${var.region}.${var.domain_suffix}")
-  dns_prefix   = lower("${var.label}-${var.region}")
+  base_domain  = lower("${var.account}.${var.domain_suffix}")
+  dns_prefix   = lower("${var.label}.${var.region}")
+  dns_name     = lower("${var.label}.${var.region}.${var.account}.${var.domain_suffix}")
 }
 
 resource "tls_private_key" "pk" {
@@ -147,7 +148,7 @@ resource "azurerm_resource_group" "cod-cluster" {
 }
 
 data "azurerm_dns_zone" "primary" {
-  name = lower("azure.indico.io")
+  name = lower("${var.account}.indico.io")
 }
 
 module "networking" {
@@ -233,6 +234,7 @@ module "cluster" {
   k8s_version             = var.k8s_version
   private_cluster_enabled = var.private_cluster_enabled
   resource_group_name     = local.resource_group_name
+  admin_group_name        = var.admin_group_name
   # this feature can be checked using:
   # az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/EnableWorkloadIdentityPreview')].{Name:name,State:properties.state}"
   # az provider register --namespace Microsoft.ContainerService

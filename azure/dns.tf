@@ -3,7 +3,7 @@ data "azurerm_resource_group" "domain" {
 }
 
 data "azurerm_dns_zone" "domain" {
-  name                = var.domain_suffix
+  name                = local.base_domain
   resource_group_name = data.azurerm_resource_group.domain.name
 }
 
