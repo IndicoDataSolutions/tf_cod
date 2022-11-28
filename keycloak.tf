@@ -1,13 +1,13 @@
 
 data "keycloak_realm" "realm" {
-  realm   = "GoogleAuth"
-  enabled = true
+  realm = "GoogleAuth"
 }
 
 resource "keycloak_openid_client" "k8s-keycloak-client" {
   realm_id  = data.keycloak_realm.realm.id
   client_id = local.dns_name
   name      = local.dns_name
+  enabled   = true
 
   access_type = "CONFIDENTIAL"
   valid_redirect_uris = [
