@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/time"
       version = "0.7.2"
     }
+    keycloak = {
+      source  = "mrparkers/keycloak"
+      version = "4.0.1"
+    }
     argocd = {
       source  = "oboukili/argocd"
       version = "3.1.0"
@@ -39,6 +43,10 @@ terraform {
 }
 
 provider "time" {}
+
+provider "keycloak" {
+   # these values are provided by the keycloak varset from terraform cloud
+}
 
 provider "vault" {
   address          = var.vault_address
