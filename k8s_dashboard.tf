@@ -67,8 +67,8 @@ oauth2-proxy:
       value: 'true'
 
   config:
-    clientID: kube-oidc-proxy
-    clientSecret: WBszYp6sQtozqaAiqTXXnCeV5BnQk6EP
+    clientID: ${keycloak_openid_client.k8s-keycloak-client.client_id}
+    clientSecret: ${keycloak_openid_client.k8s-keycloak-client.client_secret}
 
   service:
     annotations:
