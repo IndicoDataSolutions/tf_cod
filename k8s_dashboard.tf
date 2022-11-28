@@ -1,4 +1,7 @@
 
+
+
+
 resource "helm_release" "k8s-dashboard" {
   depends_on = [
     module.cluster,
@@ -59,13 +62,13 @@ oauth2-proxy:
     - name: OAUTH2_PROXY_ALLOWED_GROUPS
       value: DevOps,Engineering,QA,Customer Ops
     - name: OAUTH2_PROXY_UPSTREAMS
-      value: http://dashboard-kubernetes-dashboard:443
+      value: http://k8s-kubernetes-dashboard:443
     - name: OAUTH2_PROXY_SSL_UPSTREAM_INSECURE_SKIP_VERIFY
       value: 'true'
 
   config:
-    clientID: kube-oidc-proxy
-    clientSecret: WBszYp6sQtozqaAiqTXXnCeV5BnQk6EP
+    clientID: ${keycloak_openid_client.k8s-keycloak-client.client_id}
+    clientSecret: ${keycloak_openid_client.k8s-keycloak-client.client_secret}
 
   service:
     annotations:
