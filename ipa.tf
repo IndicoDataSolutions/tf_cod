@@ -611,7 +611,7 @@ spec:
     repoURL: ${var.ipa_repo}
     targetRevision: ${var.ipa_version}
     plugin:
-      name: argocd-vault-plugin-helm-values-expand-no-build-2
+      name: argocd-vault-plugin-helm-values-expand-no-build
       env:
         - name: RELEASE_NAME
           value: ipa
