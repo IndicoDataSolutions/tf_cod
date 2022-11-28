@@ -75,7 +75,10 @@ app-edge:
             - path: /
               pathType: Prefix
   EOT
-  ) : ""
+  ) : (<<EOT
+no-overrides: "true"
+  EOT
+  )
 }
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
