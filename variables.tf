@@ -480,4 +480,10 @@ variable "k8s_dashboard_chart_version" {
 variable "enable_k8s_dashboard" {
   type = bool
   default = true
+
+variable "use_acm" {
+  type        = bool
+  default     = false
+  description = "create cluster that will use acm"
+
 }
