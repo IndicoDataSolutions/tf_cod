@@ -47,7 +47,7 @@ oauth2-proxy:
     - name: OAUTH2_PROXY_OIDC_ISSUER_URL
       value: https://keycloak.devops.indico.io/auth/realms/GoogleAuth
     - name: OAUTH2_PROXY_REDIRECT_URL
-      value: https://k8s.${local.dns_suffix}/oauth2/callback
+      value: https://k8s.${local.dns_name}/oauth2/callback
     - name: OAUTH2_PROXY_PASS_AUTHORIZATION_HEADER
       value: 'true'
     - name: OAUTH2_PROXY_EMAIL_DOMAINS
@@ -69,18 +69,18 @@ oauth2-proxy:
 
   service:
     annotations:
-      external-dns.alpha.kubernetes.io/hostname: k8s.${local.dns_suffix}
+      external-dns.alpha.kubernetes.io/hostname: k8s.${local.dns_name}
 
   ingress:
     enabled: true
     hosts:
-      - k8s.${local.dns_suffix}
+      - k8s.${local.dns_name}
     annotations:
       kubernetes.io/ingress.class: nginx
       cert-manager.io/cluster-issuer: zerossl
     tls:
       - hosts:
-          - k8s.${local.dns_suffix}
+          - k8s.${local.dns_name}
         secretName: k8s-proxy-tls
 
    EOF
