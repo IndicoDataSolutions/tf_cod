@@ -1,7 +1,7 @@
 # 
 # Include local modules here
 #
-module "keycloak-oidc" {
+module "keycloak" {
   depends_on = [
     module.cluster,
     helm_release.ipa-pre-requisites
