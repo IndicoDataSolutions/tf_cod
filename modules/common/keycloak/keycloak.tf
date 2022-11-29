@@ -21,7 +21,7 @@ data "keycloak_openid_client" "kube-oidc-proxy" {
   client_id = "kube-oidc-proxy"
 }
 
-resource "null_resource" "register-callback" {
+resource "null_resource" "register-callback-test" {
 
   provisioner "local-exec" {
     command = "echo 'create register-callback'"
