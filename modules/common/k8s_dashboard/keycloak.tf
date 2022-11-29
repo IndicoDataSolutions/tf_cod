@@ -28,6 +28,8 @@ resource "keycloak_openid_client" "k8s-keycloak-client" {
     "https://k8s.${var.local_dns_name}/oauth2/callback" # k8s dashboard
   ]
 
+  direct_access_grants_enabled = true
+
   frontchannel_logout_enabled = true
   frontchannel_logout_url     = "https://k8s.${var.local_dns_name}/oauth2/sign_out"
 
