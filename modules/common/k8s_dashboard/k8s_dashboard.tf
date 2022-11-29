@@ -32,7 +32,6 @@ oauth2-proxy:
   extraArgs:
     insecure-oidc-allow-unverified-email: true
     email-domain: indico.io
-    pass-authorization-header: true
 
   redis:
     enabled: true
@@ -64,9 +63,9 @@ oauth2-proxy:
       value: 'true'
 
   config:
-    clientID: ${keycloak_openid_client.k8s-keycloak-client.client_id}
-    clientSecret: ${keycloak_openid_client.k8s-keycloak-client.client_secret}
-    cookieSecret: ${keycloak_openid_client.k8s-keycloak-client.client_secret}
+    clientID: ${data.keycloak_openid_client.kube-oidc-proxy.client_id}
+    clientSecret: ${data.keycloak_openid_client.kube-oidc-proxy.client_secret}
+   
 
   service:
     annotations:
