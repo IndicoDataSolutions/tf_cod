@@ -290,3 +290,8 @@ variable "admin_group_name" {
   default = "DevOps"
   description = "Name of group that will own the cluster"
 }
+
+variable "enable_k8s_dashboard" {
+  type    = bool
+  default = true
+}
