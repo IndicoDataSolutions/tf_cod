@@ -1,8 +1,5 @@
 resource "helm_release" "k8s-dashboard" {
-  #depends_on = [
-  #  module.cluster,
-  #  helm_release.ipa-crds
-  #]
+
   count            = var.enable_k8s_dashboard == true ? 1 : 0
   name             = "k8s"
   create_namespace = true
@@ -10,6 +7,7 @@ resource "helm_release" "k8s-dashboard" {
   repository       = var.ipa_repo
   chart            = "k8s-dashboard"
   version          = var.k8s_dashboard_chart_version
+  timeout          = 36000 # 10 minutes
 
   values = [
     <<EOF
