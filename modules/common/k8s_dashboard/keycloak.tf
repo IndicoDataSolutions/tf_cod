@@ -23,7 +23,7 @@ provider "restapi" {
 
   headers = {
     X-Internal-Client = "abc123"
-    Authorization     = var.SECRET_TOKEN
+    Authorization     = "foobar"
   }
 }
 
