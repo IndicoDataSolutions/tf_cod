@@ -7,7 +7,7 @@ resource "helm_release" "k8s-dashboard" {
   repository       = var.ipa_repo
   chart            = "k8s-dashboard"
   version          = var.k8s_dashboard_chart_version
-  timeout          = 36000 # 10 minutes
+  timeout          = 600 # 10 minutes
 
   values = [
     <<EOF
