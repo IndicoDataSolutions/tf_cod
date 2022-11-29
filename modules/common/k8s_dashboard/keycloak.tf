@@ -41,7 +41,7 @@ resource "keycloak_openid_client_scope" "client_scope" {
 
 resource "keycloak_openid_client_default_scopes" "client_default_scopes" {
   realm_id  = data.keycloak_realm.realm.id
-  client_id = keycloak_openid_client.k8s-keycloak-client
+  client_id = keycloak_openid_client.k8s-keycloak-client.id
 
   default_scopes = [
     "profile",
