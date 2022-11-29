@@ -1,6 +1,4 @@
 resource "helm_release" "k8s-dashboard" {
-
-  count            = var.enable_k8s_dashboard == true ? 1 : 0
   name             = "k8s"
   create_namespace = true
   namespace        = "default"
