@@ -7,7 +7,6 @@ variable "k8s_dashboard_chart_version" {
 
 variable "ipa_repo" {}
 
-
 variable "keycloak_client_id" {
 
 }
