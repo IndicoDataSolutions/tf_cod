@@ -1,3 +1,15 @@
+terraform {
+  required_providers {
+    keycloak = {
+      source  = "mrparkers/keycloak"
+      version = "4.0.1"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">= 2.6.0"
+    }
+  }
+}
 
 data "keycloak_realm" "realm" {
   realm = "GoogleAuth"
@@ -5,15 +17,15 @@ data "keycloak_realm" "realm" {
 
 resource "keycloak_openid_client" "k8s-keycloak-client" {
   realm_id  = data.keycloak_realm.realm.id
-  client_id = local.dns_name
-  name      = local.dns_name
+  client_id = var.local_dns_name
+  name      = var.local_dns_name
   enabled   = true
 
   standard_flow_enabled = true
-  
+
   access_type = "CONFIDENTIAL"
   valid_redirect_uris = [
-    "k8s.${local.dns_name}/oauth2/callback" # k8s dashboard
+    "k8s.${var.local_dns_name}/oauth2/callback" # k8s dashboard
   ]
 
   login_theme = "keycloak"
