@@ -34,6 +34,25 @@ resource "keycloak_openid_client" "k8s-keycloak-client" {
   login_theme = "keycloak"
 }
 
+resource "keycloak_openid_client_scope" "client_scope" {
+  realm_id = data.keycloak_realm.realm.id
+  name     = "k8s-client-scope"
+}
+
+resource "keycloak_openid_client_default_scopes" "client_default_scopes" {
+  realm_id  = data.keycloak_realm.realm.id
+  client_id = keycloak_openid_client.k8s-keycloak-client
+
+  default_scopes = [
+    "profile",
+    "email",
+    "groups",
+    "roles",
+    "web-origins",
+    keycloak_openid_client_scope.client_scope.name,
+  ]
+}
+
 resource "keycloak_openid_group_membership_protocol_mapper" "group_membership_mapper" {
   realm_id            = data.keycloak_realm.realm.id
   client_id           = keycloak_openid_client.k8s-keycloak-client.id
@@ -42,5 +61,6 @@ resource "keycloak_openid_group_membership_protocol_mapper" "group_membership_ma
   add_to_id_token     = true
   add_to_userinfo     = true
   add_to_access_token = true
+  full_path           = false
 
 }
