@@ -4,10 +4,10 @@
 module "k8s_dashboard" {
   #count = var.enable_k8s_dashboard == true ? 1 : 0
 
-  depends_on = [
-    module.cluster,
-    helm_release.ipa-pre-requisites
-  ]
+  #depends_on = [
+  #  module.cluster,
+  #  helm_release.ipa-pre-requisites
+  #]
 
   source = "./modules/common/k8s_dashboard"
 

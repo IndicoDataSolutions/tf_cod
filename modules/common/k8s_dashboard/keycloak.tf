@@ -27,8 +27,6 @@ provider "restapi" {
   }
 }
 
-/*
-
 data "keycloak_realm" "realm" {
   realm = "GoogleAuth"
 }
@@ -37,4 +35,4 @@ data "keycloak_openid_client" "kube-oidc-proxy" {
   realm_id  = data.keycloak_realm.realm.id
   client_id = "kube-oidc-proxy"
 }
-*/
+
