@@ -25,7 +25,7 @@ resource "keycloak_openid_client" "k8s-keycloak-client" {
 
   access_type = "CONFIDENTIAL"
   valid_redirect_uris = [
-    "k8s.${var.local_dns_name}/oauth2/callback" # k8s dashboard
+    "https://k8s.${var.local_dns_name}/oauth2/callback" # k8s dashboard
   ]
 
   login_theme = "keycloak"

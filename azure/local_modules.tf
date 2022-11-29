@@ -4,7 +4,7 @@
 module "k8s_dashboard" {
   depends_on = [
     module.cluster,
-    helm_release.ipa-crds
+    helm_release.ipa-pre-requisites
   ]
 
   source = "../modules/common/k8s_dashboard"
