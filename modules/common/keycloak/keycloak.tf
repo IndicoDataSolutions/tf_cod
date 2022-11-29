@@ -22,5 +22,15 @@ data "keycloak_openid_client" "kube-oidc-proxy" {
 }
 
 resource "null_resource" "register-callback" {
+
+  provisioner "local-exec" {
+    command = "echo 'create register-callback'"
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "echo 'destroy register-callback'"
+  }
+
 }
 
