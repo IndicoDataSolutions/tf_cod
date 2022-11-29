@@ -75,7 +75,10 @@ app-edge:
             - path: /
               pathType: Prefix
   EOT
-  ) : ""
+  ) : (<<EOT
+no-overrides: "true"
+  EOT
+  )
 }
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
@@ -756,9 +759,9 @@ spec:
     plugin:
       name: argocd-vault-plugin-helm-values-expand-no-build
       env:
-        - RELEASE_NAME
+        - name: RELEASE_NAME
           value: ${each.value.name}
-        - HELM_VALUES
+        - name: HELM_VALUES
           value: |
             ${base64decode(each.value.values)}
 EOT
