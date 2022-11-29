@@ -21,7 +21,6 @@ data "keycloak_openid_client" "kube-oidc-proxy" {
   client_id = "kube-oidc-proxy"
 }
 
-resource "null_resource" {
-
+resource "null_resource" "register-callback" {
 }
 
