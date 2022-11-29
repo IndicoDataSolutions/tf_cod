@@ -1,7 +1,7 @@
 # 
 # Include local modules here
 #
-module "keycloak" {  
+module "keycloak-oidc" {
   depends_on = [
     module.cluster,
     helm_release.ipa-pre-requisites
@@ -16,6 +16,6 @@ module "k8s_dashboard" {
 
   local_dns_name         = local.dns_name
   ipa_repo               = var.ipa_repo
-  keycloak_client_id     =  module.keycloak.client_id
-  keycloak_client_secret =  module.keycloak.client_secret
+  keycloak_client_id     = module.keycloak.client_id
+  keycloak_client_secret = module.keycloak.client_secret
 }

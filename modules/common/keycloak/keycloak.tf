@@ -28,7 +28,7 @@ resource "null_resource" "register-callback-test" {
   }
 
   provisioner "local-exec" {
-    when    = "destroy"
+    when    = destroy
     command = "echo 'destroy register-callback'"
   }
 
