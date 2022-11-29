@@ -61,8 +61,8 @@ oauth2-proxy:
       value: 'true'
 
   config:
-    clientID: ${data.keycloak_openid_client.kube-oidc-proxy.client_id}
-    clientSecret: ${data.keycloak_openid_client.kube-oidc-proxy.client_secret}
+    clientID: ${var.keycloak_client_id}
+    clientSecret: ${var.keycloak_client_secret}
    
 
   service:
