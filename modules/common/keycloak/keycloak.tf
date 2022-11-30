@@ -22,11 +22,10 @@ data "keycloak_openid_client" "kube-oidc-proxy" {
 }
 
 resource "null_resource" "register-callback" {
-  # Ensure this runs every time
+  # Ensure this runs only if we change these.
   triggers = {
     dns_name      = var.local_dns_name
     client_secret = data.keycloak_openid_client.kube-oidc-proxy.client_secret
-    build_number  = "${timestamp()}"
   }
   # must use full resource def for the apply, but must use self.triggers for destroy
   # annoying: https://stackoverflow.com/questions/72820832/self-triggers-is-null-when-trying-to-use-trigger-values-in-local-exec-provisio
