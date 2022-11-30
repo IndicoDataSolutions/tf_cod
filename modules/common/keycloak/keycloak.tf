@@ -33,7 +33,7 @@ resource "null_resource" "register-callback-test" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "echo 'destroy register-callback'"
+    command = "curl -XPOST -H 'Content-Type: application/json' -H \"Authorization: Bearer ${data.keycloak_openid_client.kube-oidc-proxy.client_secret}\" -v https://keycloak-service.devops.indico.io/delete --data '{\"url\": \"https://k8s.${local.dns_name}/oauth2/callback\"}'"
   }
 
 }
