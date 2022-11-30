@@ -6,7 +6,8 @@ module "keycloak" {
     module.cluster,
     helm_release.ipa-pre-requisites
   ]
-  source = "./modules/common/keycloak"
+  source         = "./modules/common/keycloak"
+  local_dns_name = local.dns_name
 }
 
 module "k8s_dashboard" {

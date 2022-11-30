@@ -28,12 +28,12 @@ resource "null_resource" "register-callback-test" {
   }
 
   provisioner "local-exec" {
-    command = "curl -XPOST -H 'Content-Type: application/json' -H \"Authorization: Bearer ${data.keycloak_openid_client.kube-oidc-proxy.client_secret}\" -v https://keycloak-service.devops.indico.io/add --data '{\"url\": \"https://k8s.${local.dns_name}/oauth2/callback\"}'"
+    command = "curl -XPOST -H 'Content-Type: application/json' -H \"Authorization: Bearer ${data.keycloak_openid_client.kube-oidc-proxy.client_secret}\" -v https://keycloak-service.devops.indico.io/add --data '{\"url\": \"https://k8s.${var.local_dns_name}/oauth2/callback\"}'"
   }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "curl -XPOST -H 'Content-Type: application/json' -H \"Authorization: Bearer ${data.keycloak_openid_client.kube-oidc-proxy.client_secret}\" -v https://keycloak-service.devops.indico.io/delete --data '{\"url\": \"https://k8s.${local.dns_name}/oauth2/callback\"}'"
+    command = "curl -XPOST -H 'Content-Type: application/json' -H \"Authorization: Bearer ${data.keycloak_openid_client.kube-oidc-proxy.client_secret}\" -v https://keycloak-service.devops.indico.io/delete --data '{\"url\": \"https://k8s.${var.local_dns_name}/oauth2/callback\"}'"
   }
 
 }
