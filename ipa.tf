@@ -75,7 +75,7 @@ app-edge:
             - path: /
               pathType: Prefix
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
 no-overrides: "true"
   EOT
   )
@@ -250,6 +250,13 @@ resource "helm_release" "ipa-pre-requisites" {
   disable_webhooks = false
 
   values = concat(local.storage_spec, [<<EOF
+
+cluster:
+  name: ${var.label}
+  region: ${var.region}
+  domain: indico.io
+  account: ${var.aws_account}
+
 secrets:
   rabbitmq:
     create: true
