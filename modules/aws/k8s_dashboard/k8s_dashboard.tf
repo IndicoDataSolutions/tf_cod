@@ -35,6 +35,18 @@ oauth2-proxy:
     enabled: true
     replica:
       replicaCount: 1
+    affinity:
+      podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: redis
+                    app.kubernetes.io/component: replica
+                namespaces:
+                  - "default"
+                topologyKey: kubernetes.io/hostname
+              weight: 1
 
   sessionStorage:
     type: redis
