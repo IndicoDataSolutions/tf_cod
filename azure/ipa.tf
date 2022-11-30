@@ -150,6 +150,12 @@ resource "helm_release" "ipa-pre-requisites" {
 
   values = [<<EOF
 
+cluster:
+  name: ${var.label}
+  region: ${var.region}
+  domain: ${var.domain_suffix}
+  account: ${var.aws_account}
+
 secrets:
   rabbitmq:
     create: true
@@ -176,7 +182,7 @@ external-dns:
   policy: sync
   txtOwnerId: "${var.label}-${var.region}"
   domainFilters:
-    - ${var.account}.indico.io.
+    - ${var.account}.${var.domain_suffix}.
 
   provider: azure
   

@@ -75,7 +75,7 @@ app-edge:
             - path: /
               pathType: Prefix
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
 no-overrides: "true"
   EOT
   )
