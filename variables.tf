@@ -1,3 +1,14 @@
+
+variable "is_azure" {
+  type = bool
+  default = false
+}
+
+variable "is_aws" {
+  type = bool
+  default = true
+}
+
 variable "label" {
   type        = string
   default     = "indico"

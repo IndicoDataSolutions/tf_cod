@@ -1,19 +1,20 @@
 # 
-# Include local modules here
+# Include modules only installed on AWS here.
 #
 module "keycloak" {
   depends_on = [
     module.cluster,
     helm_release.ipa-pre-requisites
   ]
-  source         = "./modules/common/keycloak"
+  source         = "./modules/aws/keycloak"
   local_dns_name = local.dns_name
 }
 
+# Azure doesn't support arbitrary OIDC, so we can use keycloak on Azure.
 module "k8s_dashboard" {
   count = var.enable_k8s_dashboard == true ? 1 : 0
 
-  source = "./modules/common/k8s_dashboard"
+  source = "./modules/aws/k8s_dashboard"
 
   local_dns_name         = local.dns_name
   ipa_repo               = var.ipa_repo

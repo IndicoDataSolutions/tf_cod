@@ -34,7 +34,7 @@ oauth2-proxy:
   redis:
     enabled: true
     replica:
-      replicaCount: 2
+      replicaCount: 1
 
   sessionStorage:
     type: redis

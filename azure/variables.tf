@@ -1,3 +1,14 @@
+
+variable "is_azure" {
+  type = bool
+  default = true
+}
+
+variable "is_aws" {
+  type = bool
+  default = false
+}
+
 # top level variable declarations
 variable "common_resource_group" {
   type        = string
