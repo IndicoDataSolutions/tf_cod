@@ -184,23 +184,23 @@ module "s3-storage" {
 
 # This empties the buckets upon delete so terraform doesn't take forever.
 resource "null_resource" "register-callback" {
-   depends_on = [
+  depends_on = [
     module.s3-storage
   ]
-  # Ensure this runs only if we change these.
+
   triggers = {
-    data_bucket_name = "indico-data-${var.label}"
+    data_bucket_name      = "indico-data-${var.label}"
     pg_backup_bucket_name = "indico-pgbackup-${var.label}"
   }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "aws s3 rm \"s3://${self.triggers.data_bucket_name}/" --recursive --only-show-errors || echo "WARNING: S3 rm ${self.trigger.data_bucket_name} reported errors\" >&2"
+    command = "aws s3 rm \"s3://${self.triggers.data_bucket_name}/\" --recursive --only-show-errors || echo \"WARNING: S3 rm ${self.trigger.data_bucket_name} reported errors\" >&2"
   }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "aws s3 rm \"s3://${self.triggers.pg_backup_bucket_name}/" --recursive --only-show-errors || echo "WARNING: S3 rm ${self.trigger.pg_backup_bucket_name} reported errors\" >&2"
+    command = "aws s3 rm \"s3://${self.triggers.pg_backup_bucket_name}/\" --recursive --only-show-errors || echo \"WARNING: S3 rm ${self.trigger.pg_backup_bucket_name} reported errors\" >&2"
   }
 }
 
