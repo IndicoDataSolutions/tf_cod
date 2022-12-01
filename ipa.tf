@@ -47,6 +47,38 @@ locals {
  EOF
   ] : []
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
+  acm_ipa_values = var.use_acm == true ? (<<EOT
+app-edge:
+  service:
+    type: "NodePort"
+    ports:
+      http_port: 31755
+      https_port: 31756
+      http_api_port: 31270
+  aws-load-balancer-controller:
+    enabled: true
+    aws-load-balancer-controller:
+      clusterName: ${var.label}
+      vpcId: ${local.network[0].indico_vpc_id}
+      region: ${var.region}
+    ingress:
+      enabled: true
+      alb:
+        publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
+        acmArn: ${aws_acm_certificate_validation.alb[0].certificate_arn}
+      service:
+        name: app-edge
+        port: 443
+      hosts:
+        - host: ${local.dns_name}
+          paths:
+            - path: /
+              pathType: Prefix
+  EOT
+  ) : (<<EOT
+no-overrides: "true"
+  EOT
+  )
 }
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
@@ -172,11 +204,6 @@ resource "helm_release" "ipa-crds" {
     enabled: true
   
   cert-manager:
-    #extraArgs:
-    #  - --dns01-recursive-nameservers-only
-    #  - --dns01-recursive-nameservers='${data.aws_route53_zone.aws-zone.name_servers[0]}:53,${data.aws_route53_zone.aws-zone.name_servers[1]}:53,${data.aws_route53_zone.aws-zone.name_servers[2]}:53'
-    #  - --acme-http01-solver-nameservers='${data.aws_route53_zone.aws-zone.name_servers[0]}:53,${data.aws_route53_zone.aws-zone.name_servers[1]}:53,${data.aws_route53_zone.aws-zone.name_servers[2]}:53'
-     
     nodeSelector:
       kubernetes.io/os: linux
     webhook:
@@ -520,6 +547,26 @@ spec:
 EOT
 }
 
+resource "github_repository_file" "alb-values-yaml" {
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/helm/alb.values"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+  depends_on = [
+    module.cluster,
+    aws_acm_certificate_validation.alb[0]
+  ]
+
+  content = local.acm_ipa_values
+}
+
 resource "github_repository_file" "argocd-application-yaml" {
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
@@ -532,6 +579,10 @@ resource "github_repository_file" "argocd-application-yaml" {
       content
     ]
   }
+  depends_on = [
+    module.cluster,
+    aws_acm_certificate_validation.alb[0]
+  ]
 
   content = <<EOT
 apiVersion: argoproj.io/v1alpha1
@@ -567,6 +618,10 @@ spec:
       env:
         - name: RELEASE_NAME
           value: ipa
+        
+        - name: HELM_TF_COD_VALUES
+          value: |
+            ${indent(12, local.acm_ipa_values)}         
 
         - name: HELM_VALUES
           value: |
@@ -599,10 +654,6 @@ resource "argocd_application" "ipa" {
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
     github_repository_file.argocd-application-yaml,
-    github_repository_file.hibernation-autoscaler-yaml,
-    github_repository_file.hibernation-exporter-yaml,
-    github_repository_file.hibernation-prometheus-yaml,
-    github_repository_file.hibernation-secrets-yaml,
     helm_release.monitoring
   ]
 
@@ -705,11 +756,14 @@ spec:
     chart: ${each.value.chart}
     repoURL: ${each.value.repo}
     targetRevision: ${each.value.version}
-    helm:
-      releaseName: ${each.value.name}
-      values: |
-        ${base64decode(each.value.values)}    
-
+    plugin:
+      name: argocd-vault-plugin-helm-values-expand-no-build
+      env:
+        - name: RELEASE_NAME
+          value: ${each.value.name}
+        - name: HELM_VALUES
+          value: |
+            ${base64decode(each.value.values)}
 EOT
 }
 
