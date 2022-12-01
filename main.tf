@@ -183,7 +183,7 @@ module "s3-storage" {
 
 
 # This empties the buckets upon delete so terraform doesn't take forever.
-resource "null_resource" "register-callback" {
+resource "null_resource" "fast-s3-delete" {
   depends_on = [
     module.s3-storage
   ]
