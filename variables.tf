@@ -1,3 +1,14 @@
+
+variable "is_azure" {
+  type = bool
+  default = false
+}
+
+variable "is_aws" {
+  type = bool
+  default = true
+}
+
 variable "label" {
   type        = string
   default     = "indico"
@@ -486,5 +497,4 @@ variable "use_acm" {
   type        = bool
   default     = false
   description = "create cluster that will use acm"
-
 }
