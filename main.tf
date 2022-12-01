@@ -183,19 +183,30 @@ module "s3-storage" {
 
 
 # This empties the buckets upon delete so terraform doesn't take forever.
-resource "null_resource" "fast-s3-delete" {
+resource "null_resource" "s3-delete-data-bucket" {
   depends_on = [
     module.s3-storage
   ]
 
   triggers = {
-    data_bucket_name      = "indico-data-${var.label}"
-    pg_backup_bucket_name = "indico-pgbackup-${var.label}"
+    data_bucket_name = module.s3-storage.data_s3_bucket_name
   }
 
   provisioner "local-exec" {
     when    = destroy
     command = "aws s3 rm \"s3://${self.triggers.data_bucket_name}/\" --recursive --only-show-errors || echo \"WARNING: S3 rm ${self.triggers.data_bucket_name} reported errors\" >&2"
+  }
+}
+
+resource "null_resource" "s3-delete-data-pgbackup-bucket" {
+  count = var.include_pgbackup == true ? 1 : 0
+
+  depends_on = [
+    module.s3-storage
+  ]
+
+  triggers = {
+    pg_backup_bucket_name = module.s3-storage.pgbackup_s3_bucket_name
   }
 
   provisioner "local-exec" {
@@ -203,7 +214,6 @@ resource "null_resource" "fast-s3-delete" {
     command = "aws s3 rm \"s3://${self.triggers.pg_backup_bucket_name}/\" --recursive --only-show-errors || echo \"WARNING: S3 rm ${self.triggers.pg_backup_bucket_name} reported errors\" >&2"
   }
 }
-
 
 module "efs-storage" {
   count              = var.include_efs == true ? 1 : 0
