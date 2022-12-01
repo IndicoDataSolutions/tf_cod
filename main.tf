@@ -195,12 +195,12 @@ resource "null_resource" "register-callback" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "aws s3 rm \"s3://${self.triggers.data_bucket_name}/\" --recursive --only-show-errors || echo \"WARNING: S3 rm ${self.trigger.data_bucket_name} reported errors\" >&2"
+    command = "aws s3 rm \"s3://${self.triggers.data_bucket_name}/\" --recursive --only-show-errors || echo \"WARNING: S3 rm ${self.triggers.data_bucket_name} reported errors\" >&2"
   }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "aws s3 rm \"s3://${self.triggers.pg_backup_bucket_name}/\" --recursive --only-show-errors || echo \"WARNING: S3 rm ${self.trigger.pg_backup_bucket_name} reported errors\" >&2"
+    command = "aws s3 rm \"s3://${self.triggers.pg_backup_bucket_name}/\" --recursive --only-show-errors || echo \"WARNING: S3 rm ${self.triggers.pg_backup_bucket_name} reported errors\" >&2"
   }
 }
 
