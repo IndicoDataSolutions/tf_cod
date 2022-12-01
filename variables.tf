@@ -1,11 +1,11 @@
 
 variable "is_azure" {
-  type = bool
+  type    = bool
   default = false
 }
 
 variable "is_aws" {
-  type = bool
+  type    = bool
   default = true
 }
 
@@ -483,11 +483,6 @@ variable "crds-values-yaml-b64" {
 variable "pre-reqs-values-yaml-b64" {
   default = "Cg=="
 }
-
-<<<<<<<<< Temporary merge branch 1
-
-=========
->>>>>>>>> Temporary merge branch 2
 variable "k8s_dashboard_chart_version" {
   default = "0.1.0"
 }
@@ -501,25 +496,4 @@ variable "use_acm" {
   type        = bool
   default     = false
   description = "create cluster that will use acm"
-
 }
-variable "k8s_dashboard_chart_version" {
-  default = "0.1.0"
-}
-
-variable "enable_k8s_dashboard" {
-  type    = bool
-  default = true
-}
-
->>>>>>>>> Temporary merge branch 2
-variable "use_acm" {
-  type        = bool
-  default     = false
-  description = "create cluster that will use acm"
-<<<<<<<<< Temporary merge branch 1
-}
-=========
-
-}
->>>>>>>>> Temporary merge branch 2
