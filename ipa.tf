@@ -62,10 +62,7 @@ app-edge:
       vpcId: ${local.network[0].indico_vpc_id}
       region: ${var.region}
     ingress:
-      enabled: true
-      annotations:
-        acme.cert-manager.io/http01-edit-in-place: "true"
-        cert-manager.io/cluster-issuer: zerossl
+      enabled: true      
       tls:
         - secretName: indico-ssl-cm-cert
           hosts:
