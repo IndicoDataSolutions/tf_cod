@@ -1,3 +1,14 @@
+
+variable "is_azure" {
+  type = bool
+  default = true
+}
+
+variable "is_aws" {
+  type = bool
+  default = false
+}
+
 # top level variable declarations
 variable "common_resource_group" {
   type        = string
@@ -289,4 +300,9 @@ variable "admin_group_name" {
   type = string
   default = "DevOps"
   description = "Name of group that will own the cluster"
+}
+
+variable "enable_k8s_dashboard" {
+  type    = bool
+  default = true
 }
