@@ -75,7 +75,7 @@ app-edge:
             - path: /
               pathType: Prefix
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
 no-overrides: "true"
   EOT
   )
@@ -770,7 +770,7 @@ spec:
           value: ${each.value.name}
         - name: HELM_VALUES
           value: |
-            ${base64decode(each.value.values)}
+            ${indent(12, base64decode(each.value.values))}
 EOT
 }
 
