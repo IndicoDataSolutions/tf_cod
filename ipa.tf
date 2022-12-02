@@ -57,10 +57,6 @@ app-edge:
       http_api_port: 31270
   aws-load-balancer-controller:
     enabled: true
-    aws-load-balancer-controller:
-      clusterName: ${var.label}
-      vpcId: ${local.network[0].indico_vpc_id}
-      region: ${var.region}
     ingress:
       enabled: true
       annotations:
@@ -474,7 +470,11 @@ crunchy-postgres:
           incremental: 0 */1 * * *
     imagePullSecrets:
       - name: harbor-pull-secret
-  
+aws-load-balancer-controller:
+  aws-load-balancer-controller:
+    clusterName: ${var.label}
+    vpcId: ${local.network[0].indico_vpc_id}
+    region: ${var.region}
 EOF
     ,
     <<EOT
