@@ -1,11 +1,11 @@
 
 variable "is_azure" {
-  type = bool
+  type    = bool
   default = false
 }
 
 variable "is_aws" {
-  type = bool
+  type    = bool
   default = true
 }
 
@@ -315,6 +315,10 @@ variable "ipa_version" {
   default = "0.12.1"
 }
 
+variable "ipa_smoketest_values" {
+  type    = string
+  default = "Cg==" # empty newline string
+}
 
 variable "ipa_smoketest_repo" {
   type    = string
@@ -483,13 +487,12 @@ variable "crds-values-yaml-b64" {
 variable "pre-reqs-values-yaml-b64" {
   default = "Cg=="
 }
-
 variable "k8s_dashboard_chart_version" {
   default = "0.1.0"
 }
 
 variable "enable_k8s_dashboard" {
-  type = bool
+  type    = bool
   default = true
 }
 

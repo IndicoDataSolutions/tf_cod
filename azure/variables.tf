@@ -1,11 +1,11 @@
 
 variable "is_azure" {
-  type = bool
+  type    = bool
   default = true
 }
 
 variable "is_aws" {
-  type = bool
+  type    = bool
   default = false
 }
 
@@ -35,8 +35,8 @@ variable "message" {
 }
 
 variable "account" {
-  type = string
-  default = "Azure-Dev"
+  type        = string
+  default     = "Azure-Dev"
   description = "The name of the subscription that this cluster falls under"
 }
 
@@ -261,6 +261,11 @@ variable "opentelemetry-collector_version" {
   description = "Version of opentelemetry-collector helm chart"
 }
 
+variable "ipa_smoketest_values" {
+  type    = string
+  default = "Cg==" # empty newline string
+}
+
 variable "ipa_smoketest_repo" {
   type    = string
   default = "https://harbor.devops.indico.io/chartrepo/indico-charts"
@@ -297,8 +302,8 @@ variable "ipa_smoketest_cronjob_schedule" {
 }
 
 variable "admin_group_name" {
-  type = string
-  default = "DevOps"
+  type        = string
+  default     = "DevOps"
   description = "Name of group that will own the cluster"
 }
 

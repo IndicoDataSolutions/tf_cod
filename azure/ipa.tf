@@ -154,7 +154,7 @@ cluster:
   name: ${var.label}
   region: ${var.region}
   domain: ${var.domain_suffix}
-  account: ${var.aws_account}
+  account: ${var.account}
 
 secrets:
   rabbitmq:
@@ -298,6 +298,7 @@ spec:
       
         - name: HELM_VALUES
           value: |
+            ${indent(12, base64decode(var.ipa_smoketest_values))} 
             image:
               tag: ${var.ipa_smoketest_container_tag}
             cronjob:
