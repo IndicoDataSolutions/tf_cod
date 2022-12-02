@@ -154,11 +154,7 @@ cluster:
   name: ${var.label}
   region: ${var.region}
   domain: ${var.domain_suffix}
-<<<<<<< HEAD
   account: ${var.account}
-=======
-  account: ${var.aws_account}
->>>>>>> origin
 
 secrets:
   rabbitmq:

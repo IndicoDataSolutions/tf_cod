@@ -5,7 +5,7 @@ variable "is_azure" {
 }
 
 variable "is_aws" {
-  type = bool
+  type    = bool
   default = true
 }
 
