@@ -75,7 +75,7 @@ app-edge:
             - path: /
               pathType: Prefix
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
 no-overrides: "true"
   EOT
   )
@@ -539,6 +539,7 @@ spec:
       
         - name: HELM_VALUES
           value: |
+            ${base64decode(var.ipa_smoketest_values)}    
             image:
               tag: ${var.ipa_smoketest_container_tag}
             cronjob:
