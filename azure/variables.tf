@@ -317,3 +317,9 @@ variable "name" {
   default     = "indico"
   description = "Name to use in all cluster resources names"
 }
+
+variable "cod_snapshot_restore_version" {
+  type    = string
+  default = "0.1.3"
+}
+

@@ -1,7 +1,40 @@
-#data "git" "snapshots" {
-#  name                = replace(lower("${var.account}snapshots"), "-", "")
-#  resource_group_name = var.snapshots_resource_group_name
-#}
+
+resource "helm_release" "cod-snapshot-restore" {
+  depends_on = [
+    helm_release.ipa-pre-requisites
+  ]
+  count            = var.restore_snapshot_enabled == true ? 1 : 0
+  name             = "cod-snapshot-restore"
+  create_namespace = true
+  namespace        = "default"
+  repository       = var.ipa_repo
+  chart            = "cod-snapshot-restore"
+  version          = var.cod_snapshot_restore_version
+  wait             = true
+  timeout          = "1800" # 60 minutes
+  disable_webhooks = false
+
+  values = [<<EOF
+snapshot:
+  serviceAccount:
+    labels:
+      "azure.workload.identity/use": "true"
+
+    annotations:
+      "azure.workload.identity/client-id": "${azuread_application.workload_identity.application_id}"
+
+  podAnnotations:
+    "azure.workload.identity/inject-proxy-sidecar": "true"
+
+  command: /app/restore-azure.sh
+  aws_account_name: unused
+  env:
+    - name: IDENTITY_CLIENT_ID
+      value: ${azuread_application.workload_identity.application_id}
+  EOF
+  ]
+}
+
 
 # add label "azure.workload.identity/use" = "true" to cod-snapshot service account
 # add annotation  "azure.workload.identity/client-id" = azuread_application.workload_identity.application_id to the cod-snapshot service account
