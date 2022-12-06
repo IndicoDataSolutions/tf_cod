@@ -67,12 +67,6 @@ data "http" "workstation-external-ip" {
   url = "http://ipv4.icanhazip.com"
 }
 
-
-provider "github" {
-  token = var.git_pat
-  owner = "IndicoDataSolutions"
-}
-
 # argo 
 provider "argocd" {
   server_addr = var.argo_host
