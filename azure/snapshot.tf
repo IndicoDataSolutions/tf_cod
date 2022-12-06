@@ -1,5 +1,7 @@
 
 resource "kubernetes_secret" "cod-snapshot-client-id" {
+  count = var.restore_snapshot_enabled == true ? 1 : 0
+
   metadata {
     name = "cod-snapshot-client-id"
   }
