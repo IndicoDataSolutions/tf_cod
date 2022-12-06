@@ -78,3 +78,14 @@ resource "azuread_application_federated_identity_credential" "workload_identity"
   issuer                = module.cluster.oidc_issuer_url
   subject               = "system:serviceaccount:default:workload-identity-storage-account"
 }
+
+
+resource "azuread_application_federated_identity_credential" "workload_snapshot_identity" {
+  count                 = var.restore_snapshot_enabled == true ? 1 : 0
+  application_object_id = azuread_application.workload_identity.object_id
+  display_name          = "${var.label}-${var.region}-workload-snapshot-identity"
+  description           = "Initial workload snapshot identity for cluster"
+  audiences             = ["api://AzureADTokenExchange"]
+  issuer                = module.cluster.oidc_issuer_url
+  subject               = "system:serviceaccount:default:cod-snapshot"
+}
