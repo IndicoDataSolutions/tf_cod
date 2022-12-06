@@ -1,5 +1,5 @@
-data "azurerm_storage_account" "snapshots" {
-  name                = var.account
+data "git" "snapshots" {
+  name                = replace(lower("${var.account}snapshots"), "-", "")
   resource_group_name = var.snapshots_resource_group_name
 }
 
