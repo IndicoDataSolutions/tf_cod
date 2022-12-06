@@ -3,13 +3,15 @@
 #  resource_group_name = var.snapshots_resource_group_name
 #}
 
-
+# add label "azure.workload.identity/use" = "true" to cod-snapshot service account
+# add annotation  "azure.workload.identity/client-id" = azuread_application.workload_identity.application_id to the cod-snapshot service account
 # associate the sa with the deployment job workload-identity-storage-account
 # need the client id of azuread_application.workload_identity.application_id
 # azcopy login --identity --identity-client-id azuread_application.workload_identity.application_id
 # add annotation azure.workload.identity/inject-proxy-sidecar: true to the cod-snapshot deployment job
 # ./azcopy cp /etc  https://indicodevazuresnapshots.blob.core.windows.net/blob/azure546  --from-to LocalBlob --recursive
 
+/*
 resource "kubectl_manifest" "snapshot-service-account" {
   depends_on = [
     helm_release.ipa-pre-requisites
@@ -166,3 +168,6 @@ resource "kubernetes_job" "snapshot-restore-job" {
   }
 
 }
+*/
+
+#resource "helm_release" "cod-snapshot-save"
