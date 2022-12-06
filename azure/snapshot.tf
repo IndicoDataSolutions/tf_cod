@@ -16,21 +16,21 @@ resource "helm_release" "cod-snapshot-restore" {
 
   values = [<<EOF
 snapshot:
-  serviceAccount:
-    labels:
-      "azure.workload.identity/use": "true"
-
-    annotations:
-      "azure.workload.identity/client-id": "${azuread_application.workload_identity.application_id}"
-
-  podAnnotations:
-    "azure.workload.identity/inject-proxy-sidecar": "true"
-
   command: /app/restore-azure.sh
   aws_account_name: unused
   env:
     - name: IDENTITY_CLIENT_ID
       value: ${azuread_application.workload_identity.application_id}
+
+podAnnotations:
+  "azure.workload.identity/inject-proxy-sidecar": "true"
+
+serviceAccount:
+  labels:
+    "azure.workload.identity/use": "true"
+
+  annotations:
+    "azure.workload.identity/client-id": "${azuread_application.workload_identity.application_id}"
   EOF
   ]
 }
