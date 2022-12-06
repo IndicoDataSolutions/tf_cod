@@ -1,7 +1,6 @@
 data "azurerm_storage_account" "snapshots" {
   name                = var.account
   resource_group_name = var.snapshots_resource_group_name
-  location            = var.region
 }
 
 resource "kubectl_manifest" "snapshot-service-account" {
