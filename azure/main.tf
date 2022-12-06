@@ -148,7 +148,8 @@ resource "azurerm_resource_group" "cod-cluster" {
 }
 
 data "azurerm_dns_zone" "primary" {
-  name = lower("${var.account}.indico.io")
+  name                = lower("${var.account}.indico.io")
+  resource_group_name = local.resource_group_name
 }
 
 module "networking" {
@@ -163,16 +164,6 @@ module "networking" {
   resource_group_name = local.resource_group_name
   region              = var.region
 }
-
-/*
-module "asq_eventgrid" {
-  count = var.asq_eventgrid == true ? 0 : 1
-  source  = "app.terraform.io/indico/indico-azure-aqs-eventgrid/mod"
-  version = "1.0.0"
-  region  = var.region
-  label   = var.label
-}
-*/
 
 module "cluster-manager" {
   depends_on = [
@@ -189,14 +180,6 @@ module "cluster-manager" {
   resource_group_name = local.resource_group_name
 }
 
-/*
-module "key_vault_key" {
-  source          = "app.terraform.io/indico/indico-aws-kms/mod"
-  version         = "1.1.0"
-  label           = var.label
-  additional_tags = var.additional_tags
-}*/
-
 module "storage" {
   depends_on = [
     azurerm_resource_group.cod-cluster
@@ -207,15 +190,6 @@ module "storage" {
   region              = var.region
   resource_group_name = local.resource_group_name
 }
-
-/*
-module "security-group" {
-  source   = "app.terraform.io/indico/indico-aws-security-group/mod"
-  version  = "1.0.0"
-  label    = var.label
-  vpc_cidr = var.vpc_cidr
-  vpc_id   = local.network[0].indico_vpc_id
-}*/
 
 module "cluster" {
   depends_on = [

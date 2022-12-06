@@ -306,3 +306,8 @@ variable "enable_k8s_dashboard" {
   type    = bool
   default = true
 }
+
+variable "snapshots_resource_group_name" {
+  type = string
+  default = "cod-snapshots"
+}
