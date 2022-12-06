@@ -1,11 +1,11 @@
 
 variable "is_azure" {
-  type = bool
+  type    = bool
   default = true
 }
 
 variable "is_aws" {
-  type = bool
+  type    = bool
   default = false
 }
 
@@ -35,8 +35,8 @@ variable "message" {
 }
 
 variable "account" {
-  type = string
-  default = "Azure-Dev"
+  type        = string
+  default     = "Azure-Dev"
   description = "The name of the subscription that this cluster falls under"
 }
 
@@ -297,8 +297,8 @@ variable "ipa_smoketest_cronjob_schedule" {
 }
 
 variable "admin_group_name" {
-  type = string
-  default = "DevOps"
+  type        = string
+  default     = "DevOps"
   description = "Name of group that will own the cluster"
 }
 
@@ -308,6 +308,12 @@ variable "enable_k8s_dashboard" {
 }
 
 variable "snapshots_resource_group_name" {
-  type = string
+  type    = string
   default = "cod-snapshots"
+}
+
+variable "name" {
+  type        = string
+  default     = "indico"
+  description = "Name to use in all cluster resources names"
 }
