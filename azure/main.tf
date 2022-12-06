@@ -27,6 +27,10 @@ terraform {
       source  = "hashicorp/local"
       version = "=2.2.3"
     }
+    github = {
+      source  = "integrations/github"
+      version = "4.26.0"
+    }
   }
 }
 
@@ -52,7 +56,10 @@ provider "vault" {
     }
   }
 }
-
+provider "github" {
+  token = var.git_pat
+  owner = "IndicoDataSolutions"
+}
 data "azurerm_subscription" "primary" {}
 data "azurerm_client_config" "current" {}
 

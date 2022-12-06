@@ -1,7 +1,7 @@
-data "git" "snapshots" {
-  name                = replace(lower("${var.account}snapshots"), "-", "")
-  resource_group_name = var.snapshots_resource_group_name
-}
+#data "git" "snapshots" {
+#  name                = replace(lower("${var.account}snapshots"), "-", "")
+#  resource_group_name = var.snapshots_resource_group_name
+#}
 
 resource "kubectl_manifest" "snapshot-service-account" {
   depends_on = [
