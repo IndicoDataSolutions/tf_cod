@@ -4,7 +4,7 @@ data "azurerm_resource_group" "domain" {
 
 data "azurerm_dns_zone" "domain" {
   name                = local.base_domain
-  resource_group_name = var.common_resource_gorup
+  resource_group_name = data.azurerm_resource_group.domain.name
 }
 
 resource "azurerm_dns_caa_record" "fqdn" {

@@ -148,11 +148,6 @@ resource "azurerm_resource_group" "cod-cluster" {
   location = var.region
 }
 
-data "azurerm_dns_zone" "primary" {
-  name                = lower("${var.account}.indico.io")
-  resource_group_name = var.common_resource_gorup
-}
-
 module "networking" {
   depends_on = [
     azurerm_resource_group.cod-cluster
