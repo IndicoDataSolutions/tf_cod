@@ -150,7 +150,7 @@ resource "azurerm_resource_group" "cod-cluster" {
 
 data "azurerm_dns_zone" "primary" {
   name                = lower("${var.account}.indico.io")
-  resource_group_name = "indico"
+  resource_group_name = var.common_resource_gorup
 }
 
 module "networking" {
