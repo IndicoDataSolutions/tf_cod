@@ -1,4 +1,15 @@
 
+resource "kubernetes_secret" "cod-snapshot-client-id" {
+  metadata {
+    name = "cod-snapshot-client-id"
+  }
+
+  data = {
+    id = "${azuread_application.workload_identity.application_id}"
+  }
+}
+
+
 resource "helm_release" "cod-snapshot-restore" {
   depends_on = [
     helm_release.ipa-pre-requisites
