@@ -4,6 +4,7 @@ resource "kubernetes_secret" "cod-snapshot-client-id" {
 
   metadata {
     name = "cod-snapshot-client-id"
+    namespace = "default"
   }
 
   data = {
