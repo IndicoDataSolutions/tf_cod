@@ -86,5 +86,5 @@ resource "azuread_application_federated_identity_credential" "workload_snapshot_
   description           = "Initial workload snapshot identity for cluster"
   audiences             = ["api://AzureADTokenExchange"]
   issuer                = module.cluster.oidc_issuer_url
-  subject               = "system:serviceaccount:default:cod-snapshot"
+  subject               = "system:serviceaccount:default:cod-snapshots"
 }
