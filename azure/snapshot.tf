@@ -1,7 +1,7 @@
-
+# Create a secret with the workload identity so azcopy can execute
 resource "kubernetes_secret" "cod-snapshot-client-id" {
   metadata {
-    name = "cod-snapshot-client-id"
+    name      = "cod-snapshot-client-id"
     namespace = "default"
   }
 
@@ -10,11 +10,12 @@ resource "kubernetes_secret" "cod-snapshot-client-id" {
   }
 }
 
-
 resource "helm_release" "cod-snapshot-restore" {
   depends_on = [
-    helm_release.ipa-pre-requisites
+    helm_release.ipa-pre-requisites,
+    kubernetes_secret.cod-snapshot-client-id
   ]
+
   count            = var.restore_snapshot_enabled == true ? 1 : 0
   name             = "cod-snapshot-restore"
   create_namespace = true
@@ -23,7 +24,7 @@ resource "helm_release" "cod-snapshot-restore" {
   chart            = "cod-snapshot-restore"
   version          = var.cod_snapshot_restore_version
   wait             = true
-  timeout          = "1800" # 60 minutes
+  timeout          = "3600" # 120 minutes
   disable_webhooks = false
 
   values = [<<EOF
@@ -32,7 +33,10 @@ snapshot:
   aws_account_name: unused
   env:
     - name: IDENTITY_CLIENT_ID
-      value: ${azuread_application.workload_identity.application_id}
+      valueFrom:
+        secretKeyRef:
+          name: cod-snapshot-client-id
+          key: id
 
 podAnnotations:
   "azure.workload.identity/inject-proxy-sidecar": "true"
