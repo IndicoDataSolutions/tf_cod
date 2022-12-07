@@ -48,6 +48,7 @@ serviceAccount:
   labels:
     "azure.workload.identity/use": "true"
 
+  # https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview
   annotations:
     "azure.workload.identity/client-id": "${azuread_application.workload_identity.application_id}"
     "azure.workload.identity/tenant-id": "${data.azurerm_client_config.current.tenant_id}"
