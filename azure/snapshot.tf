@@ -13,7 +13,9 @@ resource "kubernetes_secret" "cod-snapshot-client-id" {
 resource "helm_release" "cod-snapshot-restore" {
   depends_on = [
     helm_release.ipa-pre-requisites,
-    kubernetes_secret.cod-snapshot-client-id
+    kubernetes_secret.cod-snapshot-client-id,
+    azuread_application_federated_identity_credential.workload_snapshot_identity,
+    kubernetes_service_account.workload_identity
   ]
 
   count            = var.restore_snapshot_enabled == true ? 1 : 0
