@@ -32,6 +32,8 @@ image:
   repository: harbor.devops.indico.io/indico/cod-snapshot-azure
 
 snapshot:
+  labels:
+    "azure.workload.identity/use": "true"
   command: /app/restore-azure.sh
   aws_account_name: unused
   name: "${var.restore_snapshot_name}"
