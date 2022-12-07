@@ -34,6 +34,7 @@ image:
 snapshot:
   command: /app/restore-azure.sh
   aws_account_name: unused
+  name: "${var.restore_snapshot_name}"
   env:
     - name: IDENTITY_CLIENT_ID
       valueFrom:
