@@ -28,6 +28,9 @@ resource "helm_release" "cod-snapshot-restore" {
   disable_webhooks = false
 
   values = [<<EOF
+image:
+  repository: harbor.devops.indico.io/indico/cod-snapshot-azure
+  
 snapshot:
   command: /app/restore-azure.sh
   aws_account_name: unused
