@@ -30,7 +30,7 @@ resource "helm_release" "cod-snapshot-restore" {
   values = [<<EOF
 image:
   repository: harbor.devops.indico.io/indico/cod-snapshot-azure
-  
+
 snapshot:
   command: /app/restore-azure.sh
   aws_account_name: unused
@@ -50,6 +50,7 @@ serviceAccount:
 
   annotations:
     "azure.workload.identity/client-id": "${azuread_application.workload_identity.application_id}"
+    "azure.workload.identity/tenant-id": "${data.azurerm_client_config.current.tenant_id}"
   EOF
   ]
 }
