@@ -112,7 +112,7 @@ resource "aws_key_pair" "kp" {
 module "public_networking" {
   count                = var.direct_connect == true ? 0 : 1
   source               = "app.terraform.io/indico/indico-aws-network/mod"
-  version              = "1.0.1"
+  version              = "1.2.0"
   label                = var.label
   vpc_cidr             = var.vpc_cidr
   private_subnet_cidrs = var.private_subnet_cidrs
@@ -250,7 +250,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "7.2.2"
+  version                    = "7.3.0"
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
