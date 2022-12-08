@@ -150,6 +150,12 @@ resource "helm_release" "ipa-pre-requisites" {
 
   values = [<<EOF
 
+cluster:
+  name: ${var.label}
+  region: ${var.region}
+  domain: ${var.domain_suffix}
+  account: ${var.account}
+
 secrets:
   rabbitmq:
     create: true
@@ -176,7 +182,7 @@ external-dns:
   policy: sync
   txtOwnerId: "${var.label}-${var.region}"
   domainFilters:
-    - azure.indico.io.
+    - ${var.account}.${var.domain_suffix}.
 
   provider: azure
   
@@ -265,7 +271,7 @@ metadata:
   labels:
     app: cod
     region: ${var.region}
-    account: azure
+    account: ${var.account}
     name: ${var.label}
   annotations:
     avp.kubernetes.io/path: tools/argo/data/ipa-deploy
@@ -292,6 +298,7 @@ spec:
       
         - name: HELM_VALUES
           value: |
+            ${indent(12, base64decode(var.ipa_smoketest_values))} 
             image:
               tag: ${var.ipa_smoketest_container_tag}
             cronjob:
@@ -300,7 +307,7 @@ spec:
             cluster:
               name: ${var.label}
               region: ${var.region}
-              account: azure
+              account: ${var.account}
             host: ${local.dns_name}
             slack:
               channel: ${var.ipa_smoketest_slack_channel}
@@ -331,7 +338,7 @@ metadata:
   labels:
     app: cod
     region: ${var.region}
-    account: azure
+    account: ${var.account}
     name: ${var.label}
   annotations:
     avp.kubernetes.io/path: tools/argo/data/ipa-deploy
@@ -395,7 +402,7 @@ resource "argocd_application" "ipa" {
   wait = true
 
   metadata {
-    name      = lower("azure-${var.region}-${var.label}-deploy-ipa")
+    name      = lower("${var.account}-${var.region}-${var.label}-deploy-ipa")
     namespace = "argo"
     labels = {
       test = "true"
@@ -461,13 +468,13 @@ resource "github_repository_file" "custom-application-yaml" {
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${lower("azure-${var.region}-${var.label}-${each.value.name}")} 
+  name: ${lower("${var.account}-${var.region}-${var.label}-${each.value.name}")} 
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
     app: ${each.value.name}
     region: ${var.region}
-    account: azure
+    account: ${var.account}
     name: ${var.label}
 spec:
   destination:

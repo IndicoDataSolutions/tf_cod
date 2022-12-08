@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/time"
       version = "0.7.2"
     }
+    keycloak = {
+      source  = "mrparkers/keycloak"
+      version = "4.0.1"
+    }
     argocd = {
       source  = "oboukili/argocd"
       version = "3.1.0"
@@ -39,6 +43,10 @@ terraform {
 }
 
 provider "time" {}
+
+provider "keycloak" {
+  # these values are provided by the keycloak varset from terraform cloud
+}
 
 provider "vault" {
   address          = var.vault_address
@@ -171,6 +179,40 @@ module "s3-storage" {
   submission_expiry = var.submission_expiry
   uploads_expiry    = var.uploads_expiry
   include_rox       = var.include_rox
+}
+
+
+# This empties the buckets upon delete so terraform doesn't take forever.
+resource "null_resource" "s3-delete-data-bucket" {
+  depends_on = [
+    module.s3-storage
+  ]
+
+  triggers = {
+    data_bucket_name = module.s3-storage.data_s3_bucket_name
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "aws s3 rm \"s3://${self.triggers.data_bucket_name}/\" --recursive --only-show-errors || echo \"WARNING: S3 rm ${self.triggers.data_bucket_name} reported errors\" >&2"
+  }
+}
+
+resource "null_resource" "s3-delete-data-pgbackup-bucket" {
+  count = var.include_pgbackup == true ? 1 : 0
+
+  depends_on = [
+    module.s3-storage
+  ]
+
+  triggers = {
+    pg_backup_bucket_name = module.s3-storage.pgbackup_s3_bucket_name
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "aws s3 rm \"s3://${self.triggers.pg_backup_bucket_name}/\" --recursive --only-show-errors || echo \"WARNING: S3 rm ${self.triggers.pg_backup_bucket_name} reported errors\" >&2"
+  }
 }
 
 module "efs-storage" {
@@ -322,6 +364,7 @@ locals {
   security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
   cluster_name      = var.label
   dns_name          = lower("${var.label}.${var.region}.${var.aws_account}.indico.io")
+  dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
 }
 
 

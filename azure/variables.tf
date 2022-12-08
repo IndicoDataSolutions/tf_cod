@@ -1,3 +1,14 @@
+
+variable "is_azure" {
+  type    = bool
+  default = true
+}
+
+variable "is_aws" {
+  type    = bool
+  default = false
+}
+
 # top level variable declarations
 variable "common_resource_group" {
   type        = string
@@ -7,7 +18,7 @@ variable "common_resource_group" {
 
 variable "domain_suffix" {
   type        = string
-  default     = "azure.indico.io"
+  default     = "indico.io"
   description = "Domain suffix"
 }
 
@@ -21,6 +32,12 @@ variable "message" {
   type        = string
   default     = "Managed by Terraform"
   description = "The commit message for updates"
+}
+
+variable "account" {
+  type        = string
+  default     = "Azure-Dev"
+  description = "The name of the subscription that this cluster falls under"
 }
 
 variable "region" {
@@ -244,6 +261,11 @@ variable "opentelemetry-collector_version" {
   description = "Version of opentelemetry-collector helm chart"
 }
 
+variable "ipa_smoketest_values" {
+  type    = string
+  default = "Cg==" # empty newline string
+}
+
 variable "ipa_smoketest_repo" {
   type    = string
   default = "https://harbor.devops.indico.io/chartrepo/indico-charts"
@@ -277,4 +299,15 @@ variable "ipa_smoketest_cronjob_enabled" {
 variable "ipa_smoketest_cronjob_schedule" {
   type    = string
   default = "0 0 * * *" # every night at midnight
+}
+
+variable "admin_group_name" {
+  type        = string
+  default     = "DevOps"
+  description = "Name of group that will own the cluster"
+}
+
+variable "enable_k8s_dashboard" {
+  type    = bool
+  default = true
 }
