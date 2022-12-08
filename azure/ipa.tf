@@ -54,6 +54,7 @@ resource "helm_release" "ipa-crds" {
   repository       = var.ipa_repo
   chart            = "ipa-crds"
   version          = var.ipa_crds_version
+  timeout          = "600" # 10 minutes
   wait             = true
 
   values = [<<EOF
@@ -390,7 +391,7 @@ resource "argocd_application" "ipa" {
     helm_release.ipa-pre-requisites,
     time_sleep.wait_1_minutes_after_pre_reqs,
     module.argo-registration,
-    kubernetes_job.snapshot-restore-job,
+    helm_release.cod-snapshot-restore,
     github_repository_file.smoketest-application-yaml,
     github_repository_file.argocd-application-yaml,
     helm_release.keda-monitoring

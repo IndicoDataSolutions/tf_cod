@@ -12,7 +12,7 @@ variable "is_aws" {
 # top level variable declarations
 variable "common_resource_group" {
   type        = string
-  default     = "indico"
+  default     = "indico-common"
   description = "The common resource group name"
 }
 
@@ -317,3 +317,9 @@ variable "name" {
   default     = "indico"
   description = "Name to use in all cluster resources names"
 }
+
+variable "cod_snapshot_restore_version" {
+  type    = string
+  default = "0.1.3"
+}
+
