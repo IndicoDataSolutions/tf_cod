@@ -471,6 +471,7 @@ crunchy-postgres:
     imagePullSecrets:
       - name: harbor-pull-secret
 aws-load-balancer-controller:
+  enabled: ${var.use_acm}
   aws-load-balancer-controller:
     clusterName: ${var.label}
     vpcId: ${local.network[0].indico_vpc_id}
