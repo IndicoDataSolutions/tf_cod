@@ -261,6 +261,11 @@ variable "opentelemetry-collector_version" {
   description = "Version of opentelemetry-collector helm chart"
 }
 
+variable "ipa_smoketest_values" {
+  type    = string
+  default = "Cg==" # empty newline string
+}
+
 variable "ipa_smoketest_repo" {
   type    = string
   default = "https://harbor.devops.indico.io/chartrepo/indico-charts"
