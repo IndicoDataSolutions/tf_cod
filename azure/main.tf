@@ -27,6 +27,10 @@ terraform {
       source  = "hashicorp/local"
       version = "=2.2.3"
     }
+    github = {
+      source  = "integrations/github"
+      version = "4.26.0"
+    }
   }
 }
 
@@ -52,18 +56,15 @@ provider "vault" {
     }
   }
 }
-
+provider "github" {
+  token = var.git_pat
+  owner = "IndicoDataSolutions"
+}
 data "azurerm_subscription" "primary" {}
 data "azurerm_client_config" "current" {}
 
 data "http" "workstation-external-ip" {
   url = "http://ipv4.icanhazip.com"
-}
-
-
-provider "github" {
-  token = var.git_pat
-  owner = "IndicoDataSolutions"
 }
 
 # argo 
@@ -127,6 +128,7 @@ locals {
   resource_group_name = "${var.label}-${var.region}"
   current_ip          = "${chomp(data.http.workstation-external-ip.response_body)}/20"
 
+  storage_account_name    = replace(lower("${var.account}snapshots"), "-", "")
   argo_app_name           = lower("${var.account}.${var.region}.${var.label}-ipa")
   argo_cluster_name       = "${var.account}.${var.region}.${var.label}"
   argo_smoketest_app_name = lower("${var.account}.${var.region}.${var.label}-smoketest")
@@ -147,10 +149,6 @@ resource "azurerm_resource_group" "cod-cluster" {
   location = var.region
 }
 
-data "azurerm_dns_zone" "primary" {
-  name = lower("${var.account}.indico.io")
-}
-
 module "networking" {
   depends_on = [
     azurerm_resource_group.cod-cluster
@@ -163,16 +161,6 @@ module "networking" {
   resource_group_name = local.resource_group_name
   region              = var.region
 }
-
-/*
-module "asq_eventgrid" {
-  count = var.asq_eventgrid == true ? 0 : 1
-  source  = "app.terraform.io/indico/indico-azure-aqs-eventgrid/mod"
-  version = "1.0.0"
-  region  = var.region
-  label   = var.label
-}
-*/
 
 module "cluster-manager" {
   depends_on = [
@@ -189,14 +177,6 @@ module "cluster-manager" {
   resource_group_name = local.resource_group_name
 }
 
-/*
-module "key_vault_key" {
-  source          = "app.terraform.io/indico/indico-aws-kms/mod"
-  version         = "1.1.0"
-  label           = var.label
-  additional_tags = var.additional_tags
-}*/
-
 module "storage" {
   depends_on = [
     azurerm_resource_group.cod-cluster
@@ -207,15 +187,6 @@ module "storage" {
   region              = var.region
   resource_group_name = local.resource_group_name
 }
-
-/*
-module "security-group" {
-  source   = "app.terraform.io/indico/indico-aws-security-group/mod"
-  version  = "1.0.0"
-  label    = var.label
-  vpc_cidr = var.vpc_cidr
-  vpc_id   = local.network[0].indico_vpc_id
-}*/
 
 module "cluster" {
   depends_on = [

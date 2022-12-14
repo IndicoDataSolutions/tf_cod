@@ -311,3 +311,20 @@ variable "enable_k8s_dashboard" {
   type    = bool
   default = true
 }
+
+variable "snapshots_resource_group_name" {
+  type    = string
+  default = "cod-snapshots"
+}
+
+variable "name" {
+  type        = string
+  default     = "indico"
+  description = "Name to use in all cluster resources names"
+}
+
+variable "cod_snapshot_restore_version" {
+  type    = string
+  default = "0.1.3"
+}
+
