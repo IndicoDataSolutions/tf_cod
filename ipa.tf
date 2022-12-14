@@ -539,7 +539,6 @@ spec:
       
         - name: HELM_VALUES
           value: |
-            ${indent(12, base64decode(var.ipa_smoketest_values))}    
             image:
               tag: ${var.ipa_smoketest_container_tag}
             cronjob:
@@ -552,6 +551,7 @@ spec:
             host: ${local.dns_name}
             slack:
               channel: ${var.ipa_smoketest_slack_channel}
+            ${indent(12, base64decode(var.ipa_smoketest_values))}    
 EOT
 }
 
