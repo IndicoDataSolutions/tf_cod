@@ -12,7 +12,7 @@ variable "is_aws" {
 # top level variable declarations
 variable "common_resource_group" {
   type        = string
-  default     = "indico"
+  default     = "indico-common"
   description = "The common resource group name"
 }
 
