@@ -315,6 +315,10 @@ variable "ipa_version" {
   default = "0.12.1"
 }
 
+variable "ipa_smoketest_values" {
+  type    = string
+  default = "Cg==" # empty newline string
+}
 
 variable "ipa_smoketest_repo" {
   type    = string
