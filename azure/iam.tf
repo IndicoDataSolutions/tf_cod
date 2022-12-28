@@ -28,6 +28,11 @@ resource "azuread_group" "default_write" {
   security_enabled = true
 }
 
+data "azuread_group" "engineering" {
+  display_name     = "Engineering"
+  security_enabled = true
+}
+
 resource "azurerm_role_assignment" "default_write" {
   scope                = "${module.cluster.id}/namespaces/default"
   role_definition_name = "Azure Kubernetes Service RBAC Writer"
@@ -44,4 +49,25 @@ resource "azurerm_role_assignment" "default_read" {
   scope                = "${module.cluster.id}/namespaces/default"
   role_definition_name = "Azure Kubernetes Service RBAC Reader"
   principal_id         = azuread_group.default_read.object_id
+}
+
+resource "kubectl_manifest" "engineering-role-binding" {
+  depends_on = [
+    module.cluster
+  ]
+  yaml_body = <<YAML
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: engineering-team
+ 
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: ${data.azuread_group.engineering.object_id}
+YAML
 }
