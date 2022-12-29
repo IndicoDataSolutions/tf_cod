@@ -10,6 +10,12 @@ resource "azuread_group" "cluster_admin" {
   security_enabled = true
 }
 
+# add engineering group to admins
+resource "azuread_group_member" "engineering" {
+  group_object_id  = azuread_group.cluster_admin.id
+  member_object_id = data.azuread_user.engineering.id
+}
+
 resource "azurerm_role_assignment" "cluster_admin" {
   scope                = module.cluster.id
   role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
@@ -61,9 +67,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: engineering-team
-  labels:
-     addonmanager.kubernetes.io/mode: Reconcile
-     kubernetes.io/cluster-service: "true"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
