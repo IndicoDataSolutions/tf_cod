@@ -4,10 +4,9 @@ data "azuread_group" "engineering" {
   security_enabled = true
 }
 
-# include the engineering team here.
 resource "azuread_group" "cluster_admin" {
   display_name     = "aks-admin-${var.label}-${var.region}"
-  owners           = [data.azuread_client_config.current.object_id, data.azuread_group.engineering.object_id]
+  owners           = [data.azuread_client_config.current.object_id]
   security_enabled = true
 }
 
