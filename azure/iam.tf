@@ -13,7 +13,7 @@ resource "azuread_group" "cluster_admin" {
 # add engineering group to admins
 resource "azuread_group_member" "engineering" {
   group_object_id  = azuread_group.cluster_admin.id
-  member_object_id = data.azuread_user.engineering.id
+  member_object_id = data.azuread_group.engineering.id
 }
 
 resource "azurerm_role_assignment" "cluster_admin" {
