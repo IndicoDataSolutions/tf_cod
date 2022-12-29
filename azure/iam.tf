@@ -1,6 +1,13 @@
+
+data "azuread_group" "engineering" {
+  display_name     = "Engineering"
+  security_enabled = true
+}
+
+# include the engineering team here.
 resource "azuread_group" "cluster_admin" {
   display_name     = "aks-admin-${var.label}-${var.region}"
-  owners           = [data.azuread_client_config.current.object_id]
+  owners           = [data.azuread_client_config.current.object_id, data.azuread_group.engineering.object_id]
   security_enabled = true
 }
 
@@ -25,11 +32,6 @@ resource "azurerm_role_assignment" "default_admin" {
 resource "azuread_group" "default_write" {
   display_name     = "aks-write-admin-${var.label}-${var.region}"
   owners           = [data.azuread_client_config.current.object_id]
-  security_enabled = true
-}
-
-data "azuread_group" "engineering" {
-  display_name     = "Engineering"
   security_enabled = true
 }
 
@@ -60,7 +62,9 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: engineering-team
- 
+  labels:
+     addonmanager.kubernetes.io/mode: Reconcile
+     kubernetes.io/cluster-service: "true"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
