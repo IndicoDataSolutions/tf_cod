@@ -180,7 +180,7 @@ variable "svp_client_secret" {
 
 variable "k8s_version" {
   type        = string
-  default     = "1.23.12"
+  default     = "1.23.15"
   description = "The version of the kubernetes cluster"
 }
 
