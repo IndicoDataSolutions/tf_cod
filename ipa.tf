@@ -57,12 +57,15 @@ app-edge:
       http_api_port: 31270
   aws-load-balancer-controller:
     enabled: true
-    aws-load-balancer-controller:
-      clusterName: ${var.label}
-      vpcId: ${local.network[0].indico_vpc_id}
-      region: ${var.region}
     ingress:
       enabled: true
+      annotations:
+        acme.cert-manager.io/http01-edit-in-place: "true"
+        cert-manager.io/cluster-issuer: zerossl      
+      tls:
+        - secretName: indico-ssl-cm-cert
+          hosts:
+            - ${local.dns_name}
       alb:
         publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
         acmArn: ${aws_acm_certificate_validation.alb[0].certificate_arn}
@@ -250,6 +253,13 @@ resource "helm_release" "ipa-pre-requisites" {
   disable_webhooks = false
 
   values = concat(local.storage_spec, [<<EOF
+
+cluster:
+  name: ${var.label}
+  region: ${var.region}
+  domain: indico.io
+  account: ${var.aws_account}
+
 
 cluster:
   name: ${var.label}
@@ -467,7 +477,12 @@ crunchy-postgres:
           incremental: 0 */1 * * *
     imagePullSecrets:
       - name: harbor-pull-secret
-  
+aws-load-balancer-controller:
+  enabled: ${var.use_acm}
+  aws-load-balancer-controller:
+    clusterName: ${var.label}
+    vpcId: ${local.network[0].indico_vpc_id}
+    region: ${var.region}
 EOF
     ,
     <<EOT
@@ -551,7 +566,7 @@ spec:
             host: ${local.dns_name}
             slack:
               channel: ${var.ipa_smoketest_slack_channel}
-            ${indent(12, base64decode(var.ipa_smoketest_values))}
+            ${indent(12, base64decode(var.ipa_smoketest_values))}    
 EOT
 }
 
@@ -587,6 +602,10 @@ resource "github_repository_file" "argocd-application-yaml" {
       content
     ]
   }
+  depends_on = [
+    module.cluster,
+    aws_acm_certificate_validation.alb[0]
+  ]
   depends_on = [
     module.cluster,
     aws_acm_certificate_validation.alb[0]
@@ -771,7 +790,7 @@ spec:
           value: ${each.value.name}
         - name: HELM_VALUES
           value: |
-            ${base64decode(each.value.values)}
+            ${indent(12, base64decode(each.value.values))}
 EOT
 }
 
