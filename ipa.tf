@@ -606,10 +606,6 @@ resource "github_repository_file" "argocd-application-yaml" {
     module.cluster,
     aws_acm_certificate_validation.alb[0]
   ]
-  depends_on = [
-    module.cluster,
-    aws_acm_certificate_validation.alb[0]
-  ]
 
   content = <<EOT
 apiVersion: argoproj.io/v1alpha1
