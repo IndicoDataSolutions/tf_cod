@@ -450,8 +450,6 @@ resource "argocd_application" "ipa" {
 
 
 resource "github_repository_file" "custom-application-yaml" {
-  count = var.ipa_enabled == true ? 1 : 0
-
   for_each = var.applications
 
   repository          = data.github_repository.argo-github-repo.name
