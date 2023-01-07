@@ -317,6 +317,8 @@ EOT
 
 
 resource "github_repository_file" "argocd-application-yaml" {
+  count = var.ipa_enabled == true ? 1 : 0
+
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
   file                = "${var.argo_path}/ipa_application.yaml"
@@ -448,6 +450,7 @@ resource "argocd_application" "ipa" {
 
 
 resource "github_repository_file" "custom-application-yaml" {
+  count = var.ipa_enabled == true ? 1 : 0
 
   for_each = var.applications
 

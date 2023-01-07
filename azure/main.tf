@@ -56,6 +56,7 @@ provider "vault" {
     }
   }
 }
+
 provider "github" {
   token = var.git_pat
   owner = "IndicoDataSolutions"
