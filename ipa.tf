@@ -678,7 +678,7 @@ resource "argocd_application" "ipa" {
   wait = true
 
   metadata {
-    name      = lower("${var.aws_account}-${var.region}-${var.name}-deploy-ipa")
+    name      = lower("${var.aws_account}-${var.region}-${var.label}-deploy-ipa")
     namespace = "argo"
     labels = {
       test = "true"
@@ -748,7 +748,7 @@ resource "github_repository_file" "custom-application-yaml" {
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${lower("${var.aws_account}-${var.region}-${var.name}-${each.value.name}")} 
+  name: ${lower("${var.aws_account}-${var.region}-${var.label}-${each.value.name}")} 
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:

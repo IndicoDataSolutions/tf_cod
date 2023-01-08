@@ -4,3 +4,5 @@ vendor
 dont_check_in*
 terraform.tfstate*
 module.kubeconfig
+azure/overrides.tfvars
+

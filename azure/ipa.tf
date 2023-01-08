@@ -244,13 +244,14 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
 }
 
 data "github_repository" "argo-github-repo" {
-  full_name = "IndicoDataSolutions/${var.argo_repo}"
+  count     = var.argo_enabled == true ? 1 : 0
+  full_name = "${var.github_organization}/${var.argo_repo}"
 }
 
 resource "github_repository_file" "smoketest-application-yaml" {
   count = var.ipa_smoketest_enabled == true ? 1 : 0
 
-  repository          = data.github_repository.argo-github-repo.name
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/ipa_smoketest.yaml"
   commit_message      = var.message
@@ -281,7 +282,7 @@ spec:
   destination:
     server: ${module.cluster.kubernetes_host}
     namespace: default
-  project: ${module.argo-registration.argo_project_name}
+  project: "${lower("${var.account}.${var.label}.${var.region}")}"
   syncPolicy:
     automated:
       prune: true
@@ -317,9 +318,9 @@ EOT
 
 
 resource "github_repository_file" "argocd-application-yaml" {
-  count = var.ipa_enabled == true ? 1 : 0
+  count = var.argo_enabled == true ? 1 : 0
 
-  repository          = data.github_repository.argo-github-repo.name
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/ipa_application.yaml"
   commit_message      = var.message
@@ -349,7 +350,7 @@ spec:
   destination:
     server: ${module.cluster.kubernetes_host}
     namespace: default
-  project: ${module.argo-registration.argo_project_name}
+  project: "${lower("${var.account}.${var.label}.${var.region}")}"
   syncPolicy:
     automated:
       prune: true
@@ -379,7 +380,7 @@ resource "local_file" "kubeconfig" {
 
 
 data "vault_kv_secret_v2" "zerossl_data" {
-  mount = "tools/argo"
+  mount = var.vault_mount_path
   name  = "zerossl"
 }
 
@@ -414,7 +415,7 @@ resource "argocd_application" "ipa" {
 
   spec {
 
-    project = module.argo-registration.argo_project_name
+    project = lower("${var.account}.${var.label}.${var.region}")
 
     source {
       plugin {
@@ -450,9 +451,9 @@ resource "argocd_application" "ipa" {
 
 
 resource "github_repository_file" "custom-application-yaml" {
-  for_each = var.applications
+  for_each = var.argo_enabled == true ? var.applications : {}
 
-  repository          = data.github_repository.argo-github-repo.name
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/${each.value.name}_application.yaml"
   commit_message      = var.message
@@ -469,7 +470,7 @@ resource "github_repository_file" "custom-application-yaml" {
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${lower("${var.account}-${var.region}-${var.name}-${each.value.name}")} 
+  name: ${lower("${var.account}-${var.region}-${var.label}-${each.value.name}")} 
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:
@@ -483,7 +484,7 @@ spec:
   destination:
     server: ${module.cluster.kubernetes_host}
     namespace: ${each.value.namespace}
-  project: ${module.argo-registration.argo_project_name}
+  project: "${lower("${var.account}.${var.label}.${var.region}")}"
   syncPolicy:
     automated:
       prune: true
