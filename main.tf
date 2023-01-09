@@ -351,7 +351,7 @@ module "argo-registration" {
     argocd     = argocd
   }
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.0.46"
+  version                      = "1.1.6"
   label                        = var.label
   region                       = var.region
   argo_password                = var.argo_password
