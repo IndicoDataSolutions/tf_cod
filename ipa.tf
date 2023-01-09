@@ -542,6 +542,9 @@ spec:
     plugin:
       name: argocd-vault-plugin-helm-values-expand-no-build
       env:
+        - name: KUBE_VERSION
+          value: "${var.cluster_version}"
+
         - name: RELEASE_NAME
           value: run
       
@@ -632,6 +635,9 @@ spec:
     plugin:
       name: argocd-vault-plugin-helm-values-expand-no-build
       env:
+        - name: KUBE_VERSION
+          value: "${var.cluster_version}"
+
         - name: RELEASE_NAME
           value: ipa
         
@@ -775,6 +781,8 @@ spec:
     plugin:
       name: argocd-vault-plugin-helm-values-expand-no-build
       env:
+        - name: KUBE_VERSION
+          value: "${var.cluster_version}"
         - name: RELEASE_NAME
           value: ${each.value.name}
         - name: HELM_VALUES
