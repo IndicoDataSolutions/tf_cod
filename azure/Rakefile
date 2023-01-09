@@ -9,7 +9,11 @@ end
 
 
 required_vars = %w[
- git d
+  ARM_CLIENT_ID
+  ARM_CLIENT_SECRET
+  ARM_SUBSCRIPTION_ID
+  ARM_TENANT_ID
+  OCR_LICENSE_KEY
 ]
 
 required_files = %w[
