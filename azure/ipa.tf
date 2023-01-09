@@ -211,7 +211,7 @@ storage:
     enabled: false
   indicoStorageClass:
     enabled: false
-    name: "default"
+    name: "azurefile"
   pvcSpec:
     azureFile:
       readOnly: false
