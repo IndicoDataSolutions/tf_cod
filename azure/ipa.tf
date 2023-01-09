@@ -211,7 +211,7 @@ storage:
     enabled: false
   indicoStorageClass:
     enabled: false
-    name: "default"
+    name: "azurefile"
   pvcSpec:
     azureFile:
       readOnly: false
@@ -221,8 +221,10 @@ storage:
     mountOptions:
       - dir_mode=0777
       - file_mode=0777
-      - uid=1000
-      - gid=1000
+      - uid=0
+      - gid=0
+      - nobrl
+      - nosharesock
     csi: null
     persistentVolumeReclaimPolicy: Retain
     volumeMode: Filesystem
