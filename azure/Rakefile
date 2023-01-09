@@ -160,5 +160,85 @@ HEREDOC
   puts("helm upgrade --install ipa indico/ipa --version #{vars.ipa_version} -f ipa.yaml")
 end
 
+task ipa: :verify do
+  ipa = <<HEREDOC
+global:
+  appDomains: [#{vars.label}.#{vars.region}.#{vars.account}.#{vars.domain_suffix}]
+  secretRefs:
+    - indico-generated-secrets
+    - indico-static-secrets
+    - rabbitmq
+    - azure-storage-key
+rabbitmq:
+  enabled: true
+secrets:
+  ocr_license_key: #{ENV['OCR_LICENSE_KEY']}
+configs:
+  allowed_origins: ALLOW_ALL
+  postgres:
+    app:
+      user: indico
+    metrics:
+      user: indico
+  storage:
+    blob:
+      s3:
+      azure:
+        account: #{vars.label}#{vars.region}
+        key: ''
+        container: blob
+        prefix: ''
+  extraIndicoConfigs:
+    DEFAULT_OCR_ENGINE: omnipage
+    OCR_ENGINES: readapi, omnipage
+worker:
+  serviceAccountName: workload-identity-storage-account
+  services:
+    acord-workflow:
+      enabled: true
+    formextraction:
+      enabled: true
+    glove-v1:
+      enabled: true
+    imagefeatures-v2:
+      enabled: true
+    objectdetection-predict:
+      enabled: true
+    objectdetection-train:
+      enabled: true
+    vdp:
+      enabled: true
+server:
+  serviceAccountName: workload-identity-storage-account
+  services:
+    restapi-proxy:
+      enabled: true
+faust-worker:
+  serviceAccountName: workload-identity-storage-account
+rainbow-nginx:
+  serviceAccountName: workload-identity-storage-account
+app-edge:
+  frontend:
+    config:
+      features:
+        galleryEnabled: true
+authSettings:
+  manageAllData: 'True'
+readapi:
+  enabled: false
+cronjob:
+  services:
+    storage-cleanup:
+      enabled: true
+HEREDOC
+
+  File.write('ipa.yaml', ipa)
+  puts("helm repo add indico https://harbor.devops.indico.io/chartrepo/indico-charts")
+  puts("helm upgrade --install ipa indico/ipa --version #{vars.ipa_version} -f ipa.yaml")
+end
+
+
+
+
 
 
