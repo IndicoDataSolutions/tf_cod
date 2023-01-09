@@ -14,8 +14,8 @@ Terraform repo used for Clusters On Demand (COD)
 </tr>
 
 <tr>
-<td></td>
-<td>Used by `dev-ci` cluster</td>
+<td>1.0.15</td>
+<td>Used by 5.7.0 cluster</td>
 </tr>
 
 
