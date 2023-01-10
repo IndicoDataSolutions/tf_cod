@@ -48,14 +48,12 @@ provider "time" {}
 provider "vault" {
   address          = var.vault_address
   skip_child_token = true
-  auth_login {
-    method = "github"
-    path   = "auth/github/login"
-    parameters = {
-      token = var.git_pat
-    }
+  auth_login_userpass {
+    username = var.vault_username
+    password = var.vault_password
   }
 }
+
 provider "github" {
   token = var.git_pat
   owner = "IndicoDataSolutions"
@@ -104,6 +102,8 @@ module "argo-registration" {
   depends_on = [
     module.cluster
   ]
+
+  count = var.argo_enabled == true ? 1 : 0
 
   providers = {
     kubernetes = kubernetes,
