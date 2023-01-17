@@ -260,16 +260,6 @@ cluster:
   domain: indico.io
   account: ${var.aws_account}
 
-<<<<<<< HEAD
-
-cluster:
-  name: ${var.label}
-  region: ${var.region}
-  domain: indico.io
-  account: ${var.aws_account}
-
-=======
->>>>>>> 1.0.15.5
 secrets:
   rabbitmq:
     create: true
