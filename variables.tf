@@ -165,7 +165,7 @@ variable "cluster_name" {
 
 variable "cluster_version" {
   type        = string
-  default     = "1.20"
+  default     = "1.23"
   description = "The EKS version to use"
 }
 
@@ -490,7 +490,6 @@ variable "pre-reqs-values-yaml-b64" {
 variable "k8s_dashboard_chart_version" {
   default = "0.1.0"
 }
-
 
 variable "enable_k8s_dashboard" {
   type    = bool

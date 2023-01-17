@@ -130,7 +130,7 @@ module "private_networking" {
 }
 
 module "sqs_sns" {
-  count   = var.sqs_sns == true ? 0 : 1
+  count   = var.sqs_sns == true ? 1 : 0
   source  = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
   version = "1.1.1"
   region  = var.region
@@ -250,7 +250,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "7.3.0"
+  version                    = "7.4.0"
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
@@ -351,13 +351,17 @@ module "argo-registration" {
     argocd     = argocd
   }
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.0.46"
-  label                        = var.label
+  version                      = "1.1.7"
+  cluster_name                 = var.label
   region                       = var.region
   argo_password                = var.argo_password
   argo_username                = var.argo_username
-  aws_account                  = var.aws_account
+  account                      = var.aws_account
+  cloud_provider               = "aws"
   argo_github_team_admin_group = var.argo_github_team_owner
+  endpoint                     = module.cluster.kubernetes_host
+  ca_data                      = module.cluster.kubernetes_cluster_ca_certificate
+
 }
 
 locals {

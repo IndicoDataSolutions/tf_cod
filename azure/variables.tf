@@ -12,7 +12,7 @@ variable "is_aws" {
 # top level variable declarations
 variable "common_resource_group" {
   type        = string
-  default     = "indico"
+  default     = "indico-common"
   description = "The common resource group name"
 }
 
@@ -180,7 +180,7 @@ variable "svp_client_secret" {
 
 variable "k8s_version" {
   type        = string
-  default     = "1.22.15"
+  default     = "1.23.12"
   description = "The version of the kubernetes cluster"
 }
 
@@ -311,3 +311,20 @@ variable "enable_k8s_dashboard" {
   type    = bool
   default = true
 }
+
+variable "snapshots_resource_group_name" {
+  type    = string
+  default = "cod-snapshots"
+}
+
+variable "name" {
+  type        = string
+  default     = "indico"
+  description = "Name to use in all cluster resources names"
+}
+
+variable "cod_snapshot_restore_version" {
+  type    = string
+  default = "0.1.3"
+}
+
