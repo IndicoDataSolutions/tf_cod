@@ -250,11 +250,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-<<<<<<< HEAD
   version                    = "7.4.0"
-=======
-  version                    = "7.2.2"
->>>>>>> 1.0.15.5
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
