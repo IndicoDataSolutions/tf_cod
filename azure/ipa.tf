@@ -211,7 +211,7 @@ storage:
     enabled: false
   indicoStorageClass:
     enabled: false
-    name: "default"
+    name: "azurefile"
   pvcSpec:
     azureFile:
       readOnly: false
@@ -221,8 +221,10 @@ storage:
     mountOptions:
       - dir_mode=0777
       - file_mode=0777
-      - uid=1000
-      - gid=1000
+      - uid=0
+      - gid=0
+      - nobrl
+      - nosharesock
     csi: null
     persistentVolumeReclaimPolicy: Retain
     volumeMode: Filesystem
@@ -244,13 +246,14 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
 }
 
 data "github_repository" "argo-github-repo" {
-  full_name = "IndicoDataSolutions/${var.argo_repo}"
+  count     = var.argo_enabled == true ? 1 : 0
+  full_name = "${var.github_organization}/${var.argo_repo}"
 }
 
 resource "github_repository_file" "smoketest-application-yaml" {
   count = var.ipa_smoketest_enabled == true ? 1 : 0
 
-  repository          = data.github_repository.argo-github-repo.name
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/ipa_smoketest.yaml"
   commit_message      = var.message
@@ -281,7 +284,7 @@ spec:
   destination:
     server: ${module.cluster.kubernetes_host}
     namespace: default
-  project: ${module.argo-registration.argo_project_name}
+  project: "${lower("${var.account}.${var.label}.${var.region}")}"
   syncPolicy:
     automated:
       prune: true
@@ -294,6 +297,9 @@ spec:
     plugin:
       name: argocd-vault-plugin-helm-values-expand-no-build
       env:
+        - name: KUBE_VERSION
+          value: "${var.k8s_version}"
+          
         - name: RELEASE_NAME
           value: run
       
@@ -317,7 +323,9 @@ EOT
 
 
 resource "github_repository_file" "argocd-application-yaml" {
-  repository          = data.github_repository.argo-github-repo.name
+  count = var.argo_enabled == true ? 1 : 0
+
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/ipa_application.yaml"
   commit_message      = var.message
@@ -347,7 +355,7 @@ spec:
   destination:
     server: ${module.cluster.kubernetes_host}
     namespace: default
-  project: ${module.argo-registration.argo_project_name}
+  project: "${lower("${var.account}.${var.label}.${var.region}")}"
   syncPolicy:
     automated:
       prune: true
@@ -360,6 +368,9 @@ spec:
     plugin:
       name: argocd-vault-plugin-helm-values-expand-no-build
       env:
+        - name: KUBE_VERSION
+          value: "${var.k8s_version}"
+          
         - name: RELEASE_NAME
           value: ipa
 
@@ -377,7 +388,7 @@ resource "local_file" "kubeconfig" {
 
 
 data "vault_kv_secret_v2" "zerossl_data" {
-  mount = "tools/argo"
+  mount = var.vault_mount_path
   name  = "zerossl"
 }
 
@@ -412,7 +423,7 @@ resource "argocd_application" "ipa" {
 
   spec {
 
-    project = module.argo-registration.argo_project_name
+    project = lower("${var.account}.${var.label}.${var.region}")
 
     source {
       plugin {
@@ -448,10 +459,9 @@ resource "argocd_application" "ipa" {
 
 
 resource "github_repository_file" "custom-application-yaml" {
+  for_each = var.argo_enabled == true ? var.applications : {}
 
-  for_each = var.applications
-
-  repository          = data.github_repository.argo-github-repo.name
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/${each.value.name}_application.yaml"
   commit_message      = var.message
@@ -468,7 +478,7 @@ resource "github_repository_file" "custom-application-yaml" {
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${lower("${var.account}-${var.region}-${var.name}-${each.value.name}")} 
+  name: ${lower("azure-${var.region}-${var.label}-${each.value.name}")} 
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:
@@ -482,7 +492,7 @@ spec:
   destination:
     server: ${module.cluster.kubernetes_host}
     namespace: ${each.value.namespace}
-  project: ${module.argo-registration.argo_project_name}
+  project: "${lower("${var.account}.${var.label}.${var.region}")}"
   syncPolicy:
     automated:
       prune: true
@@ -492,14 +502,11 @@ spec:
     chart: ${each.value.chart}
     repoURL: ${each.value.repo}
     targetRevision: ${each.value.version}
-    plugin:
-      name: argocd-vault-plugin-helm-values-expand-no-build
-      env:
-        - name: RELEASE_NAME
-          value: ${each.value.name}
-        - name: HELM_VALUES
-          value: |
-            ${indent(12, base64decode(each.value.values))}
+    helm:
+      releaseName: ${each.value.name}
+      values: |
+        ${base64decode(each.value.values)}    
+
 EOT
 }
 

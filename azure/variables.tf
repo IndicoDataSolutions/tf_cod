@@ -1,4 +1,4 @@
-
+#
 variable "is_azure" {
   type    = bool
   default = true
@@ -80,6 +80,11 @@ variable "vault_address" {
   default = "https://vault.devops.indico.io"
 }
 
+variable "argo_enabled" {
+  type    = bool
+  default = true
+}
+
 variable "argo_host" {
   type    = string
   default = "argo.devops.indico.io"
@@ -92,14 +97,17 @@ variable "argo_username" {
 
 variable "argo_password" {
   sensitive = true
+  default   = ""
 }
 
 variable "argo_repo" {
   description = "Argo Github Repository containing the IPA Application"
+  default     = ""
 }
 
 variable "argo_branch" {
   description = "Branch to use on argo_repo"
+  default     = ""
 }
 
 variable "argo_path" {
@@ -328,3 +336,27 @@ variable "cod_snapshot_restore_version" {
   default = "0.1.3"
 }
 
+variable "vault_mount_path" {
+  type    = string
+  default = "tools/argo"
+}
+
+variable "vault_username" {}
+variable "vault_password" {
+  sensitive = true
+}
+
+variable "github_organization" {
+  default = "IndicoDataSolutions"
+}
+
+variable "ad_group_name" {
+  default     = "Engineering"
+  description = "Name of an AD group to be mapped if enable_ad_group_mapping is true"
+}
+
+variable "enable_ad_group_mapping" {
+  type        = bool
+  default     = true
+  description = "Enable the Mapping of AD Group"
+}
