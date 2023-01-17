@@ -781,11 +781,8 @@ spec:
     plugin:
       name: argocd-vault-plugin-helm-values-expand-no-build
       env:
-<<<<<<< HEAD
-=======
         - name: KUBE_VERSION
           value: "${var.cluster_version}"
->>>>>>> 1.0.15.5
         - name: RELEASE_NAME
           value: ${each.value.name}
         - name: HELM_VALUES
