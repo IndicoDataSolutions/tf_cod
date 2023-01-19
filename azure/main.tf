@@ -53,6 +53,7 @@ provider "vault" {
     password = var.vault_password
   }
 }
+
 provider "github" {
   token = var.git_pat
   owner = "IndicoDataSolutions"

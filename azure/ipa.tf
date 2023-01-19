@@ -478,7 +478,7 @@ resource "github_repository_file" "custom-application-yaml" {
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${lower("azure-${var.region}-${var.label}-${each.value.name}")} 
+  name: ${lower("${var.account}-${var.region}-${var.label}-${each.value.name}")} 
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:
@@ -502,11 +502,16 @@ spec:
     chart: ${each.value.chart}
     repoURL: ${each.value.repo}
     targetRevision: ${each.value.version}
-    helm:
-      releaseName: ${each.value.name}
-      values: |
-        ${base64decode(each.value.values)}    
-
+    plugin:
+      name: argocd-vault-plugin-helm-values-expand-no-build
+      env:
+        - name: KUBE_VERSION
+          value: "${var.k8s_version}"
+        - name: RELEASE_NAME
+          value: ${each.value.name}
+        - name: HELM_VALUES
+          value: |
+            ${indent(12, base64decode(each.value.values))}
 EOT
 }
 
