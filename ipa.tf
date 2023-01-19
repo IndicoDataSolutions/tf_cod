@@ -50,8 +50,7 @@ locals {
   acm_ipa_values = var.use_acm == true ? (<<EOT
 runtime-scanner:
   enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
-  ingress:
-    enabled: ${var.enable_runtime_ingress}
+
 app-edge:
   service:
     type: "NodePort"
