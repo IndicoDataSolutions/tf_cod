@@ -48,9 +48,6 @@ locals {
   ] : []
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
   acm_ipa_values = var.use_acm == true ? (<<EOT
-runtime-scanner:
-  enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
-
 app-edge:
   service:
     type: "NodePort"
@@ -83,7 +80,9 @@ app-edge:
   EOT
     ) : (<<EOT
 no-overrides: "true"
-  EOT
+runtime-scanner:
+  enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
+EOT
   )
 }
 resource "kubernetes_secret" "issuer-secret" {
