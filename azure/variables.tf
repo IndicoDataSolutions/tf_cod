@@ -228,7 +228,8 @@ variable "applications" {
     version         = string
     values          = string,
     namespace       = string,
-    createNamespace = bool
+    createNamespace = bool,
+    vaultPath       = string
   }))
   default = {}
 }
