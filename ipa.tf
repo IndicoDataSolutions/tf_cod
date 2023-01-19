@@ -48,6 +48,10 @@ locals {
   ] : []
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
   acm_ipa_values = var.use_acm == true ? (<<EOT
+runtime-scanner:
+  enabled: ${replace(lower(var.account), "indico", "") == lower(var.account) ? "true" : "false"}
+  ingress:
+    enabled: ${var.enable_runtime_ingress}
 app-edge:
   service:
     type: "NodePort"
