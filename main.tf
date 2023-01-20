@@ -14,7 +14,7 @@ terraform {
     }
     argocd = {
       source  = "oboukili/argocd"
-      version = "3.1.0"
+      version = "4.3.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
