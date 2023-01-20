@@ -1,6 +1,7 @@
 
 data "azuread_group" "engineering" {
-  display_name     = "Engineering"
+  count            = var.enable_ad_group_mapping == true ? 1 : 0
+  display_name     = var.ad_group_name
   security_enabled = true
 }
 
@@ -12,8 +13,9 @@ resource "azuread_group" "cluster_admin" {
 
 # add engineering group to admins
 resource "azuread_group_member" "engineering" {
+  count            = var.enable_ad_group_mapping == true ? 1 : 0
   group_object_id  = azuread_group.cluster_admin.id
-  member_object_id = data.azuread_group.engineering.id
+  member_object_id = data.azuread_group.engineering.0.id
 }
 
 resource "azurerm_role_assignment" "cluster_admin" {
@@ -59,6 +61,7 @@ resource "azurerm_role_assignment" "default_read" {
 }
 
 resource "kubectl_manifest" "engineering-role-binding" {
+  count = var.enable_ad_group_mapping == true ? 1 : 0
   depends_on = [
     module.cluster
   ]
@@ -66,7 +69,7 @@ resource "kubectl_manifest" "engineering-role-binding" {
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: engineering-team
+  name: ${lower(var.ad_group_name)}-team
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -74,6 +77,6 @@ roleRef:
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
-  name: ${data.azuread_group.engineering.object_id}
+  name: ${data.azuread_group.engineering.0.object_id}
 YAML
 }

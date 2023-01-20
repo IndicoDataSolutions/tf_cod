@@ -1,4 +1,4 @@
-
+#
 variable "is_azure" {
   type    = bool
   default = true
@@ -81,7 +81,7 @@ variable "vault_address" {
 }
 
 variable "argo_enabled" {
-  type = bool
+  type    = bool
   default = true
 }
 
@@ -228,7 +228,8 @@ variable "applications" {
     version         = string
     values          = string,
     namespace       = string,
-    createNamespace = bool
+    createNamespace = bool,
+    vaultPath       = string
   }))
   default = {}
 }
@@ -348,4 +349,15 @@ variable "vault_password" {
 
 variable "github_organization" {
   default = "IndicoDataSolutions"
+}
+
+variable "ad_group_name" {
+  default     = "Engineering"
+  description = "Name of an AD group to be mapped if enable_ad_group_mapping is true"
+}
+
+variable "enable_ad_group_mapping" {
+  type        = bool
+  default     = true
+  description = "Enable the Mapping of AD Group"
 }
