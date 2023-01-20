@@ -373,7 +373,15 @@ spec:
           
         - name: RELEASE_NAME
           value: ipa
-
+        
+        - name: HELM_TF_COD_VALUES
+          value: |
+            runtime-scanner:
+              enabled: ${replace(lower(var.account), "indico", "") == lower(var.account) ? "false" : "true"}
+              authentication:
+                ingressUser: monitoring
+                ingressPassword: ${random_password.monitoring-password.result}
+        
         - name: HELM_VALUES
           value: |
             ${base64decode(var.ipa_values)}    
