@@ -82,6 +82,9 @@ app-edge:
 no-overrides: "true"
 runtime-scanner:
   enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
+  authentication:
+    ingressUser: monitoring
+    ingressPassword: ${random_password.monitoring-password.result}
 EOT
   )
 }
