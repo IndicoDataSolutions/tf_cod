@@ -7,24 +7,17 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
   template_content = file("${path.module}/ARM-openShiftClusters.json")
 
 
-parameters_content =  jsonencode({
-        azure_location                    = {value = azurerm_resource_group.rg.location}
-        name                              = {value = "testLogicApp1"}
-        azure_function_code               = {value = "testtesttest"}
-    })
-
-
   parameters_content = jsonencode({
-    "clientId"                 = {value = var.svp_client_id}
-    "clientSecret"             = {value = var.svp_client_secret}
-    "clusterName"              = {value = var.label}
-    "clusterResourceGroupName" = {value = lower("aro-${var.label}-${var.region}")}
-    "domain"                   = {value = var.cluster_domain}
-    "location"                 = {value = var.region}
-    "masterSubnetId"           = {value = var.master_subnet_id}
-    "pullSecret"               = {value = var.pull_secret}
-    "tags"                     = {value = jsonencode(var.tags)}
-    "workerSubnetId"           = {value = var.worker_subnet_id}
+    "clientId"                 = { value = var.svp_client_id }
+    "clientSecret"             = { value = var.svp_client_secret }
+    "clusterName"              = { value = var.label }
+    "clusterResourceGroupName" = { value = lower("aro-${var.label}-${var.region}") }
+    "domain"                   = { value = var.cluster_domain }
+    "location"                 = { value = var.region }
+    "masterSubnetId"           = { value = var.master_subnet_id }
+    "pullSecret"               = { value = var.pull_secret }
+    "tags"                     = { value = jsonencode(var.tags) }
+    "workerSubnetId"           = { value = var.worker_subnet_id }
   })
 
   deployment_mode = "Incremental"
