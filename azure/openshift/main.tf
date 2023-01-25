@@ -95,20 +95,23 @@ resource "azurerm_role_assignment" "virtual-network-assignment" {
   depends_on = [
     module.networking
   ]
-  count                = length(var.roles)
-  scope                = module.networking.vnet_id
-  role_definition_name = var.roles[count.index].role
-  principal_id         = azuread_service_principal.openshift.application_id
+  count                            = length(var.roles)
+  scope                            = module.networking.vnet_id
+  role_definition_name             = var.roles[count.index].role
+  skip_service_principal_aad_check = true
+
+  principal_id = azuread_service_principal.openshift.application_id
 }
 
 resource "azurerm_role_assignment" "resource-provider-assignment" {
   depends_on = [
     module.networking
   ]
-  count                = length(var.roles)
-  scope                = module.networking.vnet_id
-  role_definition_name = var.roles[count.index].role
-  principal_id         = data.azuread_service_principal.redhat-openshift.application_id
+  count                            = length(var.roles)
+  scope                            = module.networking.vnet_id
+  role_definition_name             = var.roles[count.index].role
+  skip_service_principal_aad_check = true
+  principal_id                     = data.azuread_service_principal.redhat-openshift.application_id
 }
 
 # argo 
