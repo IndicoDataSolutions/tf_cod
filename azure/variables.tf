@@ -376,7 +376,19 @@ variable "include_external_dns" {
 }
 
 variable "use_workload_identity" {
-  type = bool
+  type    = bool
   default = true
 }
 
+variable "roles" {
+  description = "Roles to be assigned to the Principal"
+  type        = list(object({ role = string }))
+  default = [
+    {
+      role = "Contributor"
+    },
+    {
+      role = "User Access Administrator"
+    }
+  ]
+}

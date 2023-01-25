@@ -25,7 +25,7 @@ terraform {
     }
     argocd = {
       source  = "oboukili/argocd"
-      version = "3.1.0"
+      version = "4.3.0"
     }
     local = {
       source  = "hashicorp/local"
@@ -71,6 +71,46 @@ data "http" "workstation-external-ip" {
   url = "http://ipv4.icanhazip.com"
 }
 
+data "azuread_service_principal" "redhat-openshift" {
+  display_name = "Azure Red Hat OpenShift RP"
+}
+
+resource "azuread_application" "openshift-application" {
+  display_name = "${var.label}-${var.region}"
+  owners       = [data.azuread_client_config.current.object_id]
+}
+
+resource "azuread_service_principal" "openshift" {
+  application_id               = azuread_application.openshift-application.application_id
+  app_role_assignment_required = false
+  owners                       = [data.azuread_client_config.current.object_id]
+}
+
+resource "azuread_application_password" "application-secret" {
+  display_name          = "terraform-sa-secret"
+  application_object_id = azuread_application.openshift-application.object_id
+}
+
+resource "azurerm_role_assignment" "virtual-network-assignment" {
+  depends_on = [
+    module.networking
+  ]
+  count                = length(var.roles)
+  scope                = module.networking.vnet_id
+  role_definition_name = var.roles[count.index].role
+  principal_id         = azuread_service_principal.openshift.application_id
+}
+
+resource "azurerm_role_assignment" "resource-provider-assignment" {
+  depends_on = [
+    module.networking
+  ]
+  count                = length(var.roles)
+  scope                = module.networking.vnet_id
+  role_definition_name = var.roles[count.index].role
+  principal_id         = data.azuread_service_principal.redhat-openshift.application_id
+}
+
 # argo 
 provider "argocd" {
   server_addr = var.argo_host
@@ -110,7 +150,7 @@ module "argo-registration" {
     argocd     = argocd
   }
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.1.7"
+  version                      = "1.1.11"
   cluster_name                 = var.label
   region                       = var.region
   argo_password                = var.argo_password
@@ -189,8 +229,8 @@ module "cluster" {
   source            = "./modules/openshift-cluster"
   label             = var.label
   region            = var.region
-  svp_client_id     = var.svp_client_id
-  svp_client_secret = var.svp_client_secret
+  svp_client_id     = azuread_service_principal.openshift.application_id
+  svp_client_secret = azuread_application_password.application-secret.value
   #default_node_pool       = var.default_node_pool
   #additional_node_pools   = var.additional_node_pools
   master_subnet_id = module.networking.subnet_id

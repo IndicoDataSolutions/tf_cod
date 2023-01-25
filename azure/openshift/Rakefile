@@ -10,8 +10,6 @@ WORKSPACE=`terraform workspace show`.strip
 
 
 task :verify do
-  ENV['TF_VAR_svp_client_id'] = ENV['ARM_CLIENT_ID']
-  ENV['TF_VAR_svp_client_secret'] = ENV['ARM_CLIENT_SECRET']
   ENV['TF_VAR_vault_password'] = ENV['VAULT_PASSWORD']
   ENV['TF_VAR_vault_username'] = ENV['VAULT_USERNAME']
   ENV['TF_VAR_account'] = 'indico-dev-azure'
