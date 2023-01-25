@@ -67,6 +67,9 @@ provider "github" {
 data "azurerm_subscription" "primary" {}
 data "azurerm_client_config" "current" {}
 
+data "http" "workstation-external-ip" {
+  url = "http://ipv4.icanhazip.com"
+}
 
 # argo 
 provider "argocd" {
@@ -76,28 +79,22 @@ provider "argocd" {
 }
 
 provider "kubernetes" {
-  host                   = module.cluster.kubernetes_host
-  client_certificate     = module.cluster.kubernetes_client_certificate
-  client_key             = module.cluster.kubernetes_client_key
-  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+  host  = module.cluster.kubernetes_host
+  token = module.cluster.kubernetes_token
 }
 
 provider "kubectl" {
-  host                   = module.cluster.kubernetes_host
-  client_certificate     = module.cluster.kubernetes_client_certificate
-  client_key             = module.cluster.kubernetes_client_key
-  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  load_config_file       = false
+  host             = module.cluster.kubernetes_host
+  token            = module.cluster.kubernetes_token
+  load_config_file = false
 }
 
 
 provider "helm" {
   debug = true
   kubernetes {
-    host                   = module.cluster.kubernetes_host
-    client_certificate     = module.cluster.kubernetes_client_certificate
-    client_key             = module.cluster.kubernetes_client_key
-    cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+    host  = module.cluster.kubernetes_host
+    token = module.cluster.kubernetes_token
   }
 }
 
@@ -122,13 +119,14 @@ module "argo-registration" {
   cloud_provider               = "azure"
   argo_github_team_admin_group = var.argo_github_team_owner
   endpoint                     = module.cluster.kubernetes_host
-  ca_data                      = module.cluster.kubernetes_cluster_ca_certificate
+  ca_data                      = data.kubernetes_secret.deployer.data["ca.crt"]
 }
 
 provider "local" {}
 
 locals {
   resource_group_name = "${var.label}-${var.region}"
+  current_ip          = "${chomp(data.http.workstation-external-ip.response_body)}/20"
 
   storage_account_name    = replace(lower("${var.account}snapshots"), "-", "")
   argo_app_name           = lower("${var.account}.${var.region}.${var.label}-ipa")
@@ -155,28 +153,14 @@ module "networking" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  source              = "app.terraform.io/indico/indico-azure-network/mod"
-  version             = "3.0.5"
+  source              = "app.terraform.io/indico/indico-azure-openshift-network/mod"
+  version             = "1.0.1"
   label               = var.label
   vnet_cidr           = var.vnet_cidr
   subnet_cidrs        = var.subnet_cidrs
+  worker_subnet_cidrs = var.worker_subnet_cidrs
   resource_group_name = local.resource_group_name
   region              = var.region
-}
-
-module "cluster-manager" {
-  depends_on = [
-    azurerm_resource_group.cod-cluster
-  ]
-  source              = "app.terraform.io/indico/indico-azure-cluster-manager/mod"
-  version             = "2.0.7"
-  label               = var.label
-  subnet_id           = module.networking.subnet_id
-  public_key          = tls_private_key.pk.public_key_openssh
-  region              = var.region
-  vm_size             = var.cluster_manager_vm_size
-  external_ip         = var.external_ip
-  resource_group_name = local.resource_group_name
 }
 
 module "storage" {
@@ -190,29 +174,66 @@ module "storage" {
   resource_group_name = local.resource_group_name
 }
 
+
+data "vault_kv_secret_v2" "terraform-redhat" {
+  mount = "terraform"
+  name  = "redhat"
+}
+
 module "cluster" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  source                  = "app.terraform.io/indico/indico-azure-cluster/mod"
-  version                 = "2.0.22"
-  label                   = var.label
-  public_key              = tls_private_key.pk.public_key_openssh
-  region                  = var.region
-  svp_client_id           = var.svp_client_id
-  svp_client_secret       = var.svp_client_secret
-  default_node_pool       = var.default_node_pool
-  additional_node_pools   = var.additional_node_pools
-  vnet_subnet_id          = module.networking.subnet_id
-  k8s_version             = var.k8s_version
-  private_cluster_enabled = var.private_cluster_enabled
-  resource_group_name     = local.resource_group_name
-  admin_group_name        = var.admin_group_name
+  pull_secret       = jsondecode(data.vault_kv_secret_v2.terraform-redhat.data_json)["openshift-pull-secret"]
+  cluster_domain    = local.dns_name
+  source            = "./modules/openshift-cluster"
+  label             = var.label
+  region            = var.region
+  svp_client_id     = var.svp_client_id
+  svp_client_secret = var.svp_client_secret
+  #default_node_pool       = var.default_node_pool
+  #additional_node_pools   = var.additional_node_pools
+  master_subnet_id = module.networking.subnet_id
+  worker_subnet_id = module.networking.worker_subnet_id
+  #k8s_version             = var.k8s_version
+  #private_cluster_enabled = var.private_cluster_enabled
+  resource_group_name = local.resource_group_name
+  #admin_group_name        = var.admin_group_name
   # this feature can be checked using:
   # az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/EnableWorkloadIdentityPreview')].{Name:name,State:properties.state}"
   # az provider register --namespace Microsoft.ContainerService
-  enable_workload_identity = true # requires: az feature register --namespace "Microsoft.ContainerService" --name "EnableWorkloadIdentityPreview"
-  enable_oidc_issuer       = true
+  #enable_workload_identity = true # requires: az feature register --namespace "Microsoft.ContainerService" --name "EnableWorkloadIdentityPreview"
+  #enable_oidc_issuer       = true
 }
 
 
+data "kubernetes_service_account_v1" "deployer" {
+  depends_on = [
+    module.cluster
+  ]
+  metadata {
+    name      = "deployer"
+    namespace = "default"
+  }
+}
+
+
+
+data "kubernetes_secret" "deployer" {
+  depends_on = [
+    module.cluster
+  ]
+  metadata {
+    name      = data.kubernetes_service_account_v1.deployer.default_secret_name
+    namespace = "default"
+  }
+}
+
+output "deployer" {
+  value = data.kubernetes_service_account_v1.deployer.default_secret_name
+}
+
+output "cluster_ca_certificate" {
+  sensitive = true
+  value     = data.kubernetes_secret.deployer.data["ca.crt"]
+}

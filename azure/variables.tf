@@ -62,10 +62,10 @@ variable "subnet_cidrs" {
   description = "CIDR ranges for the subnet(s)"
 }
 
-variable "database_subnet_cidr" {
+variable "worker_subnet_cidrs" {
   type        = list(string)
   default     = null
-  description = "CIDR range for the delegated database subnet"
+  description = "CIDR range for the worker database subnet"
 }
 
 ### storage account variables
@@ -360,3 +360,20 @@ variable "enable_ad_group_mapping" {
   default     = true
   description = "Enable the Mapping of AD Group"
 }
+
+#openshift variables
+
+# enable for openshift
+variable "is_openshift" {
+  type    = bool
+  default = false
+}
+
+variable "include_external_dns" {
+  type    = bool
+  default = true
+}
+
+
+
+

@@ -88,12 +88,19 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
 }
 
 resource "azurerm_role_assignment" "external_dns" {
+  count = var.include_external_dns == true ? 1 : 0
+  depends_on = [
+    module.cluster
+  ]
   scope                = data.azurerm_dns_zone.domain.id
   role_definition_name = "DNS Zone Contributor"
   principal_id         = module.cluster.kubelet_identity.object_id
 }
 
 resource "kubernetes_secret" "azure_storage_key" {
+  depends_on = [
+    module.cluster
+  ]
   metadata {
     name = "azure-storage-key"
   }
@@ -108,6 +115,11 @@ resource "kubernetes_secret" "azure_storage_key" {
 }
 
 resource "kubernetes_config_map" "azure_dns_credentials" {
+  count = var.include_external_dns == true ? 1 : 0
+
+  depends_on = [
+    module.cluster
+  ]
 
   metadata {
     name = "dns-credentials-config"
@@ -380,13 +392,6 @@ spec:
 EOT
 }
 
-
-resource "local_file" "kubeconfig" {
-  content  = module.cluster.kubectl_config
-  filename = "${path.module}/module.kubeconfig"
-}
-
-
 data "vault_kv_secret_v2" "zerossl_data" {
   mount = var.vault_mount_path
   name  = "zerossl"
@@ -399,7 +404,6 @@ output "zerossl" {
 
 resource "argocd_application" "ipa" {
   depends_on = [
-    local_file.kubeconfig,
     helm_release.ipa-pre-requisites,
     time_sleep.wait_1_minutes_after_pre_reqs,
     module.argo-registration,
