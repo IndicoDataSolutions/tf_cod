@@ -75,6 +75,21 @@ data "azuread_service_principal" "redhat-openshift" {
   display_name = "Azure Red Hat OpenShift RP"
 }
 
+
+module "shell-kube-install-az-cli" {
+  depends_on = [
+    azurerm_resource_group_template_deployment.openshift-cluster
+  ]
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
+  }
+
+  source       = "Invicton-Labs/shell-data/external"
+  command_unix = "az version"
+}
+
+
 resource "azuread_application" "openshift-application" {
   display_name = "${var.label}-${var.region}"
   owners       = [data.azuread_client_config.current.object_id]
