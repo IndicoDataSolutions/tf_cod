@@ -82,7 +82,7 @@ module "shell-kube-install-az-cli" {
   ]
 
   source       = "Invicton-Labs/shell-data/external"
-  command_unix = "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash""
+  command_unix = "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
 }
 
 
