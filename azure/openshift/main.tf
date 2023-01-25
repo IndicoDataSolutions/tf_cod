@@ -92,7 +92,9 @@ resource "null_resource" "install_azure_cli" {
       EOH
 
     interpreter = ["/bin/bash", "-c"]
+  }
 }
+
 
 resource "azuread_application" "openshift-application" {
   display_name = "${var.label}-${var.region}"
