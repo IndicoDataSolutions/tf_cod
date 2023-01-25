@@ -1,12 +1,12 @@
 # Deploy ARO using ARM template
 
-resource "azurerm_template_deployment" "openshift-cluster" {
+resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
   name                = var.label
   resource_group_name = var.resource_group_name
 
-  template_body = file("${path.module}/ARM-openShiftClusters.json")
+  template_content = file("${path.module}/ARM-openShiftClusters.json")
 
-  parameters = {
+  parameters_content = jsonencode({
     "clientId"                 = var.svp_client_id
     "clientSecret"             = var.svp_client_secret
     "clusterName"              = var.label
@@ -17,14 +17,14 @@ resource "azurerm_template_deployment" "openshift-cluster" {
     "pullSecret"               = var.pull_secret
     "tags"                     = jsonencode(var.tags)
     "workerSubnetId"           = var.worker_subnet_id
-  }
+  })
 
   deployment_mode = "Incremental"
 }
 
 module "shell-kube-credentials" {
   depends_on = [
-    azurerm_template_deployment.openshift-cluster
+    azurerm_resource_group_template_deployment.openshift-cluster
   ]
   source       = "Invicton-Labs/shell-data/external"
   command_unix = "az aro list-credentials --name ${var.label} --resource-group ${var.resource_group_name} --output json"
@@ -32,7 +32,7 @@ module "shell-kube-credentials" {
 
 module "shell-kube-host" {
   depends_on = [
-    azurerm_template_deployment.openshift-cluster
+    azurerm_resource_group_template_deployment.openshift-cluster
   ]
 
   source       = "Invicton-Labs/shell-data/external"
@@ -41,7 +41,7 @@ module "shell-kube-host" {
 
 module "shell-oc-login" {
   depends_on = [
-    azurerm_template_deployment.openshift-cluster,
+    azurerm_resource_group_template_deployment.openshift-cluster,
     module.shell-kube-credentials
   ]
 

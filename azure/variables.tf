@@ -374,6 +374,8 @@ variable "include_external_dns" {
   default = true
 }
 
-
-
+variable "use_workload_identity" {
+  type = bool
+  default = true
+}
 

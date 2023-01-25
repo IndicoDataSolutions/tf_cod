@@ -54,6 +54,7 @@ resource "azurerm_role_assignment" "snapshot_storage_account_queue_contributer" 
 }
 
 resource "kubernetes_service_account" "workload_identity" {
+  count = var.use_workload_identity == true ? 1 : 0
   depends_on = [
     module.cluster
   ]
@@ -71,6 +72,7 @@ resource "kubernetes_service_account" "workload_identity" {
 }
 
 resource "azuread_application_federated_identity_credential" "workload_identity" {
+  count                 = var.use_workload_identity == true ? 1 : 0
   application_object_id = azuread_application.workload_identity.object_id
   display_name          = "${var.label}-${var.region}-workload-identity"
   description           = "Initial workload identity for cluster"
@@ -81,6 +83,7 @@ resource "azuread_application_federated_identity_credential" "workload_identity"
 
 
 resource "azuread_application_federated_identity_credential" "workload_snapshot_identity" {
+  count                 = var.use_workload_identity == true ? 1 : 0
   application_object_id = azuread_application.workload_identity.object_id
   display_name          = "${var.label}-${var.region}-workload-snapshot-identity"
   description           = "Initial workload snapshot identity for cluster"

@@ -1,6 +1,6 @@
 is_openshift         = true
 include_external_dns = false
-
+use_workload_identity = false
 # fill out this file with desired values and reference it 
 
 region                  = "eastus"

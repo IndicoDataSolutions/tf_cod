@@ -1,17 +1,17 @@
 # Stubbed outputs (not used)
 output "kubelet_identity" {
   value = {
-    object_id = "openshift-not-applicable"
-    client_id = "openshift-not-applicable"
+    object_id = "ERROR:OPENSHIFT-NOT-APPLICABLE"
+    client_id = "ERROR:OPENSHIFT-NOT-APPLICABLE"
   }
 }
 
 output "oidc_issuer_url" {
-  value = "openshift-not-applicable"
+  value = "ERROR:OPENSHIFT-NOT-APPLICABLE"
 }
 
 output "id" {
-  value = "openshift-not-applicable"
+  value = "ERROR:OPENSHIFT-NOT-APPLICABLE"
 }
 
 
