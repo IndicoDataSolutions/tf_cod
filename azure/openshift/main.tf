@@ -77,10 +77,6 @@ data "azuread_service_principal" "redhat-openshift" {
 
 
 module "shell-kube-install-az-cli" {
-  depends_on = [
-    azurerm_resource_group_template_deployment.openshift-cluster
-  ]
-
   source       = "Invicton-Labs/shell-data/external"
   command_unix = "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
 }
