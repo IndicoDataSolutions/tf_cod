@@ -80,13 +80,9 @@ module "shell-kube-install-az-cli" {
   depends_on = [
     azurerm_resource_group_template_deployment.openshift-cluster
   ]
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-c"]
-    command     = "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
-  }
 
   source       = "Invicton-Labs/shell-data/external"
-  command_unix = "az version"
+  command_unix = "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash""
 }
 
 
