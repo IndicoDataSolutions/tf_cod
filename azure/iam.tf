@@ -62,7 +62,6 @@ resource "azurerm_role_assignment" "default_read" {
 
 resource "kubectl_manifest" "engineering-role-binding" {
   count = var.enable_ad_group_mapping == true ? 1 : 0
-
   depends_on = [
     module.cluster
   ]
