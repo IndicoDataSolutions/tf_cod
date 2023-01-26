@@ -93,6 +93,7 @@ module "get-kube-credentials" {
   source       = "Invicton-Labs/shell-data/external"
   command_unix = <<EOH
     env|sort
+    mkdir -p ${path.module}/tmpfiles
     pwd
     az aro list-credentials --name ${var.label} --resource-group ${var.resource_group_name} --output json
   EOH
