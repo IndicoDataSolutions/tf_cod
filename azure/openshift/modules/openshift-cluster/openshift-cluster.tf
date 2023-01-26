@@ -50,7 +50,7 @@ module "shell-oc-login" {
 
   source = "Invicton-Labs/shell-data/external"
   environment = {
-    KUBECONFIG = "${path.module}/.openshift-config"
+    KUBECONFIG = "/tmp/.openshift-config"
   }
 
   command_unix = "oc login --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]} --server ${jsondecode(module.shell-kube-credentials.stdout)["apiUrl"]}"
@@ -60,7 +60,7 @@ data "local_file" "kubeconfig" {
   depends_on = [
     module.shell-oc-login
   ]
-  filename = "${path.module}/.openshift-config"
+  filename = "/tmp/.openshift-config"
 }
 
 

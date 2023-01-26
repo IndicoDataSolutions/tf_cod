@@ -82,7 +82,8 @@ resource "null_resource" "install_azure_cli" {
     command     = <<EOH
      az version
      env|sort
-     curl -O https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.1.0/openshift-client-linux-4.1.0.tar.gz
+     echo "yello" > /tmp/test.txt
+     cat /tmp/test.txt
     EOH
     interpreter = ["/bin/bash", "-c"]
   }
