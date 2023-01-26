@@ -113,7 +113,7 @@ resource "azuread_service_principal" "openshift" {
 }
 
 resource "azuread_application_password" "application-secret" {
-  display_name          = "terraform-sa-secret"
+  display_name          = "openshift-sp-secret"
   application_object_id = azuread_application.openshift-application.object_id
 }
 
