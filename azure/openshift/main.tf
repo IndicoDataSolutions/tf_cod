@@ -95,7 +95,7 @@ module "get-kube-credentials" {
     env|sort
     mkdir -p ${path.module}/tmpfiles
     pwd
-    az aro list-credentials --name ${var.label} --resource-group ${var.resource_group_name} --output json
+    az aro list-credentials --name ${var.label} --resource-group ${local.resource_group_name} --output json
   EOH
 }
 
