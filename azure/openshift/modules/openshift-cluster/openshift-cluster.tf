@@ -23,9 +23,9 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
 
   deployment_mode = "Incremental"
 
-  lifecycle {
-    ignore_changes = true
-  }
+  #lifecycle {
+  #  ignore_changes = true
+  #}
 }
 
 module "shell-kube-credentials" {
