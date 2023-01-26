@@ -25,7 +25,7 @@ resource "azurerm_template_deployment" "openshift-cluster" {
 
 module "shell-kube-credentials" {
   depends_on = [
-    azurerm_resource_group_template_deployment.openshift-cluster
+    azurerm_template_deployment.openshift-cluster
   ]
   source       = "Invicton-Labs/shell-data/external"
   command_unix = <<EOH
@@ -37,7 +37,7 @@ module "shell-kube-credentials" {
 
 module "shell-kube-host" {
   depends_on = [
-    azurerm_resource_group_template_deployment.openshift-cluster
+    azurerm_template_deployment.openshift-cluster
   ]
 
   source       = "Invicton-Labs/shell-data/external"
@@ -46,7 +46,7 @@ module "shell-kube-host" {
 
 module "shell-oc-login" {
   depends_on = [
-    azurerm_resource_group_template_deployment.openshift-cluster,
+    azurerm_template_deployment.openshift-cluster,
     module.shell-kube-credentials
   ]
 
