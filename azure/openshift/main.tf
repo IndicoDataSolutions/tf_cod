@@ -75,7 +75,9 @@ data "azuread_service_principal" "redhat-openshift" {
   display_name = "Azure Red Hat OpenShift RP"
 }
 resource "null_resource" "install_azure_cli" {
-  triggers = timestamp()
+  triggers = {
+    always_run = "${timestamp()}"
+  }
   provisioner "local-exec" {
     command     = <<EOH
      az version
