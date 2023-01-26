@@ -255,6 +255,7 @@ module "cluster" {
     module.networking,
     azurerm_resource_group.cod-cluster
   ]
+  subscriptionId    = split("/", data.azurerm_subscription.primary.id)[2]
   pull_secret       = jsondecode(data.vault_kv_secret_v2.terraform-redhat.data_json)["openshift-pull-secret"]
   cluster_domain    = local.dns_name
   source            = "./modules/openshift-cluster"

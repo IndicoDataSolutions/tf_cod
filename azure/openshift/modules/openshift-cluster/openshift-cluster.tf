@@ -2,16 +2,16 @@
 
 
 resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
-  name                = var.label
+  name                = "${var.label}-deployment"
   resource_group_name = var.resource_group_name
 
   template_content = file("${path.module}/ARM-openShiftClusters.json")
-
 
   parameters_content = jsonencode({
     "clientId"                 = { value = var.svp_client_id }
     "clientSecret"             = { value = var.svp_client_secret }
     "clusterName"              = { value = var.label }
+    "clusterResourceGroupId"   = { value = "/subscriptions/${var.subscriptionId}/resourceGroups/${lower("aro-${var.label}-${var.region}")}" }
     "clusterResourceGroupName" = { value = lower("aro-${var.label}-${var.region}") }
     "domain"                   = { value = var.cluster_domain }
     "location"                 = { value = var.region }

@@ -66,6 +66,12 @@
       "metadata": {
         "description": "The pull secret for the cluster (immutable)"
       }
+    },
+    "clusterResourceGroupId": {
+      "type": "String",
+      "metadata": {
+        "description": "The Resource Group ID"
+      }
     }
   },
   "variables": {
@@ -83,7 +89,7 @@
         "clusterProfile": {
           "pullSecret": "[parameters('pullSecret')]",
           "domain": "[parameters('domain')]",
-          "resourceGroupId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', parameters('clusterResourceGroupName'))]"
+          "resourceGroupId": "[parameters('clusterResourceGroupId')]"
         },
         "masterProfile": {
           "subnetId": "[parameters('masterSubnetId')]",

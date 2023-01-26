@@ -54,4 +54,6 @@ variable "enable_oidc_issuer" {
   description = "Enable OIDC Issuer URL"
 }
 
-
+variable "subscriptionId" {
+  type = string
+}
