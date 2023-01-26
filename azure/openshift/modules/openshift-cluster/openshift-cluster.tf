@@ -1,24 +1,24 @@
 # Deploy ARO using ARM template
 
-resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
+resource "azurerm_template_deployment" "openshift-cluster" {
   name                = var.label
   resource_group_name = var.resource_group_name
 
-  template_content = file("${path.module}/ARM-openShiftClusters.json")
+  template_body = file("${path.module}/ARM-openShiftClusters.json")
 
 
-  parameters_content = jsonencode({
-    "clientId"                 = { value = var.svp_client_id }
-    "clientSecret"             = { value = var.svp_client_secret }
-    "clusterName"              = { value = var.label }
-    "clusterResourceGroupName" = { value = lower("aro-${var.label}-${var.region}") }
-    "domain"                   = { value = var.cluster_domain }
-    "location"                 = { value = var.region }
-    "masterSubnetId"           = { value = var.master_subnet_id }
-    "pullSecret"               = { value = var.pull_secret }
-    "tags"                     = { value = jsonencode(var.tags) }
-    "workerSubnetId"           = { value = var.worker_subnet_id }
-  })
+  parameters = {
+    "clientId"                 = var.svp_client_id
+    "clientSecret"             = var.svp_client_secret
+    "clusterName"              = var.label
+    "clusterResourceGroupName" = lower("aro-${var.label}-${var.region}")
+    "domain"                   = var.cluster_domain
+    "location"                 = var.region
+    "masterSubnetId"           = var.master_subnet_id
+    "pullSecret"               = var.pull_secret
+    "tags"                     = jsonencode(var.tags)
+    "workerSubnetId"           = var.worker_subnet_id
+  }
 
   deployment_mode = "Complete"
 }

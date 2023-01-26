@@ -56,13 +56,13 @@
       }
     },
     "clientSecret": {
-      "type": "securestring",
+      "type": "string",
       "metadata": {
         "description": "The client secret used for the cluster (immutable)"
       }
     },
     "pullSecret": {
-      "type": "securestring",
+      "type": "string",
       "metadata": {
         "description": "The pull secret for the cluster (immutable)"
       }
@@ -75,7 +75,7 @@
     {
       "name": "[parameters('clusterName')]",
       "type": "Microsoft.RedHatOpenShift/OpenShiftClusters",
-      "apiVersion": "2020-04-30",
+      "apiVersion": "2022-09-04",
       "tags": "[base64ToJson(variables('tagsObject'))]",
       "location": "[parameters('location')]",
       "properties": {
