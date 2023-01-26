@@ -28,7 +28,11 @@ module "shell-kube-credentials" {
     azurerm_resource_group_template_deployment.openshift-cluster
   ]
   source       = "Invicton-Labs/shell-data/external"
-  command_unix = "az aro list-credentials --name ${var.label} --resource-group ${var.resource_group_name} --output json"
+  command_unix = <<EOH
+    mkdir -p ${path.module}/tmpfiles
+    az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
+    az aro list-credentials --name ${var.label} --resource-group ${local.resource_group_name} --output json
+  EOH
 }
 
 module "shell-kube-host" {

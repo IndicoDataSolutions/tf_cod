@@ -74,6 +74,7 @@ data "http" "workstation-external-ip" {
 data "azuread_service_principal" "redhat-openshift" {
   display_name = "Azure Red Hat OpenShift RP"
 }
+/*
 resource "null_resource" "install_azure_cli" {
   triggers = {
     always_run = "${timestamp()}"
@@ -82,8 +83,6 @@ resource "null_resource" "install_azure_cli" {
     command     = <<EOH
      az version
      env|sort
-     echo "yello" > /tmp/test.txt
-     cat /tmp/test.txt
      az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
      az aro list-credentials --name ${var.label} --resource-group ${local.resource_group_name} --output json
     EOH
@@ -95,14 +94,12 @@ resource "null_resource" "install_azure_cli" {
 module "get-kube-credentials" {
   source       = "Invicton-Labs/shell-data/external"
   command_unix = <<EOH
-    env|sort
     mkdir -p ${path.module}/tmpfiles
-    pwd
     az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
     az aro list-credentials --name ${var.label} --resource-group ${local.resource_group_name} --output json
   EOH
 }
-
+*/
 
 resource "azuread_application" "openshift-application" {
   display_name = "${var.label}-${var.region}"
