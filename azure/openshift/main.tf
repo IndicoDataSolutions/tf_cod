@@ -248,6 +248,7 @@ data "vault_kv_secret_v2" "terraform-redhat" {
 
 module "cluster" {
   depends_on = [
+    module.networking,
     azurerm_resource_group.cod-cluster
   ]
   pull_secret       = jsondecode(data.vault_kv_secret_v2.terraform-redhat.data_json)["openshift-pull-secret"]
