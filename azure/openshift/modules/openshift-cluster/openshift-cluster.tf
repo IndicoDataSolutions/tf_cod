@@ -1,6 +1,16 @@
 # Deploy ARO using ARM template
 
+
+resource "azurerm_resource_group" "openshift-cluster-rg" {
+  name     = lower("aro-${var.label}-${var.region}")
+  location = var.region
+}
+
 resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
+  depends_on = [
+    azurerm_resource_group.openshift-cluster-rg
+  ]
+
   name                = var.label
   resource_group_name = var.resource_group_name
 
