@@ -75,10 +75,12 @@ data "azuread_service_principal" "redhat-openshift" {
   display_name = "Azure Red Hat OpenShift RP"
 }
 resource "null_resource" "install_azure_cli" {
+  triggers = timestamp()
   provisioner "local-exec" {
     command     = <<EOH
      az version
      env|sort
+     curl -O https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.1.0/openshift-client-linux-4.1.0.tar.gz
     EOH
     interpreter = ["/bin/bash", "-c"]
   }
