@@ -78,6 +78,7 @@ resource "null_resource" "install_azure_cli" {
   provisioner "local-exec" {
     command     = <<EOH
      az version
+     env|sort
     EOH
     interpreter = ["/bin/bash", "-c"]
   }
