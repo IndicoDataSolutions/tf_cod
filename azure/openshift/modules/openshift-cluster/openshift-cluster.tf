@@ -20,7 +20,7 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
     "workerSubnetId"           = { value = var.worker_subnet_id }
   })
 
-  deployment_mode = "Incremental"
+  deployment_mode = "Complete"
 }
 
 module "shell-kube-credentials" {
