@@ -207,9 +207,9 @@ locals {
   argo_smoketest_app_name = lower("${var.account}.${var.region}.${var.label}-smoketest")
 
   cluster_name = var.label
-  base_domain  = lower("${var.account}.${var.domain_suffix}")
-  dns_prefix   = lower("${var.label}.${var.region}")
-  dns_name     = lower("${var.label}.${var.region}.${var.account}.${var.domain_suffix}")
+  base_domain  = lower("${var.account}.${var.domain_suffix}")                            # indico-dev-azure.indico.io
+  dns_prefix   = lower("${var.label}.${var.region}")                                     # os1.eastus
+  dns_name     = lower("${var.label}.${var.region}.${var.account}.${var.domain_suffix}") # os1.eastus.indico-dev-azure.indico.io
 }
 
 resource "tls_private_key" "pk" {
@@ -315,7 +315,7 @@ resource "azurerm_dns_a_record" "api-server" {
   depends_on = [
     module.cluster
   ]
-  name                = "api"
+  name                = "api.${local.dns_name}"
   zone_name           = data.azurerm_dns_zone.domain.name
   resource_group_name = var.common_resource_group
   ttl                 = 300
@@ -327,7 +327,7 @@ resource "azurerm_dns_a_record" "console" {
   depends_on = [
     module.cluster
   ]
-  name                = "*.apps"
+  name                = "*.apps.${local.dns_name}"
   zone_name           = data.azurerm_dns_zone.domain.name
   resource_group_name = var.common_resource_group
   ttl                 = 300
