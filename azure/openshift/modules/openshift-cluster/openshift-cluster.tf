@@ -69,7 +69,7 @@ module "shell-oc-login" {
   }
 
   command_unix = <<EOH
-    touch /tmp/.openshft-config
+    touch /tmp/.openshift-config
     oc login ${jsondecode(module.shell-kube-host.stdout)["apiUrl"]} --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]} > /dev/null
   EOH
 }
