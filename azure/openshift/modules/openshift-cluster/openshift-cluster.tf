@@ -69,8 +69,10 @@ module "shell-oc-login" {
   }
 
   command_unix = <<EOH
-    echo "{users: [{user: {token: INVALID}}]}" > /tmp/.openshift-config
     oc login ${jsondecode(module.shell-kube-host.stdout)["apiUrl"]} --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]} > /dev/null
+    if [ $? -ne 0 ]; then
+      echo "{users: [{user: {token: INVALID}}]}" > /tmp/.openshift-config
+    fi
   EOH
 }
 
