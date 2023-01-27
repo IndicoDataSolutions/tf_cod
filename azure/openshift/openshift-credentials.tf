@@ -48,6 +48,7 @@ output "shell-kube-host-stderr" {
   value = module.shell-kube-host.stderr
 }
 
+/*
 module "shell-oc-login" {
   depends_on = [
 
@@ -88,3 +89,4 @@ data "local_file" "kubeconfig" {
   ]
   filename = "/tmp/.openshift-config"
 }
+*/
