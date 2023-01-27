@@ -49,6 +49,7 @@ module "shell-kube-host" {
     azurerm_resource_group_template_deployment.openshift-cluster
   ]
 
+
   source       = "Invicton-Labs/shell-data/external"
   command_unix = <<EOH
     mkdir -p ${path.module}/tmpfiles
@@ -73,7 +74,8 @@ module "shell-oc-login" {
 
   command_unix = <<EOH
     mkdir -p ${path.module}/tmpfiles
-    oc login https://${jsondecode(module.shell-kube-host.stdout)["api"]}:6443/ --insecure-skip-tls-verify=true --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]} > /dev/null
+    echo "${module.shell-kube-host.stdout}"
+    oc login https://${jsondecode(module.shell-kube-host.stdout)["api"]}:6443/ --insecure-skip-tls-verify=true --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]}
   EOH
 }
 
