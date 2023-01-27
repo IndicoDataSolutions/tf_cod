@@ -89,6 +89,8 @@ resource "null_resource" "install_azure_cli" {
      env|sort
      az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
      az aro list-credentials --name os4 --resource-group os4-eastus --output json
+     az aro show --name os4 --resource-group os4-eastus --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
+
     EOH
     interpreter = ["/bin/bash", "-c"]
   }
