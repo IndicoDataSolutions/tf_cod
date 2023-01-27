@@ -278,7 +278,6 @@ module "cluster" {
   #enable_oidc_issuer       = true
 }
 
-
 data "kubernetes_service_account_v1" "deployer" {
   depends_on = [
     module.cluster
@@ -288,8 +287,6 @@ data "kubernetes_service_account_v1" "deployer" {
     namespace = "default"
   }
 }
-
-
 
 data "kubernetes_secret" "deployer" {
   depends_on = [
