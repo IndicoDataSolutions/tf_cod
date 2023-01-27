@@ -69,7 +69,7 @@ module "shell-oc-login" {
   }
 
   command_unix = <<EOH
-    oc login ${jsondecode(module.shell-kube-host.stdout)["apiUrl"]} --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]} > /dev/null
+    oc login ${jsondecode(module.shell-kube-host.stdout)["apiUrl"]} --insecure-skip-tls-verify=true --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]} > /dev/null
   EOH
 }
 
