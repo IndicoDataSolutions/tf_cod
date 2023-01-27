@@ -36,3 +36,12 @@ output "kubernetes_password" {
   value = jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]
 }
 
+output "api_server_ip" {
+  value = jsondecode(module.shell-kube-host.stdout)["api"]
+}
+
+output "console_ingress_ip" {
+  value = jsondecode(module.shell-kube-host.stdout)["ingress"]
+}
+
+
