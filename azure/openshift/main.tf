@@ -324,19 +324,3 @@ output "cluster_ca_certificate" {
 
 
 
-module "kubernetes-host" {
-  depends_on = [
-    module.cluster
-  ]
-
-  source       = "Invicton-Labs/shell-data/external"
-  command_unix = <<EOH
-    mkdir -p ${path.module}/tmpfiles
-    az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID" > /dev/null
-    az aro show --name ${var.label} --resource-group ${local.resource_group_name} --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
-  EOH
-}
-
-
-
-
