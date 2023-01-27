@@ -79,6 +79,7 @@ data "azuread_service_principal" "redhat-openshift" {
   display_name = "Azure Red Hat OpenShift RP"
 }
 
+/*
 resource "null_resource" "install_azure_cli" {
   triggers = {
     always_run = "${timestamp()}"
@@ -95,7 +96,7 @@ resource "null_resource" "install_azure_cli" {
     interpreter = ["/bin/bash", "-c"]
   }
 }
-
+*/
 
 resource "azuread_application" "openshift-application" {
   display_name = "${var.label}-${var.region}"
@@ -141,14 +142,22 @@ provider "argocd" {
 }
 
 provider "kubernetes" {
-  host  = module.cluster.kubernetes_host
-  token = module.cluster.kubernetes_token
+  host = jsondecode(module.kubernetes-host.stdout)["ip"]
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["${var.label}", "${local.resource_group_name}"]
+    command     = "./get_token.sh"
+  }
 
 }
 
 provider "kubectl" {
-  host             = module.cluster.kubernetes_host
-  token            = module.cluster.kubernetes_token
+  host = jsondecode(module.kubernetes-host.stdout)["ip"]
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["${var.label}", "${local.resource_group_name}"]
+    command     = "./get_token.sh"
+  }
   insecure         = true
   load_config_file = false
 }
@@ -157,8 +166,12 @@ provider "kubectl" {
 provider "helm" {
   debug = true
   kubernetes {
-    host     = module.cluster.kubernetes_host
-    token    = module.cluster.kubernetes_token
+    host = jsondecode(module.kubernetes-host.stdout)["ip"]
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      args        = ["${var.label}", "${local.resource_group_name}"]
+      command     = "./get_token.sh"
+    }
     insecure = true
   }
 }
@@ -183,7 +196,7 @@ module "argo-registration" {
   account                      = var.account
   cloud_provider               = "azure"
   argo_github_team_admin_group = var.argo_github_team_owner
-  endpoint                     = module.cluster.kubernetes_host
+  endpoint                     = jsondecode(module.kubernetes-host.stdout)["ip"]
   ca_data                      = data.kubernetes_secret.deployer.data["ca.crt"]
 }
 
@@ -253,7 +266,7 @@ module "cluster" {
   subscriptionId    = split("/", data.azurerm_subscription.primary.id)[2]
   pull_secret       = jsondecode(data.vault_kv_secret_v2.terraform-redhat.data_json)["openshift-pull-secret"]
   cluster_domain    = local.dns_name
-  source            = "./modules/dummy"
+  source            = "./modules/openshift-cluster"
   label             = var.label
   region            = var.region
   svp_client_id     = azuread_service_principal.openshift.application_id
@@ -301,3 +314,22 @@ output "cluster_ca_certificate" {
   sensitive = true
   value     = data.kubernetes_secret.deployer.data["ca.crt"]
 }
+
+
+
+module "kubernetes-host" {
+  depends_on = [
+    module.cluster
+  ]
+
+  source       = "Invicton-Labs/shell-data/external"
+  command_unix = <<EOH
+    mkdir -p ${path.module}/tmpfiles
+    az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID" > /dev/null
+    az aro show --name ${var.label} --resource-group ${local.resource_group_name} --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
+  EOH
+}
+
+
+
+
