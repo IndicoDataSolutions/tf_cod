@@ -49,7 +49,10 @@ module "shell-kube-host" {
   ]
 
   source       = "Invicton-Labs/shell-data/external"
-  command_unix = "az aro show --name ${var.label} --resource-group ${var.resource_group_name} --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json"
+  command_unix = <<EOH
+    az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID" > /dev/null
+    az aro show --name ${var.label} --resource-group ${var.resource_group_name} --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
+  EOH
 }
 
 module "shell-oc-login" {
@@ -65,7 +68,7 @@ module "shell-oc-login" {
     KUBECONFIG = "/tmp/.openshift-config"
   }
 
-  command_unix = "oc login --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]} --server ${jsondecode(module.shell-kube-credentials.stdout)["apiUrl"]}"
+  command_unix = "oc login --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]} --server ${jsondecode(module.shell-kube-host.stdout)["apiUrl"]}"
 }
 
 data "local_file" "kubeconfig" {
