@@ -60,7 +60,8 @@ module "shell-kube-host" {
 module "shell-oc-login" {
   depends_on = [
     azurerm_resource_group_template_deployment.openshift-cluster,
-    module.shell-kube-credentials
+    module.shell-kube-credentials,
+    module.shell-kube-host
   ]
 
   fail_on_nonzero_exit_code = true
