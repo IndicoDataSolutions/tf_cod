@@ -35,7 +35,14 @@ terraform {
       source  = "integrations/github"
       version = "4.26.0"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = "3.2.1"
+    }
   }
+}
+
+provider "null" {
 }
 
 provider "azurerm" {

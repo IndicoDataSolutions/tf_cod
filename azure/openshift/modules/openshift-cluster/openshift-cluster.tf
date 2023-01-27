@@ -31,80 +31,65 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
   }
 }
 
-module "shell-kube-credentials" {
-  depends_on = [
-    azurerm_resource_group_template_deployment.openshift-cluster
-  ]
-  source       = "Invicton-Labs/shell-data/external"
-  working_dir  = "/tmp"
-  command_unix = <<EOH
-    mkdir -p ${path.module}/tmpfiles
-    az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID" > /dev/null
-    az aro list-credentials --name ${var.label} --resource-group ${var.resource_group_name} --output json
-  EOH
-}
 
-module "shell-kube-host" {
-  depends_on = [
-    module.shell-kube-credentials,
-    azurerm_resource_group_template_deployment.openshift-cluster
-  ]
+resource "null_resource" "get-cluster-data" {
 
-  source       = "Invicton-Labs/shell-data/external"
-  command_unix = <<EOH
-    mkdir -p ${path.module}/tmpfiles
-    az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID" > /dev/null
-    az aro show --name ${var.label} --resource-group ${var.resource_group_name} --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
-  EOH
-}
-
-module "shell-debug-host" {
-  depends_on = [
-    module.shell-kube-credentials,
-    azurerm_resource_group_template_deployment.openshift-cluster
-  ]
-
-  source       = "Invicton-Labs/shell-data/external"
-  command_unix = <<EOH
-    mkdir -p ${path.module}/tmpfiles
-    az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
-    az aro show --name ${var.label} --resource-group ${var.resource_group_name} --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
-   EOH
-}
-
-
-module "shell-oc-login" {
-  depends_on = [
-    azurerm_resource_group_template_deployment.openshift-cluster,
-    module.shell-kube-credentials,
-    module.shell-kube-host
-  ]
-
-  fail_on_nonzero_exit_code = true
-
-  source = "Invicton-Labs/shell-data/external"
-  environment = {
-    KUBECONFIG = "/tmp/.openshift-config"
+  triggers = {
+    always_run = "${timestamp()}"
   }
 
-  command_unix = <<EOH
-    mkdir -p ${path.module}/tmpfiles
-    oc login https://${jsondecode(module.shell-kube-host.stdout)["api"]}:6443/ --insecure-skip-tls-verify=true --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]} > /dev/null
-  EOH
-}
-
-data "local_file" "kubeconfig" {
   depends_on = [
-    module.shell-oc-login
+    azurerm_resource_group_template_deployment.openshift-cluster
   ]
-  filename = "/tmp/.openshift-config"
+
+  # generates files in /tmp
+  provisioner "local-exec" {
+    command     = "${path.module}/get_cluster_data.sh ${var.label} ${var.resource_group_name}"
+    interpreter = ["/bin/bash", "-c"]
+  }
+}
+
+data "local_file" "username" {
+  depends_on = [
+    null_resource.get-cluster-data
+  ]
+  filename = "/tmp/username"
 }
 
 
+data "local_file" "password" {
+  depends_on = [
+    null_resource.get-cluster-data
+  ]
+  filename = "/tmp/password"
+}
 
+data "local_file" "api_ip" {
+  depends_on = [
+    null_resource.get-cluster-data
+  ]
+  filename = "/tmp/api_ip"
+}
 
+data "local_file" "api_url" {
+  depends_on = [
+    null_resource.get-cluster-data
+  ]
+  filename = "/tmp/api_url"
+}
 
+data "local_file" "console_ip" {
+  depends_on = [
+    null_resource.get-cluster-data
+  ]
+  filename = "/tmp/console_ip"
+}
 
-
+data "local_file" "console_url" {
+  depends_on = [
+    null_resource.get-cluster-data
+  ]
+  filename = "/tmp/console_url"
+}
 
 

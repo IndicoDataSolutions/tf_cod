@@ -14,34 +14,25 @@ output "id" {
   value = "ERROR:OPENSHIFT-NOT-APPLICABLE"
 }
 
-
-# real outputs
-output "kubernetes_token" {
-  depends_on = [
-    data.local_file.kubeconfig
-  ]
-  value = yamldecode(data.local_file.kubeconfig.content)["users"][0]["user"]["token"]
-}
-
 output "kubernetes_host" {
-  value = jsondecode(module.shell-kube-host.stdout)["apiUrl"]
+  value = trimspace(data.local_file.api_ip.content)
 }
 
 #  Now, we get back the output of the script
 output "kubernetes_username" {
-  value = jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]
+  value = trimspace(data.local_file.username.content)
 }
 
 output "kubernetes_password" {
-  value = jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]
+  value = trimspace(data.local_file.password.content)
 }
 
 output "api_server_ip" {
-  value = jsondecode(module.shell-kube-host.stdout)["api"]
+  value = trimspace(data.local_file.api_ip.content)
 }
 
 output "console_ingress_ip" {
-  value = jsondecode(module.shell-kube-host.stdout)["ingress"]
+  value = trimspace(data.local_file.console_url.content)
 }
 
 
