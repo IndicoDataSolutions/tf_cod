@@ -14,7 +14,7 @@ terraform {
     }
     argocd = {
       source  = "oboukili/argocd"
-      version = "3.1.0"
+      version = "4.3.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
@@ -315,7 +315,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "7.4.0"
+  version                    = "7.6.0"
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
@@ -416,7 +416,7 @@ module "argo-registration" {
     argocd     = argocd
   }
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.1.7"
+  version                      = "1.1.11"
   cluster_name                 = var.label
   region                       = var.region
   argo_password                = var.argo_password
