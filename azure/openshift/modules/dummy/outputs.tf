@@ -38,7 +38,7 @@ output "api_server_ip" {
 }
 
 output "console_ingress_ip" {
-
+  value = ""
 }
 
 
