@@ -75,7 +75,7 @@ module "shell-oc-login" {
 
   command_unix = <<EOH
     mkdir -p ${path.module}/tmpfiles
-    oc login ${jsondecode(module.shell-kube-host.stdout)["apiUrl"]} --insecure-skip-tls-verify=true --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]} > /dev/null
+    oc login https://${jsondecode(module.shell-kube-host.stdout)["api"]}:6443/ --insecure-skip-tls-verify=true --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]} > /dev/null
   EOH
 }
 
