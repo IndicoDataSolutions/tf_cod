@@ -279,6 +279,13 @@ secrets:
       eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
      
+clusterIssuer:
+  additionalSolvers:
+    - dns01:
+        route53:
+          region: ${var.region}
+          role: ${var.dns_manager_arn}
+
 monitoring:
   enabled: true
   global:

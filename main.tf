@@ -244,6 +244,10 @@ module "fsx-storage" {
   include_rox                 = var.include_rox
 }
 
+locals {
+  cluster_node_policies = concat(var.cluster_node_policies, [aws_iam_role.dns_manager.name])
+}
+
 module "cluster" {
   cod_snapshots_enabled      = true
   allow_dns_management       = true
@@ -260,7 +264,7 @@ module "cluster" {
   security_group_id          = module.security-group.all_subnets_sg_id
   subnet_ids                 = flatten([local.network[0].private_subnet_ids])
   node_groups                = var.node_groups
-  cluster_node_policies      = var.cluster_node_policies
+  cluster_node_policies      = local.cluster_node_policies
   eks_cluster_iam_role       = var.eks_cluster_iam_role
   eks_cluster_nodes_iam_role = "${var.label}-${var.region}-node-role"
   fsx_arns                   = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]

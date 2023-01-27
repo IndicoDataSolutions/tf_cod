@@ -62,11 +62,15 @@ resource "helm_release" "ipa-crds" {
     enabled: true
   
   cert-manager:
-    #extraArgs:
-    #  - --dns01-recursive-nameservers-only
-    #  - --dns01-recursive-nameservers='$#{data.azurerm_dns_zone.azure_zone.name_servers[0]}:53,$#{data.azurerm_dns_zone.azure_zone.name_servers[1]}:53,$#{dataazurerm_dns_zone.azure_zone.name_servers[2]}:53'
-    #  - --acme-http01-solver-nameservers='$#{data.azurerm_dns_zone.azure_zone.name_servers[0]}:53,$#{data.azurerm_dns_zone.azure_zone.name_servers[1]}:53,$#{data.azurerm_dns_zone.azure_zone.name_servers[2]}:53'
-     
+    podLabels:
+      azure.workload.identity/use: "true"
+    serviceAccount:
+      labels:
+        azure.workload.identity/use: "true"
+    
+    #dns01RecursiveNameserversOnly: true
+    #dns01RecursiveNameservers: "$#{data.azurerm_dns_zone.domain.name_servers[0]}:53,$#{data.azurerm_dns_zone.domain.name_servers[1]}:53,$#{data.azurerm_dns_zone.domain.name_servers[2]}:53,$#{data.azurerm_dns_zone.domain.name_servers[3]}:53"
+
     nodeSelector:
       kubernetes.io/os: linux
     webhook:
@@ -171,6 +175,16 @@ secrets:
       eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
      
+clusterIssuer:
+  additionalSolvers:
+    - dns01:
+        azureDNS:
+          environment: AzurePublicCloud
+          hostedZoneName: ${local.dns_prefix}.${data.azurerm_dns_zone.domain.name}
+          managedIdentity:
+            clientID: ${azuread_application.workload_identity.application_id}
+          resourceGroupName: ${var.common_resource_group}
+          subscriptionID: ${split("/", data.azurerm_subscription.primary.id)[2]}
 
 apiModels:
   enabled: true
