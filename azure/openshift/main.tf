@@ -320,7 +320,7 @@ resource "azurerm_dns_a_record" "api-server" {
 }
 
 # add an A record for the console
-resource "azurerm_dns_a_record" "api-server" {
+resource "azurerm_dns_a_record" "console" {
   depends_on = [
     module.cluster
   ]
