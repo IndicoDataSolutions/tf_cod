@@ -1,9 +1,6 @@
 
 
 module "shell-kube-credentials" {
-  depends_on = [
-    module.cluster
-  ]
   source       = "Invicton-Labs/shell-data/external"
   working_dir  = "/tmp"
   command_unix = <<EOH
@@ -28,8 +25,8 @@ output "shell-kube-credentials-stderr" {
 
 module "shell-kube-host" {
   depends_on = [
-    module.shell-kube-credentials,
-    module.cluster
+    module.shell-kube-credentials
+
   ]
 
   source       = "Invicton-Labs/shell-data/external"
@@ -53,7 +50,7 @@ output "shell-kube-host-stderr" {
 
 module "shell-oc-login" {
   depends_on = [
-    module.cluster,
+
     module.shell-kube-credentials,
     module.shell-kube-host
   ]
