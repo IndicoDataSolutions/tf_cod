@@ -244,6 +244,67 @@ module "fsx-storage" {
   include_rox                 = var.include_rox
 }
 
+resource "aws_iam_role" "dns_manager" {
+  name = "${var.label}-dns-manager"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = "EKSNodeAssumeRole"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ebs_cluster_policy" {
+  policy_arn = aws_iam_policy.dns_manager_policy.arn
+  role       = aws_iam_role.node_role.name
+}
+
+# EKS node policy for ALB and cluster autoscaling
+resource "aws_iam_policy" "dns_manager_policy" {
+  name   = "${var.label}-dns-manager-policy"
+  policy = data.aws_iam_policy_document.dns_manager_policy.json
+}
+
+data "aws_iam_policy_document" "dns_manager_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "route53:GetChange"
+    ]
+    resources = [
+      "arn:aws:route53:::change/*"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "route53:ChangeResourceRecordSets",
+      "route53:ListResourceRecordSets"
+    ]
+    resources = [
+      "arn:aws:route53:::hostedzone/*"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "route53:ListHostedZonesByName"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+
 locals {
   cluster_node_policies = concat(var.cluster_node_policies, [aws_iam_role.dns_manager.name])
 }
