@@ -260,7 +260,7 @@ module "cluster" {
   ]
   subscriptionId    = split("/", data.azurerm_subscription.primary.id)[2]
   pull_secret       = jsondecode(data.vault_kv_secret_v2.terraform-redhat.data_json)["openshift-pull-secret"]
-  cluster_domain    = local.base_domain
+  cluster_domain    = local.dns_name
   source            = "./modules/openshift-cluster"
   label             = var.label
   region            = var.region
@@ -310,6 +310,7 @@ output "cluster_ca_certificate" {
   value     = data.kubernetes_secret.deployer.data["ca.crt"]
 }
 
+/*
 # add an A record for the api server
 resource "azurerm_dns_a_record" "api-server" {
   depends_on = [
@@ -333,4 +334,5 @@ resource "azurerm_dns_a_record" "console" {
   ttl                 = 300
   records             = [module.cluster.console_ingress_ip]
 }
+*/
 

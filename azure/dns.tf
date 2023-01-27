@@ -19,3 +19,20 @@ resource "azurerm_dns_caa_record" "fqdn" {
     value = "sectigo.com"
   }
 }
+
+resource "azurerm_dns_zone" "child-zone" {
+  count               = var.is_openshift == true ? 1 : 0
+  name                = "${var.label}.${local.base_domain}"
+  resource_group_name = data.azurerm_resource_group.domain.name
+}
+
+
+# create ns record for sub-zone in parent zone
+resource "azurerm_dns_ns_record" "example" {
+  count               = var.is_openshift == true ? 1 : 0
+  name                = var.label
+  zone_name           = data.azurerm_dns_zone.domain.name
+  resource_group_name = data.azurerm_resource_group.domain.name
+  ttl                 = 60
+  records             = azurerm_dns_zone.child-zone.name_servers
+}
