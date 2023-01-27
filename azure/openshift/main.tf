@@ -79,6 +79,22 @@ data "azuread_service_principal" "redhat-openshift" {
   display_name = "Azure Red Hat OpenShift RP"
 }
 
+resource "null_resource" "install_azure_cli" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+  provisioner "local-exec" {
+    command     = <<EOH
+     az version
+     env|sort
+     az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
+     az aro list-credentials --name ${var.label} --resource-group ${local.resource_group_name} --output json
+    EOH
+    interpreter = ["/bin/bash", "-c"]
+  }
+}
+
+
 resource "azuread_application" "openshift-application" {
   display_name = "${var.label}-${var.region}"
   owners       = [data.azuread_client_config.current.object_id]
