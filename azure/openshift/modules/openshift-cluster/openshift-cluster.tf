@@ -61,7 +61,7 @@ module "shell-oc-login" {
     module.shell-kube-credentials
   ]
 
-  fail_on_nonzero_exit_code = false
+  fail_on_nonzero_exit_code = true
 
   source = "Invicton-Labs/shell-data/external"
   environment = {
@@ -70,9 +70,6 @@ module "shell-oc-login" {
 
   command_unix = <<EOH
     oc login ${jsondecode(module.shell-kube-host.stdout)["apiUrl"]} --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]} > /dev/null
-    if [ $? -ne 0 ]; then
-      echo "{users: [{user: {token: INVALID}}]}" > /tmp/.openshift-config
-    fi
   EOH
 }
 

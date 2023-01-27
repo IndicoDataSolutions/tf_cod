@@ -257,7 +257,7 @@ module "cluster" {
   ]
   subscriptionId    = split("/", data.azurerm_subscription.primary.id)[2]
   pull_secret       = jsondecode(data.vault_kv_secret_v2.terraform-redhat.data_json)["openshift-pull-secret"]
-  cluster_domain    = lower("${var.name}-${var.region}-${var.account}")
+  cluster_domain    = lower("${var.name}-${var.account}")
   source            = "./modules/openshift-cluster"
   label             = var.label
   region            = var.region
