@@ -262,9 +262,9 @@ resource "aws_iam_role" "dns_manager" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ebs_cluster_policy" {
+resource "aws_iam_role_policy_attachment" "dns_manager_policy" {
   policy_arn = aws_iam_policy.dns_manager_policy.arn
-  role       = aws_iam_role.node_role.name
+  role       = aws_iam_role.dns_manager.name
 }
 
 # EKS node policy for ALB and cluster autoscaling
