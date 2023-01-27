@@ -46,9 +46,9 @@ module "shell-kube-credentials" {
 
 module "shell-kube-host" {
   depends_on = [
+    module.shell-kube-credentials,
     azurerm_resource_group_template_deployment.openshift-cluster
   ]
-
 
   source       = "Invicton-Labs/shell-data/external"
   command_unix = <<EOH
@@ -58,6 +58,21 @@ module "shell-kube-host" {
   EOH
 }
 
+module "shell-debug-host" {
+  depends_on = [
+    module.shell-kube-credentials,
+    azurerm_resource_group_template_deployment.openshift-cluster
+  ]
+
+  source       = "Invicton-Labs/shell-data/external"
+  command_unix = <<EOH
+    mkdir -p ${path.module}/tmpfiles
+    az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
+    az aro show --name ${var.label} --resource-group ${var.resource_group_name} --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
+   EOH
+}
+
+
 module "shell-oc-login" {
   depends_on = [
     azurerm_resource_group_template_deployment.openshift-cluster,
@@ -65,7 +80,7 @@ module "shell-oc-login" {
     module.shell-kube-host
   ]
 
-  fail_on_nonzero_exit_code = false
+  fail_on_nonzero_exit_code = true
 
   source = "Invicton-Labs/shell-data/external"
   environment = {
@@ -74,8 +89,7 @@ module "shell-oc-login" {
 
   command_unix = <<EOH
     mkdir -p ${path.module}/tmpfiles
-    echo "${module.shell-kube-host.stdout}"
-    oc login https://${jsondecode(module.shell-kube-host.stdout)["api"]}:6443/ --insecure-skip-tls-verify=true --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]}
+    oc login https://${jsondecode(module.shell-kube-host.stdout)["api"]}:6443/ --insecure-skip-tls-verify=true --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]} > /dev/null
   EOH
 }
 
