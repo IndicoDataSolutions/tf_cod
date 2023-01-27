@@ -78,32 +78,6 @@ data "http" "workstation-external-ip" {
 data "azuread_service_principal" "redhat-openshift" {
   display_name = "Azure Red Hat OpenShift RP"
 }
-/*
-resource "null_resource" "install_azure_cli" {
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-  provisioner "local-exec" {
-    command     = <<EOH
-     az version
-     env|sort
-     az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
-     az aro list-credentials --name ${var.label} --resource-group ${local.resource_group_name} --output json
-    EOH
-    interpreter = ["/bin/bash", "-c"]
-  }
-}
-
-
-module "get-kube-credentials" {
-  source       = "Invicton-Labs/shell-data/external"
-  command_unix = <<EOH
-    mkdir -p ${path.module}/tmpfiles
-    az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
-    az aro list-credentials --name ${var.label} --resource-group ${local.resource_group_name} --output json
-  EOH
-}
-*/
 
 resource "azuread_application" "openshift-application" {
   display_name = "${var.label}-${var.region}"
@@ -309,30 +283,3 @@ output "cluster_ca_certificate" {
   sensitive = true
   value     = data.kubernetes_secret.deployer.data["ca.crt"]
 }
-
-/*
-# add an A record for the api server
-resource "azurerm_dns_a_record" "api-server" {
-  depends_on = [
-    module.cluster
-  ]
-  name                = "api.${local.dns_name}"
-  zone_name           = data.azurerm_dns_zone.domain.name
-  resource_group_name = var.common_resource_group
-  ttl                 = 300
-  records             = [module.cluster.api_server_ip]
-}
-
-# add an A record for the console
-resource "azurerm_dns_a_record" "console" {
-  depends_on = [
-    module.cluster
-  ]
-  name                = "*.apps.${local.dns_name}"
-  zone_name           = data.azurerm_dns_zone.domain.name
-  resource_group_name = var.common_resource_group
-  ttl                 = 300
-  records             = [module.cluster.console_ingress_ip]
-}
-*/
-
