@@ -284,7 +284,7 @@ clusterIssuer:
     - dns01:
         route53:
           region: ${var.region}
-          role: ${var.dns_manager_arn}
+          role: ${aws_iam_role.dns_manager.arn}
 
 monitoring:
   enabled: true
