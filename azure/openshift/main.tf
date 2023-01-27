@@ -149,7 +149,7 @@ provider "argocd" {
 }
 
 provider "kubernetes" {
-  host = jsondecode(module.kubernetes-host.stdout)["ip"]
+  host = module.cluster.kubernetes_host
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     args        = ["${var.label}", "${local.resource_group_name}"]
@@ -159,7 +159,7 @@ provider "kubernetes" {
 }
 
 provider "kubectl" {
-  host = jsondecode(module.kubernetes-host.stdout)["ip"]
+  host = module.cluster.kubernetes_host
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     args        = ["${var.label}", "${local.resource_group_name}"]
@@ -173,7 +173,7 @@ provider "kubectl" {
 provider "helm" {
   debug = true
   kubernetes {
-    host = jsondecode(module.kubernetes-host.stdout)["ip"]
+    host = module.cluster.kubernetes_host
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
       args        = ["${var.label}", "${local.resource_group_name}"]
@@ -203,7 +203,7 @@ module "argo-registration" {
   account                      = var.account
   cloud_provider               = "azure"
   argo_github_team_admin_group = var.argo_github_team_owner
-  endpoint                     = jsondecode(module.kubernetes-host.stdout)["ip"]
+  endpoint                     = module.cluster.kubernetes_host
   ca_data                      = data.kubernetes_secret.deployer.data["ca.crt"]
 }
 
