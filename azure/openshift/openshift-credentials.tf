@@ -21,7 +21,7 @@ output "shell-kube-credentials-stderr" {
   value = module.shell-kube-credentials.stderr
 }
 
-
+/*
 
 module "shell-kube-host" {
   depends_on = [
@@ -48,7 +48,7 @@ output "shell-kube-host-stderr" {
   value = module.shell-kube-host.stderr
 }
 
-/*
+
 module "shell-oc-login" {
   depends_on = [
 
