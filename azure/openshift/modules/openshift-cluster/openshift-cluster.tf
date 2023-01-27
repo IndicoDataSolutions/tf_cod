@@ -68,7 +68,9 @@ module "shell-oc-login" {
     KUBECONFIG = "/tmp/.openshift-config"
   }
 
-  command_unix = "oc login --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]} --server ${jsondecode(module.shell-kube-host.stdout)["apiUrl"]}"
+  command_unix = <<EOH
+    oc login ${jsondecode(module.shell-kube-host.stdout)["apiUrl"]} --username ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminUsername"]} --password ${jsondecode(module.shell-kube-credentials.stdout)["kubeadminPassword"]} > /dev/null
+  EOH
 }
 
 data "local_file" "kubeconfig" {
