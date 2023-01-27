@@ -65,7 +65,7 @@ module "shell-oc-login" {
     module.shell-kube-host
   ]
 
-  fail_on_nonzero_exit_code = true
+  fail_on_nonzero_exit_code = false
 
   source = "Invicton-Labs/shell-data/external"
   environment = {
