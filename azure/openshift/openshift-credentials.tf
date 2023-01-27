@@ -9,7 +9,7 @@ module "shell-kube-credentials" {
   command_unix = <<EOH
     mkdir -p ${path.module}/tmpfiles
     az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID" > /dev/null
-    az aro list-credentials --name os3 --resource-group os3-eastus --output json
+    az aro list-credentials --name os4 --resource-group os4-eastus --output json
   EOH
 }
 
@@ -36,7 +36,7 @@ module "shell-kube-host" {
   command_unix = <<EOH
     mkdir -p ${path.module}/tmpfiles
     az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID" > /dev/null
-    az aro show --name os3 --resource-group os3-eastus --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
+    az aro show --name os4 --resource-group os4-eastus --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
   EOH
 }
 
