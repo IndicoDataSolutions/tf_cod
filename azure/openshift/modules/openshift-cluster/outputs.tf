@@ -24,7 +24,7 @@ output "kubernetes_token" {
 }
 
 output "kubernetes_host" {
-  value = jsondecode(module.shell-kube-credentials.stdout)["apiUrl"]
+  value = jsondecode(module.shell-kube-host.stdout)["apiUrl"]
 }
 
 #  Now, we get back the output of the script
