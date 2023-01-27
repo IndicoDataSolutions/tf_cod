@@ -9,7 +9,7 @@ module "shell-kube-credentials" {
   command_unix = <<EOH
     mkdir -p ${path.module}/tmpfiles
     az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID" > /dev/null
-    az aro list-credentials --name ${var.label} --resource-group ${var.resource_group_name} --output json
+    az aro list-credentials --name ${var.label} --resource-group ${local.resource_group_name} --output json
   EOH
 }
 
@@ -23,7 +23,7 @@ module "shell-kube-host" {
   command_unix = <<EOH
     mkdir -p ${path.module}/tmpfiles
     az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID" > /dev/null
-    az aro show --name ${var.label} --resource-group ${var.resource_group_name} --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
+    az aro show --name ${var.label} --resource-group ${local.resource_group_name} --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
   EOH
 }
 
@@ -37,7 +37,7 @@ module "shell-debug-host" {
   command_unix = <<EOH
     mkdir -p ${path.module}/tmpfiles
     az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
-    az aro show --name ${var.label} --resource-group ${var.resource_group_name} --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
+    az aro show --name ${var.label} --resource-group ${local.resource_group_name} --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
    EOH
 }
 
