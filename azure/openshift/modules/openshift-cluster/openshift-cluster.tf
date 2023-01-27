@@ -48,7 +48,6 @@ module "shell-kube-host" {
   depends_on = [
     azurerm_resource_group_template_deployment.openshift-cluster
   ]
-  working_dir = "/tmp"
 
   source       = "Invicton-Labs/shell-data/external"
   command_unix = <<EOH
@@ -70,8 +69,6 @@ module "shell-oc-login" {
   environment = {
     KUBECONFIG = "/tmp/.openshift-config"
   }
-
-  working_dir = "/tmp"
 
   command_unix = <<EOH
     mkdir -p ${path.module}/tmpfiles
