@@ -33,6 +33,10 @@ output "kubernetes_password" {
   value = module.cluster.kubernetes_password
 }
 
+output "kubernetes_ca_cert" {
+  value = module.cluster.kubernetes_sa_cert
+}
+
 output "api_server_ip" {
   value = module.cluster.api_server_ip
 }
