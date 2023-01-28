@@ -10,11 +10,16 @@ api_url=$(cat info.json | jq -r '.apiUrl')
 console_ip=$(cat info.json | jq -r '.consoleIp')
 console_url=$(cat info.json | jq -r '.consoleUrl')
 
+export KUBECONFIG="/tmp/.openshift_kubeconfig"
+touch "/tmp/.openshift_kubeconfig"
+oc login $api_url --username ${username} --password ${password} > /dev/null
+token=$(cat /tmp/.openshift_kubeconfig | yq '.users[0].user.token')
+
 echo "${username}" > /tmp/username
 echo "${password}" > /tmp/password
 echo "${api_ip}" > /tmp/api_ip
 echo "${api_url}" > /tmp/api_url
 echo "${console_ip}" > /tmp/console_ip
 echo "${console_url}" > /tmp/console_url
-
+echo "${token}" > /tmp/token
 

@@ -49,13 +49,20 @@ resource "null_resource" "get-cluster-data" {
   }
 }
 
+
+data "local_file" "token" {
+  depends_on = [
+    null_resource.get-cluster-data
+  ]
+  filename = "/tmp/token"
+}
+
 data "local_file" "username" {
   depends_on = [
     null_resource.get-cluster-data
   ]
   filename = "/tmp/username"
 }
-
 
 data "local_file" "password" {
   depends_on = [
