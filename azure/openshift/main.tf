@@ -150,8 +150,7 @@ provider "argocd" {
 }
 
 provider "kubernetes" {
-  host     = module.cluster.kubernetes_url
-  insecure = module.cluster.kubernetes_insecure
+  host = module.cluster.kubernetes_url
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     args        = ["${var.label}", "${local.resource_group_name}"]
@@ -160,8 +159,7 @@ provider "kubernetes" {
 }
 
 provider "kubectl" {
-  host     = module.cluster.kubernetes_url
-  insecure = module.cluster.kubernetes_insecure
+  host = module.cluster.kubernetes_url
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     args        = ["${var.label}", "${local.resource_group_name}"]
@@ -175,8 +173,7 @@ provider "kubectl" {
 provider "helm" {
   debug = true
   kubernetes {
-    host     = module.cluster.kubernetes_url
-    insecure = module.cluster.kubernetes_insecure
+    host = module.cluster.kubernetes_url
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
       args        = ["${var.label}", "${local.resource_group_name}"]
