@@ -264,6 +264,10 @@ data "vault_kv_secret_v2" "terraform-redhat" {
 }
 
 module "cluster" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
   depends_on = [
     module.networking,
     azurerm_resource_group.cod-cluster
