@@ -150,36 +150,22 @@ provider "argocd" {
 }
 
 provider "kubernetes" {
-  host = module.cluster.kubernetes_url
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["${var.label}", "${local.resource_group_name}"]
-    command     = "./get_token.sh"
-  }
+  host  = module.cluster.kubernetes_url
+  token = module.cluster.kubernetes_token
 }
 
 provider "kubectl" {
-  host = module.cluster.kubernetes_url
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["${var.label}", "${local.resource_group_name}"]
-    command     = "./get_token.sh"
-  }
+  host  = module.cluster.kubernetes_url
+  token = module.cluster.kubernetes_token
 
   load_config_file = false
 }
 
-
 provider "helm" {
   debug = true
   kubernetes {
-    host = module.cluster.kubernetes_url
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      args        = ["${var.label}", "${local.resource_group_name}"]
-      command     = "./get_token.sh"
-    }
-
+    host  = module.cluster.kubernetes_url
+    token = module.cluster.kubernetes_token
   }
 }
 
