@@ -20,8 +20,13 @@ if [ -f "$KUBECONFIG" ]; then
 fi
 touch "/tmp/.openshift_kubeconfig"
 oc login $api_url --username ${username} --password ${password} > /dev/null
-
+os=$(uname -s)
+if [ "$os" == 'Darwin' ]; then
+an_hour_from_now=$(date -v+1H -u '+%Y-%m-%dT%H:%M:%SZ')
+else
 an_hour_from_now=$(date -u -d '+1 hour' '+%Y-%m-%dT%H:%M:%SZ')
+fi
+
 token=$(cat /tmp/.openshift_kubeconfig | yq '.users[0].user.token')
 ocversion='client.authentication.k8s.io/v1beta1'
 json=$( jq -n -c \
