@@ -51,8 +51,7 @@ resource "null_resource" "get-cluster-data" {
 
 
 
-resource "null_resource" "get-cluster-token" {
-
+resource "null_resource" "get-cluster-token-debug" {
   triggers = {
     always_run = "${timestamp()}"
   }
@@ -70,7 +69,7 @@ resource "null_resource" "get-cluster-token" {
 
 data "local_file" "cluster_creds" {
   depends_on = [
-    null_resource.get-cluster-token
+    null_resource.get-cluster-token-debug
   ]
   filename = "/tmp/cluster_creds"
 }
