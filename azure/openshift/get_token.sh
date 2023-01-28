@@ -34,7 +34,7 @@ an_hour_from_now=$(date -u -d '+1 hour' '+%Y-%m-%dT%H:%M:%SZ')
 fi
 
 token=$(cat /tmp/.openshift_kubeconfig | yq '.users[0].user.token')
-ocversion='client.authentication.k8s.io/v1beta1'
+version='client.authentication.k8s.io/v1beta1'
 json=$( jq -n -c \
   --arg version "$version" \
   --arg api_ip "$api_url" \
