@@ -17,7 +17,11 @@ export KUBECONFIG="/tmp/.openshift_kubeconfig"
 touch "/tmp/.openshift_kubeconfig"
 oc login https://${api_ip}:6443/ --insecure-skip-tls-verify=true --username "${username}" --password "${password}" > /dev/null
 token=$(cat /tmp/.openshift_kubeconfig | yq '.users[0].user.token')
-echo \{\"kind\": \"ExecCredential\", \"apiVersion\": \"client.authentication.k8s.io/v1beta1\", \"spec\": {}, \"status\": {\"expirationTimestamp\": \"2030-01-27T20:04:59Z\",\"token\": \"${token}\"}\}
-
-
- 
+#echo \{\"kind\": \"ExecCredential\", \"apiVersion\": \"client.authentication.k8s.io/v1beta1\", \"spec\": {}, \"status\": {\"expirationTimestamp\": \"2030-01-27T20:04:59Z\",\"token\": \"${token}\"}\}
+version='client.authentication.k8s.io/v1beta1'
+json=$( jq -n -c \
+  --arg version "$version" \
+  --arg api_ip "https://:$api_ip:6443" \
+  --arg token "$token" \
+  '{kind: "ExecCredential", apiVersion: $version, spec: {cluster: {server: $api_ip, "insecure-skip-tls-verify": true}}, status: {expirationTimeStamp: "2030-01-27T20:00:00Z", token: $token}}' )
+echo $json             

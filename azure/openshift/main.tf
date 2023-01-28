@@ -156,7 +156,6 @@ provider "kubernetes" {
     args        = ["${var.label}", "${local.resource_group_name}"]
     command     = "./get_token.sh"
   }
-
 }
 
 provider "kubectl" {
