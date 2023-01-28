@@ -21,6 +21,10 @@ if [ $? -ne 0 ]; then
   echo "Creating terraform-sa"
   oc create sa terraform-sa
 fi
+
+oc get clusterroles
+oc get clusterrolebindings
+
 oc get clusterrolebinding terraform-sa 2> /dev/null
 if [ $? -ne 0 ]; then 
   echo "Creating terraform-sa cluster-admin rolebinding"
@@ -29,6 +33,10 @@ fi
 secret0_name=$(oc get sa terraform-sa -o json | jq -r '.secrets[0].name')
 secret1_name=$(oc get sa terraform-sa -o json | jq -r '.secrets[1].name')
 echo "Secret $secret0_name $secret1_name"
+
+
+oc get clusterroles
+oc get clusterrolebindings
 
 if [[ "$secret0_name" == *"dockercfg"* ]]; then
   secret_name=$secret1_name
