@@ -25,7 +25,8 @@ if [ "${kube_config}" == "" ]; then
 else 
   echo "Updating $KUBECONFIG"
 fi
-oc login $api_url --username ${username} --password ${password}
+
+oc login $api_url --username ${username} --password ${password} --insecure-skip-tls-verify=false
 os=$(uname -s)
 if [ "$os" == 'Darwin' ]; then
 an_hour_from_now=$(date -v+1H -u '+%Y-%m-%dT%H:%M:%SZ')
