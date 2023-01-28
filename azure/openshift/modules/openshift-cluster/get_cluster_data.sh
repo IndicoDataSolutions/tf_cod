@@ -4,6 +4,8 @@ az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenan
 az aro list-credentials --name "$1" --resource-group "$2" --output json > creds.json
 az aro show --name "$1" --resource-group "$2" --query '{api:apiserverProfile.ip, consoleIp:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json > info.json
 
+oc version
+
 username=$(cat creds.json | jq -r '.kubeadminUsername')
 password=$(cat creds.json | jq -r '.kubeadminPassword')
 api_ip=$(cat info.json | jq -r '.api')
