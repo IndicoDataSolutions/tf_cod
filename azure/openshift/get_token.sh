@@ -21,11 +21,13 @@ fi
 touch "/tmp/.openshift_kubeconfig"
 oc login $api_url --username ${username} --password ${password} > /dev/null
 
+an_hour_from_now=$(date -u -d '+1 hour' '+%Y-%m-%dT%H:%M:%SZ')
 token=$(cat /tmp/.openshift_kubeconfig | yq '.users[0].user.token')
 ocversion='client.authentication.k8s.io/v1beta1'
 json=$( jq -n -c \
   --arg version "$version" \
   --arg api_ip "$api_url" \
   --arg token "$token" \
-  '{kind: "ExecCredential", apiVersion: $version, spec: {cluster: {server: $api_ip, "insecure-skip-tls-verify": false}}, status: {expirationTimeStamp: "2030-01-27T20:00:00Z", token: $token}}' )
+  --arg an_hour_from_now "$an_hour_from_now" \
+  '{kind: "ExecCredential", apiVersion: $version, spec: {cluster: {server: $api_ip, "insecure-skip-tls-verify": false}}, status: {expirationTimeStamp: $an_hour_from_now, token: $token}}' )
 echo $json             
