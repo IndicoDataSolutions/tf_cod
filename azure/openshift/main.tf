@@ -48,7 +48,8 @@ provider "null" {
 provider "azurerm" {
   features {
     key_vault {
-      purge_soft_delete_on_destroy = true
+      purge_soft_delete_on_destroy    = true
+      recover_soft_deleted_key_vaults = true
     }
   }
 }
@@ -255,7 +256,7 @@ module "storage" {
     azurerm_resource_group.cod-cluster
   ]
   source              = "app.terraform.io/indico/indico-azure-blob/mod"
-  version             = "0.1.6"
+  version             = "0.1.7"
   label               = var.label
   region              = var.region
   resource_group_name = local.resource_group_name
