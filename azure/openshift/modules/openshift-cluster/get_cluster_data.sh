@@ -31,13 +31,6 @@ if [ $? -ne 0 ]; then
 fi
 secret0_name=$(oc get sa -n default terraform-sa -o json | jq -r '.secrets[0].name')
 secret1_name=$(oc get sa -n default terraform-sa -o json | jq -r '.secrets[1].name')
-echo "Secret $secret0_name $secret1_name"
-
-#echo "Service Accounts"
-#oc get sa -n default
-#echo "Cluster Role Bindings"
-#oc get clusterrolebindings
-
 oc get clusterrolebinding terraform-sa -o yaml
 
 if [[ "$secret0_name" == *"dockercfg"* ]]; then
@@ -50,8 +43,6 @@ fi
 sa_token=$(oc get secret $secret_name -o json | jq -r '.data.token')
 sa_cert=$(oc get secret $secret_name -o json | jq -r '.data."ca.crt"')
 
-echo "Secret name $secret_name"
-
 echo "${username}" > /tmp/username
 echo "${password}" > /tmp/password
 echo "${api_ip}" > /tmp/api_ip
@@ -63,4 +54,3 @@ echo "${sa_token}" > /tmp/sa_token
 echo "${user_token}" > /tmp/user_token
 echo "${sa_cert}" > /tmp/sa_cert
 
-echo "User token: ${user_token}"
