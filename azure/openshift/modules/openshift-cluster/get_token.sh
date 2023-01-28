@@ -9,8 +9,10 @@ set -e
 echo "az login"
 az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
 echo "az list creds"
+az aro list-credentials --name "$1" --resource-group "$2" --output json
 az aro list-credentials --name "$1" --resource-group "$2" --output json > creds.json
 echo "az list show data"
+az aro show --name "$1" --resource-group "$2" --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
 az aro show --name "$1" --resource-group "$2" --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json > info.json
 
 username=$(cat creds.json | jq -r '.kubeadminUsername')
