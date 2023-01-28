@@ -40,5 +40,5 @@ json=$( jq -n -c \
   --arg api_ip "$api_url" \
   --arg token "$token" \
   --arg an_hour_from_now "$an_hour_from_now" \
-  '{kind: "ExecCredential", apiVersion: $version, spec: {cluster: {server: $api_ip, "insecure-skip-tls-verify": false}}, status: {expirationTimeStamp: $an_hour_from_now, token: $token}}' )
+  '{kind: "ExecCredential", apiVersion: $version, spec: {cluster: {server: $api_ip, "insecure-skip-tls-verify": true}}, status: {expirationTimeStamp: $an_hour_from_now, token: $token}}' )
 echo $json             
