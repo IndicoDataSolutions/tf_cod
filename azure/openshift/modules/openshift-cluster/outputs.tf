@@ -23,7 +23,7 @@ output "kubernetes_insecure" {
 }
 
 output "kubernetes_url" {
-  value = "https://${trimspace(data.local_file.api_ip.content)}:6443"
+  value = trimspace(data.local_file.api_url.content)
 }
 
 #  Now, we get back the output of the script
