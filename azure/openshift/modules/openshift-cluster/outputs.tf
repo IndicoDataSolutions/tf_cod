@@ -27,7 +27,15 @@ output "kubernetes_url" {
 }
 
 output "kubernetes_token" {
-  value = trimspace(data.local_file.token.content)
+  value = trimspace(data.local_file.user_token.content)
+}
+
+output "kubernetes_sa_username" {
+  value = trimspace(data.local_file.sa_username.content)
+}
+
+output "kubernetes_sa_token" {
+  value = trimspace(data.local_file.sa_token.content)
 }
 
 #  Now, we get back the output of the script

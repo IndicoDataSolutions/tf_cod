@@ -15,11 +15,14 @@ password=$(cat creds.json | jq -r '.kubeadminPassword')
 api_ip=$(cat info.json | jq -r '.api')
 api_url=$(cat info.json | jq -r '.apiUrl')
 export KUBECONFIG="/tmp/.openshift_kubeconfig"
+if [ -f "$KUBECONFIG" ]; then
+  rm $KUBECONFIG
+fi
 touch "/tmp/.openshift_kubeconfig"
 oc login $api_url --username ${username} --password ${password} > /dev/null
+
 token=$(cat /tmp/.openshift_kubeconfig | yq '.users[0].user.token')
-#echo \{\"kind\": \"ExecCredential\", \"apiVersion\": \"client.authentication.k8s.io/v1beta1\", \"spec\": {}, \"status\": {\"expirationTimestamp\": \"2030-01-27T20:04:59Z\",\"token\": \"${token}\"}\}
-version='client.authentication.k8s.io/v1beta1'
+ocversion='client.authentication.k8s.io/v1beta1'
 json=$( jq -n -c \
   --arg version "$version" \
   --arg api_ip "$api_url" \

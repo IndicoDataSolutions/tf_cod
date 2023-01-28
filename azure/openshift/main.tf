@@ -151,12 +151,12 @@ provider "argocd" {
 
 provider "kubernetes" {
   host  = module.cluster.kubernetes_url
-  token = module.cluster.kubernetes_token
+  token = module.cluster.kubernetes_sa_token
 }
 
 provider "kubectl" {
   host  = module.cluster.kubernetes_url
-  token = module.cluster.kubernetes_token
+  token = module.cluster.kubernetes_sa_token
 
   load_config_file = false
 }
@@ -165,7 +165,7 @@ provider "helm" {
   debug = true
   kubernetes {
     host  = module.cluster.kubernetes_url
-    token = module.cluster.kubernetes_token
+    token = module.cluster.kubernetes_sa_token
   }
 }
 

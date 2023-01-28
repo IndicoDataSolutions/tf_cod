@@ -12,6 +12,13 @@ output "kubernetes_url" {
   value = module.cluster.kubernetes_url
 }
 
+output "sa_username" {
+  value = module.cluster.kubernetes_sa_username
+}
+
+output "sa_token" {
+  value = module.cluster.kubernetes_sa_token
+}
 
 output "kubernetes_token" {
   value = module.cluster.kubernetes_token
