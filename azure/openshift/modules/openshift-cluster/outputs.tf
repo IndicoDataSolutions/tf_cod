@@ -19,7 +19,7 @@ output "kubernetes_host" {
 }
 
 output "kubernetes_insecure" {
-  value = true
+  value = false
 }
 
 output "kubernetes_url" {
