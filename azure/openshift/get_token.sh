@@ -5,6 +5,7 @@ resource_group=$2
 kube_config=$3
 
 set -e
+set -x
 
 az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID" > /dev/null
 az aro list-credentials --name "$1" --resource-group "$2" --output json > creds.json
