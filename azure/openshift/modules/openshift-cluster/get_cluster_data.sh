@@ -15,7 +15,7 @@ console_url=$(cat info.json | jq -r '.consoleUrl')
 
 export KUBECONFIG="/tmp/.openshift_kubeconfig"
 touch "/tmp/.openshift_kubeconfig"
-oc login $api_url --username ${username} --password ${password} --insecure-skip-tls-verify=false
+oc login $api_url --username ${username} --password ${password} --insecure-skip-tls-verify=true
 user_token=$(cat /tmp/.openshift_kubeconfig | yq '.users[0].user.token')
 
 echo "Getting Service Accounts"
