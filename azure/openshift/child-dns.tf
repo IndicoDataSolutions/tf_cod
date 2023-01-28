@@ -2,6 +2,7 @@
 
 # add an A record for the api server
 resource "azurerm_dns_a_record" "api-server" {
+  count = var.use_private_console == true ? 1 : 0
   depends_on = [
     module.cluster
   ]
@@ -14,6 +15,7 @@ resource "azurerm_dns_a_record" "api-server" {
 
 # add an A record for the console
 resource "azurerm_dns_a_record" "console" {
+  count = var.use_private_console == true ? 1 : 0
   depends_on = [
     module.cluster
   ]

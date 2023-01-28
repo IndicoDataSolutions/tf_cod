@@ -380,6 +380,11 @@ variable "use_workload_identity" {
   default = true
 }
 
+variable "use_private_console" {
+  type    = bool
+  default = false
+}
+
 variable "roles" {
   description = "Roles to be assigned to the Principal"
   type        = list(object({ role = string }))
