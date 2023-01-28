@@ -63,7 +63,7 @@ resource "null_resource" "get-cluster-token" {
 
   # generates files in /tmp
   provisioner "local-exec" {
-    command     = "${path.module}/get_token.sh ${var.label} ${var.resource_group_name}"
+    command     = "${path.module}/get_token.sh ${var.label} ${var.resource_group_name}/tmp/cluster_creds"
     interpreter = ["/bin/bash", "-c"]
   }
 }
