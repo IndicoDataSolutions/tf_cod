@@ -15,7 +15,7 @@ output "id" {
 }
 
 output "credentials" {
-  value = trimspace(data.local_file.cluster_creds)
+  value = trimspace(data.local_file.cluster_creds.content)
 }
 
 output "kubernetes_host" {
