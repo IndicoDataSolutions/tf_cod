@@ -22,7 +22,7 @@ token=$(cat /tmp/.openshift_kubeconfig | yq '.users[0].user.token')
 version='client.authentication.k8s.io/v1beta1'
 json=$( jq -n -c \
   --arg version "$version" \
-  --arg api_ip $api_url" \
+  --arg api_ip "$api_url" \
   --arg token "$token" \
-  '{kind: "ExecCredential", apiVersion: $version, spec: {cluster: {server: $api_ip, "insecure-skip-tls-verify": true}}, status: {expirationTimeStamp: "2030-01-27T20:00:00Z", token: $token}}' )
+  '{kind: "ExecCredential", apiVersion: $version, spec: {cluster: {server: $api_ip, "insecure-skip-tls-verify": false}}, status: {expirationTimeStamp: "2030-01-27T20:00:00Z", token: $token}}' )
 echo $json             
