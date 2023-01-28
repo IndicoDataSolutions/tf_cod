@@ -18,6 +18,10 @@ touch "/tmp/.openshift_kubeconfig"
 oc login $api_url --username ${username} --password ${password} > /dev/null
 user_token=$(cat /tmp/.openshift_kubeconfig | yq '.users[0].user.token')
 
+echo "Getting Service Accounts"
+oc get sa --namespace default
+echo "Finished Service Accounts"
+echo ""
 oc get sa --namespace terraform-sa &> /dev/null
 if [ $? -ne 0 ]; then 
   echo "Creating terraform-sa"
