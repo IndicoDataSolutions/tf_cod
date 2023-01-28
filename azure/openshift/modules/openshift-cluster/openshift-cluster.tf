@@ -49,7 +49,21 @@ resource "null_resource" "get-cluster-data" {
   }
 }
 
+resource "null_resource" "get-cluster-token-debug-show" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
 
+  depends_on = [
+    azurerm_resource_group_template_deployment.openshift-cluster
+  ]
+
+  # generates files in /tmp
+  provisioner "local-exec" {
+    command     = "cat ${path.module}/get_token.sh "
+    interpreter = ["/bin/bash", "-c"]
+  }
+}
 
 resource "null_resource" "get-cluster-token-debug" {
   triggers = {
