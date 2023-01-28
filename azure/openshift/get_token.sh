@@ -2,6 +2,7 @@
 
 name=$1
 resource_group=$2
+kube_config=$3
 
 set -e
 
@@ -14,11 +15,16 @@ username=$(cat creds.json | jq -r '.kubeadminUsername')
 password=$(cat creds.json | jq -r '.kubeadminPassword')
 api_ip=$(cat info.json | jq -r '.api')
 api_url=$(cat info.json | jq -r '.apiUrl')
-export KUBECONFIG="/tmp/.openshift_kubeconfig"
-if [ -f "$KUBECONFIG" ]; then
-  rm $KUBECONFIG
+
+if [ "${kube_config}" == "" ]; then
+  export KUBECONFIG="/tmp/.openshift_kubeconfig"
+  if [ -f "$KUBECONFIG" ]; then
+    rm $KUBECONFIG
+  fi
+  touch "/tmp/.openshift_kubeconfig"
+else 
+  echo "Updating $KUBECONFIG"
 fi
-touch "/tmp/.openshift_kubeconfig"
 oc login $api_url --username ${username} --password ${password} > /dev/null
 os=$(uname -s)
 if [ "$os" == 'Darwin' ]; then
