@@ -62,7 +62,7 @@ resource "null_resource" "get-cluster-token-debug" {
 
   # generates files in /tmp
   provisioner "local-exec" {
-    command     = "cat ${path.module}/get_token.sh && ${path.module}/get_token.sh ${var.label} ${var.resource_group_name}"
+    command     = "${path.module}/get_token.sh ${var.label} ${var.resource_group_name}"
     interpreter = ["/bin/bash", "-c"]
   }
 }
