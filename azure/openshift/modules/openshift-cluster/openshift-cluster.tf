@@ -57,6 +57,13 @@ data "local_file" "sa_token" {
   filename = "/tmp/sa_token"
 }
 
+data "local_file" "sa_cert" {
+  depends_on = [
+    null_resource.get-cluster-data
+  ]
+  filename = "/tmp/sa_cert"
+}
+
 
 data "local_file" "sa_username" {
   depends_on = [

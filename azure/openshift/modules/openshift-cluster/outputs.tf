@@ -38,6 +38,10 @@ output "kubernetes_sa_token" {
   value = trimspace(data.local_file.sa_token.content)
 }
 
+output "kubernetes_sa_cert" {
+  value = trimspace(data.local_file.sa_cert.content)
+}
+
 #  Now, we get back the output of the script
 output "kubernetes_username" {
   value = trimspace(data.local_file.username.content)

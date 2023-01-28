@@ -16,12 +16,12 @@ touch "/tmp/.openshift_kubeconfig"
 oc login $api_url --username ${username} --password ${password} > /dev/null
 user_token=$(cat /tmp/.openshift_kubeconfig | yq '.users[0].user.token')
 
-oc get sa terraform-sa > /dev/null
+oc get sa terraform-sa 2> /dev/null
 if [ $? -ne 0 ]; then 
   echo "Creating terraform-sa"
   oc create sa terraform-sa
 fi
-oc get clusterrolebinding terraform-sa > /dev/null
+oc get clusterrolebinding terraform-sa 2> /dev/null
 if [ $? -ne 0 ]; then 
   echo "Creating terraform-sa cluster-admin rolebinding"
   oc create clusterrolebinding terraform-sa --clusterrole=cluster-admin --serviceaccount=default:terraform-sa
@@ -38,6 +38,7 @@ if [[ "$secret1_name" == *"dockercfg"* ]]; then
   secret_name=$secret0_name
 fi
 sa_token=$(oc get secret $secret_name -o json | jq -r '.data.token')
+sa_cert=$(oc get secret $secret_name -o json | jq -r '.data."ca.crt"')
 
 echo "Secret name $secret_name"
 
@@ -50,3 +51,4 @@ echo "${console_url}" > /tmp/console_url
 echo "terraform-sa" > /tmp/sa_username
 echo "${sa_token}" > /tmp/sa_token
 echo "${user_token}" > /tmp/user_token
+echo "${sa_cert}" > /tmp/sa_cert
