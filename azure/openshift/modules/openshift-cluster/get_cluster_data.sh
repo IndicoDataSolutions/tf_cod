@@ -16,7 +16,7 @@ touch "/tmp/.openshift_kubeconfig"
 oc login $api_url --username ${username} --password ${password} > /dev/null
 user_token=$(cat /tmp/.openshift_kubeconfig | yq '.users[0].user.token')
 
-oc get sa terraform-sa 2> /dev/null
+oc get sa terraform-sa &> /dev/null
 if [ $? -ne 0 ]; then 
   echo "Creating terraform-sa"
   oc create sa terraform-sa
@@ -25,7 +25,7 @@ fi
 oc get clusterroles
 oc get clusterrolebindings
 
-oc get clusterrolebinding terraform-sa 2> /dev/null
+oc get clusterrolebinding terraform-sa &> /dev/null
 if [ $? -ne 0 ]; then 
   echo "Creating terraform-sa cluster-admin rolebinding"
   oc create clusterrolebinding terraform-sa --clusterrole=cluster-admin --serviceaccount=default:terraform-sa
