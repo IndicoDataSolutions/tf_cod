@@ -29,14 +29,16 @@ if [ $? -ne 0 ]; then
   echo "Creating terraform-sa cluster-admin rolebinding"
   oc create clusterrolebinding terraform-sa --clusterrole=cluster-admin --serviceaccount=default:terraform-sa
 fi
-secret0_name=$(oc get sa terraform-sa -o json | jq -r '.secrets[0].name')
-secret1_name=$(oc get sa terraform-sa -o json | jq -r '.secrets[1].name')
+secret0_name=$(oc get sa -n default terraform-sa -o json | jq -r '.secrets[0].name')
+secret1_name=$(oc get sa -n default terraform-sa -o json | jq -r '.secrets[1].name')
 echo "Secret $secret0_name $secret1_name"
 
-echo "Servicd Accounts"
-oc get sa -n default
-echo "Cluster Role Bindings"
-oc get clusterrolebindings
+#echo "Service Accounts"
+#oc get sa -n default
+#echo "Cluster Role Bindings"
+#oc get clusterrolebindings
+
+oc get clusterrolebinding terraform-sa -o yaml
 
 if [[ "$secret0_name" == *"dockercfg"* ]]; then
   secret_name=$secret1_name
