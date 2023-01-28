@@ -70,7 +70,7 @@ resource "null_resource" "get-cluster-token" {
 
 data "local_file" "cluster_creds" {
   depends_on = [
-    null_resource.get-cluster-data
+    null_resource.get-cluster-token
   ]
   filename = "/tmp/cluster_creds"
 }
