@@ -149,7 +149,8 @@ provider "argocd" {
 }
 
 provider "kubernetes" {
-  host = module.cluster.kubernetes_host
+  host     = module.cluster.kubernetes_url
+  insecure = module.cluster.kubernetes_insecure
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     args        = ["${var.label}", "${local.resource_group_name}"]
@@ -159,13 +160,14 @@ provider "kubernetes" {
 }
 
 provider "kubectl" {
-  host = module.cluster.kubernetes_host
+  host     = module.cluster.kubernetes_url
+  insecure = module.cluster.kubernetes_insecure
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     args        = ["${var.label}", "${local.resource_group_name}"]
     command     = "./get_token.sh"
   }
-  insecure         = true
+
   load_config_file = false
 }
 
@@ -173,13 +175,14 @@ provider "kubectl" {
 provider "helm" {
   debug = true
   kubernetes {
-    host = module.cluster.kubernetes_host
+    host     = module.cluster.kubernetes_url
+    insecure = module.cluster.kubernetes_insecure
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
       args        = ["${var.label}", "${local.resource_group_name}"]
       command     = "./get_token.sh"
     }
-    insecure = true
+
   }
 }
 
@@ -203,7 +206,7 @@ module "argo-registration" {
   account                      = var.account
   cloud_provider               = "azure"
   argo_github_team_admin_group = var.argo_github_team_owner
-  endpoint                     = module.cluster.kubernetes_host
+  endpoint                     = module.cluster.kubernetes_url
   ca_data                      = data.kubernetes_secret.deployer.data["ca.crt"]
 }
 

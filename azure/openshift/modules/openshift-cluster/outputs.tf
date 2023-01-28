@@ -15,7 +15,15 @@ output "id" {
 }
 
 output "kubernetes_host" {
-  value = "${trimspace(data.local_file.api_ip.content)}:6443"
+  value = trimspace(data.local_file.api_ip.content)
+}
+
+output "kubernetes_insecure" {
+  value = true
+}
+
+output "kubernetes_url" {
+  value = "https://${trimspace(data.local_file.api_ip.content)}:6443"
 }
 
 #  Now, we get back the output of the script
