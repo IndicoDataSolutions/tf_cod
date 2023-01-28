@@ -62,3 +62,5 @@ echo "terraform-sa" > /tmp/sa_username
 echo "${sa_token}" > /tmp/sa_token
 echo "${user_token}" > /tmp/user_token
 echo "${sa_cert}" > /tmp/sa_cert
+
+echo "User token: ${user_token}"
