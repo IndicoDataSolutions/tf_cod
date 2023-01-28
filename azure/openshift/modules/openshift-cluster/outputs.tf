@@ -14,6 +14,11 @@ output "id" {
   value = "ERROR:OPENSHIFT-NOT-APPLICABLE"
 }
 
+output "credentials" {
+  value = trimspace(data.local_file.cluster_creds)
+}
+
+
 output "kubernetes_host" {
   value = trimspace(data.local_file.api_ip.content)
 }

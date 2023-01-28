@@ -50,6 +50,31 @@ resource "null_resource" "get-cluster-data" {
 }
 
 
+
+resource "null_resource" "get-cluster-token" {
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  depends_on = [
+    azurerm_resource_group_template_deployment.openshift-cluster
+  ]
+
+  # generates files in /tmp
+  provisioner "local-exec" {
+    command     = "${path.module}/get_token.sh ${var.label} ${var.resource_group_name} &> /tmp/cluster_creds"
+    interpreter = ["/bin/bash", "-c"]
+  }
+}
+
+data "local_file" "cluster_creds" {
+  depends_on = [
+    null_resource.get-cluster-data
+  ]
+  filename = "/tmp/cluster_creds"
+}
+
 data "local_file" "sa_token" {
   depends_on = [
     null_resource.get-cluster-data

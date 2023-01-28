@@ -24,6 +24,12 @@ output "kubernetes_token" {
   value = module.cluster.kubernetes_token
 }
 
+
+output "credentials" {
+  value = module.cluster.credentials
+}
+
+
 #  Now, we get back the output of the script
 output "kubernetes_username" {
   value = module.cluster.kubernetes_username
