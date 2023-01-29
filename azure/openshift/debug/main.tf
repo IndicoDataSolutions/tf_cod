@@ -41,8 +41,11 @@ terraform {
     }
   }
 }
-
-
+variable "region" { default = "eastus" }
+variable "restore_snapshot_enabled" {
+  type    = bool
+  default = false
+}
 variable "label" {
   default = "os8"
 }
@@ -214,6 +217,8 @@ resource "kubernetes_secret" "cod-snapshot-client-id" {
     module.cluster
   ]
 
+  count = var.restore_snapshot_enabled == true ? 1 : 0
+
   metadata {
     name      = "cod-snapshot-client-id"
     namespace = "default"
@@ -224,5 +229,17 @@ resource "kubernetes_secret" "cod-snapshot-client-id" {
   }
 }
 
+data "azuread_client_config" "current" {}
+
+resource "azuread_application" "workload_identity" {
+  display_name = "${var.label}-${var.region}-workload-identity"
+  owners       = [data.azuread_client_config.current.object_id]
+}
+
+resource "azuread_service_principal" "workload_identity" {
+  application_id               = azuread_application.workload_identity.application_id
+  app_role_assignment_required = false
+  owners                       = [data.azuread_client_config.current.object_id]
+}
 
 

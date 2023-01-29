@@ -5,10 +5,10 @@ resource_group=$2
 kube_config=$3
 
 set -e
-set -x
 
-creds_file='/tmp/creds.json'
-info_file='/tmp/info.json'
+creds_file="/tmp/${name}-${resource_group}_creds.json"
+info_file="/tmp/${name}-${resource_group}_info.json"
+kubeconfig_file="/tmp/${name}-${resource_group}.openshift_kubeconfig"
 
 if [ -f $creds_file ]; then
   rm $creds_file
@@ -28,11 +28,11 @@ api_ip=$(cat $info_file | jq -r '.api')
 api_url=$(cat $info_file | jq -r '.apiUrl')
 
 if [ "${kube_config}" == "" ]; then
-  export KUBECONFIG="/tmp/.openshift_kubeconfig"
+  KUBECONFIG="$kubeconfig_file"
   if [ -f "$KUBECONFIG" ]; then
     rm $KUBECONFIG
   fi
-  touch "/tmp/.openshift_kubeconfig"
+  touch $kubeconfig_file
 else 
   echo "Updating $KUBECONFIG"
 fi
