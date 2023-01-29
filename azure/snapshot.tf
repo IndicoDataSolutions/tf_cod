@@ -1,5 +1,8 @@
 # Create a secret with the workload identity so azcopy can execute
 resource "kubernetes_secret" "cod-snapshot-client-id" {
+  depends_on = [
+    module.cluster
+  ]
   count = var.restore_snapshot_enabled == true ? 1 : 0
 
   metadata {
@@ -14,6 +17,7 @@ resource "kubernetes_secret" "cod-snapshot-client-id" {
 
 resource "helm_release" "cod-snapshot-restore" {
   depends_on = [
+    module.cluster,
     helm_release.ipa-pre-requisites,
     kubernetes_secret.cod-snapshot-client-id,
     azuread_application_federated_identity_credential.workload_snapshot_identity,
