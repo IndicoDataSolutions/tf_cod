@@ -209,3 +209,20 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
+resource "kubernetes_secret" "cod-snapshot-client-id" {
+  depends_on = [
+    module.cluster
+  ]
+
+  metadata {
+    name      = "cod-snapshot-client-id"
+    namespace = "default"
+  }
+
+  data = {
+    id = "${azuread_application.workload_identity.application_id}"
+  }
+}
+
+
+
