@@ -1,6 +1,9 @@
 #!/bin/bash
 
 set -x
+
+env|sort
+
 creds_file='/tmp/data_creds.json'
 info_file='/tmp/info_file.json'
 
