@@ -51,6 +51,10 @@ locals {
   resource_group_name = "os8-eastus"
 }
 
+variable "harbor_pull_secret_b64" {
+  default = "ewogICJhdXRocyI6IHsKICAgICJodHRwczovL2hhcmJvci5kZXZvcHMuaW5kaWNvLmlvIjogewogICAgICAiYXV0aCI6ICJjbTlpYjNRa2FXMWhaMlV0Y0hWc2JDMXpaV055WlhRNk9URnROV0ZqV2taSVREZFhOM1EzYlRaVlMzVkdOMDlMU0ZkSVlscENNMWM9IgogICAgfQogIH0KfQ=="
+}
+
 provider "null" {
 }
 
@@ -160,4 +164,48 @@ output "kubernetes_token" {
 
 
 
+
+resource "kubernetes_secret" "issuer-secret" {
+  depends_on = [
+    module.cluster
+  ]
+
+  metadata {
+    name      = "acme-azuredns"
+    namespace = "default"
+    annotations = {
+      "reflector.v1.k8s.emberstack.com/reflection-allowed"      = true
+      "reflector.v1.k8s.emberstack.com/reflection-auto-enabled" = true
+      "temporary.please.change/weaker-credentials-needed"       = true
+    }
+  }
+
+  type = "Opaque"
+
+  data = {
+    "secret-access-key" = "foobar"
+  }
+}
+
+#TODO: move to prereqs
+resource "kubernetes_secret" "harbor-pull-secret" {
+  depends_on = [
+    module.cluster
+  ]
+
+  metadata {
+    name      = "harbor-pull-secret"
+    namespace = "default"
+    annotations = {
+      "reflector.v1.k8s.emberstack.com/reflection-allowed"      = true
+      "reflector.v1.k8s.emberstack.com/reflection-auto-enabled" = true
+    }
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+
+  data = {
+    ".dockerconfigjson" = "${base64decode(var.harbor_pull_secret_b64)}"
+  }
+}
 

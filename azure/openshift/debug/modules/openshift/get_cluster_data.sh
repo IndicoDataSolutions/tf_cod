@@ -39,6 +39,7 @@ if [ $? -ne 0 ]; then
   echo "Creating terraform-sa"
   oc create sa --namespace default terraform-sa
 fi
+oc get sa --namespace default
 
 oc get clusterrolebinding terraform-sa &> /dev/null
 if [ $? -ne 0 ]; then 
