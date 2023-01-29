@@ -5,6 +5,7 @@ resource_group=$2
 kube_config=$3
 
 set -e
+set -x
 
 creds_file='/tmp/creds.json'
 info_file='/tmp/info.json'
