@@ -32,6 +32,24 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
 }
 
 
+
+resource "null_resource" "verify-certificate" {
+  depends_on = [
+    azurerm_resource_group_template_deployment.openshift-cluster
+  ]
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  # generates files in /tmp
+  provisioner "local-exec" {
+    command     = "${path.module}/verify_cert.sh ${var.label} ${var.resource_group_name}"
+    interpreter = ["/bin/bash", "-c"]
+  }
+}
+
+
 resource "null_resource" "get-cluster-data" {
 
   triggers = {
@@ -39,7 +57,7 @@ resource "null_resource" "get-cluster-data" {
   }
 
   depends_on = [
-    azurerm_resource_group_template_deployment.openshift-cluster
+    null_resource.verify-certificate
   ]
 
   # generates files in /tmp

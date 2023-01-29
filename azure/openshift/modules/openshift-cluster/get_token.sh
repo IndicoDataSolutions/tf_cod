@@ -5,20 +5,27 @@ resource_group=$2
 kube_config=$3
 
 set -e
+set -x
 
-echo "az login"
-az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
-echo "az list creds"
-az aro list-credentials --name "$1" --resource-group "$2" --output json
-az aro list-credentials --name "$1" --resource-group "$2" --output json > creds.json
-echo "az list show data"
-az aro show --name "$1" --resource-group "$2" --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
-az aro show --name "$1" --resource-group "$2" --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json > info.json
+creds_file='/tmp/creds.json'
+info_file='/tmp/info.json'
 
-username=$(cat creds.json | jq -r '.kubeadminUsername')
-password=$(cat creds.json | jq -r '.kubeadminPassword')
-api_ip=$(cat info.json | jq -r '.api')
-api_url=$(cat info.json | jq -r '.apiUrl')
+if [ -f $creds_file ]; then
+  rm $creds_file
+fi
+
+if [ -f $info_file ]; then
+  rm $info_file
+fi
+
+az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID" > /dev/null
+az aro list-credentials --name "$1" --resource-group "$2" --output json > $creds_file
+az aro show --name "$1" --resource-group "$2" --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json > $info_file
+
+username=$(cat $creds_file | jq -r '.kubeadminUsername')
+password=$(cat $creds_file | jq -r '.kubeadminPassword')
+api_ip=$(cat $info_file | jq -r '.api')
+api_url=$(cat $info_file | jq -r '.apiUrl')
 
 if [ "${kube_config}" == "" ]; then
   export KUBECONFIG="/tmp/.openshift_kubeconfig"
@@ -29,8 +36,7 @@ if [ "${kube_config}" == "" ]; then
 else 
   echo "Updating $KUBECONFIG"
 fi
-echo "oc login"
-oc login $api_url --username "${username}" --password "${password}" --insecure-skip-tls-verify=true
+oc login $api_url --username "${username}" --password "${password}" --insecure-skip-tls-verify=true &> /dev/null
 os=$(uname -s)
 if [ "$os" == 'Darwin' ]; then
 an_hour_from_now=$(date -v+1H -u '+%Y-%m-%dT%H:%M:%SZ')

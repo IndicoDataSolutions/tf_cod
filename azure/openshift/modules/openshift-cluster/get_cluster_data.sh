@@ -1,17 +1,30 @@
 #!/bin/bash
 
+set -x
+creds_file='/tmp/data_creds.json'
+info_file='/tmp/info_file.json'
+
+if [ -f $creds_file ]; then
+  rm $creds_file
+fi
+
+if [ -f $info_file ]; then
+  rm $info_file
+fi
+
+
 az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
-az aro list-credentials --name "$1" --resource-group "$2" --output json > creds.json
-az aro show --name "$1" --resource-group "$2" --query '{api:apiserverProfile.ip, consoleIp:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json > info.json
+az aro list-credentials --name "$1" --resource-group "$2" --output json > $creds_file
+az aro show --name "$1" --resource-group "$2" --query '{api:apiserverProfile.ip, consoleIp:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json > $info_file
 
 oc version
 
-username=$(cat creds.json | jq -r '.kubeadminUsername')
-password=$(cat creds.json | jq -r '.kubeadminPassword')
-api_ip=$(cat info.json | jq -r '.api')
-api_url=$(cat info.json | jq -r '.apiUrl')
-console_ip=$(cat info.json | jq -r '.consoleIp')
-console_url=$(cat info.json | jq -r '.consoleUrl')
+username=$(cat $creds_file | jq -r '.kubeadminUsername')
+password=$(cat $creds_file | jq -r '.kubeadminPassword')
+api_ip=$(cat $info_file | jq -r '.api')
+api_url=$(cat $info_file | jq -r '.apiUrl')
+console_ip=$(cat $info_file | jq -r '.consoleIp')
+console_url=$(cat $info_file | jq -r '.consoleUrl')
 
 export KUBECONFIG="/tmp/.openshift_kubeconfig"
 touch "/tmp/.openshift_kubeconfig"
@@ -27,6 +40,7 @@ if [ $? -ne 0 ]; then
   echo "Creating terraform-sa"
   oc create sa --namespace default terraform-sa
 fi
+oc get sa --namespace default
 
 oc get clusterrolebinding terraform-sa &> /dev/null
 if [ $? -ne 0 ]; then 
@@ -57,4 +71,5 @@ echo "terraform-sa" > /tmp/sa_username
 echo "${sa_token}" > /tmp/sa_token
 echo "${user_token}" > /tmp/user_token
 echo "${sa_cert}" > /tmp/sa_cert
+
 

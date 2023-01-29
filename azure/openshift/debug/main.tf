@@ -52,7 +52,7 @@ locals {
 }
 
 variable "harbor_pull_secret_b64" {
-  default = "ewogICJhdXRocyI6IHsKICAgICJodHRwczovL2hhcmJvci5kZXZvcHMuaW5kaWNvLmlvIjogewogICAgICAiYXV0aCI6ICJjbTlpYjNRa2FXMWhaMlV0Y0hWc2JDMXpaV055WlhRNk9URnROV0ZqV2taSVREZFhOM1EzYlRaVlMzVkdOMDlMU0ZkSVlscENNMWM9IgogICAgfQogIH0KfQ=="
+  default = "ewogICJhdXRocyI6IHsKICAgICJodHRwczovL2hhcmJvci5kZXZvcHMuaW5kaWNvLmlvIjogewogICAgICAiYXV0aCI6ICJjbTlpYjNRa2FXMWhaMlV0Y0hWc2JDMXpaV055WlhRNk9URnROV0ZqV2taSVREZFhOM1EzYlRaVlMzVkdOMDlMU0ZkSVlscENNMWM9IgogICAgfQogIH0KfQ==pwd"
 }
 
 provider "null" {
