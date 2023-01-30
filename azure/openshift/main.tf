@@ -295,7 +295,7 @@ module "cluster" {
   #enable_oidc_issuer       = true
 }
 
-resource "local_file" {
+resource "local_file" "kubeconfig" {
   depends_on = [
     module.cluster
   ]
