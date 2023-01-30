@@ -397,3 +397,7 @@ variable "roles" {
     }
   ]
 }
+
+variable "kubernetes_host" {
+  default = ""
+}

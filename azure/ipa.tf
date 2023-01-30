@@ -1,6 +1,6 @@
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
-    local_file.kubeconfig
+    module.cluster
   ]
 
   metadata {
@@ -23,7 +23,7 @@ resource "kubernetes_secret" "issuer-secret" {
 #TODO: move to prereqs
 resource "kubernetes_secret" "harbor-pull-secret" {
   depends_on = [
-    local_file.kubeconfig
+    module.cluster
   ]
 
   metadata {
@@ -44,7 +44,7 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 
 resource "helm_release" "ipa-crds" {
   depends_on = [
-    local_file.kubeconfig,
+    module.cluster,
     kubernetes_secret.harbor-pull-secret,
     kubernetes_secret.issuer-secret
   ]
@@ -92,7 +92,7 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
 resource "azurerm_role_assignment" "external_dns" {
   count = var.include_external_dns == true ? 1 : 0
   depends_on = [
-    local_file.kubeconfig
+    module.cluster
   ]
   scope                = data.azurerm_dns_zone.domain.id
   role_definition_name = "DNS Zone Contributor"
@@ -101,7 +101,7 @@ resource "azurerm_role_assignment" "external_dns" {
 
 resource "kubernetes_secret" "azure_storage_key" {
   depends_on = [
-    local_file.kubeconfig
+    module.cluster
   ]
   metadata {
     name = "azure-storage-key"
@@ -120,7 +120,7 @@ resource "kubernetes_config_map" "azure_dns_credentials" {
   count = var.include_external_dns == true ? 1 : 0
 
   depends_on = [
-    local_file.kubeconfig
+    module.cluster
   ]
 
   metadata {
@@ -143,7 +143,7 @@ resource "kubernetes_config_map" "azure_dns_credentials" {
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
     time_sleep.wait_1_minutes_after_crds,
-    local_file.kubeconfig,
+    module.cluster,
     module.storage,
     helm_release.ipa-crds,
     data.vault_kv_secret_v2.zerossl_data,
