@@ -44,7 +44,7 @@ resource "null_resource" "create-user" {
 
   # generates files in /tmp
   provisioner "local-exec" {
-    command     = "${path.module}/get_token.sh ${var.label} ${var.resource_group_name}"
+    command     = "${path.module}/create-user.sh ${var.label} ${var.resource_group_name}"
     interpreter = ["/bin/bash", "-c"]
   }
 }
