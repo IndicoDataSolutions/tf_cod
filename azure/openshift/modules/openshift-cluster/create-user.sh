@@ -53,6 +53,13 @@ cat $NEW_KUBECONFIG
 export KUBECONFIG=$NEW_KUBECONFIG
 
 oc whoami
+oc get csr ${name}-${resource_group}-access
+if [ $? -eq 0 ]; then
+  echo "CSR ${name}-${resource_group}-access already exists, finished."
+  oc get user
+  exit 0
+fi
+
 
 
 oc get user terraform-sa
