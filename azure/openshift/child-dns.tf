@@ -10,7 +10,7 @@ resource "azurerm_dns_a_record" "api-server" {
   zone_name           = data.azurerm_dns_zone.domain.name
   resource_group_name = var.common_resource_group
   ttl                 = 300
-  records             = [module.cluster.api_server_ip]
+  records             = [module.cluster.openshift_api_server_ip]
 }
 
 # add an A record for the console
@@ -23,6 +23,6 @@ resource "azurerm_dns_a_record" "console" {
   zone_name           = data.azurerm_dns_zone.domain.name
   resource_group_name = var.common_resource_group
   ttl                 = 300
-  records             = [module.cluster.console_ingress_ip]
+  records             = [module.cluster.openshift_console_ip]
 }
 

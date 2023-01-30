@@ -33,57 +33,7 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
 
 
 
-resource "null_resource" "verify-certificate" {
-  depends_on = [
-    azurerm_resource_group_template_deployment.openshift-cluster
-  ]
-
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-
-  # generates files in /tmp
-  provisioner "local-exec" {
-    command     = "${path.module}/verify_cert.sh ${var.label} ${var.resource_group_name}"
-    interpreter = ["/bin/bash", "-c"]
-  }
-}
-
-
-resource "null_resource" "get-cluster-data" {
-
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-
-  depends_on = [
-    null_resource.verify-certificate
-  ]
-
-  # generates files in /tmp
-  provisioner "local-exec" {
-    command     = "${path.module}/get_cluster_data.sh ${var.label} ${var.resource_group_name}"
-    interpreter = ["/bin/bash", "-c"]
-  }
-}
-
-resource "null_resource" "get-cluster-token-debug-show" {
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-
-  depends_on = [
-    azurerm_resource_group_template_deployment.openshift-cluster
-  ]
-
-  # generates files in /tmp
-  provisioner "local-exec" {
-    command     = "cat ${path.module}/get_token.sh "
-    interpreter = ["/bin/bash", "-c"]
-  }
-}
-
-resource "null_resource" "get-cluster-token-debug" {
+resource "null_resource" "create-user" {
   triggers = {
     always_run = "${timestamp()}"
   }
@@ -99,82 +49,30 @@ resource "null_resource" "get-cluster-token-debug" {
   }
 }
 
-data "local_file" "cluster_creds" {
+data "local_file" "kubernetes_host" {
   depends_on = [
-    null_resource.get-cluster-token-debug
+    null_resource.create-user
   ]
-  filename = "/tmp/cluster_creds"
+  filename = "/tmp/${var.label}-${var.resource_group_name}.kubernetes_host"
 }
 
-data "local_file" "sa_token" {
+data "local_file" "kubernetes_client_certificate" {
   depends_on = [
-    null_resource.get-cluster-data
+    null_resource.create-user
   ]
-  filename = "/tmp/sa_token"
+  filename = "/tmp/${var.label}-${var.resource_group_name}.kubernetes_client_certificate"
 }
 
-data "local_file" "sa_cert" {
+data "local_file" "kubernetes_client_key" {
   depends_on = [
-    null_resource.get-cluster-data
+    null_resource.create-user
   ]
-  filename = "/tmp/sa_cert"
+  filename = "/tmp/${var.label}-${var.resource_group_name}.kubernetes_client_key"
 }
 
-
-data "local_file" "sa_username" {
+data "local_file" "kubernetes_cluster_ca_certificate" {
   depends_on = [
-    null_resource.get-cluster-data
+    null_resource.create-user
   ]
-  filename = "/tmp/sa_username"
+  filename = "/tmp/${var.label}-${var.resource_group_name}.kubernetes_cluster_ca_certificate"
 }
-
-data "local_file" "user_token" {
-  depends_on = [
-    null_resource.get-cluster-data
-  ]
-  filename = "/tmp/user_token"
-}
-
-data "local_file" "username" {
-  depends_on = [
-    null_resource.get-cluster-data
-  ]
-  filename = "/tmp/username"
-}
-
-data "local_file" "password" {
-  depends_on = [
-    null_resource.get-cluster-data
-  ]
-  filename = "/tmp/password"
-}
-
-data "local_file" "api_ip" {
-  depends_on = [
-    null_resource.get-cluster-data
-  ]
-  filename = "/tmp/api_ip"
-}
-
-data "local_file" "api_url" {
-  depends_on = [
-    null_resource.get-cluster-data
-  ]
-  filename = "/tmp/api_url"
-}
-
-data "local_file" "console_ip" {
-  depends_on = [
-    null_resource.get-cluster-data
-  ]
-  filename = "/tmp/console_ip"
-}
-
-data "local_file" "console_url" {
-  depends_on = [
-    null_resource.get-cluster-data
-  ]
-  filename = "/tmp/console_url"
-}
-
-

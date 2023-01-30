@@ -150,21 +150,17 @@ provider "argocd" {
 }
 
 provider "kubernetes" {
-  host = module.cluster.kubernetes_url
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    args        = [var.label, local.resource_group_name]
-    command     = "./get_token.sh"
-  }
+  host                   = module.cluster.kubernetes_host
+  client_certificate     = module.cluster.kubernetes_client_certificate
+  client_key             = module.cluster.kubernetes_client_key
+  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
 }
 
 provider "kubectl" {
-  host = module.cluster.kubernetes_url
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    args        = [var.label, local.resource_group_name]
-    command     = "./get_token.sh"
-  }
+  host                   = module.cluster.kubernetes_host
+  client_certificate     = module.cluster.kubernetes_client_certificate
+  client_key             = module.cluster.kubernetes_client_key
+  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
 
   load_config_file = false
 }
@@ -172,12 +168,10 @@ provider "kubectl" {
 provider "helm" {
   debug = true
   kubernetes {
-    host = module.cluster.kubernetes_url
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      args        = [var.label, local.resource_group_name]
-      command     = "./get_token.sh"
-    }
+    host                   = module.cluster.kubernetes_host
+    client_certificate     = module.cluster.kubernetes_client_certificate
+    client_key             = module.cluster.kubernetes_client_key
+    cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
   }
 }
 
@@ -201,8 +195,8 @@ module "argo-registration" {
   account                      = var.account
   cloud_provider               = "azure"
   argo_github_team_admin_group = var.argo_github_team_owner
-  endpoint                     = module.cluster.kubernetes_url
-  ca_data                      = data.kubernetes_secret.deployer.data["ca.crt"]
+  endpoint                     = module.cluster.kubernetes_host
+  ca_data                      = module.cluster.kubernetes_cluster_ca_certificate
 }
 
 provider "local" {}
@@ -290,35 +284,3 @@ module "cluster" {
   #enable_workload_identity = true # requires: az feature register --namespace "Microsoft.ContainerService" --name "EnableWorkloadIdentityPreview"
   #enable_oidc_issuer       = true
 }
-
-data "kubernetes_service_account_v1" "deployer" {
-  depends_on = [
-    module.cluster
-  ]
-  metadata {
-    name      = "deployer"
-    namespace = "default"
-  }
-}
-
-data "kubernetes_secret" "deployer" {
-  depends_on = [
-    module.cluster
-  ]
-  metadata {
-    name      = data.kubernetes_service_account_v1.deployer.default_secret_name
-    namespace = "default"
-  }
-}
-
-output "deployer" {
-  value = data.kubernetes_service_account_v1.deployer.default_secret_name
-}
-
-output "cluster_ca_certificate" {
-  sensitive = true
-  value     = data.kubernetes_secret.deployer.data["ca.crt"]
-}
-
-
-

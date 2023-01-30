@@ -27,16 +27,13 @@ password=$(cat $creds_file | jq -r '.kubeadminPassword')
 api_ip=$(cat $info_file | jq -r '.api')
 api_url=$(cat $info_file | jq -r '.apiUrl')
 
-if [ "${kube_config}" == "" ]; then
-  KUBECONFIG="$kubeconfig_file"
-  if [ -f "$KUBECONFIG" ]; then
-    rm $KUBECONFIG
-  fi
-  touch $kubeconfig_file
-else 
-  echo "Updating $KUBECONFIG"
+if [ "$kube_config" != "" ]; then
+  kubeconfig_file=$kube_config
+  echo "Using $kubeconfig_file"
 fi
-oc login $api_url --username "${username}" --password "${password}" --insecure-skip-tls-verify=true &> /dev/null
+
+oc login --kubeconfig=$kubeconfig_file $api_url --username "${username}" --password "${password}" --insecure-skip-tls-verify=true &> /dev/null
+
 os=$(uname -s)
 if [ "$os" == 'Darwin' ]; then
 an_hour_from_now=$(date -v+1H -u '+%Y-%m-%dT%H:%M:%SZ')
@@ -44,6 +41,7 @@ else
 an_hour_from_now=$(date -u -d '+1 hour' '+%Y-%m-%dT%H:%M:%SZ')
 fi
 
+echo date > lastrun.txt
 token=$(cat /tmp/.openshift_kubeconfig | yq '.users[0].user.token')
 version='client.authentication.k8s.io/v1beta1'
 json=$( jq -n -c \
