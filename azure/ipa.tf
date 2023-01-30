@@ -44,7 +44,9 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 
 resource "helm_release" "ipa-crds" {
   depends_on = [
-    local_file.kubeconfig
+    local_file.kubeconfig,
+    kubernetes_secret.harbor-pull-secret,
+    kubernetes_secret.issuer-secret
   ]
 
   verify           = false
