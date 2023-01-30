@@ -134,7 +134,7 @@ cp $NEW_KUBECONFIG ./$name.kubeconfig
 #  Now, we get back the output of the script
 #output "kubernetes_host" 
 kubernetes_host=/tmp/${name}-${resource_group}.kubernetes_host
-oc --kubeconfig $NEW_KUBECONFIG config view -o jsonpath='{.clusters[0].name}' > $kubernetes_host
+oc --kubeconfig $NEW_KUBECONFIG config view -o jsonpath='{.clusters[0].cluster.server}' > $kubernetes_host
 cat $kubernetes_host
 
 #output "kubernetes_client_certificate" 
