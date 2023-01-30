@@ -110,12 +110,13 @@ resource "vault_kv_secret_v2" "kubernetes-credentials" {
       console_ip                        = data.local_file.openshift_console_ip.content
     }
   )
-  #lifecycle {
-  #  ignore_changes = [
-  #    data_json
-  #  ]
-  #}
+  lifecycle {
+    ignore_changes = [
+      data_json
+    ]
+  }
 }
+
 
 data "vault_kv_secret_v2" "kubernetes-credentials" {
   depends_on = [
