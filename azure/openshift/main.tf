@@ -151,7 +151,7 @@ provider "argocd" {
 
 provider "kubernetes" {
   config_path    = "${path.module}/kubeconfig"
-  config_context = lower("default/api-${var.label}-${var.account}-${region}-aroapp-io:6443/terraform-sa")
+  config_context = lower("default/api-${var.label}-${var.account}-${var.region}-aroapp-io:6443/terraform-sa")
 
   ##host                   = module.cluster.kubernetes_host
   #client_certificate     = module.cluster.kubernetes_client_certificate
@@ -161,7 +161,7 @@ provider "kubernetes" {
 
 provider "kubectl" {
   config_path    = "${path.module}/kubeconfig"
-  config_context = lower("default/api-${var.label}-${var.account}-${region}-aroapp-io:6443/terraform-sa")
+  config_context = lower("default/api-${var.label}-${var.account}-${var.region}-aroapp-io:6443/terraform-sa")
 
   #host                   = module.cluster.kubernetes_host
   #client_certificate     = module.cluster.kubernetes_client_certificate
@@ -176,7 +176,7 @@ provider "helm" {
 
   kubernetes {
     config_path    = "${path.module}/kubeconfig"
-    config_context = lower("default/api-${var.label}-${var.account}-${region}-aroapp-io:6443/terraform-sa")
+    config_context = lower("default/api-${var.label}-${var.account}-${var.region}-aroapp-io:6443/terraform-sa")
 
     #host                   = module.cluster.kubernetes_host
     #client_certificate     = module.cluster.kubernetes_client_certificate
@@ -299,6 +299,6 @@ resource "local_file" "kubeconfig" {
   depends_on = [
     module.cluster
   ]
-  name     = "${path.module}/kubeconfig"
-  contents = module.cluster.kube_config_file
+  filename = "${path.module}/kubeconfig"
+  content  = module.cluster.kube_config_file
 }
