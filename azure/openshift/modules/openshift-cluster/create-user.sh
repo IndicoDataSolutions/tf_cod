@@ -149,6 +149,9 @@ cat $key_file > $kubernetes_client_key
 kubernetes_cluster_ca_certificate=/tmp/${name}-${resource_group}.kubernetes_cluster_ca_certificate
 cat $ca_crt > $kubernetes_cluster_ca_certificate
 
+kube_config_file=/tmp/${name}-${resource_group}.kube_config
+cp $NEW_KUBECONFIG $kube_config_file
+
 #echo "kubernetes_host"
 #cat $kubernetes_host
 

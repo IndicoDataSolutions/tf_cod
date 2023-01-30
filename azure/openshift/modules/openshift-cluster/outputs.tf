@@ -42,4 +42,8 @@ output "kubernetes_cluster_ca_certificate" {
   value = base64decode(data.local_file.kubernetes_cluster_ca_certificate.content)
 }
 
+output "kube_config_file" {
+  value = data.local_file.kube_config_file.content
+}
+
 

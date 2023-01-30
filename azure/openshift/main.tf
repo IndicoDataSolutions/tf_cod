@@ -150,28 +150,38 @@ provider "argocd" {
 }
 
 provider "kubernetes" {
-  host                   = module.cluster.kubernetes_host
-  client_certificate     = module.cluster.kubernetes_client_certificate
-  client_key             = module.cluster.kubernetes_client_key
-  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+  config_path    = "${path.module}/kubeconfig"
+  config_context = lower("default/api-${var.label}-${var.account}-${region}-aroapp-io:6443/terraform-sa")
+
+  ##host                   = module.cluster.kubernetes_host
+  #client_certificate     = module.cluster.kubernetes_client_certificate
+  #client_key             = module.cluster.kubernetes_client_key
+  #cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
 }
 
 provider "kubectl" {
-  host                   = module.cluster.kubernetes_host
-  client_certificate     = module.cluster.kubernetes_client_certificate
-  client_key             = module.cluster.kubernetes_client_key
-  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+  config_path    = "${path.module}/kubeconfig"
+  config_context = lower("default/api-${var.label}-${var.account}-${region}-aroapp-io:6443/terraform-sa")
 
-  load_config_file = false
+  #host                   = module.cluster.kubernetes_host
+  #client_certificate     = module.cluster.kubernetes_client_certificate
+  #client_key             = module.cluster.kubernetes_client_key
+  #cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+
+  load_config_file = true
 }
 
 provider "helm" {
   debug = true
+
   kubernetes {
-    host                   = module.cluster.kubernetes_host
-    client_certificate     = module.cluster.kubernetes_client_certificate
-    client_key             = module.cluster.kubernetes_client_key
-    cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+    config_path    = "${path.module}/kubeconfig"
+    config_context = lower("default/api-${var.label}-${var.account}-${region}-aroapp-io:6443/terraform-sa")
+
+    #host                   = module.cluster.kubernetes_host
+    #client_certificate     = module.cluster.kubernetes_client_certificate
+    #client_key             = module.cluster.kubernetes_client_key
+    #cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
   }
 }
 
@@ -283,4 +293,12 @@ module "cluster" {
   # az provider register --namespace Microsoft.ContainerService
   #enable_workload_identity = true # requires: az feature register --namespace "Microsoft.ContainerService" --name "EnableWorkloadIdentityPreview"
   #enable_oidc_issuer       = true
+}
+
+resource "local_file" {
+  depends_on = [
+    module.cluster
+  ]
+  name     = "${path.module}/kubeconfig"
+  contents = module.cluster.kube_config_file
 }

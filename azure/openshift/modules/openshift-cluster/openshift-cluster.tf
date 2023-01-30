@@ -76,3 +76,11 @@ data "local_file" "kubernetes_cluster_ca_certificate" {
   ]
   filename = "/tmp/${var.label}-${var.resource_group_name}.kubernetes_cluster_ca_certificate"
 }
+
+data "local_file" "kube_config_file" {
+  depends_on = [
+    null_resource.create-user
+  ]
+  filename = "/tmp/${var.label}-${var.resource_group_name}.kube_config_file"
+}
+
