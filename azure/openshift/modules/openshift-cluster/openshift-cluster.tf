@@ -81,6 +81,6 @@ data "local_file" "kube_config_file" {
   depends_on = [
     null_resource.create-user
   ]
-  filename = "/tmp/${var.label}-${var.resource_group_name}.kube_config_file"
+  filename = "/tmp/${var.label}-${var.resource_group_name}.kube_config"
 }
 
