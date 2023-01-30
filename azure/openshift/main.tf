@@ -150,7 +150,7 @@ provider "argocd" {
 }
 
 provider "kubernetes" {
-  config_path    = "${path.module}/kubeconfig"
+  config_path    = local_file.kubeconfig.filename
   config_context = lower("default/api-${var.label}-${var.account}-${var.region}-aroapp-io:6443/terraform-sa")
 
   ##host                   = module.cluster.kubernetes_host
@@ -160,7 +160,7 @@ provider "kubernetes" {
 }
 
 provider "kubectl" {
-  config_path    = "${path.module}/kubeconfig"
+  config_path    = local_file.kubeconfig.filename
   config_context = lower("default/api-${var.label}-${var.account}-${var.region}-aroapp-io:6443/terraform-sa")
 
   #host                   = module.cluster.kubernetes_host
@@ -175,7 +175,7 @@ provider "helm" {
   debug = true
 
   kubernetes {
-    config_path    = "${path.module}/kubeconfig"
+    config_path    = local_file.kubeconfig.filename
     config_context = lower("default/api-${var.label}-${var.account}-${var.region}-aroapp-io:6443/terraform-sa")
 
     #host                   = module.cluster.kubernetes_host
