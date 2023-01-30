@@ -31,15 +31,15 @@ output "kubernetes_host" {
 }
 
 output "kubernetes_client_certificate" {
-  value = trimspace(data.local_file.kubernetes_client_certificate.content)
+  value = base64encode(data.local_file.kubernetes_client_certificate.content)
 }
 
 output "kubernetes_client_key" {
-  value = trimspace(data.local_file.kubernetes_client_key.content)
+  value = base64encode(data.local_file.kubernetes_client_key.content)
 }
 
 output "kubernetes_cluster_ca_certificate" {
-  value = trimspace(data.local_file.kubernetes_cluster_ca_certificate.content)
+  value = base64encode(data.local_file.kubernetes_cluster_ca_certificate.content)
 }
 
 
