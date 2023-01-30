@@ -23,12 +23,12 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
 
   deployment_mode = "Incremental"
 
-  #lifecycle {
-  #  ignore_changes = [
-  #    template_content,
-  #    parameters_content
-  #  ]
-  #}
+  lifecycle {
+    ignore_changes = [
+      template_content,
+      parameters_content
+    ]
+  }
 }
 
 resource "null_resource" "create-user" {
@@ -96,6 +96,7 @@ data "local_file" "kube_config_file" {
   filename = "/tmp/${var.label}-${var.resource_group_name}.kube_config"
 }
 
+
 resource "vault_kv_secret_v2" "kubernetes-credentials" {
   mount = "terraform"
   name  = var.vault_path
@@ -109,11 +110,11 @@ resource "vault_kv_secret_v2" "kubernetes-credentials" {
       console_ip                        = data.local_file.openshift_console_ip.content
     }
   )
-  lifecycle {
-    ignore_changes = [
-      data_json
-    ]
-  }
+  #lifecycle {
+  #  ignore_changes = [
+  #    data_json
+  #  ]
+  #}
 }
 
 data "vault_kv_secret_v2" "kubernetes-credentials" {
