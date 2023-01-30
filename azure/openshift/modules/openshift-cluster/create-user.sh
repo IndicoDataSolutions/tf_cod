@@ -47,8 +47,8 @@ api_url=$(cat $info_file | jq -r '.apiUrl')
 console_ip=$(cat $info_file | jq -r '.consoleIp')
 console_url=$(cat $info_file | jq -r '.consoleUrl')
 
-echo oc login $api_url --username "${username}" --password "${password}" --kubeconfig $NEW_KUBECONFIG
-oc login $api_url --username "${username}" --password "${password}" --kubeconfig $NEW_KUBECONFIG
+echo oc login $api_url --username "${username}" --password "${password}" --kubeconfig $NEW_KUBECONFIG --insecure-skip-tls-verify=true
+oc login $api_url --username "${username}" --password "${password}" --kubeconfig $NEW_KUBECONFIG --insecure-skip-tls-verify=true
 cat $NEW_KUBECONFIG
 export KUBECONFIG=$NEW_KUBECONFIG
 

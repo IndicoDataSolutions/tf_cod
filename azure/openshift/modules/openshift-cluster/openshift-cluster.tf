@@ -97,6 +97,11 @@ data "local_file" "kube_config_file" {
 }
 
 
+# missing:
+# kubernetes_client_certificate
+# kubernetes_cluster_ca_certificate
+# kubernetes_host
+
 resource "vault_kv_secret_v2" "kubernetes-credentials" {
   mount = "terraform"
   name  = var.vault_path
