@@ -39,7 +39,7 @@ output "kubernetes_client_key" {
 }
 
 output "kubernetes_cluster_ca_certificate" {
-  value = data.local_file.kubernetes_cluster_ca_certificate.content
+  value = base64decode(data.local_file.kubernetes_cluster_ca_certificate.content)
 }
 
 
