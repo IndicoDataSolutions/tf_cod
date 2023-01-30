@@ -1,4 +1,4 @@
-kc "gdresource" "kubernetes_secret" "issuer-secret" {
+resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
     local_file.kubeconfig
   ]
