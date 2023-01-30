@@ -16,7 +16,7 @@ output "id" {
 
 
 output "kubernetes_host" {
-  value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernnetes-host"]
+  value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernnetes_host"]
 }
 
 output "kubernetes_client_certificate" {
@@ -28,7 +28,7 @@ output "kubernetes_client_key" {
 }
 
 output "kubernetes_cluster_ca_certificate" {
-  value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernetes_clikubernetes_cluster_ca_certificateent_certificate"]
+  value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernetes_cluster_ca_certificate"]
 }
 
 output "openshift_api_server_ip" {
