@@ -16,7 +16,7 @@ output "id" {
 
 
 output "kubernetes_host" {
-  value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernnetes_host"]
+  value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernetes_host"]
 }
 
 output "kubernetes_client_certificate" {
