@@ -150,23 +150,23 @@ provider "argocd" {
 }
 
 provider "kubernetes" {
-  config_path    = local_file.kubeconfig.filename
-  config_context = lower("default/api-${var.label}-${var.account}-${var.region}-aroapp-io:6443/terraform-sa")
+  #config_path    = local_file.kubeconfig.filename
+  #config_context = lower("default/api-${var.label}-${var.account}-${var.region}-aroapp-io:6443/terraform-sa")
 
-  ##host                   = module.cluster.kubernetes_host
-  #client_certificate     = module.cluster.kubernetes_client_certificate
-  #client_key             = module.cluster.kubernetes_client_key
-  #cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+  host                   = module.cluster.kubernetes_host
+  client_certificate     = module.cluster.kubernetes_client_certificate
+  client_key             = module.cluster.kubernetes_client_key
+  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
 }
 
 provider "kubectl" {
   config_path    = local_file.kubeconfig.filename
   config_context = lower("default/api-${var.label}-${var.account}-${var.region}-aroapp-io:6443/terraform-sa")
 
-  #host                   = module.cluster.kubernetes_host
-  #client_certificate     = module.cluster.kubernetes_client_certificate
-  #client_key             = module.cluster.kubernetes_client_key
-  #cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+  host                   = module.cluster.kubernetes_host
+  client_certificate     = module.cluster.kubernetes_client_certificate
+  client_key             = module.cluster.kubernetes_client_key
+  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
 
   load_config_file = true
 }
@@ -175,13 +175,13 @@ provider "helm" {
   debug = true
 
   kubernetes {
-    config_path    = local_file.kubeconfig.filename
-    config_context = lower("default/api-${var.label}-${var.account}-${var.region}-aroapp-io:6443/terraform-sa")
+    #config_path    = local_file.kubeconfig.filename
+    #config_context = lower("default/api-${var.label}-${var.account}-${var.region}-aroapp-io:6443/terraform-sa")
 
-    #host                   = module.cluster.kubernetes_host
-    #client_certificate     = module.cluster.kubernetes_client_certificate
-    #client_key             = module.cluster.kubernetes_client_key
-    #cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+    host                   = module.cluster.kubernetes_host
+    client_certificate     = module.cluster.kubernetes_client_certificate
+    client_key             = module.cluster.kubernetes_client_key
+    cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
   }
 }
 
