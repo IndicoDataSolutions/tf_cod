@@ -15,35 +15,29 @@ output "id" {
 }
 
 
-#  Now, we get back the output of the script
-output "openshift_api_server_ip" {
-  value = "none"
-}
-
-output "openshift_console_ip" {
-  value = "none"
-}
-
-
-#  Now, we get back the output of the script
 output "kubernetes_host" {
-  value = trimspace(data.local_file.kubernetes_host.content)
+  value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernnetes-host"]
 }
 
 output "kubernetes_client_certificate" {
-  value = data.local_file.kubernetes_client_certificate.content
+  value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernetes_client_certificate"]
 }
 
 output "kubernetes_client_key" {
-  value = data.local_file.kubernetes_client_key.content
+  value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernetes_client_key"]
 }
 
 output "kubernetes_cluster_ca_certificate" {
-  value = base64decode(data.local_file.kubernetes_cluster_ca_certificate.content)
+  value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernetes_clikubernetes_cluster_ca_certificateent_certificate"]
 }
 
-output "kube_config_file" {
-  value = data.local_file.kube_config_file.content
+output "openshift_api_server_ip" {
+  value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["api_ip"]
 }
+
+output "openshift_console_ip" {
+  value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["console_ip"]
+}
+
 
 

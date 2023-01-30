@@ -59,8 +59,6 @@ if [ $? -eq 0 ]; then
   oc get user
 fi
 
-
-
 oc get user terraform-sa
 [ $? -eq 0 ] && oc delete user terraform-sa
 oc create user terraform-sa
@@ -151,6 +149,9 @@ cat $ca_crt > $kubernetes_cluster_ca_certificate
 
 kube_config_file=/tmp/${name}-${resource_group}.kube_config
 cp $NEW_KUBECONFIG $kube_config_file
+
+echo $api_ip > /tmp/${name}-${resource_group}.openshift_api_ip
+echo $console_ip > /tmp/${name}-${resource_group}.openshift_console_ip
 
 #echo "kubernetes_host"
 #cat $kubernetes_host

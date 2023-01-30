@@ -57,3 +57,7 @@ variable "enable_oidc_issuer" {
 variable "subscriptionId" {
   type = string
 }
+
+variable "vault_path" {
+  # account-region-label
+}

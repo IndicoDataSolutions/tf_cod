@@ -31,8 +31,6 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
   }
 }
 
-
-
 resource "null_resource" "create-user" {
   triggers = {
     always_run = "${timestamp()}"
@@ -47,6 +45,20 @@ resource "null_resource" "create-user" {
     command     = "${path.module}/create-user.sh ${var.label} ${var.resource_group_name}"
     interpreter = ["/bin/bash", "-c"]
   }
+}
+
+data "local_file" "openshift_console_ip" {
+  depends_on = [
+    null_resource.create-user
+  ]
+  filename = "/tmp/${var.label}-${var.resource_group_name}.openshift_console_ip"
+}
+
+data "local_file" "openshift_api_ip" {
+  depends_on = [
+    null_resource.create-user
+  ]
+  filename = "/tmp/${var.label}-${var.resource_group_name}.openshift_api_ip"
 }
 
 data "local_file" "kubernetes_host" {
@@ -82,5 +94,33 @@ data "local_file" "kube_config_file" {
     null_resource.create-user
   ]
   filename = "/tmp/${var.label}-${var.resource_group_name}.kube_config"
+}
+
+resource "vault_kv_secret_v2" "kubernetes-credentials" {
+  mount = "terraform"
+  name  = var.vault_path
+  data_json = jsonencode(
+    {
+      kubernetes_host                   = trimspace(data.local_file.kubernetes_host.content),
+      kubernetes_client_certificate     = data.local_file.kubernetes_client_certificate.content,
+      kubernetes_client_key             = data.local_file.kubernetes_client_key.content,
+      kubernetes_cluster_ca_certificate = base64decode(data.local_file.kubernetes_cluster_ca_certificate.content),
+      api_ip                            = data.local_file.openshift_api_ip.content,
+      console_ip                        = data.local_file.openshift_console_ip.content
+    }
+  )
+  lifecycle {
+    ignore_changes = [
+      data_json
+    ]
+  }
+}
+
+data "vault_kv_secret_v2" "kubernetes-credentials" {
+  depends_on = [
+    vault_kv_secret_v2.kubernetes-credentials
+  ]
+  mount = "terraform"
+  name  = var.vault_path
 }
 
