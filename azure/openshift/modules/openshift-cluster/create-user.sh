@@ -60,6 +60,8 @@ do
   fi
 done
 
+curl $api_url/version
+
 cert_valid="false"
 retry_attempts=10
 until [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
