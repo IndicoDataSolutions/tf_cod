@@ -71,8 +71,9 @@ do
   else
     api_host=$(basename $api_url)
     echo "openssl s_client -showcerts -connect $api_host"
-    openssl s_client -quiet -showcerts -connect $api_host
+    echo "Q" | openssl s_client -quiet -showcerts -connect $api_host
     echo "Error: x509 Cert Invalid.. ${retry_attempts}"
+    curl $api_url/version
     sleep 30
     ((retry_attempts--))
   fi
