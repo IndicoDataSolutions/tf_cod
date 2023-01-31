@@ -60,13 +60,14 @@ do
   fi
 done
 
+export KUBECONFIG=$NEW_KUBECONFIG
 curl $api_url/version
 
 cert_valid="false"
 retry_attempts=10
 until [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
 do
-  oc get csr
+  oc --kubeconfig $NEW_KUBECONFIG get csr
   if [ $? -eq 0 ]; then
     echo "Successfully tested certificates $api_url"
     cert_valid="true"
@@ -80,9 +81,6 @@ do
     ((retry_attempts--))
   fi
 done
-
-cat $NEW_KUBECONFIG
-export KUBECONFIG=$NEW_KUBECONFIG
 
 oc whoami
 oc get csr ${name}-${resource_group}-access
