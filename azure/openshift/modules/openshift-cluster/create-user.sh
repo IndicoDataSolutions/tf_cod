@@ -31,8 +31,20 @@ if [ -f $info_file ]; then
 fi
 
 az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
+if [ $? -ne 0 ]; then
+  echo "Failed to login"
+ exit 1
+fi
 az aro list-credentials --name "$1" --resource-group "$2" --output json > $creds_file
+if [ $? -ne 0 ]; then
+  echo "Failed to list-credentials"
+ exit 1
+fi
 az aro show --name "$1" --resource-group "$2" --query '{api:apiserverProfile.ip, consoleIp:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json > $info_file
+if [ $? -ne 0 ]; then
+  echo "Failed to show cluster information"
+ exit 1
+fi
 
 cat $creds_file
 cat $info_file
@@ -46,26 +58,33 @@ console_url=$(cat $info_file | jq -r '.consoleUrl')
 
 retry_attempts=40
 cert_valid="false"
+success_atempts=0
+needed_success_attempts=5
 until [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
 do
-  curl -v --connect-timeout 30 $api_url/version
+  curl -v --connect-timeout 30 ${api_url}version
   if [ $? -eq 0 ]; then
     echo "Certificate is valid [$retry_attempt]"
-    cert_valid="true"
+    ((success_atempts++))
+    if [ $success_atempts -ge $needed_success_attempts ]; then
+      cert_valid="true"
+    else
+      echo "Success attempt ${success_attempts} of $needed_success_attempts"
+    fi
   else
     echo "Error: Invalid curl cert trying again in 30 seconds... ${retry_attempts}"
     sleep 30
     ((retry_attempts--))
   fi
 done
-
+echo "Retry atemps: ${retry_attempts}"
 
 logged_in="false"
 retry_attempts=40
 until [ $logged_in == "true" ] || [ $retry_attempts -le 0 ]
 do
   # if you use --insecure-skip-tls-verify=true then the sa account will prompt for a password on the oc login below
-  oc login --loglevel=10 $api_url --username "${username}" --password "${password}" --kubeconfig $NEW_KUBECONFIG
+  oc login --loglevel=1 $api_url --username "${username}" --password "${password}" --kubeconfig $NEW_KUBECONFIG
   if [ $? -eq 0 ]; then
     echo "Successfully Logged in to new cluster $api_url"
     logged_in="true"
@@ -75,6 +94,7 @@ do
     ((retry_attempts--))
   fi
 done
+echo "Retry atemps: ${retry_attempts}"
 
 export KUBECONFIG=$NEW_KUBECONFIG
 curl -v $api_url/version
@@ -97,6 +117,8 @@ do
     ((retry_attempts--))
   fi
 done
+echo "Retry atemps: ${retry_attempts}"
+
 
 oc whoami
 oc get csr ${name}-${resource_group}-access
@@ -161,7 +183,9 @@ oc config use-context terraform-sa --kubeconfig=$NEW_KUBECONFIG
 
 oc whoami 
 export KUBECONFIG=$NEW_KUBECONFIG
+set -e
 oc login -u terraform-sa
+set +e
 oc whoami
 oc get ns | grep terraform-sa
 [ $? -ne 0 ] && oc create ns terraform-sa
@@ -199,6 +223,7 @@ cp $NEW_KUBECONFIG $kube_config_file
 echo $api_ip > /tmp/${name}-${resource_group}.openshift_api_ip
 echo $console_ip > /tmp/${name}-${resource_group}.openshift_console_ip
 
+echo "Completed login"
 #echo "kubernetes_host"
 #cat $kubernetes_host
 
@@ -210,3 +235,4 @@ echo $console_ip > /tmp/${name}-${resource_group}.openshift_console_ip
 
 #echo "kubernetes_cluster_ca_certificate"
 #cat $kubernetes_cluster_ca_certificate
+echo "to use: export KUBECONFIG=$PWD/$name.kubeconfig"
