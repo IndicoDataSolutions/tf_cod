@@ -58,20 +58,22 @@ console_url=$(cat $info_file | jq -r '.consoleUrl')
 
 retry_attempts=40
 cert_valid="false"
-success_atempts=0
+success_attempts=0
 needed_success_attempts=5
 until [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
 do
   curl -v --connect-timeout 30 ${api_url}version
   if [ $? -eq 0 ]; then
     echo "Certificate is valid [$retry_attempt]"
-    ((success_atempts++))
-    if [ $success_atempts -ge $needed_success_attempts ]; then
+    ((success_attempts++))
+    sleep 10
+    if [ $success_attempts -ge $needed_success_attempts ]; then
       cert_valid="true"
     else
       echo "Success attempt ${success_attempts} of $needed_success_attempts"
     fi
   else
+    success_attempts=0
     echo "Error: Invalid curl cert trying again in 30 seconds... ${retry_attempts}"
     sleep 30
     ((retry_attempts--))
