@@ -69,6 +69,9 @@ do
     echo "Successfully tested certificates $api_url"
     cert_valid="true"
   else
+    api_host=$(basename $api_url)
+    echo "openssl s_client -showcerts -connect $api_host"
+    openssl s_client -quiet -showcerts -connect $api_host
     echo "Error: x509 Cert Invalid.. ${retry_attempts}"
     sleep 30
     ((retry_attempts--))
