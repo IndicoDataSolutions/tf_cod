@@ -60,6 +60,21 @@ do
   fi
 done
 
+cert_valid="false"
+retry_attempts=10
+until [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
+do
+  oc get csr
+  if [ $? -eq 0 ]; then
+    echo "Successfully tested certificates $api_url"
+    cert_valid="true"
+  else
+    echo "Error: x509 Cert Invalid.. ${retry_attempts}"
+    sleep 30
+    ((retry_attempts--))
+  fi
+done
+
 cat $NEW_KUBECONFIG
 export KUBECONFIG=$NEW_KUBECONFIG
 
