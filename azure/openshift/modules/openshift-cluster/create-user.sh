@@ -4,15 +4,12 @@ name=$1
 resource_group=$2
 kube_config=$3
 
-
 access_crt=/tmp/${name}-${resource_group}-access.crt
 ca_crt=/tmp/${name}-${resource_group}-ca.crt
 crb_yaml=/tmp/${name}-${resource_group}-crb.yaml
 csr_yaml=/tmp/${name}-${resource_group}-csr.yaml
 csr_file=/tmp/${name}-${resource_group}.csr
 key_file=/tmp/${name}-${resource_group}.key
-
-
 
 NEW_KUBECONFIG="/tmp/.${name}-${resource_group}_kubeconfig"
 
@@ -47,8 +44,21 @@ api_url=$(cat $info_file | jq -r '.apiUrl')
 console_ip=$(cat $info_file | jq -r '.consoleIp')
 console_url=$(cat $info_file | jq -r '.consoleUrl')
 
-echo oc login $api_url --username "${username}" --password "${password}" --kubeconfig $NEW_KUBECONFIG --insecure-skip-tls-verify=true
-oc login $api_url --username "${username}" --password "${password}" --kubeconfig $NEW_KUBECONFIG --insecure-skip-tls-verify=true
+logged_in="false"
+retry_attempts=10
+until [ $logged_in == "true" ] || [ $retry_attempts -le 0 ]
+do
+  oc login $api_url --username "${username}" --password "${password}" --kubeconfig $NEW_KUBECONFIG --insecure-skip-tls-verify=false
+  if [ $? -eq 0 ]; then
+    echo "Successfully Logged in to new cluster $api_url"
+    logged_in="true"
+  else
+    echo "Error: Unable to login, waiting for certificate to become valid, trying again in 30 seconds... ${retry_attempts}"
+    sleep 30
+    ((retry_attempts--))
+  fi
+done
+
 cat $NEW_KUBECONFIG
 export KUBECONFIG=$NEW_KUBECONFIG
 
