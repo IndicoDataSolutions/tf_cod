@@ -59,7 +59,7 @@ console_url=$(cat $info_file | jq -r '.consoleUrl')
 retry_attempts=40
 cert_valid="false"
 success_attempts=0
-needed_success_attempts=5
+needed_success_attempts=6
 until [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
 do
   curl -v --connect-timeout 30 ${api_url}version

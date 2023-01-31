@@ -130,4 +130,3 @@ data "vault_kv_secret_v2" "kubernetes-credentials" {
   mount = "terraform"
   name  = var.vault_path
 }
-

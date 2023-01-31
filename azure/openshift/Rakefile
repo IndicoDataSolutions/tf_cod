@@ -13,7 +13,7 @@ task :verify do
   ENV['TF_VAR_vault_password'] = ENV['VAULT_PASSWORD']
   ENV['TF_VAR_vault_username'] = ENV['VAULT_USERNAME']
   ENV['TF_VAR_account'] = 'indico-dev-azure'
-  ENV['TF_VAR_label'] = 'terraform'
+  ENV['TF_VAR_label'] = 'os4'
   ENV['TF_VAR_argo_enabled'] = 'false'
   ENV['TF_VAR_ipa_smoketest_enabled'] = 'false'
 

@@ -203,19 +203,19 @@ module "argo-registration" {
 provider "local" {}
 
 locals {
-  resource_group_name = "${var.label}-${var.region}"
-  current_ip          = "${chomp(data.http.workstation-external-ip.response_body)}/20"
-
+  resource_group_name     = "${var.label}-${var.region}"
+  current_ip              = "${chomp(data.http.workstation-external-ip.response_body)}/20"
   storage_account_name    = replace(lower("${var.account}snapshots"), "-", "")
   argo_app_name           = lower("${var.account}.${var.region}.${var.label}-ipa")
   argo_cluster_name       = "${var.account}.${var.region}.${var.label}"
   argo_smoketest_app_name = lower("${var.account}.${var.region}.${var.label}-smoketest")
-
-  cluster_name = var.label
-  base_domain  = lower("${var.account}.${var.domain_suffix}")                            # indico-dev-azure.indico.io
-  dns_prefix   = lower("${var.label}.${var.region}")                                     # os1.eastus
-  dns_name     = lower("${var.label}.${var.region}.${var.account}.${var.domain_suffix}") # os1.eastus.indico-dev-azure.indico.io
+  cluster_name            = var.label
+  base_domain             = lower("${var.account}.${var.domain_suffix}")                            # indico-dev-azure.indico.io
+  dns_prefix              = lower("${var.label}.${var.region}")                                     # os1.eastus
+  dns_name                = lower("${var.label}.${var.region}.${var.account}.${var.domain_suffix}") # os1.eastus.indico-dev-azure.indico.io
+  infrastructure_id       = data.kubernetes_resource.infrastructure-cluster.object.status.infrastructureName
 }
+
 
 resource "tls_private_key" "pk" {
   algorithm = "RSA"
@@ -286,3 +286,21 @@ module "cluster" {
   #enable_workload_identity = true # requires: az feature register --namespace "Microsoft.ContainerService" --name "EnableWorkloadIdentityPreview"
   #enable_oidc_issuer       = true
 }
+
+data "kubernetes_resource" "infrastructure-cluster" {
+  depends_on = [
+    module.cluster
+  ]
+  api_version = "config.openshift.io/v1"
+  kind        = "Infrastructure"
+
+  metadata {
+    name = "cluster"
+  }
+}
+
+output "infrastructure_id" {
+  value = local.infrastructure_id
+}
+
+
