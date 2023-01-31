@@ -44,8 +44,24 @@ api_url=$(cat $info_file | jq -r '.apiUrl')
 console_ip=$(cat $info_file | jq -r '.consoleIp')
 console_url=$(cat $info_file | jq -r '.consoleUrl')
 
+retry_attempts=40
+cert_valid="false"
+until [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
+do
+  curl -v --connect-timeout 30 $api_url/version
+  if [ $? -eq 0 ]; then
+    echo "Certificate is valid [$retry_attempt]"
+    cert_valid="true"
+  else
+    echo "Error: Invalid curl cert trying again in 30 seconds... ${retry_attempts}"
+    sleep 30
+    ((retry_attempts--))
+  fi
+done
+
+
 logged_in="false"
-retry_attempts=30
+retry_attempts=40
 until [ $logged_in == "true" ] || [ $retry_attempts -le 0 ]
 do
   # if you use --insecure-skip-tls-verify=true then the sa account will prompt for a password on the oc login below
@@ -64,7 +80,7 @@ export KUBECONFIG=$NEW_KUBECONFIG
 curl -v $api_url/version
 
 cert_valid="false"
-retry_attempts=10
+retry_attempts=30
 until [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
 do
   oc --kubeconfig $NEW_KUBECONFIG get csr
