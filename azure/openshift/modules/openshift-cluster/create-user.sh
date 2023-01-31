@@ -61,7 +61,7 @@ do
 done
 
 export KUBECONFIG=$NEW_KUBECONFIG
-curl $api_url/version
+curl -v $api_url/version
 
 cert_valid="false"
 retry_attempts=10
@@ -76,7 +76,7 @@ do
     echo "openssl s_client -showcerts -connect $api_host"
     echo "Q" | openssl s_client -quiet -showcerts -connect $api_host
     echo "Error: x509 Cert Invalid.. ${retry_attempts}"
-    curl $api_url/version
+    curl -v $api_url/version
     sleep 30
     ((retry_attempts--))
   fi
