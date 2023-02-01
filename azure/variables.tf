@@ -268,7 +268,7 @@ variable "openshift_machine_sets" {
     node_os                        = "n/a"
     pool_name                      = "n/a"
     taints                         = []
-    labels                         = {}}
+    labels                         = {}
     cluster_auto_scaling           = false
     cluster_auto_scaling_min_count = 0
     cluster_auto_scaling_max_count = 0
