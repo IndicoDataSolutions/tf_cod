@@ -203,6 +203,7 @@ variable "default_node_pool" {
     cluster_auto_scaling_min_count = number
     cluster_auto_scaling_max_count = number
   })
+  default = {}
 }
 
 variable "additional_node_pools" {
@@ -218,7 +219,27 @@ variable "additional_node_pools" {
     cluster_auto_scaling_min_count = number
     cluster_auto_scaling_max_count = number
   }))
+  default = {}
 }
+
+
+variable "openshift_machine_sets" {
+  type = map(object({
+    node_count                     = number
+    vm_size                        = string
+    zones                          = list(string)
+    node_os                        = string
+    pool_name                      = string
+    taints                         = list(string)
+    labels                         = map(string)
+    cluster_auto_scaling           = bool
+    cluster_auto_scaling_min_count = number
+    cluster_auto_scaling_max_count = number
+    storageAccountType             = string
+  }))
+  default = {}
+}
+
 
 variable "applications" {
   type = map(object({

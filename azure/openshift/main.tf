@@ -215,7 +215,7 @@ locals {
   dns_name                = lower("${var.label}.${var.region}.${var.account}.${var.domain_suffix}") # os1.eastus.indico-dev-azure.indico.io
   infrastructure_id       = data.kubernetes_resource.infrastructure-cluster.object.status.infrastructureName
   machinesets = flatten([
-    for key, group in var.additional_node_pools : {
+    for key, group in var.openshift_machine_sets : {
       name                           = key
       pool_name                      = group.pool_name
       vm_size                        = group.vm_size
