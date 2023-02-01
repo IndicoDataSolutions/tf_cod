@@ -205,20 +205,18 @@ variable "default_node_pool" {
   })
 
   default = {
-    "empty" = {
-      cluster_auto_scaling           = false
-      cluster_auto_scaling_max_count = 1
-      cluster_auto_scaling_min_count = 1
-      labels = {
-        "key" = "value"
-      }
-      node_count = 1
-      node_os    = "value"
-      pool_name  = "value"
-      taints     = ["value"]
-      vm_size    = "value"
-      zones      = ["value"]
+    cluster_auto_scaling           = false
+    cluster_auto_scaling_max_count = 1
+    cluster_auto_scaling_min_count = 1
+    labels = {
+      "key" = "value"
     }
+    node_count = 1
+    node_os    = "value"
+    pool_name  = "value"
+    taints     = ["value"]
+    vm_size    = "value"
+    zones      = ["value"]
   }
 }
 
