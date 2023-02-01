@@ -220,14 +220,16 @@ variable "additional_node_pools" {
     cluster_auto_scaling_max_count = number
   }))
   default = {
-    name                           = ""
     node_count                     = 0
-    vm_size                        = ""
+    vm_size                        = "n/a"
     zones                          = []
-    taints                         = null
+    node_os                        = "n/a"
+    pool_name                      = "n/a"
+    taints                         = []
+    labels                         = {}}
     cluster_auto_scaling           = false
-    cluster_auto_scaling_min_count = null
-    cluster_auto_scaling_max_count = null
+    cluster_auto_scaling_min_count = 0
+    cluster_auto_scaling_max_count = 0
   }
 }
 
@@ -248,15 +250,17 @@ variable "openshift_machine_sets" {
   }))
 
   default = {
-    name                           = ""
     node_count                     = 0
-    vm_size                        = ""
+    vm_size                        = "n/a"
     zones                          = []
-    taints                         = null
+    node_os                        = "n/a"
+    pool_name                      = "n/a"
+    taints                         = []
+    labels                         = {}}
     cluster_auto_scaling           = false
-    cluster_auto_scaling_min_count = null
-    cluster_auto_scaling_max_count = null
-    storageAccountType             = ""
+    cluster_auto_scaling_min_count = 0
+    cluster_auto_scaling_max_count = 0
+    storageAccountType             = "n/a"
   }
 }
 
