@@ -162,7 +162,7 @@ resource "helm_release" "keda-monitoring" {
 }
 
 resource "helm_release" "opentelemetry-collector" {
-  count = var.monitoring_enabled == true ? 1 : 0
+  count = local.kube_prometheus_stack_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
     helm_release.monitoring
@@ -177,7 +177,7 @@ resource "helm_release" "opentelemetry-collector" {
 
 
   values = [<<EOF
-    enabled: ${local.kube_prometheus_stack_enabled}
+    enabled: true
     fullnameOverride: "collector-collector"
     mode: deployment
     tolerations:
