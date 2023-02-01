@@ -212,7 +212,7 @@ variable "default_node_pool" {
     node_os                        = "n/a"
     pool_name                      = "n/a"
     taints                         = []
-    cluster_auto_scaling           = false
+    cluster_auto_scaling           = {}
     cluster_auto_scaling_min_count = 0
     cluster_auto_scaling_max_count = 0
   }
@@ -241,7 +241,7 @@ variable "additional_node_pools" {
     pool_name                      = "n/a"
     taints                         = []
     labels                         = {}
-    cluster_auto_scaling           = false
+    cluster_auto_scaling           = {}
     cluster_auto_scaling_min_count = 0
     cluster_auto_scaling_max_count = 0
   }
@@ -272,7 +272,7 @@ variable "openshift_machine_sets" {
     pool_name                      = "n/a"
     taints                         = []
     labels                         = {}
-    cluster_auto_scaling           = false
+    cluster_auto_scaling           = {}
     cluster_auto_scaling_min_count = 0
     cluster_auto_scaling_max_count = 0
     storageAccountType             = "n/a"
