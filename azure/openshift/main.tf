@@ -222,6 +222,7 @@ locals {
       node_os                        = group.node_os
       zones                          = group.zones
       taints                         = group.taints
+      labels                         = group.labels
       cluster_auto_scaling_min_count = group.cluster_auto_scaling_min_count
       cluster_auto_scaling_max_count = group.cluster_auto_scaling_max_count
       storageAccountType             = group.storageAccountType
