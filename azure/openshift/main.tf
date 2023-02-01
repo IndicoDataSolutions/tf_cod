@@ -226,6 +226,7 @@ locals {
       cluster_auto_scaling_min_count = group.cluster_auto_scaling_min_count
       cluster_auto_scaling_max_count = group.cluster_auto_scaling_max_count
       storageAccountType             = group.storageAccountType
+      image                          = group.image
     }
   ])
 }
