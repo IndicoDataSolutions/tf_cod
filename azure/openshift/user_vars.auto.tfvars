@@ -73,7 +73,7 @@ openshift_machine_sets = {
   },
   staticworkers = {
     node_count = 1
-    pool_name  = "static"
+    pool_name  = "staticw"
     vm_size    = "Standard_D16_v3"
     node_os    = "Linux"
     zones      = ["1", "2"]
