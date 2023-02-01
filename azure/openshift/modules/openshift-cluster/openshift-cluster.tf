@@ -32,9 +32,9 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
 }
 
 resource "null_resource" "create-user" {
-  triggers = {
-    always_run = "${timestamp()}"
-  }
+  #triggers = {
+  #  always_run = "${timestamp()}"
+  #}
 
   depends_on = [
     azurerm_resource_group_template_deployment.openshift-cluster
