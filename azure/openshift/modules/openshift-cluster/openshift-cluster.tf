@@ -122,7 +122,6 @@ resource "vault_kv_secret_v2" "kubernetes-credentials" {
   }
 }
 
-
 data "vault_kv_secret_v2" "kubernetes-credentials" {
   depends_on = [
     vault_kv_secret_v2.kubernetes-credentials

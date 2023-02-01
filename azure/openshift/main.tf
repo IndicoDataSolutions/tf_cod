@@ -214,6 +214,18 @@ locals {
   dns_prefix              = lower("${var.label}.${var.region}")                                     # os1.eastus
   dns_name                = lower("${var.label}.${var.region}.${var.account}.${var.domain_suffix}") # os1.eastus.indico-dev-azure.indico.io
   infrastructure_id       = data.kubernetes_resource.infrastructure-cluster.object.status.infrastructureName
+  machinesets = flatten([
+    for key, group in var.additional_node_pools : {
+      name                           = key
+      pool_name                      = group.pool_name
+      vm_size                        = group.vm_size
+      node_os                        = group.node_os
+      zones                          = group.zones
+      taints                         = group.taints
+      cluster_auto_scaling_min_count = group.cluster_auto_scaling_min_count
+      cluster_auto_scaling_max_count = group.cluster_auto_scaling_max_count
+    }
+  ])
 }
 
 
@@ -303,4 +315,37 @@ output "infrastructure_id" {
   value = local.infrastructure_id
 }
 
+
+# Install the Machinesets now
+resource "helm_release" "openshift-crds" {
+  depends_on = [
+    module.cluster,
+    data.kubernetes_resource.infrastructure-cluster
+  ]
+
+  verify           = false
+  name             = "ipa-ms"
+  create_namespace = true
+  namespace        = "default"
+  repository       = var.ipa_repo
+  chart            = "openshift-crds"
+  version          = var.ipa_openshift_crds_version
+  timeout          = "600" # 10 minutes
+  wait             = true
+
+  values = [<<EOF
+machineset:
+  # oc get -o jsonpath='{.status.infrastructureName}{"\n"}' infrastructure cluster
+  infrastructureId: ${local.infrastructure_id}
+  region: ${var.region}
+  networkResourceGroup: ${var.label}-${var.region}
+  clusterResourceGroup: aro-${var.label}-${var.region}
+  workerSubnetId: indico-worker-${var.label}-${var.region}
+  vnetId: ${var.label}-vnet
+
+machineSets:
+${yamlencode(local.machinesets)}
+  EOF
+  ]
+}
 
