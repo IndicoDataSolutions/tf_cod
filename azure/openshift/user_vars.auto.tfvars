@@ -41,6 +41,7 @@ additional_node_pools = {
     cluster_auto_scaling           = true
     cluster_auto_scaling_min_count = 0
     cluster_auto_scaling_max_count = 5
+    storageAccountType             = "StandardSSD_LRS"
   },
   celeryworkers = {
     node_count = 0
@@ -55,6 +56,7 @@ additional_node_pools = {
     cluster_auto_scaling           = true
     cluster_auto_scaling_min_count = 0
     cluster_auto_scaling_max_count = 20
+    storageAccountType             = "StandardSSD_LRS"
   },
   staticworkers = {
     node_count = 1
@@ -69,6 +71,7 @@ additional_node_pools = {
     cluster_auto_scaling           = true
     cluster_auto_scaling_min_count = 1
     cluster_auto_scaling_max_count = 20
+    storageAccountType             = "StandardSSD_LRS"
   },
   pdfworkers = {
     node_count = 1
@@ -83,6 +86,7 @@ additional_node_pools = {
     cluster_auto_scaling           = true
     cluster_auto_scaling_min_count = 0
     cluster_auto_scaling_max_count = 5
+    storageAccountType             = "StandardSSD_LRS"
   },
   highmemworkers = {
     node_count = 0
@@ -97,6 +101,7 @@ additional_node_pools = {
     cluster_auto_scaling           = true
     cluster_auto_scaling_min_count = 0
     cluster_auto_scaling_max_count = 3
+    storageAccountType             = "StandardSSD_LRS"
   },
   monitoringworkers = {
     node_count = 1
@@ -111,6 +116,7 @@ additional_node_pools = {
     cluster_auto_scaling           = true
     cluster_auto_scaling_min_count = 1
     cluster_auto_scaling_max_count = 4
+    storageAccountType             = "StandardSSD_LRS"
   },
   pgoworkers = {
     node_count = 1
@@ -125,5 +131,6 @@ additional_node_pools = {
     cluster_auto_scaling           = true
     cluster_auto_scaling_min_count = 1
     cluster_auto_scaling_max_count = 4
+    storageAccountType             = "StandardSSD_LRS"
   }
 }
