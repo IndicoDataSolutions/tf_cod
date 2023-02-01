@@ -13,7 +13,13 @@ variable "openshift_machine_sets" {
     cluster_auto_scaling_min_count = number
     cluster_auto_scaling_max_count = number
     storageAccountType             = string
-    image                          = map(object)
+    image = map(object({
+      offer      = string
+      publisher  = string
+      resourceID = string
+      sku        = string
+      version    = string
+    }))
   }))
 }
 
