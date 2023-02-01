@@ -205,13 +205,14 @@ variable "default_node_pool" {
   })
 
   default = {
+    name                           = "empty"
     cluster_auto_scaling           = false
-    cluster_auto_scaling_max_count = 1
-    cluster_auto_scaling_min_count = 1
+    cluster_auto_scaling_max_count = 0
+    cluster_auto_scaling_min_count = 0
     labels = {
       "key" = "value"
     }
-    node_count = 1
+    node_count = 0
     node_os    = "value"
     pool_name  = "value"
     taints     = ["value"]
