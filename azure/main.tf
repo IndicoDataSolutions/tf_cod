@@ -140,6 +140,8 @@ locals {
   base_domain  = lower("${var.account}.${var.domain_suffix}")
   dns_prefix   = lower("${var.label}.${var.region}")
   dns_name     = lower("${var.label}.${var.region}.${var.account}.${var.domain_suffix}")
+
+  monitoring_enabled = true
 }
 
 resource "tls_private_key" "pk" {

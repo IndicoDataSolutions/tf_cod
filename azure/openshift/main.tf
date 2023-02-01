@@ -229,6 +229,7 @@ locals {
       image                          = group.image
     }
   ])
+  monitoring_enabled = false
 }
 
 

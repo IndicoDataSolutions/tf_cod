@@ -31,7 +31,7 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
   }
 }
 
-resource "null_resource" "create-user" {
+resource "null_resource" "create-terraform-sa" {
   triggers = {
     always_run = "${timestamp()}"
   }
@@ -49,49 +49,49 @@ resource "null_resource" "create-user" {
 
 data "local_file" "openshift_console_ip" {
   depends_on = [
-    null_resource.create-user
+    null_resource.create-terraform-sa
   ]
   filename = "/tmp/${var.label}-${var.resource_group_name}.openshift_console_ip"
 }
 
 data "local_file" "openshift_api_ip" {
   depends_on = [
-    null_resource.create-user
+    null_resource.create-terraform-sa
   ]
   filename = "/tmp/${var.label}-${var.resource_group_name}.openshift_api_ip"
 }
 
 data "local_file" "kubernetes_host" {
   depends_on = [
-    null_resource.create-user
+    null_resource.create-terraform-sa
   ]
   filename = "/tmp/${var.label}-${var.resource_group_name}.kubernetes_host"
 }
 
 data "local_file" "kubernetes_client_certificate" {
   depends_on = [
-    null_resource.create-user
+    null_resource.create-terraform-sa
   ]
   filename = "/tmp/${var.label}-${var.resource_group_name}.kubernetes_client_certificate"
 }
 
 data "local_file" "kubernetes_client_key" {
   depends_on = [
-    null_resource.create-user
+    null_resource.create-terraform-sa
   ]
   filename = "/tmp/${var.label}-${var.resource_group_name}.kubernetes_client_key"
 }
 
 data "local_file" "kubernetes_cluster_ca_certificate" {
   depends_on = [
-    null_resource.create-user
+    null_resource.create-terraform-sa
   ]
   filename = "/tmp/${var.label}-${var.resource_group_name}.kubernetes_cluster_ca_certificate"
 }
 
 data "local_file" "kube_config_file" {
   depends_on = [
-    null_resource.create-user
+    null_resource.create-terraform-sa
   ]
   filename = "/tmp/${var.label}-${var.resource_group_name}.kube_config"
 }

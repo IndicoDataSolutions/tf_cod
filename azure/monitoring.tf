@@ -1,5 +1,5 @@
 resource "azurerm_dns_caa_record" "grafana-caa" {
-  count               = var.monitoring_enabled == true ? 1 : 0
+  count               = local.monitoring_enabled == true ? 1 : 0
   name                = lower("grafana.${local.dns_prefix}")
   zone_name           = data.azurerm_dns_zone.domain.name
   resource_group_name = var.common_resource_group
@@ -13,7 +13,7 @@ resource "azurerm_dns_caa_record" "grafana-caa" {
 
 
 resource "azurerm_dns_caa_record" "prometheus-caa" {
-  count               = var.monitoring_enabled == true ? 1 : 0
+  count               = local.monitoring_enabled == true ? 1 : 0
   name                = lower("prometheus.${local.dns_prefix}")
   zone_name           = data.azurerm_dns_zone.domain.name
   resource_group_name = var.common_resource_group
@@ -28,7 +28,7 @@ resource "azurerm_dns_caa_record" "prometheus-caa" {
 
 
 resource "azurerm_dns_caa_record" "alertmanager-caa" {
-  count               = var.monitoring_enabled == true ? 1 : 0
+  count               = local.monitoring_enabled == true ? 1 : 0
   name                = lower("alertmanager.${local.dns_prefix}")
   zone_name           = data.azurerm_dns_zone.domain.name
   resource_group_name = var.common_resource_group
@@ -58,7 +58,7 @@ output "monitoring-password" {
 
 
 resource "helm_release" "monitoring" {
-  count = var.monitoring_enabled == true ? 1 : 0
+  count = local.monitoring_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
     helm_release.ipa-pre-requisites,
@@ -116,7 +116,7 @@ resource "helm_release" "monitoring" {
 }
 
 resource "helm_release" "keda-monitoring" {
-  count = var.monitoring_enabled == true ? 1 : 0
+  count = local.monitoring_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
     helm_release.monitoring
@@ -158,7 +158,7 @@ resource "helm_release" "keda-monitoring" {
 }
 
 resource "helm_release" "opentelemetry-collector" {
-  count = var.monitoring_enabled == true ? 1 : 0
+  count = local.monitoring_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
     helm_release.monitoring
