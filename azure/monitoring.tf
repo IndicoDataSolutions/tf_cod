@@ -177,7 +177,7 @@ resource "helm_release" "opentelemetry-collector" {
 
 
   values = [<<EOF
-    enabled: true
+    enabled: ${local.kube_prometheus_stack_enabled}
     fullnameOverride: "collector-collector"
     mode: deployment
     tolerations:
