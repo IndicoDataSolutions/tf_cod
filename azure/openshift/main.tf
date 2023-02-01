@@ -229,7 +229,7 @@ locals {
       image                          = group.image
     }
   ])
-  kube_prometheus_stack_enabled = true
+  kube_prometheus_stack_enabled = false
 }
 
 
