@@ -15,6 +15,34 @@ storage_account_name    = "indicodatatest"
 cluster_manager_vm_size = "Standard_F2s"
 private_cluster_enabled = false
 
+default_node_pool = {
+  name                           = ""
+  node_count                     = 0
+  vm_size                        = ""
+  zones                          = []
+  taints                         = null
+  cluster_auto_scaling           = false
+  cluster_auto_scaling_min_count = null
+  cluster_auto_scaling_max_count = null
+}
+
+additional_node_pools = {
+  "empty" = {
+    cluster_auto_scaling           = false
+    cluster_auto_scaling_max_count = 1
+    cluster_auto_scaling_min_count = 1
+    labels = {
+      "key" = "value"
+    }
+    node_count = 1
+    node_os    = "value"
+    pool_name  = "value"
+    taints     = ["value"]
+    vm_size    = "value"
+    zones      = ["value"]
+  }
+}
+
 openshift_machine_sets = {
   gpuworkers = {
     node_count = 0
