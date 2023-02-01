@@ -13,6 +13,7 @@ variable "openshift_machine_sets" {
     cluster_auto_scaling_min_count = number
     cluster_auto_scaling_max_count = number
     storageAccountType             = string
+    image                          = map(object)
   }))
 }
 
@@ -36,7 +37,7 @@ variable "roles" {
 }
 variable "ipa_openshift_crds_version" {
   type    = string
-  default = "0.1.0"
+  default = "0.1.1"
 }
 
 variable "kubernetes_host" {

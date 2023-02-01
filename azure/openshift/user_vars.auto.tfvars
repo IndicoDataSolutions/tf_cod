@@ -15,33 +15,15 @@ storage_account_name    = "indicodatatest"
 cluster_manager_vm_size = "Standard_F2s"
 private_cluster_enabled = false
 
-default_node_pool = {
-  name                           = ""
-  node_count                     = 0
-  vm_size                        = ""
-  zones                          = []
-  taints                         = null
-  cluster_auto_scaling           = false
-  cluster_auto_scaling_min_count = null
-  cluster_auto_scaling_max_count = null
-}
-
-additional_node_pools = {
-  "empty" = {
-    cluster_auto_scaling           = false
-    cluster_auto_scaling_max_count = 1
-    cluster_auto_scaling_min_count = 1
-    labels = {
-      "key" = "value"
-    }
-    node_count = 1
-    node_os    = "value"
-    pool_name  = "value"
-    taints     = ["value"]
-    vm_size    = "value"
-    zones      = ["value"]
-  }
-}
+#
+#  az vm image list --all --offer aro4 --publisher azureopenshift -o table
+#
+#image:
+# offer: aro4
+# publisher: azureopenshift
+# resourceID: ""
+# sku: aro_410
+# version: 410.84.20220125
 
 openshift_machine_sets = {
   gpuworkers = {
@@ -59,6 +41,13 @@ openshift_machine_sets = {
     cluster_auto_scaling_min_count = 0
     cluster_auto_scaling_max_count = 5
     storageAccountType             = "StandardSSD_LRS"
+    image = {
+      offer     = "aro4"
+      publisher = "azureopenshift"
+      resourceID : ""
+      sku : "aro_410"
+      version : "410.84.20220125"
+    }
   },
   celeryworkers = {
     node_count = 0
@@ -74,6 +63,13 @@ openshift_machine_sets = {
     cluster_auto_scaling_min_count = 0
     cluster_auto_scaling_max_count = 20
     storageAccountType             = "StandardSSD_LRS"
+    image = {
+      offer     = "aro4"
+      publisher = "azureopenshift"
+      resourceID : ""
+      sku : "aro_410"
+      version : "410.84.20220125"
+    }
   },
   staticworkers = {
     node_count = 1
@@ -89,6 +85,13 @@ openshift_machine_sets = {
     cluster_auto_scaling_min_count = 1
     cluster_auto_scaling_max_count = 20
     storageAccountType             = "StandardSSD_LRS"
+    image = {
+      offer     = "aro4"
+      publisher = "azureopenshift"
+      resourceID : ""
+      sku : "aro_410"
+      version : "410.84.20220125"
+    }
   },
   pdfworkers = {
     node_count = 1
@@ -104,6 +107,13 @@ openshift_machine_sets = {
     cluster_auto_scaling_min_count = 0
     cluster_auto_scaling_max_count = 5
     storageAccountType             = "StandardSSD_LRS"
+    image = {
+      offer     = "aro4"
+      publisher = "azureopenshift"
+      resourceID : ""
+      sku : "aro_410"
+      version : "410.84.20220125"
+    }
   },
   highmemworkers = {
     node_count = 0
@@ -119,6 +129,13 @@ openshift_machine_sets = {
     cluster_auto_scaling_min_count = 0
     cluster_auto_scaling_max_count = 3
     storageAccountType             = "StandardSSD_LRS"
+    image = {
+      offer     = "aro4"
+      publisher = "azureopenshift"
+      resourceID : ""
+      sku : "aro_410"
+      version : "410.84.20220125"
+    }
   },
   monitoringworkers = {
     node_count = 1
@@ -134,6 +151,13 @@ openshift_machine_sets = {
     cluster_auto_scaling_min_count = 1
     cluster_auto_scaling_max_count = 4
     storageAccountType             = "StandardSSD_LRS"
+    image = {
+      offer     = "aro4"
+      publisher = "azureopenshift"
+      resourceID : ""
+      sku : "aro_410"
+      version : "410.84.20220125"
+    }
   },
   pgoworkers = {
     node_count = 1
@@ -149,5 +173,12 @@ openshift_machine_sets = {
     cluster_auto_scaling_min_count = 1
     cluster_auto_scaling_max_count = 4
     storageAccountType             = "StandardSSD_LRS"
+    image = {
+      offer     = "aro4"
+      publisher = "azureopenshift"
+      resourceID : ""
+      sku : "aro_410"
+      version : "410.84.20220125"
+    }
   }
 }
