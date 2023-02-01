@@ -234,6 +234,23 @@ variable "additional_node_pools" {
     cluster_auto_scaling_min_count = number
     cluster_auto_scaling_max_count = number
   }))
+
+  default = {
+    "empty" = {
+      cluster_auto_scaling           = false
+      cluster_auto_scaling_max_count = 0
+      cluster_auto_scaling_min_count = 0
+      labels = {
+        "key" = "value"
+      }
+      node_count = 1
+      node_os    = "value"
+      pool_name  = "value"
+      taints     = ["value"]
+      vm_size    = "value"
+      zones      = ["value"]
+    }
+  }
 }
 
 variable "applications" {
