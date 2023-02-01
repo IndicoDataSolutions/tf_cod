@@ -141,7 +141,7 @@ locals {
   dns_prefix   = lower("${var.label}.${var.region}")
   dns_name     = lower("${var.label}.${var.region}.${var.account}.${var.domain_suffix}")
 
-  monitoring_enabled = true
+  kube_prometheus_stack_enabled = true
 }
 
 resource "tls_private_key" "pk" {

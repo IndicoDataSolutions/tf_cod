@@ -229,7 +229,7 @@ locals {
       image                          = group.image
     }
   ])
-  monitoring_enabled = false
+  kube_prometheus_stack_enabled = true
 }
 
 
