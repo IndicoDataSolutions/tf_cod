@@ -205,6 +205,7 @@ variable "default_node_pool" {
   })
 
   default = {
+    name                           = "empty"
     node_count                     = 0
     vm_size                        = "n/a"
     zones                          = []
@@ -232,6 +233,7 @@ variable "additional_node_pools" {
   }))
 
   default = {
+    name                           = "empty"
     node_count                     = 0
     vm_size                        = "n/a"
     zones                          = []
@@ -262,6 +264,7 @@ variable "openshift_machine_sets" {
   }))
 
   default = {
+    name                           = "empty"
     node_count                     = 0
     vm_size                        = "n/a"
     zones                          = []
