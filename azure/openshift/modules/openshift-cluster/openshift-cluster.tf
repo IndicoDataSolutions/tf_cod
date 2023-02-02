@@ -146,6 +146,10 @@ resource "kubernetes_storage_class" "default" {
     annotations = {
       "storageclass.kubernetes.io/is-default-class" = "true"
     }
+    labels = {
+      "addonmanager.kubernetes.io/mode" = "EnsureExists"
+      "kubernetes.io/cluster-service"   = "true"
+    }
   }
   storage_provisioner = "disk.csi.azure.com"
   reclaim_policy      = "Delete"
