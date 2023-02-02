@@ -8,6 +8,7 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
   template_content = file("${path.module}/ARM-openShiftClusters.json")
 
   parameters_content = jsonencode({
+    "version"                  = { value = var.openshift-version }
     "clientId"                 = { value = var.svp_client_id }
     "clientSecret"             = { value = var.svp_client_secret }
     "clusterName"              = { value = var.label }

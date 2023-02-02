@@ -49,3 +49,7 @@ variable "ipa_openshift_crds_version" {
 variable "kubernetes_host" {
   default = ""
 }
+
+variable "openshift_version" {
+  default = "4.12.2"
+}

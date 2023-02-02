@@ -279,28 +279,20 @@ module "cluster" {
     module.networking,
     azurerm_resource_group.cod-cluster
   ]
-  vault_path        = lower("${var.account}-${var.region}-${var.label}")
-  subscriptionId    = split("/", data.azurerm_subscription.primary.id)[2]
-  pull_secret       = jsondecode(data.vault_kv_secret_v2.terraform-redhat.data_json)["openshift-pull-secret"]
-  cluster_domain    = lower("${var.label}-${var.account}")
-  source            = "./modules/openshift-cluster"
-  label             = var.label
-  region            = var.region
-  svp_client_id     = azuread_service_principal.openshift.application_id
-  svp_client_secret = azuread_application_password.application-secret.value
-  #default_node_pool       = var.default_node_pool
-  #additional_node_pools   = var.additional_node_pools
-  master_subnet_id = module.networking.subnet_id
-  worker_subnet_id = module.networking.worker_subnet_id
-  #k8s_version             = var.k8s_version
-  #private_cluster_enabled = var.private_cluster_enabled
+  source = "./modules/openshift-cluster"
+
+  openshift-version   = var.openshift_version
+  vault_path          = lower("${var.account}-${var.region}-${var.label}")
+  subscriptionId      = split("/", data.azurerm_subscription.primary.id)[2]
+  pull_secret         = jsondecode(data.vault_kv_secret_v2.terraform-redhat.data_json)["openshift-pull-secret"]
+  cluster_domain      = lower("${var.label}-${var.account}")
+  label               = var.label
+  region              = var.region
+  svp_client_id       = azuread_service_principal.openshift.application_id
+  svp_client_secret   = azuread_application_password.application-secret.value
+  master_subnet_id    = module.networking.subnet_id
+  worker_subnet_id    = module.networking.worker_subnet_id
   resource_group_name = local.resource_group_name
-  #admin_group_name        = var.admin_group_name
-  # this feature can be checked using:
-  # az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/EnableWorkloadIdentityPreview')].{Name:name,State:properties.state}"
-  # az provider register --namespace Microsoft.ContainerService
-  #enable_workload_identity = true # requires: az feature register --namespace "Microsoft.ContainerService" --name "EnableWorkloadIdentityPreview"
-  #enable_oidc_issuer       = true
 }
 
 data "kubernetes_resource" "infrastructure-cluster" {

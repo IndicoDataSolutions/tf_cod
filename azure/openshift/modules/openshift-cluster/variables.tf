@@ -61,3 +61,6 @@ variable "subscriptionId" {
 variable "vault_path" {
   # account-region-label
 }
+
+variable "openshift-version" {
+}

@@ -26,6 +26,12 @@
         "description": "The domain for the cluster (immutable)"
       }
     },
+    "version": {
+      "type": "String",
+      "metadata": {
+        "description": "The version for the cluster (immutable)"
+      }
+    },
     "tags": {
       "type": "String",
       "defaultValue": {
@@ -87,6 +93,7 @@
       "properties": {
         "consoleProfile": {},
         "clusterProfile": {
+          "version": "[parameters('version')]",
           "pullSecret": "[parameters('pullSecret')]",
           "domain": "[parameters('domain')]",
           "resourceGroupId": "[parameters('clusterResourceGroupId')]"

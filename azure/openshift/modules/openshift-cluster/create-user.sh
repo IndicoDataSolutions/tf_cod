@@ -1,5 +1,38 @@
 #!/bin/bash
 
+POSITIONAL_ARGS=()
+SKIP_VALIDATE=NO
+
+while [[ $# -gt 0 ]]; do
+  echo "Processing $1"
+  case $1 in
+    -e|--extension)
+      EXTENSION="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -s|--searchpath)
+      SEARCHPATH="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    --skip-validate)
+      SKIP_VALIDATE=YES
+      shift # past argument
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift # past argument
+      ;;
+  esac
+done
+
+set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
 name=$1
 resource_group=$2
 kube_config=$3
@@ -60,7 +93,7 @@ retry_attempts=40
 cert_valid="false"
 success_attempts=0
 needed_success_attempts=6
-until [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
+until [ $SKIP_VALIDATE=YES ] || [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
 do
   curl -v --connect-timeout 30 ${api_url}version
   if [ $? -eq 0 ]; then
@@ -103,7 +136,7 @@ curl -v $api_url/version
 
 cert_valid="false"
 retry_attempts=30
-until [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
+until [ $SKIP_VALIDATE=YES ] || [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
 do
   oc --kubeconfig $NEW_KUBECONFIG get csr
   if [ $? -eq 0 ]; then
