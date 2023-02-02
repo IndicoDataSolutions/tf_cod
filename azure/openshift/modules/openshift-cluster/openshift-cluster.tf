@@ -120,7 +120,7 @@ resource "vault_kv_secret_v2" "kubernetes-credentials" {
       kubernetes_cluster_ca_certificate = base64decode(data.local_file.kubernetes_cluster_ca_certificate.content),
       api_ip                            = data.local_file.openshift_api_ip.content,
       console_ip                        = data.local_file.openshift_console_ip.content,
-      kubernetes_credentials            = data.local_file.kubernets_credentials.content
+      kubernetes_credentials            = data.local_file.kubernetes_credentials.content
     }
   )
   lifecycle {
