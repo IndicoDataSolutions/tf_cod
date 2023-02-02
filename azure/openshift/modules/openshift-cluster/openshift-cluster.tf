@@ -138,3 +138,38 @@ data "vault_kv_secret_v2" "kubernetes-credentials" {
   mount = "terraform"
   name  = var.vault_path
 }
+
+
+resource "kubernetes_storage_class" "default" {
+  metadata {
+    name = "default"
+    annotations = {
+      "storageclass.kubernetes.io/is-default-class" = "true"
+    }
+  }
+  storage_provisioner = "disk.csi.azure.com"
+  reclaim_policy      = "Delete"
+  volume_binding_mode = "WaitForFirstConsumer"
+  parameters = {
+    skuname = "StandardSSD_LRS"
+  }
+
+}
+
+/*
+  allowVolumeExpansion: true
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+  labels:
+    addonmanager.kubernetes.io/mode: EnsureExists
+    kubernetes.io/cluster-service: "true"
+  name: default
+parameters:
+  skuname: StandardSSD_LRS
+provisioner: disk.csi.azure.com
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+*/
