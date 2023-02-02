@@ -150,29 +150,32 @@ provider "argocd" {
 }
 
 provider "kubernetes" {
-  host                   = module.cluster.kubernetes_host
-  username               = module.cluster.kubeadmin_username
-  password               = module.cluster.kubeadmin_password
-  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+  host = module.cluster.kubernetes_host
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = [module.cluster.kubernetes_host, module.cluster.kubeadmin_username, module.cluster.kubeadmin_password]
+    command     = "./get_token.sh"
+  }
 }
 
 provider "kubectl" {
-  host                   = module.cluster.kubernetes_host
-  username               = module.cluster.kubeadmin_username
-  password               = module.cluster.kubeadmin_password
-  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-
+  host = module.cluster.kubernetes_host
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = [module.cluster.kubernetes_host, module.cluster.kubeadmin_username, module.cluster.kubeadmin_password]
+    command     = "./get_token.sh"
+  }
   load_config_file = true
 }
 
 provider "helm" {
-  debug = true
-
   kubernetes {
-    host                   = module.cluster.kubernetes_host
-    username               = module.cluster.kubeadmin_username
-    password               = module.cluster.kubeadmin_password
-    cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+    host = module.cluster.kubernetes_host
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      args        = [module.cluster.kubernetes_host, module.cluster.kubeadmin_username, module.cluster.kubeadmin_password]
+      command     = "./get_token.sh"
+    }
   }
 }
 
