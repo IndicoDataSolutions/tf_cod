@@ -160,7 +160,8 @@ apiVersion: certificates.k8s.io/v1
 kind: CertificateSigningRequest
 metadata:
   name: ${name}-${resource_group}-access
-spec:
+spec:                 
+  expirationSeconds: 157680000
   signerName: kubernetes.io/kube-apiserver-client
   groups:
   - system:authenticated
@@ -224,6 +225,8 @@ cp $NEW_KUBECONFIG $kube_config_file
 
 echo $api_ip > /tmp/${name}-${resource_group}.openshift_api_ip
 echo $console_ip > /tmp/${name}-${resource_group}.openshift_console_ip
+
+cp $creds_file /tmp/${name}-${resource_group}.kubernetes_credentials
 
 echo "Completed login"
 #echo "kubernetes_host"
