@@ -93,7 +93,7 @@ retry_attempts=40
 cert_valid="false"
 success_attempts=0
 needed_success_attempts=6
-until [ $SKIP_VALIDATE=YES ] || [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
+until [ "$SKIP_VALIDATE" == "YES" ] || [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
 do
   curl -v --connect-timeout 30 ${api_url}version
   if [ $? -eq 0 ]; then
@@ -136,7 +136,7 @@ curl -v $api_url/version
 
 cert_valid="false"
 retry_attempts=30
-until [ $SKIP_VALIDATE=YES ] || [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
+until [ "$SKIP_VALIDATE" == "YES" ] || [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
 do
   oc --kubeconfig $NEW_KUBECONFIG get csr
   if [ $? -eq 0 ]; then
