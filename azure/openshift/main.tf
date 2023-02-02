@@ -151,15 +151,15 @@ provider "argocd" {
 
 provider "kubernetes" {
   host                   = module.cluster.kubernetes_host
-  client_certificate     = module.cluster.kubernetes_client_certificate
-  client_key             = module.cluster.kubernetes_client_key
+  username               = module.cluster.kubeadmin_username
+  password               = module.cluster.kubeadmin_password
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
 }
 
 provider "kubectl" {
   host                   = module.cluster.kubernetes_host
-  client_certificate     = module.cluster.kubernetes_client_certificate
-  client_key             = module.cluster.kubernetes_client_key
+  username               = module.cluster.kubeadmin_username
+  password               = module.cluster.kubeadmin_password
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
 
   load_config_file = true
@@ -170,8 +170,8 @@ provider "helm" {
 
   kubernetes {
     host                   = module.cluster.kubernetes_host
-    client_certificate     = module.cluster.kubernetes_client_certificate
-    client_key             = module.cluster.kubernetes_client_key
+    username               = module.cluster.kubeadmin_username
+    password               = module.cluster.kubeadmin_password
     cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
   }
 }

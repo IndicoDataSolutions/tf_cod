@@ -19,6 +19,18 @@ output "kubernetes_host" {
   value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernetes_host"]
 }
 
+
+
+output "kubeadmin_username" {
+  value = jsondecode(jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernetes_credentials"])["kubeadminUsername"]
+}
+
+
+output "kubeadmin_password" {
+  value = jsondecode(jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernetes_credentials"])["kubeadminPassword"]
+}
+
+
 output "kubernetes_client_certificate" {
   value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernetes_client_certificate"]
 }
