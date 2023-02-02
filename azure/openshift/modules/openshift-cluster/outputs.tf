@@ -11,7 +11,7 @@ output "oidc_issuer_url" {
 }
 
 output "id" {
-  value = "ERROR:OPENSHIFT-NOT-APPLICABLE"
+  value = "ERROR:cluster.idOPENSHIFT-NOT-APPLICABLE"
 }
 
 

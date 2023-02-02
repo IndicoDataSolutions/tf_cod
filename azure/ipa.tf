@@ -111,7 +111,7 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
 }
 
 resource "azurerm_role_assignment" "external_dns" {
-  count = var.include_external_dns == true ? 1 : 0
+  count = var.is_azure == true && var.include_external_dns == true ? 1 : 0
   depends_on = [
     module.cluster
   ]
