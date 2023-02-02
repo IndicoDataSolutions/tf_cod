@@ -1,3 +1,24 @@
+locals {
+  openshift_dns_credentials = <<EOF
+  {
+  "tenantId" : "${data.azurerm_client_config.current.tenant_id}",
+  "subscriptionId" : "${split("/", data.azurerm_subscription.primary.id)[2]}",
+  "resourceGroup" : "${var.common_resource_group}",
+  "aadClientId": "${azuread_application.workload_identity.application_id}",
+  "aadClientSecret": "${azuread_application_password.workload_identity.value}"
+  }
+  EOF
+
+  azure_dns_credentials = <<EOF
+  {
+    "tenantId" : "${data.azurerm_client_config.current.tenant_id}",
+    "subscriptionId" : "${split("/", data.azurerm_subscription.primary.id)[2]}",
+    "resourceGroup" : "${var.common_resource_group}",
+    "useManagedIdentityExtension" : true,
+    "userAssignedIdentityID" : "${module.cluster.kubelet_identity.client_id}"
+  }
+  EOF
+}
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
     module.cluster
@@ -116,8 +137,8 @@ resource "kubernetes_secret" "azure_storage_key" {
   }
 }
 
-resource "kubernetes_config_map" "azure_dns_credentials-azure" {
-  count = var.is_azure == true && var.include_external_dns == true ? 1 : 0
+resource "kubernetes_config_map" "azure_dns_credentials" {
+  count = var.include_external_dns == true ? 1 : 0
 
   depends_on = [
     module.cluster
@@ -128,40 +149,7 @@ resource "kubernetes_config_map" "azure_dns_credentials-azure" {
   }
 
   data = {
-    "azure.json" = <<EOF
-{
-  "tenantId" : "${data.azurerm_client_config.current.tenant_id}",
-  "subscriptionId" : "${split("/", data.azurerm_subscription.primary.id)[2]}",
-  "resourceGroup" : "${var.common_resource_group}",
-  "useManagedIdentityExtension" : true,
-  "userAssignedIdentityID" : "${module.cluster.kubelet_identity.client_id}"
-}
-    EOF
-  }
-}
-
-
-resource "kubernetes_config_map" "azure_dns_credentials-openshift" {
-  count = var.is_openshift == true && var.include_external_dns == true ? 1 : 0
-
-  depends_on = [
-    module.cluster
-  ]
-
-  metadata {
-    name = "dns-credentials-config"
-  }
-
-  data = {
-    "azure.json" = <<EOF
-{
-  "tenantId" : "${data.azurerm_client_config.current.tenant_id}",
-  "subscriptionId" : "${split("/", data.azurerm_subscription.primary.id)[2]}",
-  "resourceGroup" : "${var.common_resource_group}",
-  "aadClientId": "${azuread_application.workload_identity.application_id}",
-  "aadClientSecret": "${azuread_application_password.workload_identity.value}"
-}
-    EOF
+    "azure.json" = var.is_openshift ? local.openshift_dns_credentials : local.azure_dns_credentials
   }
 }
 
