@@ -51,5 +51,5 @@ variable "kubernetes_host" {
 }
 
 variable "openshift_version" {
-  default = "4.12.2"
+  default = "4.12.0"
 }
