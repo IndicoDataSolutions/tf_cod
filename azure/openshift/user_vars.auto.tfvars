@@ -1,5 +1,5 @@
 is_openshift          = true
-include_external_dns  = false
+include_external_dns  = true
 use_workload_identity = false
 
 svp_client_id     = "na"
@@ -73,7 +73,7 @@ openshift_machine_sets = {
   },
   staticworkers = {
     node_count = 1
-    pool_name  = "staticw"
+    pool_name  = "static"
     vm_size    = "Standard_D16_v3"
     node_os    = "Linux"
     zones      = ["1", "2"]

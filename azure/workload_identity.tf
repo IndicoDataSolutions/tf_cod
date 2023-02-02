@@ -11,21 +11,37 @@ resource "azuread_service_principal" "workload_identity" {
   owners                       = [data.azuread_client_config.current.object_id]
 }
 
+resource "azurerm_role_assignment" "dns-zone-contributor" {
+  scope                = data.azurerm_dns_zone.domain.id
+  role_definition_name = "Contributor"
+  principal_id         = resource.azuread_service_principal.workload_identity.object_id
+}
+
+resource "azurerm_role_assignment" "dns-zone-dns-zone-contributor" {
+  scope                = data.azurerm_dns_zone.domain.id
+  role_definition_name = "DNS Zone Contributor"
+  principal_id         = resource.azuread_service_principal.workload_identity.object_id
+}
+
 resource "azuread_application_password" "workload_identity" {
   display_name          = "workload_identity"
   application_object_id = azuread_application.workload_identity.object_id
 }
 
 resource "kubernetes_secret" "workload_identity" {
+  depends_on = [
+    module.cluster
+  ]
+
   metadata {
     name = "workload-identity"
   }
 
   data = {
     ARM_SUBSCRIPTION_ID = "${data.azurerm_subscription.primary.subscription_id}"
-    ARM_TENANT_ID = "${data.azuread_client_config.current.tenant_id}"
-    ARM_CLIENT_ID = "${azuread_application.workload_identity.application_id}"
-    ARM_CLIENT_SECRET = "${azuread_application_password.workload_identity.value}"
+    ARM_TENANT_ID       = "${data.azuread_client_config.current.tenant_id}"
+    ARM_CLIENT_ID       = "${azuread_application.workload_identity.application_id}"
+    ARM_CLIENT_SECRET   = "${azuread_application_password.workload_identity.value}"
   }
 
   type = "Opaque"
