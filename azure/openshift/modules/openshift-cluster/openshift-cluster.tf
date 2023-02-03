@@ -141,6 +141,9 @@ data "vault_kv_secret_v2" "kubernetes-credentials" {
 
 
 resource "kubernetes_storage_class" "default" {
+  depends_on = [
+    azurerm_resource_group_template_deployment.openshift-cluster
+  ]
   metadata {
     name = "default"
     annotations = {

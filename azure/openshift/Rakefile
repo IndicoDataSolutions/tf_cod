@@ -1,3 +1,4 @@
+require 'json'
 
 required_vars = %w[
   ARM_CLIENT_ID
@@ -6,8 +7,15 @@ required_vars = %w[
   ARM_TENANT_ID
 ]
 
-WORKSPACE=`terraform workspace show`.strip
+vars = {}
+user_vars = {}
+label = nil
+region = nil
+account = "indico-dev-azure"
+dns_zone = "#{account}.indico.io"
+dns_zone_rg = "indico-common"
 
+WORKSPACE=`terraform workspace show`.strip
 
 task :verify do
   ENV['TF_VAR_vault_password'] = ENV['VAULT_PASSWORD']
@@ -21,6 +29,11 @@ task :verify do
     raise "Missing required environment variable #{evar}" unless ENV[evar]
     raise "Empty environment variable #{evar} not allowed" if ENV[evar].empty?
   end
+
+  user_vars = JSON.parse(`hcltool user_vars.auto.tfvars`)
+
+
+
 end
 
 task secrets: :verify do
@@ -39,5 +52,55 @@ task info: :verify do
   #sh %( az aro show --name openshift-cluster-#{WORKSPACE} --resource-group openshift-cluster-#{WORKSPACE} )
   sh %( az aro show --name openshift-cluster-#{WORKSPACE} --resource-group openshift-cluster-#{WORKSPACE} --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' )
   sh %( az aro list-credentials --name openshift-cluster-#{WORKSPACE} --resource-group openshift-cluster-#{WORKSPACE} )
+end
+
+
+def get_argo_project(name)
+  projects = JSON.parse(`argocd proj list -o json`)
+end
+
+def get_zone_records(dns_zone_rg, dns_zone, record_type='A')
+ records = JSON.parse(`az network dns record-set #{record_type} list --resource-group #{dns_zone_rg} --zone-name #{dns_zone}`)
+end
+
+def delete_zone_record(dns_zone_rg, dns_zone, record_type, record_name)
+  # az network dns record-set caa delete --name MyRecordSet --resource-group MyResourceGroup --subscription MySubscription --zone-name www.mysite.com
+  sh %(az network dns record-set #{record_type.downcase} delete --yes --name #{record_name} --resource-group #{dns_zone_rg} --zone-name #{dns_zone} )
+end
+
+
+
+def find_zone_record(dns_zone_rg, dns_zone, record_type, record_name) 
+  records = get_zone_records(dns_zone_rg, dns_zone, record_type)
+  records.each do |record|
+    puts(record['name'])
+    if record['name'] == record_name
+      return record
+    end
+  end
+  nil
+end
+
+
+task clean: :verify do
+  raise "Missing argument" unless ARGV[1].length > 0
+
+  sh %(az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID")
+
+
+  zone_name = "indico-dev-azure.indico.io"
+
+  # indico-dev-azure.indico.io
+  
+  label = ARGV[1]
+  region = user_vars['region']
+
+  sh %(argocd login argo.devops.indico.io --username "$ARGOCD_USERNAME" --password "$ARGOCD_PASSWORD" --grpc-web)
+
+  prefix = "#{label}.#{region}"
+
+  delete_zone_record(dns_zone_rg, dns_zone, 'CAA', prefix) if find_zone_record(dns_zone_rg, dns_zone, 'CAA', prefix)
 
 end
+
+
