@@ -4,7 +4,6 @@ POSITIONAL_ARGS=()
 SKIP_VALIDATE=NO
 
 while [[ $# -gt 0 ]]; do
-  echo "Processing $1"
   case $1 in
     -e|--extension)
       EXTENSION="$2"
@@ -46,7 +45,7 @@ key_file=/tmp/${name}-${resource_group}.key
 
 NEW_KUBECONFIG="/tmp/.${name}-${resource_group}_kubeconfig"
 
-set -x
+#set -x
 
 creds_file="/tmp/${name}-${resource_group}_creds.json"
 info_file="/tmp/${name}-${resource_group}_info.json"
@@ -63,7 +62,7 @@ if [ -f $info_file ]; then
   rm $info_file
 fi
 
-az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
+az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID" &> /dev/null
 if [ $? -ne 0 ]; then
   echo "Failed to login"
  exit 1
@@ -79,8 +78,8 @@ if [ $? -ne 0 ]; then
  exit 1
 fi
 
-cat $creds_file
-cat $info_file
+#cat $creds_file
+#cat $info_file
 
 username=$(cat $creds_file | jq -r '.kubeadminUsername')
 password=$(cat $creds_file | jq -r '.kubeadminPassword')
@@ -95,31 +94,28 @@ success_attempts=0
 needed_success_attempts=6
 until [ "$SKIP_VALIDATE" == "YES" ] || [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
 do
-  curl -v --connect-timeout 30 ${api_url}version
+  curl -q --connect-timeout 30 ${api_url}version &> /dev/null
   if [ $? -eq 0 ]; then
-    echo "Certificate is valid [$retry_attempt]"
+    echo "Certificate is valid [$retry_attempts] ($success_attempts/$needed_success_attempts)"
     ((success_attempts++))
     sleep 10
     if [ $success_attempts -ge $needed_success_attempts ]; then
       cert_valid="true"
-    else
-      echo "Success attempt ${success_attempts} of $needed_success_attempts"
     fi
   else
     success_attempts=0
-    echo "Error: Invalid curl cert trying again in 30 seconds... ${retry_attempts}"
+    echo "Error: Invalid Certificate trying again in 30 seconds... ${retry_attempts}"
     sleep 30
     ((retry_attempts--))
   fi
 done
-echo "Retry atemps: ${retry_attempts}"
 
 logged_in="false"
 retry_attempts=40
 until [ $logged_in == "true" ] || [ $retry_attempts -le 0 ]
 do
   # if you use --insecure-skip-tls-verify=true then the sa account will prompt for a password on the oc login below
-  oc login --loglevel=1 $api_url --username "${username}" --password "${password}" --kubeconfig $NEW_KUBECONFIG
+  oc login --loglevel=1 $api_url --username "${username}" --password "${password}" --kubeconfig $NEW_KUBECONFIG &> /dev/null
   if [ $? -eq 0 ]; then
     echo "Successfully Logged in to new cluster $api_url"
     logged_in="true"
@@ -129,10 +125,8 @@ do
     ((retry_attempts--))
   fi
 done
-echo "Retry atemps: ${retry_attempts}"
 
 export KUBECONFIG=$NEW_KUBECONFIG
-curl -v $api_url/version
 
 cert_valid="false"
 retry_attempts=30
@@ -152,8 +146,6 @@ do
     ((retry_attempts--))
   fi
 done
-echo "Retry atemps: ${retry_attempts}"
-
 
 oc whoami
 oc get csr ${name}-${resource_group}-access

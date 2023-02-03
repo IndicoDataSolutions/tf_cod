@@ -112,8 +112,8 @@ task clean: :verify do
   label = ARGV[1]
   region = user_vars['region']
 
-  resource_group = "#{label}-#{region}"
-
+  app_name = "#{label}-#{region}"
+  app_name_workload = "#{label}-#{region}-workload-identity"
 
   sh %(argocd login argo.devops.indico.io --username "$ARGOCD_USERNAME" --password "$ARGOCD_PASSWORD" --grpc-web)
 
@@ -121,7 +121,10 @@ task clean: :verify do
 
   delete_zone_record(dns_zone_rg, dns_zone, 'CAA', prefix) if find_zone_record(dns_zone_rg, dns_zone, 'CAA', prefix)
   
-  apps = find_app_registrations(resource_group)
+  apps = find_app_registrations(app_name)
+  delete_app_registrations(apps) if apps && apps.length > 0
+
+  apps = find_app_registrations(app_name_workload)
   delete_app_registrations(apps) if apps && apps.length > 0
 
   exit 
