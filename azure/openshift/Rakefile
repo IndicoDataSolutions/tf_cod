@@ -93,7 +93,10 @@ end
 
 def delete_app_registrations(apps)
   apps.each do |app|
-    sh %(az ad sp delete --id #{app['appId']})
+    begin
+      sh %(az ad sp delete --id #{app['appId']})
+    rescue
+    end
   end
 end
 
@@ -103,7 +106,6 @@ task clean: :verify do
   raise "Missing argument" unless ARGV[1].length > 0
 
   sh %(az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID")
-
 
   zone_name = "indico-dev-azure.indico.io"
 
@@ -127,6 +129,7 @@ task clean: :verify do
   apps = find_app_registrations(app_name_workload)
   delete_app_registrations(apps) if apps && apps.length > 0
 
+  sh %( az group delete -n #{app_name} )
   exit 
 end
 
