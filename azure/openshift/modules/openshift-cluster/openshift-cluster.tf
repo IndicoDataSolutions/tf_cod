@@ -146,9 +146,6 @@ resource "kubernetes_storage_class" "default" {
   ]
   metadata {
     name = "default"
-    annotations = {
-      "storageclass.kubernetes.io/is-default-class" = "true"
-    }
     labels = {
       "addonmanager.kubernetes.io/mode" = "EnsureExists"
       "kubernetes.io/cluster-service"   = "true"

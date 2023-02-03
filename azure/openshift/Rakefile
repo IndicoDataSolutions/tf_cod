@@ -68,18 +68,35 @@ def delete_zone_record(dns_zone_rg, dns_zone, record_type, record_name)
   sh %(az network dns record-set #{record_type.downcase} delete --yes --name #{record_name} --resource-group #{dns_zone_rg} --zone-name #{dns_zone} )
 end
 
-
-
 def find_zone_record(dns_zone_rg, dns_zone, record_type, record_name) 
   records = get_zone_records(dns_zone_rg, dns_zone, record_type)
   records.each do |record|
-    puts(record['name'])
     if record['name'] == record_name
       return record
     end
   end
   nil
 end
+
+
+def find_app_registrations(name)
+  all_apps = JSON.parse(`az ad app list`)
+  apps = []
+  all_apps.each do |app|
+    if app['displayName'] == name
+      apps.append(app)
+    end
+  end
+  apps
+end
+
+
+def delete_app_registrations(apps)
+  apps.each do |app|
+    sh %(az ad sp delete --id #{app['appId']})
+  end
+end
+
 
 
 task clean: :verify do
@@ -95,12 +112,19 @@ task clean: :verify do
   label = ARGV[1]
   region = user_vars['region']
 
+  resource_group = "#{label}-#{region}"
+
+
   sh %(argocd login argo.devops.indico.io --username "$ARGOCD_USERNAME" --password "$ARGOCD_PASSWORD" --grpc-web)
 
   prefix = "#{label}.#{region}"
 
   delete_zone_record(dns_zone_rg, dns_zone, 'CAA', prefix) if find_zone_record(dns_zone_rg, dns_zone, 'CAA', prefix)
+  
+  apps = find_app_registrations(resource_group)
+  delete_app_registrations(apps) if apps && apps.length > 0
 
+  exit 
 end
 
 
