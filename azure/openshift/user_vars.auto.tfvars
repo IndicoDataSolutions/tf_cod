@@ -31,7 +31,7 @@ openshift_machine_sets = {
     pool_name  = "gpu"
     vm_size    = "Standard_NC4as_T4_v3"
     node_os    = "Linux"
-    zones      = ["1", "2"]
+    zones      = ["1"]
     taints     = ["nvidia.com/gpu=true:NoSchedule"]
     labels = {
       "node_group" : "gpu-workers",
@@ -54,7 +54,7 @@ openshift_machine_sets = {
     pool_name  = "celery"
     vm_size    = "Standard_D16_v3"
     node_os    = "Linux"
-    zones      = ["1", "2"]
+    zones      = ["1"]
     taints     = ["indico.io/celery=true:NoSchedule"]
     labels = {
       "node_group" : "celery-workers"
@@ -76,7 +76,7 @@ openshift_machine_sets = {
     pool_name  = "static"
     vm_size    = "Standard_D16_v3"
     node_os    = "Linux"
-    zones      = ["1", "2"]
+    zones      = ["1"]
     taints     = []
     labels = {
       "node_group" : "static-workers"
@@ -98,7 +98,7 @@ openshift_machine_sets = {
     pool_name  = "pdf"
     vm_size    = "Standard_D16_v3"
     node_os    = "Linux"
-    zones      = ["1", "2"]
+    zones      = ["1"]
     taints     = ["indico.io/pdfextraction=true:NoSchedule"]
     labels = {
       "node_group" : "pdf-workers"
@@ -120,7 +120,7 @@ openshift_machine_sets = {
     pool_name  = "highmem"
     vm_size    = "Standard_D16_v3"
     node_os    = "Linux"
-    zones      = ["1", "2"]
+    zones      = ["1"]
     taints     = ["indico.io/highmem=true:NoSchedule"]
     labels = {
       "node_group" : "highmem-workers"
@@ -142,7 +142,7 @@ openshift_machine_sets = {
     pool_name  = "monitoring"
     vm_size    = "Standard_d11_v2"
     node_os    = "Linux"
-    zones      = ["1", "2"]
+    zones      = ["1"]
     taints     = ["indico.io/monitoring=true:NoSchedule"]
     labels = {
       "node_group" : "monitoring-workers"
@@ -164,7 +164,7 @@ openshift_machine_sets = {
     pool_name  = "pgo"
     vm_size    = "Standard_D16_v3"
     node_os    = "Linux"
-    zones      = ["1", "2"]
+    zones      = ["1"]
     taints     = ["indico.io/crunchy=true:NoSchedule"]
     labels = {
       "node_group" : "pgo-workers"
