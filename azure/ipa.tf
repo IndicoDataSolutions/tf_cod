@@ -77,6 +77,8 @@ resource "helm_release" "ipa-crds" {
         kubernetes.io/os: linux
     enabled: true
     installCRDs: true
+  aws-ebs-csi-driver:
+    enabled: false
  EOF
   ]
 }
