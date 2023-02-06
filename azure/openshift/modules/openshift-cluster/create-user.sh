@@ -2,6 +2,7 @@
 
 POSITIONAL_ARGS=()
 SKIP_VALIDATE=NO
+LOGIN_ONLY=NO
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -16,6 +17,11 @@ while [[ $# -gt 0 ]]; do
       shift # past value
       ;;
     --skip-validate)
+      SKIP_VALIDATE=YES
+      shift # past argument
+      ;;
+    --login)
+      LOGIN_ONLY=YES
       SKIP_VALIDATE=YES
       shift # past argument
       ;;
@@ -110,6 +116,11 @@ do
   fi
 done
 
+
+if [ "$LOGIN_ONLY" == "YES" ]; then
+  export NEW_KUBECONFIG=$KUBECONFIG
+fi
+
 logged_in="false"
 retry_attempts=40
 until [ $logged_in == "true" ] || [ $retry_attempts -le 0 ]
@@ -125,6 +136,12 @@ do
     ((retry_attempts--))
   fi
 done
+
+if [ "$LOGIN_ONLY" == "YES" ]; then
+  cat $info_file
+  cat $creds_file
+  exit 0
+fi
 
 export KUBECONFIG=$NEW_KUBECONFIG
 

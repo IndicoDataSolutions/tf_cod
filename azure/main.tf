@@ -142,6 +142,8 @@ locals {
   dns_name     = lower("${var.label}.${var.region}.${var.account}.${var.domain_suffix}")
 
   kube_prometheus_stack_enabled = true
+
+  indico_storage_class_name = "azurefile"
 }
 
 resource "tls_private_key" "pk" {

@@ -140,11 +140,30 @@ data "vault_kv_secret_v2" "kubernetes-credentials" {
 }
 
 
-resource "kubernetes_storage_class" "default" {
+resource "null_resource" "unset-default-sc" {
   depends_on = [
     azurerm_resource_group_template_deployment.openshift-cluster
   ]
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    command     = "${path.module}/post-cluster.sh ${var.label} ${var.resource_group_name}"
+    interpreter = ["/bin/bash", "-c"]
+  }
+}
+
+
+resource "kubernetes_storage_class" "default" {
+  depends_on = [
+    null_resource.unset-default-sc
+  ]
   metadata {
+    annotations = {
+      "storageclass.kubernetes.io/is-default-class" : "true"
+    }
     name = "default"
     labels = {
       "addonmanager.kubernetes.io/mode" = "EnsureExists"
@@ -159,6 +178,8 @@ resource "kubernetes_storage_class" "default" {
   }
 
 }
+
+
 
 /*
   allowVolumeExpansion: true

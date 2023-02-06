@@ -238,7 +238,7 @@ storage:
     enabled: false
   indicoStorageClass:
     enabled: false
-    name: "azurefile"
+    name: "${local.indico_storage_class_name}"
   pvcSpec:
     azureFile:
       readOnly: false

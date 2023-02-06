@@ -233,6 +233,7 @@ locals {
     }
   ])
   kube_prometheus_stack_enabled = false
+  indico_storage_class_name     = "azurefile"
 }
 
 
