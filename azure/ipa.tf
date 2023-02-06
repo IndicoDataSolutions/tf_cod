@@ -258,8 +258,8 @@ storage:
 
 crunchy-postgres:
   enabled: true
-  openshift: ${var.is_openshift}
-  
+  postgres-data:
+    openshift: ${var.is_openshift}
 aws-fsx-csi-driver:
   enabled: false
 metrics-server:
