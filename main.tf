@@ -306,7 +306,7 @@ data "aws_iam_policy_document" "dns_manager_policy" {
 
 
 locals {
-  cluster_node_policies = concat(var.cluster_node_policies, [aws_iam_role.dns_manager.name])
+  cluster_node_policies = concat(var.cluster_node_policies, [aws_iam_policy.dns_manager_policy.name])
 }
 
 module "cluster" {
