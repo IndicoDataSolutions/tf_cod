@@ -285,6 +285,9 @@ clusterIssuer:
         route53:
           region: ${var.region}
           role: ${aws_iam_role.dns_manager.arn}
+      selector:
+        matchLabels:
+          "acme.cert-manager.io/dns01-solver": "true"
 
 monitoring:
   enabled: true

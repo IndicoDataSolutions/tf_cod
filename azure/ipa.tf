@@ -185,6 +185,9 @@ clusterIssuer:
             clientID: ${azuread_application.workload_identity.application_id}
           resourceGroupName: ${var.common_resource_group}
           subscriptionID: ${split("/", data.azurerm_subscription.primary.id)[2]}
+      selector:
+        matchLabels:
+          "acme.cert-manager.io/dns01-solver": "true"
 
 apiModels:
   enabled: true
