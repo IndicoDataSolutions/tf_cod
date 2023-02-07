@@ -405,6 +405,12 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
+            app-edge:
+              openshift:
+                enabled: ${var.is_openshift}
+            rainbow-nginx:
+              openshift:
+                enabled: ${var.is_openshift}
             runtime-scanner:
               enabled: ${replace(lower(var.account), "indico", "") == lower(var.account) ? "false" : "true"}
               authentication:
