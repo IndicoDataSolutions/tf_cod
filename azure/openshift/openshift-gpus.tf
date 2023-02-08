@@ -8,7 +8,7 @@ resource "kubernetes_namespace" "gpu" {
     labels = {
       "indico.io/openshift" = "true"
     }
-    name = local.nvida_operator_namespace
+    name = local.nvidia_operator_namespace
   }
 }
 
@@ -22,7 +22,11 @@ resource "kubernetes_manifest" "gpu" {
     kind       = "OperatorGroup"
     metadata = {
       name      = "nvidia-gpu-operator-group"
-      namespace = local.nvida_operator_namespace
+      namespace = local.nvidia_operator_namespace
+    }
+
+    spec = {
+      targetNamespaces = [local.nvidia_operator_namespace]
     }
   }
 }
@@ -65,24 +69,24 @@ resource "kubernetes_manifest" "gpu-operator-subscription" {
     kind       = "Subscription"
     metadata = {
       name      = "gpu-operator-certified"
-      namespace = local.nvida_operator_namespace
+      namespace = local.nvidia_operator_namespace
     }
     spec = {
-      channel             = local.channel
+      channel             = "${local.channel}"
       installPlanApproval = "Automatic"
       name                = "gpu-operator-certified"
       source              = "certified-operators"
       sourceNamespace     = "openshift-marketplace"
-      startingCSV         = local.package
+      startingCSV         = "${local.package}"
     }
   }
 }
 
 
 locals {
-  nvida_operator_namespace = "nvidia-gpu-operator"
-  package                  = element([for c in data.kubernetes_resource.package.object.status.channels : c.currentCSV if c.name == data.kubernetes_resource.package.object.status.defaultChannel], 0)
-  channel                  = data.kubernetes_resource.package.object.status.defaultChannel
+  nvidia_operator_namespace = "nvidia-gpu-operator"
+  package                   = element([for c in data.kubernetes_resource.package.object.status.channels : c.currentCSV if c.name == data.kubernetes_resource.package.object.status.defaultChannel], 0)
+  channel                   = data.kubernetes_resource.package.object.status.defaultChannel
 }
 
 output "channel" {
