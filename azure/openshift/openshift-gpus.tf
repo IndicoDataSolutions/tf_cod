@@ -8,7 +8,7 @@ resource "kubernetes_namespace" "gpu" {
     labels = {
       "indico.io/openshift" = "true"
     }
-    name = "nvidia-gpu-operator"
+    name = local.nvida_operator_namespace
   }
 }
 
@@ -22,7 +22,7 @@ resource "kubernetes_manifest" "gpu" {
     kind       = "OperatorGroup"
     metadata = {
       name      = "nvidia-gpu-operator-group"
-      namespace = "nvidia-gpu-operator"
+      namespace = local.nvida_operator_namespace
     }
   }
 }
@@ -37,10 +37,52 @@ data "kubernetes_resource" "package" {
   }
 }
 
+/*
+envsubst  <<EOF | oc apply -f -
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: gpu-operator-certified
+  namespace: nvidia-gpu-operator
+spec:
+  channel: "$CHANNEL"
+  installPlanApproval: Automatic
+  name: gpu-operator-certified
+  source: certified-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: "$PACKAGE"
+EOF
+*/
+
+
+resource "kubernetes_manifest" "gpu-operator-subscription" {
+  depends_on = [
+    kubernetes_namespace.gpu
+  ]
+
+  manifest = {
+    apiVersion = "operators.coreos.com/v1alpha1"
+    kind       = "Subscription"
+    metadata = {
+      name      = "gpu-operator-certified"
+      namespace = local.nvida_operator_namespace
+    }
+    spec = {
+      channel             = local.channel
+      installPlanApproval = "Automatic"
+      name                = "gpu-operator-certified"
+      source              = "certified-operators"
+      sourceNamespace     = "openshift-marketplace"
+      startingCSV         = local.package
+    }
+  }
+}
+
 
 locals {
-  package = element([for c in data.kubernetes_resource.package.object.status.channels : c.currentCSV if c.name == data.kubernetes_resource.package.object.status.defaultChannel], 0)
-  channel = data.kubernetes_resource.package.object.status.defaultChannel
+  nvida_operator_namespace = "nvidia-gpu-operator"
+  package                  = element([for c in data.kubernetes_resource.package.object.status.channels : c.currentCSV if c.name == data.kubernetes_resource.package.object.status.defaultChannel], 0)
+  channel                  = data.kubernetes_resource.package.object.status.defaultChannel
 }
 
 output "channel" {
