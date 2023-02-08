@@ -37,16 +37,17 @@ data "kubernetes_resource" "package" {
   }
 }
 
-output "channel" {
-  value = data.kubernetes_resource.package.object.status.defaultChannel
+
+locals {
+  package = element([for c in data.kubernetes_resource.package.object.status.channels : c.currentCSV if c.name == data.kubernetes_resource.package.object.status.defaultChannel], 0)
+  channel = data.kubernetes_resource.package.object.status.defaultChannel
 }
 
-
-output "status" {
-  value = data.kubernetes_resource.package.object.status
+output "channel" {
+  value = local.channel
 }
 
 # PACKAGE=$(oc get packagemanifests/gpu-operator-certified -n openshift-marketplace -ojson | jq -r '.status.channels[] | select(.name == "'$CHANNEL'") | .currentCSV')
 output "package" {
-  value = element([for c in data.kubernetes_resource.package.object.status.channels : c.currentCSV if c.name == data.kubernetes_resource.package.object.status.defaultChannel], 0)
+  value = local.package
 }
