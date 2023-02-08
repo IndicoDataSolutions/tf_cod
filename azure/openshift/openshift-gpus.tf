@@ -80,6 +80,13 @@ resource "kubernetes_manifest" "gpu-operator-subscription" {
       startingCSV         = "${local.package}"
     }
   }
+  # wait until ready
+  wait {
+    fields = {
+      "status.conditions[0].type"   = "CatalogSourcesUnhealthy"
+      "status.conditions[0].status" = "False"
+    }
+  }
 }
 
 
