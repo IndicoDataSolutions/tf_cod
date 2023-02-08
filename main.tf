@@ -269,7 +269,7 @@ module "cluster" {
   key_pair                   = aws_key_pair.kp.key_name
   snapshot_id                = var.snapshot_id
   default_tags               = var.default_tags
-  s3_buckets                 = [module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots", var.performance_bucket ? "indico-locust-benchmark-test-results" : "")]
+  s3_buckets                 = [module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : ""]
   cluster_version            = var.cluster_version
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
   access_security_group      = module.cluster-manager.cluster_manager_sg
