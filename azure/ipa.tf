@@ -84,6 +84,9 @@ resource "helm_release" "ipa-crds" {
   crunchy-pgo:
     enabled: true
   
+  aws-ebs-csi-driver:
+    enabled: false
+
   cert-manager:
     #extraArgs:
     #  - --dns01-recursive-nameservers-only
