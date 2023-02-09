@@ -42,11 +42,11 @@ openshift_machine_sets = {
     cluster_auto_scaling_max_count = 5
     storageAccountType             = "Premium_LRS"
     image = {
-      offer     = "0001-com-ubuntu-server-focal"
-      publisher = "canonical"
-      resourceID : ""
-      sku : "20_04-lts-gen2"
-      version : "latest"
+      offer      = "aro4"
+      publisher  = "azureopenshift"
+      resourceID = ""
+      sku        = "aro_410"
+      version    = "410.84.20220125"
     }
   },
   celeryworkers = {
