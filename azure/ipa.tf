@@ -119,13 +119,16 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
 
 
 # Install the Machinesets now
-resource "helm_release" "crunchy-pgo" {
+resource "helm_release" "crunchy-postgres" {
   count = var.is_openshift == true ? 1 : 0
   depends_on = [
+    module.cluster,
+    helm_release.ipa-crds,
     time_sleep.wait_1_minutes_after_crds
   ]
 
-  name             = "crunch"
+  name             = "
+  "
   create_namespace = true
   namespace        = "crunchy"
   repository       = var.ipa_repo
