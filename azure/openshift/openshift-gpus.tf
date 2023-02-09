@@ -123,7 +123,7 @@ resource "kubernetes_manifest" "nfd-operator" {
 
 resource "kubernetes_manifest" "nfd-subscription" {
   depends_on = [
-    kubernetes_namespace.nfd-operator
+    kubernetes_manifest.nfd-operator
   ]
 
   manifest = {
