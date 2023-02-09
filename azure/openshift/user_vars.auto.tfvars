@@ -42,11 +42,11 @@ openshift_machine_sets = {
     cluster_auto_scaling_max_count = 5
     storageAccountType             = "Premium_LRS"
     image = {
-      offer     = "aro4"
-      publisher = "azureopenshift"
+      offer     = "rh-ocp-worker"
+      publisher = "RedHat"
       resourceID : ""
-      sku : "aro_410"
-      version : "410.84.20220125"
+      sku : "rh-ocp-worker"
+      version : "4.8.2021122100"
     }
   },
   celeryworkers = {
