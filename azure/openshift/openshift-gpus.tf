@@ -120,7 +120,6 @@ resource "kubernetes_manifest" "nfd-operator" {
   }
 }
 
-
 resource "kubernetes_manifest" "nfd-subscription" {
   depends_on = [
     kubernetes_manifest.nfd-operator
@@ -192,5 +191,11 @@ sources:
 EOF
       }
     }
+  }
+
+  wait {
+    fields = {
+      "status.conditions[0].type"   = "Available"
+      "status.conditions[0].status" = "True"
   }
 }
