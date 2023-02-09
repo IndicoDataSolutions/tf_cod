@@ -83,6 +83,7 @@ resource "kubectl_manifest" "gpu-operator-subscription" {
       startingCSV: "${local.package}"
   YAML
 }
+
 # wait until ready
 #wait {
 #  fields = {
@@ -155,7 +156,7 @@ YAML
 resource "kubectl_manifest" "nfd" {
   depends_on = [
     module.cluster,
-    kubernetes_manifest.nfd-subscription
+    kubectl_manifest.nfd-subscription
   ]
 
   yaml_body = <<YAML
