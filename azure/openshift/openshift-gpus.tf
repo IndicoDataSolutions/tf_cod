@@ -113,6 +113,7 @@ resource "kubernetes_namespace" "nfd" {
 
 resource "kubernetes_manifest" "nfd-operator" {
   depends_on = [
+    module.cluster,
     kubernetes_namespace.nfd
   ]
 
@@ -129,6 +130,7 @@ resource "kubernetes_manifest" "nfd-operator" {
 
 resource "kubernetes_manifest" "nfd-subscription" {
   depends_on = [
+    module.cluster,
     kubernetes_manifest.nfd-operator
   ]
 
@@ -159,6 +161,7 @@ resource "kubernetes_manifest" "nfd-subscription" {
 
 resource "kubernetes_manifest" "nfd" {
   depends_on = [
+    module.cluster,
     kubernetes_manifest.nfd-subscription
   ]
 
@@ -211,6 +214,7 @@ EOF
 
 resource "kubernetes_manifest" "gpu-cluster-policy" {
   depends_on = [
+    module.cluster,
     kubernetes_manifest.nfd
   ]
 
