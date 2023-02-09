@@ -222,7 +222,6 @@ resource "kubernetes_manifest" "gpu-cluster-policy" {
         defaultRuntime = "crio"
         initContainer  = {}
         runtimeClass   = "nvidia"
-        deployGFD      = true
       }
       dcgm = {
         enabled = true
@@ -232,8 +231,14 @@ resource "kubernetes_manifest" "gpu-cluster-policy" {
         config = {
           name = ""
         }
+        serviceMonitor = {
+          enabled = true
+        }
+        enabled = true
       }
       driver = {
+        enabled                = true
+        use_ocp_driver_toolkit = true
         licensingConfig = {
           nlsEnabled    = false
           configMapName = ""
@@ -250,29 +255,29 @@ resource "kubernetes_manifest" "gpu-cluster-policy" {
         virtualTopology = {
           config = ""
         }
-        enabled                = true
-        use_ocp_driver_toolkit = true
-        devicePlugin           = {}
-        mig = {
-          strategy = "single"
+      }
+      devicePlugin = {
+        enabled = true
+      }
+      mig = {
+        strategy = "single"
+      }
+      validator = {
+        plugin = {
+          env = [
+            {
+              name  = "WITH_WORKLOAD"
+              value = "true"
+            }
+          ]
         }
-        validator = {
-          plugin = {
-            env = [
-              {
-                name  = "WITH_WORKLOAD"
-                value = "true"
-              }
-            ]
-          }
-        }
-        nodeStatusExporter = {
-          enabled = true
-        }
-        daemonsets = {}
-        toolkit = {
-          enabled = true
-        }
+      }
+      nodeStatusExporter = {
+        enabled = true
+      }
+      daemonsets = {}
+      toolkit = {
+        enabled = true
       }
     }
   }
