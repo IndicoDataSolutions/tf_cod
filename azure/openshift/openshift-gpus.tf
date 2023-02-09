@@ -215,18 +215,27 @@ resource "kubernetes_manifest" "gpu-cluster-policy" {
     }
 
     spec = {
+      vgpuDeviceManager = {
+        config = {
+          default = "default"
+        }
+        enabled = true
+      }
       migManager = {
         enabled = true
       }
       operator = {
-        defaultRuntime = "crio"
-        initContainer  = {}
-        runtimeClass   = "nvidia"
+        defaultRuntime         = "crio"
+        initContainer          = {}
+        runtimeClass           = "nvidia"
+        use_ocp_driver_toolkit = true
       }
       dcgm = {
         enabled = true
       }
-      gfd = {}
+      gfd = {
+        enabled = true
+      }
       dcgmExporter = {
         config = {
           name = ""
@@ -247,6 +256,24 @@ resource "kubernetes_manifest" "gpu-cluster-policy" {
         }
         kernelModuleConfig = {
           name = ""
+        }
+        upgradePolicy = {
+          autoUpgrade = true
+          drain = {
+            deleteEmptyDir = false
+            enable         = false
+            force          = false
+            timeoutSeconds = 300
+          }
+          maxParallelUpgrades = 1
+          podDeletion = {
+            deleteEmptyDir = false
+            force          = false
+            timeoutSeconds = 300
+          }
+          waitForCompletion = {
+            timeoutSeconds = 0
+          }
         }
         repoConfig = {
           configMapName = ""
