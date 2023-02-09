@@ -156,8 +156,8 @@ resource "kubernetes_manifest" "nfd" {
   ]
 
   manifest = {
-    apiVersion = "operators.coreos.com/v1alpha1"
-    kind       = "Subscription"
+    apiVersion = "nfd.openshift.io/v1"
+    kind       = "NodeFeatureDiscovery"
     metadata = {
       name      = "nfd-instance"
       namespace = local.nfd_namespace
