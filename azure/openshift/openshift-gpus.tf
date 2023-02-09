@@ -66,7 +66,8 @@ data "kubernetes_resource" "package" {
 
 resource "kubernetes_manifest" "gpu-operator-subscription" {
   depends_on = [
-    kubernetes_namespace.gpu
+    kubernetes_namespace.gpu,
+    module.cluster
   ]
 
   manifest = {
@@ -97,6 +98,7 @@ resource "kubernetes_manifest" "gpu-operator-subscription" {
 
 resource "kubernetes_namespace" "nfd" {
   depends_on = [
+    module.cluster,
     kubernetes_manifest.gpu-operator-subscription
   ]
 
