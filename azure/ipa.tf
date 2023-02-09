@@ -127,8 +127,7 @@ resource "helm_release" "crunchy-postgres" {
     time_sleep.wait_1_minutes_after_crds
   ]
 
-  name             = "
-  "
+  name             = "crunchy"
   create_namespace = true
   namespace        = "crunchy"
   repository       = var.ipa_repo
