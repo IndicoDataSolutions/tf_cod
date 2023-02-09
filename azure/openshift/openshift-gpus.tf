@@ -138,11 +138,11 @@ metadata:
   namespace: ${local.nfd_namespace}
 
 spec:
-  channel             = "stable"
-  installPlanApproval = "Automatic"
-  name                = "nfd"
-  source              = "redhat-operators"
-  sourceNamespace     = "openshift-marketplace"
+  channel: "stable"
+  installPlanApproval: "Automatic"
+  name: "nfd"
+  source: "redhat-operators"
+  sourceNamespace: "openshift-marketplace"
 YAML
 
   # wait until ready
@@ -168,7 +168,7 @@ metadata:
 
 spec:
   customConfig:
-    configData = ""
+    configData: ""
 
   operand:
     servicePort: 12000
