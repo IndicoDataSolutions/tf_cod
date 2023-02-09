@@ -107,10 +107,39 @@ resource "helm_release" "ipa-crds" {
   ]
 }
 
+
+
+
 resource "time_sleep" "wait_1_minutes_after_crds" {
   depends_on = [helm_release.ipa-crds]
 
   create_duration = "1m"
+}
+
+
+
+# Install the Machinesets now
+resource "helm_release" "crunchy-pgo" {
+  count = var.is_openshift == true ? 1 : 0
+  depends_on = [
+    time_sleep.wait_1_minutes_after_crds
+  ]
+
+  name             = "crunch"
+  create_namespace = true
+  namespace        = "crunchy"
+  repository       = var.ipa_repo
+  chart            = "crunchy-postgres"
+  version          = "0.3.0"
+  timeout          = "600" # 10 minutes
+  wait             = true
+
+  values = [<<EOF
+  enabled: true
+  postgres-data:
+    openshift: true
+  EOF
+  ]
 }
 
 resource "azurerm_role_assignment" "external_dns" {
@@ -260,9 +289,10 @@ storage:
     volumeMode: Filesystem
 
 crunchy-postgres:
-  enabled: true
+  enabled: ${!var.is_openshift}
   postgres-data:
     openshift: ${var.is_openshift}
+    
 aws-fsx-csi-driver:
   enabled: false
 metrics-server:
