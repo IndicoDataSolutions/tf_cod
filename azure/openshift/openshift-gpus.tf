@@ -32,6 +32,7 @@ resource "kubernetes_namespace" "gpu" {
 
 resource "kubernetes_manifest" "gpu" {
   depends_on = [
+    module.cluster,
     kubernetes_namespace.gpu
   ]
 
@@ -50,6 +51,10 @@ resource "kubernetes_manifest" "gpu" {
 }
 
 data "kubernetes_resource" "package" {
+  depends_on = [
+    module.cluster
+  ]
+
   api_version = "packages.operators.coreos.com/v1"
   kind        = "PackageManifest"
 
