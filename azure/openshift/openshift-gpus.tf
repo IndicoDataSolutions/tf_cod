@@ -197,5 +197,6 @@ EOF
     fields = {
       "status.conditions[0].type"   = "Available"
       "status.conditions[0].status" = "True"
+    }
   }
 }
