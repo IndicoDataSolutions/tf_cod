@@ -104,7 +104,7 @@ resource "kubernetes_namespace" "nfd" {
 }
 
 
-resource "kubernetes_manifest" "nfd" {
+resource "kubernetes_manifest" "nfd-operator" {
   depends_on = [
     kubernetes_namespace.nfd
   ]
@@ -121,9 +121,9 @@ resource "kubernetes_manifest" "nfd" {
 }
 
 
-resource "kubernetes_manifest" "nfd-operator-subscription" {
+resource "kubernetes_manifest" "nfd-subscription" {
   depends_on = [
-    kubernetes_namespace.nfd
+    kubernetes_namespace.nfd-operator
   ]
 
   manifest = {
@@ -146,6 +146,45 @@ resource "kubernetes_manifest" "nfd-operator-subscription" {
     fields = {
       "status.conditions[0].type"   = "CatalogSourcesUnhealthy"
       "status.conditions[0].status" = "False"
+    }
+  }
+}
+
+resource "kubernetes_manifest" "nfd" {
+  depends_on = [
+    kubernetes_namespace.nfd-subscription
+  ]
+
+  manifest = {
+    apiVersion = "operators.coreos.com/v1alpha1"
+    kind       = "Subscription"
+    metadata = {
+      name      = "nfd-instance"
+      namespace = local.nfd_namespace
+    }
+    spec = {
+      customConfig = {
+        configData = {
+        }
+      }
+      operand = {
+        servicePort = 12000
+        image       = "registry.redhat.io/openshift4/ose-node-feature-discovery@sha256:07658ef3df4b264b02396e67af813a52ba416b47ab6e1d2d08025a350ccd2b7b"
+      }
+
+      workerConfig = {
+        configData = {
+          core = {
+            sleepInterval = "60s"
+          }
+          sources = {
+            pci = {
+              deviceClassWhiteList = ["0200", "03", "12"]
+              deviceLabelFields    = ["vendor"]
+            }
+          }
+        }
+      }
     }
   }
 }
