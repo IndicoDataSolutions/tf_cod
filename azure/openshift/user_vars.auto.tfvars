@@ -31,7 +31,7 @@ openshift_machine_sets = {
     pool_name  = "gpu"
     vm_size    = "Standard_NC4as_T4_v3"
     node_os    = "Linux"
-    zones      = ["1"]
+    zones      = []
     taints     = ["nvidia.com/gpu=true:NoSchedule"]
     labels = {
       "node_group" : "gpu-workers",
@@ -42,11 +42,11 @@ openshift_machine_sets = {
     cluster_auto_scaling_max_count = 5
     storageAccountType             = "Premium_LRS"
     image = {
-      offer     = "aro4"
-      publisher = "azureopenshift"
+      offer     = "0001-com-ubuntu-server-focal"
+      publisher = "canonical"
       resourceID : ""
-      sku : "aro_410"
-      version : "410.84.20220125"
+      sku : "20_04-lts-gen2"
+      version : "latest"
     }
   },
   celeryworkers = {
@@ -64,11 +64,11 @@ openshift_machine_sets = {
     cluster_auto_scaling_max_count = 20
     storageAccountType             = "Premium_LRS"
     image = {
-      offer     = "aro4"
-      publisher = "azureopenshift"
-      resourceID : ""
-      sku : "aro_410"
-      version : "410.84.20220125"
+      offer      = "aro4"
+      publisher  = "azureopenshift"
+      resourceID = ""
+      sku        = "aro_410"
+      version    = "410.84.20220125"
     }
   },
   staticworkers = {
@@ -86,11 +86,11 @@ openshift_machine_sets = {
     cluster_auto_scaling_max_count = 20
     storageAccountType             = "Premium_LRS"
     image = {
-      offer     = "aro4"
-      publisher = "azureopenshift"
-      resourceID : ""
-      sku : "aro_410"
-      version : "410.84.20220125"
+      offer      = "aro4"
+      publisher  = "azureopenshift"
+      resourceID = ""
+      sku        = "aro_410"
+      version    = "410.84.20220125"
     }
   },
   pdfworkers = {
@@ -108,11 +108,11 @@ openshift_machine_sets = {
     cluster_auto_scaling_max_count = 5
     storageAccountType             = "Premium_LRS"
     image = {
-      offer     = "aro4"
-      publisher = "azureopenshift"
-      resourceID : ""
-      sku : "aro_410"
-      version : "410.84.20220125"
+      offer      = "aro4"
+      publisher  = "azureopenshift"
+      resourceID = ""
+      sku        = "aro_410"
+      version    = "410.84.20220125"
     }
   },
   highmemworkers = {
@@ -130,11 +130,11 @@ openshift_machine_sets = {
     cluster_auto_scaling_max_count = 3
     storageAccountType             = "Premium_LRS"
     image = {
-      offer     = "aro4"
-      publisher = "azureopenshift"
-      resourceID : ""
-      sku : "aro_410"
-      version : "410.84.20220125"
+      offer      = "aro4"
+      publisher  = "azureopenshift"
+      resourceID = ""
+      sku        = "aro_410"
+      version    = "410.84.20220125"
     }
   },
   monitoringworkers = {
@@ -152,11 +152,11 @@ openshift_machine_sets = {
     cluster_auto_scaling_max_count = 4
     storageAccountType             = "Premium_LRS"
     image = {
-      offer     = "aro4"
-      publisher = "azureopenshift"
-      resourceID : ""
-      sku : "aro_410"
-      version : "410.84.20220125"
+      offer      = "aro4"
+      publisher  = "azureopenshift"
+      resourceID = ""
+      sku        = "aro_410"
+      version    = "410.84.20220125"
     }
   },
   pgoworkers = {
@@ -174,11 +174,11 @@ openshift_machine_sets = {
     cluster_auto_scaling_max_count = 4
     storageAccountType             = "Premium_LRS"
     image = {
-      offer     = "aro4"
-      publisher = "azureopenshift"
-      resourceID : ""
-      sku : "aro_410"
-      version : "410.84.20220125"
+      offer      = "aro4"
+      publisher  = "azureopenshift"
+      resourceID = ""
+      sku        = "aro_410"
+      version    = "410.84.20220125"
     }
   }
 }
