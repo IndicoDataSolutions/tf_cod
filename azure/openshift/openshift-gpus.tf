@@ -164,30 +164,32 @@ resource "kubernetes_manifest" "nfd" {
     }
     spec = {
       customConfig = {
-        configData = ""
+        configData = <<EOF
+#    - name: "more.kernel.features"
+#      matchOn:
+#      - loadedKMod: ["example_kmod3"]
+#    - name: "more.features.by.nodename"
+#      value: customValue
+#      matchOn:
+#      - nodename: ["special-.*-node-.*"]
+EOF
       }
+
       operand = {
         servicePort = 12000
         image       = "registry.redhat.io/openshift4/ose-node-feature-discovery@sha256:07658ef3df4b264b02396e67af813a52ba416b47ab6e1d2d08025a350ccd2b7b"
       }
 
       workerConfig = {
-        configData = {
-          core = {
-            sleepInterval = "60s"
-          }
-          sources = {
-            pci = {
-              deviceClassWhiteList = ["0200", "03", "12"]
-              deviceLabelFields    = ["vendor"]
-            }
-          }
-        }
+        configData = <<EOF
+core:
+  sleepInterval: 60s
+sources:
+  pci:
+    deviceClassWhiteList: ["0200", "03", "12"]
+    deviceLabelFields: ["vendor"]
+EOF
       }
     }
   }
 }
-
-
-
-
