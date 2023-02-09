@@ -31,7 +31,7 @@ openshift_machine_sets = {
     pool_name  = "gpu"
     vm_size    = "Standard_NC4as_T4_v3"
     node_os    = "Linux"
-    zones      = []
+    zones      = ["0"]
     taints     = ["nvidia.com/gpu=true:NoSchedule"]
     labels = {
       "node_group" : "gpu-workers",
