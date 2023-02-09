@@ -152,7 +152,7 @@ resource "kubernetes_manifest" "nfd-subscription" {
 
 resource "kubernetes_manifest" "nfd" {
   depends_on = [
-    kubernetes_namespace.nfd-subscription
+    kubernetes_manifest.nfd-subscription
   ]
 
   manifest = {
