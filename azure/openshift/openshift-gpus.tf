@@ -83,14 +83,13 @@ resource "kubectl_manifest" "gpu-operator-subscription" {
       startingCSV: "${local.package}"
   YAML
 }
-  # wait until ready
-  #wait {
-  #  fields = {
-  #    "status.conditions[0].type"   = "CatalogSourcesUnhealthy"
-  #    "status.conditions[0].status" = "False"
-  #  }
-  #}
-}
+# wait until ready
+#wait {
+#  fields = {
+#    "status.conditions[0].type"   = "CatalogSourcesUnhealthy"
+#    "status.conditions[0].status" = "False"
+#  }
+#}
 
 
 resource "kubernetes_namespace" "nfd" {
