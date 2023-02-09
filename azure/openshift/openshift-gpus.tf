@@ -141,6 +141,7 @@ resource "kubernetes_manifest" "nfd-subscription" {
       sourceNamespace     = "openshift-marketplace"
     }
   }
+
   # wait until ready
   wait {
     fields = {
