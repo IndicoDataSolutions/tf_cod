@@ -164,8 +164,7 @@ resource "kubernetes_manifest" "nfd" {
     }
     spec = {
       customConfig = {
-        configData = {
-        }
+        configData = ""
       }
       operand = {
         servicePort = 12000
