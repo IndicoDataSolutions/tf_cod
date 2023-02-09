@@ -237,8 +237,7 @@ resource "kubernetes_manifest" "gpu-cluster-policy" {
         enabled = true
       }
       driver = {
-        enabled                = true
-        use_ocp_driver_toolkit = true
+        enabled = true
         licensingConfig = {
           nlsEnabled    = false
           configMapName = ""
