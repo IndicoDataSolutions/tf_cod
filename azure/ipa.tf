@@ -504,7 +504,7 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
-            ${var.is_openshift ? "kafka-strmzi: {podSecurityContext: {fsGroup: 1001}}" : "#azure kafka-strmzi"}
+            ${var.is_openshift ? "kafka-strimzi: {podSecurityContext: {fsGroup: 1001}}" : "#azure kafka-strmzi"}
             aws-node-termination:
               enabled: false
             app-edge:
