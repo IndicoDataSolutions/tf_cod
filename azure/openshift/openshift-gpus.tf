@@ -200,3 +200,80 @@ EOF
     }
   }
 }
+
+
+resource "kubernetes_manifest" "gpu-cluster-policy" {
+  depends_on = [
+    kubernetes_manifest.nfd
+  ]
+
+  manifest = {
+    apiVersion = "nvidia.com/v1"
+    kind       = "ClusterPolicy"
+    metadata = {
+      name = "gpu-cluster-policy"
+    }
+
+    spec = {
+      migManager = {
+        enabled = true
+      }
+      operator = {
+        defaultRuntime = "crio"
+        initContainer  = {}
+        runtimeClass   = "nvidia"
+        deployGFD      = true
+      }
+      dcgm = {
+        enabled = true
+      }
+      gfd = {}
+      dcgmExporter = {
+        config = {
+          name = ""
+        }
+      }
+      driver = {
+        licensingConfig = {
+          nlsEnabled    = false
+          configMapName = ""
+        }
+        certConfig = {
+          name = ""
+        }
+        kernelModuleConfig = {
+          name = ""
+        }
+        repoConfig = {
+          configMapName = ""
+        }
+        virtualTopology = {
+          config = ""
+        }
+        enabled                = true
+        use_ocp_driver_toolkit = true
+        devicePlugin           = {}
+        mig = {
+          strategy = "single"
+        }
+        validator = {
+          plugin = {
+            env = [
+              {
+                name  = "WITH_WORKLOAD"
+                value = "true"
+              }
+            ]
+          }
+        }
+        nodeStatusExporter = {
+          enabled = true
+        }
+        daemonsets = {}
+        toolkit = {
+          enabled = true
+        }
+      }
+    }
+  }
+}
