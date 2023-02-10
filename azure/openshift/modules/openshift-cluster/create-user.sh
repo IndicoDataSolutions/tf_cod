@@ -52,7 +52,7 @@ key_file=/tmp/${name}-${resource_group}.key
 NEW_KUBECONFIG="/tmp/.${name}-${resource_group}_kubeconfig"
 
 #set -x
-prefix=$(echo "foo"|md5sum|head -c 20)
+prefix=$(openssl rand -hex 20)
 creds_file="/tmp/${prefix}-${name}-${resource_group}_creds.json"
 info_file="/tmp/${prefix}-${name}-${resource_group}_info.json"
 

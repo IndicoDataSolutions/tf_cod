@@ -3,7 +3,7 @@ name=$1
 resource_group=$2
 
 #set -x
-prefix=$(echo "foo"|md5sum|head -c 20)
+prefix=$(prefix=$(openssl rand -hex 20)
 creds_file="/tmp/$prefix-${name}-${resource_group}_creds.json"
 info_file="/tmp/$prefix-${name}-${resource_group}_info.json"
 
