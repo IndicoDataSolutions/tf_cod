@@ -87,6 +87,7 @@ resource "kubectl_manifest" "gpu-operator-subscription" {
 
 resource "null_resource" "wait-for-gpu-operator" {
   depends_on = [
+    module.cluster,
     kubectl_manifest.gpu-operator-subscription
   ]
 
@@ -169,7 +170,8 @@ YAML
 
 resource "null_resource" "wait-for-nfd-subscription" {
   depends_on = [
-    kubectl_manifest.nfd-subscription
+    kubectl_manifest.nfd-subscription,
+    module.cluster
   ]
 
   triggers = {
@@ -226,6 +228,7 @@ YAML
 
 resource "null_resource" "wait-for-node-feature-discovery" {
   depends_on = [
+    module.cluster,
     kubectl_manifest.nfd
   ]
 
@@ -248,6 +251,7 @@ resource "null_resource" "wait-for-node-feature-discovery" {
 
 resource "kubectl_manifest" "gpu-cluster-policy" {
   depends_on = [
+    module.cluster,
     null_resource.wait-for-gpu-operator,
     null_resource.wait-for-node-feature-discovery,
     null_resource.wait-for-nfd-subscription,
