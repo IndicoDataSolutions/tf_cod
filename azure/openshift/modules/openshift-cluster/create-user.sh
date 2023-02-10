@@ -140,6 +140,8 @@ done
 if [ "$LOGIN_ONLY" == "YES" ]; then
   cat $info_file
   cat $creds_file
+  rm $creds_file
+  rm $info_file
   exit 0
 fi
 
