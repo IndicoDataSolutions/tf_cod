@@ -97,7 +97,7 @@ resource "null_resource" "wait-for-gpu-operator" {
   # login
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command     = "${path.module}/auth.sh ${var.label} ${var.resource_group_name}"
+    command     = "${path.module}/auth.sh ${var.label} ${local.resource_group_name}"
   }
 
   provisioner "local-exec" {
@@ -105,16 +105,6 @@ resource "null_resource" "wait-for-gpu-operator" {
     command     = "${path.module}/wait-for-subscription.sh ${local.nvidia_operator_namespace} gpu-operator-certified"
   }
 }
-
-
-# wait until ready
-#wait {
-#  fields = {
-#    "status.conditions[0].type"   = "CatalogSourcesUnhealthy"
-#    "status.conditions[0].status" = "False"
-#  }
-#}
-
 
 resource "kubernetes_namespace" "nfd" {
   depends_on = [
@@ -189,7 +179,7 @@ resource "null_resource" "wait-for-nfd-subscription" {
   # login
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command     = "${path.module}/auth.sh ${var.label} ${var.resource_group_name}"
+    command     = "${path.module}/auth.sh ${var.label} ${local.resource_group_name}"
   }
 
   provisioner "local-exec" {
