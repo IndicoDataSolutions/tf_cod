@@ -290,7 +290,7 @@ spec:
       name: ""
     
     serviceMonitor:
-      enabled true
+      enabled: true
     
     enabled: true
   
