@@ -42,7 +42,7 @@ resource "kubectl_manifest" "gpu" {
       name: "nvidia-gpu-operator-group"
       namespace: ${local.nvidia_operator_namespace}
     spec:
-      targetNamespaces = [${local.nvidia_operator_namespace}]
+      targetNamespaces: [${local.nvidia_operator_namespace}]
   YAML
 }
 
@@ -222,9 +222,33 @@ YAML
 }
 
 
+
+
+resource "null_resource" "wait-for-nfd-subscription" {
+  depends_on = [
+    kubectl_manifest.nfd
+  ]
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  # login
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "${path.module}/auth.sh ${var.label} ${local.resource_group_name}"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "${path.module}/wait-for-nfd.sh ${local.nfd_namespace} nfd-instance"
+  }
+}
+
+
 resource "kubectl_manifest" "gpu-cluster-policy" {
   depends_on = [
-    module.cluster,
+    null_resource.wait-for-nfd-subscription,
     kubectl_manifest.nfd
   ]
 
