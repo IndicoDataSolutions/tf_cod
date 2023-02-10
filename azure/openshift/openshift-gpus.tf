@@ -84,6 +84,29 @@ resource "kubectl_manifest" "gpu-operator-subscription" {
   YAML
 }
 
+
+resource "null_resource" "wait-for-gpu-operator" {
+  depends_on = [
+    kubectl_manifest.gpu-operator-subscription
+  ]
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  # login
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "${path.module}/auth.sh ${var.label} ${var.resource_group_name}"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "${path.module}/wait-for-subscription.sh ${local.nvidia_operator_namespace} gpu-operator-certified"
+  }
+}
+
+
 # wait until ready
 #wait {
 #  fields = {
@@ -110,7 +133,7 @@ resource "kubernetes_namespace" "nfd" {
 
 resource "kubectl_manifest" "nfd-operator" {
   depends_on = [
-    module.cluster,
+    null_resource.wait-for-gpu-operator,
     kubernetes_namespace.nfd
   ]
 
@@ -153,10 +176,33 @@ YAML
   #  }
 }
 
+
+resource "null_resource" "wait-for-nfd-subscription" {
+  depends_on = [
+    kubectl_manifest.nfd-subscription
+  ]
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  # login
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "${path.module}/auth.sh ${var.label} ${var.resource_group_name}"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "${path.module}/wait-for-subscription.sh ${local.nfd_namespace} nfd"
+  }
+}
+
+
 resource "kubectl_manifest" "nfd" {
   depends_on = [
     module.cluster,
-    kubectl_manifest.nfd-subscription
+    null_resources.wait-for-nfd-subscription
   ]
 
   yaml_body = <<YAML
