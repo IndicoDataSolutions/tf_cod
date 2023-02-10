@@ -194,6 +194,7 @@ resource "null_resource" "wait-for-nfd-subscription" {
 resource "kubectl_manifest" "nfd" {
   depends_on = [
     module.cluster,
+    kubernetes_namespace.nfd,
     null_resource.wait-for-nfd-subscription
   ]
 
