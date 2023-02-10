@@ -37,6 +37,6 @@ password=$(cat $creds_file | jq -r '.kubeadminPassword')
 api_ip=$(cat $info_file | jq -r '.api')
 api_url=$(cat $info_file | jq -r '.apiUrl')
 
-oc login --loglevel=1 $api_url --username "${username}" --password "${password}"
+oc login --loglevel=1 $api_url --username "${username}" --password "${password}" --insecure-skip-tls-verify=true
 
 kubectl patch storageclass managed-premium -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
