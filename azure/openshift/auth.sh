@@ -3,9 +3,9 @@ name=$1
 resource_group=$2
 
 #set -x
-
-creds_file="/tmp/${name}-${resource_group}_creds.json"
-info_file="/tmp/${name}-${resource_group}_info.json"
+prefix=$(echo "foo"|md5sum|head -c 20)
+creds_file="/tmp/$prefix-${name}-${resource_group}_creds.json"
+info_file="/tmp/$prefix-${name}-${resource_group}_info.json"
 
 if [ -f $creds_file ]; then
   rm $creds_file
@@ -37,3 +37,6 @@ api_ip=$(cat $info_file | jq -r '.api')
 api_url=$(cat $info_file | jq -r '.apiUrl')
 
 oc login $api_url --username "${username}" --password "${password}"
+
+rm $creds_file
+rm $info_file

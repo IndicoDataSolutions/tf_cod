@@ -52,9 +52,9 @@ key_file=/tmp/${name}-${resource_group}.key
 NEW_KUBECONFIG="/tmp/.${name}-${resource_group}_kubeconfig"
 
 #set -x
-
-creds_file="/tmp/${name}-${resource_group}_creds.json"
-info_file="/tmp/${name}-${resource_group}_info.json"
+prefix=$(echo "foo"|md5sum|head -c 20)
+creds_file="/tmp/${prefix}-${name}-${resource_group}_creds.json"
+info_file="/tmp/${prefix}-${name}-${resource_group}_info.json"
 
 if [ -f $NEW_KUBECONFIG ]; then
   rm $NEW_KUBECONFIG
@@ -283,3 +283,6 @@ echo "Completed login"
 #echo "kubernetes_cluster_ca_certificate"
 #cat $kubernetes_cluster_ca_certificate
 echo "to use: export KUBECONFIG=$PWD/$name.kubeconfig"
+
+rm $creds_file
+rm $info_file
