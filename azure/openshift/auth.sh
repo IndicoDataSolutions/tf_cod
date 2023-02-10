@@ -38,5 +38,12 @@ api_url=$(cat $info_file | jq -r '.apiUrl')
 
 oc login $api_url --username "${username}" --password "${password}"
 
-rm $creds_file
-rm $info_file
+
+if [ -f $creds_file ]; then
+  rm $creds_file
+fi
+
+if [ -f $info_file ]; then
+  rm $info_file
+fi
+
