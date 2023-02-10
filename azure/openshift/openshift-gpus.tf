@@ -192,7 +192,7 @@ resource "null_resource" "wait-for-nfd-subscription" {
 resource "kubectl_manifest" "nfd" {
   depends_on = [
     module.cluster,
-    null_resources.wait-for-nfd-subscription
+    null_resource.wait-for-nfd-subscription
   ]
 
   yaml_body = <<YAML
