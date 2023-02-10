@@ -182,7 +182,7 @@ clusterIssuer:
     - dns01:
         azureDNS:
           environment: AzurePublicCloud
-          hostedZoneName: ${local.dns_prefix}.${data.azurerm_dns_zone.domain.name}
+          hostedZoneName: ${data.azurerm_dns_zone.domain.name}
           managedIdentity:
             clientID: ${azuread_application.workload_identity.application_id}
           resourceGroupName: ${var.common_resource_group}
