@@ -286,5 +286,12 @@ echo "Completed login"
 #cat $kubernetes_cluster_ca_certificate
 echo "to use: export KUBECONFIG=$PWD/$name.kubeconfig"
 
-rm $creds_file
-rm $info_file
+set +e
+
+if [ -f $creds_file ]; then
+  rm $creds_file
+fi
+
+if [ -f $info_file ]; then
+  rm $info_file
+fi
