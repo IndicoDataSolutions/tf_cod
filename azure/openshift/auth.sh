@@ -38,7 +38,7 @@ api_url=$(cat $info_file | jq -r '.apiUrl')
 
 oc login $api_url --username "${username}" --password "${password}"
 
-
+set +e
 if [ -f $creds_file ]; then
   rm $creds_file
 fi
