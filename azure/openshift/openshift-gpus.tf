@@ -195,6 +195,7 @@ resource "kubectl_manifest" "nfd" {
   depends_on = [
     module.cluster,
     kubernetes_namespace.nfd,
+    null_resource.wait-for-gpu-operator,
     null_resource.wait-for-nfd-subscription
   ]
 
@@ -223,9 +224,6 @@ spec:
           deviceLabelFields: ["vendor"]
 YAML
 }
-
-
-
 
 resource "null_resource" "wait-for-node-feature-discovery" {
   depends_on = [
