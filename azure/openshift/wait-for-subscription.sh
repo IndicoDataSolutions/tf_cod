@@ -12,6 +12,7 @@ do
   ready=$(kubectl get subscription -n $1 $2 -o json | jq -r '.status.conditions[] | select((.status == "False") and (.type == "CatalogSourcesUnhealthy")) | .reason')
   if [ $ready != $healthy ]; then
     echo "Not ready, waiting ${retry_attempts} ${ready}"
+    kubectl get subscription -n $1 $2 -o json | jq -r '.status.conditions[]'
     sleep 30
     ((retry_attempts--))
   else
