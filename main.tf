@@ -244,70 +244,6 @@ module "fsx-storage" {
   include_rox                 = var.include_rox
 }
 
-resource "aws_iam_role" "dns_manager" {
-  name = "${var.label}-dns-manager"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = "EKSNodeAssumeRole"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      },
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "dns_manager_policy" {
-  policy_arn = aws_iam_policy.dns_manager_policy.arn
-  role       = aws_iam_role.dns_manager.name
-}
-
-# EKS node policy for ALB and cluster autoscaling
-resource "aws_iam_policy" "dns_manager_policy" {
-  name   = "${var.label}-dns-manager-policy"
-  policy = data.aws_iam_policy_document.dns_manager_policy.json
-}
-
-data "aws_iam_policy_document" "dns_manager_policy" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "route53:GetChange"
-    ]
-    resources = [
-      "arn:aws:route53:::change/*"
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "route53:ChangeResourceRecordSets",
-      "route53:ListResourceRecordSets"
-    ]
-    resources = [
-      "arn:aws:route53:::hostedzone/*"
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "route53:ListHostedZonesByName"
-    ]
-    resources = [
-      "*"
-    ]
-  }
-}
-
-
-locals {
-  cluster_node_policies = concat(var.cluster_node_policies, [aws_iam_policy.dns_manager_policy.name])
-}
 
 module "cluster" {
   cod_snapshots_enabled      = true
@@ -315,7 +251,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "7.6.0"
+  version                    = "7.7.0"
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
@@ -325,7 +261,7 @@ module "cluster" {
   security_group_id          = module.security-group.all_subnets_sg_id
   subnet_ids                 = flatten([local.network[0].private_subnet_ids])
   node_groups                = var.node_groups
-  cluster_node_policies      = local.cluster_node_policies
+  cluster_node_policies      = var.cluster_node_policies
   eks_cluster_iam_role       = var.eks_cluster_iam_role
   eks_cluster_nodes_iam_role = "${var.label}-${var.region}-node-role"
   fsx_arns                   = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
