@@ -224,7 +224,7 @@ YAML
 
 
 
-resource "null_resource" "wait-for-nfd" {
+resource "null_resource" "wait-for-node-feature-discovery" {
   depends_on = [
     kubectl_manifest.nfd
   ]
@@ -248,8 +248,9 @@ resource "null_resource" "wait-for-nfd" {
 
 resource "kubectl_manifest" "gpu-cluster-policy" {
   depends_on = [
-    null_resource.wait-for-nfd,
-    null_resource.wait-for-gpu-subscription,
+    null_resource.wait-for-gpu-operator,
+    null_resource.wait-for-node-feature-discovery,
+    null_resource.wait-for-nfd-subscription,
     kubectl_manifest.nfd
   ]
 
