@@ -232,7 +232,7 @@ locals {
       image                          = group.image
     }
   ])
-  kube_prometheus_stack_enabled = false
+  kube_prometheus_stack_enabled = true
   indico_storage_class_name     = "azurefile"
 }
 
