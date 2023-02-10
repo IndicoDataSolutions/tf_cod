@@ -109,7 +109,7 @@ resource "null_resource" "wait-for-gpu-operator" {
 resource "kubernetes_namespace" "nfd" {
   depends_on = [
     module.cluster,
-    kubectl_manifest.gpu-operator-subscription
+    null_resource.wait-for-gpu-operator
   ]
 
   metadata {
@@ -249,6 +249,7 @@ resource "null_resource" "wait-for-nfd" {
 resource "kubectl_manifest" "gpu-cluster-policy" {
   depends_on = [
     null_resource.wait-for-nfd,
+    null_resource.wait-for-gpu-subscription.
     kubectl_manifest.nfd
   ]
 
