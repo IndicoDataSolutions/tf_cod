@@ -83,10 +83,10 @@ resource "helm_release" "monitoring" {
     host: "${local.dns_name}"
   
   prometheus-postgres-exporter:
-    enabled: ${!var.is_openshift}
+    enabled: ${local.kube_prometheus_stack_enabled}
 
   ingress-nginx:
-    enabled: ${!var.is_openshift}
+    enabled: ${local.kube_prometheus_stack_enabled}
 
     rbac:
       create: true
