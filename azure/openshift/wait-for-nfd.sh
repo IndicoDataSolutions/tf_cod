@@ -2,7 +2,7 @@
 namespace=$1
 subscription=$2
 
-#set -x
+set -x
 ready="false"
 retry_attempts=60
 healthy="Available"
