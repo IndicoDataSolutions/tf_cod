@@ -20,3 +20,4 @@ do
   fi
 done
 
+# kc get operator nfd.openshift-nfd -o json | jq '.status.components.refs[] | select((.kind == "CustomResourceDefinition") and (.name == "nodefeaturediscoveries.nfd.openshift.io")) | .conditions[] | select(.status == "True" and .type == "NamesAccepted") | .reason'
