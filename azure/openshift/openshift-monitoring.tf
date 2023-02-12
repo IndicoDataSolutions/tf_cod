@@ -15,4 +15,3 @@ data:
     enableUserWorkload: true
 YAML
 }
-

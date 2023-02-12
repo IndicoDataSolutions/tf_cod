@@ -285,6 +285,8 @@ cluster:
 secrets:
   rabbitmq:
     create: true
+    serviceMonitor:
+      enabled: true
   
   general:
     create: true
