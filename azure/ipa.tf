@@ -287,8 +287,8 @@ secrets:
     create: true
     metrics:
       enabled: true
-    serviceMonitor:
-      enabled: true
+      serviceMonitor:
+        enabled: true
   
   general:
     create: true

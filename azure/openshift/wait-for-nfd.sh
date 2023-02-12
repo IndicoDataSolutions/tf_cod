@@ -14,6 +14,7 @@ do
 
   if [ "$ready" == "$healthy" ] && [ "$conflicts" == "NoConflicts" ]; then
     echo "$1/$2 is $healthy and $conflicts"
+    sleep 60
   else
     echo "Not ready, waiting ${retry_attempts} ${ready}"
     kubectl get nodefeaturediscovery -n $1 $2 -o json | jq -r '.status.conditions[]'
