@@ -282,13 +282,17 @@ cluster:
   domain: ${var.domain_suffix}
   account: ${var.account}
 
-secrets:
+rabbitmq:
+  enabled: true
   rabbitmq:
-    create: true
     metrics:
       enabled: true
       serviceMonitor:
         enabled: true
+        
+secrets:
+  rabbitmq:
+    create: true
   
   general:
     create: true
