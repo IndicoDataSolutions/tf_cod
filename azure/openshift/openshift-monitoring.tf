@@ -1,6 +1,6 @@
 
 
-resource "kubectl_manifest" "openshift-keda-subscription" {
+resource "kubectl_manifest" "custom-metrics-autoscaler" {
   depends_on = [
     module.cluster
   ]
