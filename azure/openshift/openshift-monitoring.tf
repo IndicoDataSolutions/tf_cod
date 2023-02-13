@@ -49,6 +49,5 @@ spec:
     app.kubernetes.io/name: prometheus
   sessionAffinity: None
   type: ClusterIP
-}
 YAML
 }
