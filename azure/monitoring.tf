@@ -120,7 +120,7 @@ resource "helm_release" "monitoring" {
 }
 
 resource "helm_release" "keda-monitoring" {
-  count = var.monitoring_enabled == true ? 1 : 0
+  count = var.monitoring_enabled == true && !var.is_openshift == true ? 1 : 0
   depends_on = [
     module.cluster,
     helm_release.monitoring
