@@ -1,4 +1,28 @@
 
+
+resource "kubectl_manifest" "openshift-keda-subscription" {
+  depends_on = [
+    module.cluster
+  ]
+
+  yaml_body = <<YAML 
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  labels:
+    operators.coreos.com/openshift-custom-metrics-autoscaler-operator.openshift-keda: ""
+  name: openshift-custom-metrics-autoscaler-operator
+  namespace: openshift-keda
+spec:
+  channel: stable
+  installPlanApproval: Automatic
+  name: openshift-custom-metrics-autoscaler-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: custom-metrics-autoscaler.v2.7.1
+YAML
+}
+
 resource "kubectl_manifest" "cluster-monitoring-config" {
   depends_on = [
     module.cluster
