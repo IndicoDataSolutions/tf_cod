@@ -18,6 +18,9 @@ locals {
     "userAssignedIdentityID" : "${module.cluster.kubelet_identity.client_id}"
   }
   EOF
+
+  prometheus_address = var.is_openshift ? "http://prometheus-operated.openshift-user-workload-monitoring.svc.cluster.local:9090/prometheus" : "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090/prometheus"
+
 }
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
