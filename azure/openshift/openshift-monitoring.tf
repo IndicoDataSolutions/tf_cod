@@ -22,6 +22,7 @@ resource "kubectl_manifest" "prometheus-service" {
     module.cluster,
     kubectl_manifest.cluster-monitoring-config
   ]
+
   yaml_body = <<YAML
 apiVersion: v1
 kind: Service
