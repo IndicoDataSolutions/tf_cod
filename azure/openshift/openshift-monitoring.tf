@@ -40,11 +40,11 @@ spec:
   - name: web
     port: 9090
     protocol: TCP
-    targetPort: web
+    targetPort: 9090
   - name: grpc
     port: 10901
     protocol: TCP
-    targetPort: grpc
+    targetPort: 10901
   selector:
     app.kubernetes.io/name: prometheus
   sessionAffinity: None

@@ -516,6 +516,12 @@ spec:
         - name: HELM_TF_COD_VALUES
           value: |
             ${var.is_openshift ? "kafka-strimzi: {podSecurityContext: {fsGroup: 1001}}" : "#azure kafka-strmzi"}
+            worker:
+              autoscaling:
+                serverAddress: ${local.prometheus_address}
+                highmem:
+                  serverAddress: ${local.prometheus_address}
+
             reloader:
               isOpenshift: ${var.is_openshift}
             aws-node-termination:
