@@ -286,10 +286,10 @@ rabbitmq:
   enabled: true
   rabbitmq:
     metrics:
-      enabled: true
+      enabled: ${var.is_openshift}
       serviceMonitor:
-        enabled: true
-        
+        enabled: ${var.is_openshift}
+
 secrets:
   rabbitmq:
     create: true

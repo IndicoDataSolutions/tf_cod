@@ -151,10 +151,14 @@ resource "helm_release" "keda-monitoring" {
     prometheus:
       metricServer:
         enabled: true
+        serviceMonitor:
+          enabled: true
         podMonitor:
           enabled: true
       operator:
         enabled: true
+        serviceMonitor:
+          enabled: true
         podMonitor:
           enabled: true
  EOF
