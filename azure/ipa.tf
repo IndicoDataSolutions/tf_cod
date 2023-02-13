@@ -19,7 +19,7 @@ locals {
   }
   EOF
 
-  prometheus_address = var.is_openshift ? "http://prometheus.openshift-user-workload-monitoring.svc.cluster.local:9090/prometheus" : "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090/prometheus"
+  prometheus_address = var.is_openshift ? "https://thanos-querier.openshift-monitoring.svc.cluster.local:9092" : "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090/prometheus"
 
 }
 resource "kubernetes_secret" "issuer-secret" {
