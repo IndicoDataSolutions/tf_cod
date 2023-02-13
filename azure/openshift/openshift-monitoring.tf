@@ -1,11 +1,29 @@
 
 
+resource "kubectl_manifest" "cluster-monitoring-config" {
+  depends_on = [
+    module.cluster
+  ]
+
+  yaml_body = <<YAML
+apiVersion: "v1"
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+data:
+  config.yaml: |
+    enableUserWorkload: true
+YAML
+}
+
+
 resource "kubectl_manifest" "custom-metrics-autoscaler" {
   depends_on = [
     module.cluster
   ]
 
-  yaml_body = <<YAML 
+  yaml_body = <<YAML
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
@@ -23,22 +41,6 @@ spec:
 YAML
 }
 
-resource "kubectl_manifest" "cluster-monitoring-config" {
-  depends_on = [
-    module.cluster
-  ]
-
-  yaml_body = <<YAML
-apiVersion: "v1"
-kind: ConfigMap
-metadata:
-  name: cluster-monitoring-config
-  namespace: openshift-monitoring
-data:
-  config.yaml: |
-    enableUserWorkload: true
-YAML
-}
 
 # we need to create a service for prometheus that is reachable by keda
 resource "kubectl_manifest" "prometheus-service" {
