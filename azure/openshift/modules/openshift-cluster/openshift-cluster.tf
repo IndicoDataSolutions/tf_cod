@@ -156,7 +156,6 @@ resource "null_resource" "unset-default-sc" {
   }
 }
 
-
 resource "kubernetes_storage_class" "default" {
   depends_on = [
     null_resource.unset-default-sc

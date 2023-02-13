@@ -14,33 +14,10 @@ metadata:
 data:
   config.yaml: |
     enableUserWorkload: true
+    prometheus:
+      listenLocal: false 
 YAML
 }
-
-
-resource "kubectl_manifest" "custom-metrics-autoscaler" {
-  depends_on = [
-    module.cluster
-  ]
-
-  yaml_body = <<YAML
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  labels:
-    operators.coreos.com/openshift-custom-metrics-autoscaler-operator.openshift-keda: ""
-  name: openshift-custom-metrics-autoscaler-operator
-  namespace: openshift-keda
-spec:
-  channel: stable
-  installPlanApproval: Automatic
-  name: openshift-custom-metrics-autoscaler-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-  startingCSV: custom-metrics-autoscaler.v2.7.1
-YAML
-}
-
 
 # we need to create a service for prometheus that is reachable by keda
 resource "kubectl_manifest" "prometheus-service" {
@@ -77,3 +54,33 @@ spec:
   type: ClusterIP
 YAML
 }
+
+
+
+# kc edit prometheus -n openshift-user-workload-monitoring user-workload
+# kubectl patch storageclass managed-premium -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+resource "null_resource" "patch-user-monitor" {
+  depends_on = [
+    module.cluster,
+    kubectl_manifest.prometheus-service
+  ]
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  # login
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "${path.module}/auth.sh ${var.label} ${local.resource_group_name}"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = <<EOF
+  kubectl patch --type=merge prometheus  -n openshift-user-workload-monitoring user-workload -p '{"spec": {"listenLocal":false}}'
+EOF
+  }
+}
+
+
