@@ -14,55 +14,37 @@ metadata:
 data:
   config.yaml: |
     enableUserWorkload: true
-    prometheus:
-      listenLocal: false 
 YAML
 }
 
-# we need to create a service for prometheus that is reachable by keda
-resource "kubectl_manifest" "prometheus-service" {
+resource "kubectl_manifest" "custom-metrics-autoscaler" {
   depends_on = [
-    module.cluster,
-    kubectl_manifest.cluster-monitoring-config
+    module.cluster
   ]
 
   yaml_body = <<YAML
-apiVersion: v1
-kind: Service
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
 metadata:
   labels:
-    operated-prometheus: "true"
-  name: prometheus
-  namespace: openshift-user-workload-monitoring
+    operators.coreos.com/openshift-custom-metrics-autoscaler-operator.openshift-keda: ""
+  name: openshift-custom-metrics-autoscaler-operator
+  namespace: openshift-keda
 spec:
-  internalTrafficPolicy: Cluster
-  ipFamilies:
-  - IPv4
-  ipFamilyPolicy: SingleStack
-  ports:
-  - name: web
-    port: 9090
-    protocol: TCP
-    targetPort: 9090
-  - name: grpc
-    port: 10901
-    protocol: TCP
-    targetPort: 10901
-  selector:
-    app.kubernetes.io/name: prometheus
-  sessionAffinity: None
-  type: ClusterIP
+  channel: stable
+  installPlanApproval: Automatic
+  name: openshift-custom-metrics-autoscaler-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: custom-metrics-autoscaler.v2.7.1
 YAML
 }
 
 
-
-# kc edit prometheus -n openshift-user-workload-monitoring user-workload
-# kubectl patch storageclass managed-premium -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
-resource "null_resource" "patch-user-monitor" {
+resource "null_resource" "wait-for-custom-metrics-subscription" {
   depends_on = [
-    module.cluster,
-    kubectl_manifest.prometheus-service
+    kubectl_manifest.custom-metrics-autoscaler,
+    module.cluster
   ]
 
   triggers = {
@@ -77,10 +59,36 @@ resource "null_resource" "patch-user-monitor" {
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command     = <<EOF
-  kubectl patch --type=merge prometheus  -n openshift-user-workload-monitoring user-workload -p '{"spec": {"listenLocal":false}}'
-EOF
+    command     = "${path.module}/wait-for-subscription.sh openshift-keda openshift-custom-metrics-autoscaler-operator"
   }
 }
+
+
+
+resource "kubectl_manifest" "keda-controller" {
+  depends_on = [
+    module.cluster,
+    null_resource.wait-for-custom-metrics-subscription
+  ]
+
+  yaml_body = <<YAML
+apiVersion: keda.sh/v1alpha1
+kind: KedaController
+metadata:
+  finalizers:
+    - finalizer.kedacontroller.keda.k8s.io
+  name: keda
+  namespace: openshift-keda
+spec:
+  metricsServer:
+    logLevel: '0'
+  operator:
+    logEncoder: console
+    logLevel: info
+  serviceAccount: {}
+  watchNamespace: ''
+YAML
+}
+
 
 
