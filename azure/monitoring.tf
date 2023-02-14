@@ -165,6 +165,19 @@ resource "helm_release" "keda-monitoring" {
   ]
 }
 
+# Create SA to access thanos queries
+resource "kubernetes_service_account_v1" "querier" {
+  metadata {
+    name      = "querier"
+    namespace = "openshift-monitoring"
+  }
+  secret {
+    name = kubernetes_secret_v1.querier.metadata.0.name
+  }
+  automount_service_account_token = true
+}
+
+
 resource "helm_release" "opentelemetry-collector" {
   count = local.kube_prometheus_stack_enabled == true ? 1 : 0
   depends_on = [
