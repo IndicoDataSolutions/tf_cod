@@ -165,7 +165,7 @@ resource "kubectl_manifest" "trigger-authentication" {
   ]
   yaml_body = <<YAML
 apiVersion: keda.sh/v1alpha1
-kind: TriggerAuthentication
+kind: ClusterTriggerAuthentication
 metadata:
   name: keda-trigger-auth-prometheus
 spec:

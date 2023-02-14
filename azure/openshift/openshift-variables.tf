@@ -43,7 +43,7 @@ variable "roles" {
 }
 variable "ipa_openshift_crds_version" {
   type    = string
-  default = "0.1.1-add-openshift-crds-8dd3b029"
+  default = "0.1.1-add-openshift-crds-0c9b9f04"
 }
 
 variable "kubernetes_host" {
