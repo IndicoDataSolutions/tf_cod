@@ -106,7 +106,7 @@
           {
             "name": "worker",
             "subnetId": "[parameters('workerSubnetId')]",
-            "vmSize": "Standard_D4s_v3",
+            "vmSize": "Standard_D16s_v3",
             "diskSizeGB": 128,
             "count": 3
           }
