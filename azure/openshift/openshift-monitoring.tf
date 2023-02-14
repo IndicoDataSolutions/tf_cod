@@ -162,7 +162,8 @@ YAML
 resource "kubectl_manifest" "trigger-authentication" {
   depends_on = [
     module.cluster,
-    kubectl_manifest.keda-controller
+    kubectl_manifest.keda-controller,
+    kubernetes_secret_v1.querier
   ]
   yaml_body = <<YAML
 apiVersion: keda.sh/v1alpha1
