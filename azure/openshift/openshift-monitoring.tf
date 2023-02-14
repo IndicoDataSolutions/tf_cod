@@ -159,4 +159,23 @@ YAML
 }
 
 
-
+resource "kubectl_manifest" "keda-controller" {
+  depends_on = [
+    module.cluster,
+    kubectl_manifest.keda-controller
+  ]
+  yaml_body = <<YAML
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: keda-trigger-auth-prometheus
+spec:
+  secretTargetRef: 
+  - parameter: bearerToken 
+    name: thanos-api-querier
+    key: token 
+  - parameter: ca
+    name: thanos-api-querier
+    key: ca.crt
+YAML
+}
