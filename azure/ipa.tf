@@ -519,6 +519,10 @@ spec:
             ${var.is_openshift ? "kafka-strimzi: {podSecurityContext: {fsGroup: 1001}}" : "#azure kafka-strmzi"}
             worker:
               autoscaling:
+                authentication:
+                  enabled: true
+                  authModes: bearer
+                  authTrigger: keda-trigger-auth-prometheus
                 serverAddress: ${local.prometheus_address}
                 highmem:
                   serverAddress: ${local.prometheus_address}
