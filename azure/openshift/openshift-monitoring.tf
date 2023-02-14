@@ -159,7 +159,7 @@ YAML
 }
 
 
-resource "kubectl_manifest" "keda-controller" {
+resource "kubectl_manifest" "trigger-authentication" {
   depends_on = [
     module.cluster,
     kubectl_manifest.keda-controller
