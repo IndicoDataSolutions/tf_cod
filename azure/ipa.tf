@@ -516,6 +516,8 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
+            nvidia-device-plugin:
+              enabled: ${!var.is_openshift}
             ${var.is_openshift ? "kafka-strimzi: {podSecurityContext: {fsGroup: 1001}}" : "#azure kafka-strmzi"}
             worker:
               autoscaling:

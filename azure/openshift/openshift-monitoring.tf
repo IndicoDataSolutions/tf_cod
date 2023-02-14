@@ -134,6 +134,7 @@ resource "null_resource" "wait-for-custom-metrics-subscription" {
 resource "kubectl_manifest" "keda-controller" {
   depends_on = [
     module.cluster,
+    kubectl_manifest.custom-metrics-autoscaler,
     null_resource.wait-for-custom-metrics-subscription
   ]
 
