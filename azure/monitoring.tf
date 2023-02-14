@@ -180,10 +180,28 @@ resource "kubernetes_service_account_v1" "querier" {
   automount_service_account_token = true
 }
 
-resource "kubernetes_cluster_role_binding" "querier" {
+resource "kubernetes_secret_v1" "querier" {
   depends_on = [
     module.cluster,
     kubernetes_service_account_v1.querier
+  ]
+
+  metadata {
+    name      = "thanos-api-querier"
+    namespace = "openshift-monitoring"
+    annotations = {
+      "kubernetes.io/service-account.name"                      = "querier"
+      "reflector.v1.k8s.emberstack.com/reflection-allowed"      = "true"
+      "reflector.v1.k8s.emberstack.com/reflection-auto-enabled" = "true"
+    }
+  }
+  type = "kubernetes.io/service-account-token"
+}
+
+resource "kubernetes_cluster_role_binding" "querier" {
+  depends_on = [
+    module.cluster,
+    kubernetes_secret_v1.querier
   ]
 
   metadata {
@@ -201,6 +219,8 @@ resource "kubernetes_cluster_role_binding" "querier" {
     namespace = "openshift-monitoring"
   }
 }
+
+
 
 
 resource "helm_release" "opentelemetry-collector" {
