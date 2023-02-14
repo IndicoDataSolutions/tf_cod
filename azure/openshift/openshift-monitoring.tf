@@ -86,7 +86,6 @@ resource "kubernetes_namespace" "openshift-keda" {
   }
 }
 
-/*
 resource "kubectl_manifest" "custom-metrics-autoscaler" {
   depends_on = [
     module.cluster,
@@ -97,8 +96,6 @@ resource "kubectl_manifest" "custom-metrics-autoscaler" {
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  labels:
-    operators.coreos.com/openshift-custom-metrics-autoscaler-operator.openshift-keda: ""
   name: openshift-custom-metrics-autoscaler-operator
   namespace: openshift-keda
 spec:
@@ -160,6 +157,6 @@ spec:
   watchNamespace: ''
 YAML
 }
-*/
+
 
 
