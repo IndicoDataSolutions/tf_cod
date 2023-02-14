@@ -175,7 +175,7 @@ resource "kubernetes_service_account_v1" "querier" {
     namespace = "openshift-monitoring"
   }
   secret {
-    name = kubernetes_secret_v1.querier.metadata.0.name
+    name = kubernetes_service_account_v1.querier.metadata.0.name
   }
   automount_service_account_token = true
 }
