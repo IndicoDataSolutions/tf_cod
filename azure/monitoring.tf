@@ -220,9 +220,6 @@ resource "kubernetes_cluster_role_binding" "querier" {
   }
 }
 
-
-
-
 resource "helm_release" "opentelemetry-collector" {
   count = local.kube_prometheus_stack_enabled == true ? 1 : 0
   depends_on = [

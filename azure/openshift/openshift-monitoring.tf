@@ -17,9 +17,25 @@ data:
 YAML
 }
 
-resource "kubectl_manifest" "custom-metrics-autoscaler" {
+
+resource "kubernetes_namespace" "openshift-keda" {
   depends_on = [
     module.cluster
+  ]
+
+  metadata {
+    labels = {
+      "indico.io/openshift" = "true"
+    }
+    name = "openshift-keda"
+  }
+}
+
+
+resource "kubectl_manifest" "custom-metrics-autoscaler" {
+  depends_on = [
+    module.cluster,
+    kubernetes_namespace.openshift-keda
   ]
 
   yaml_body = <<YAML
