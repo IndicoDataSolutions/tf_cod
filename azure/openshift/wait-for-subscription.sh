@@ -2,7 +2,7 @@
 namespace=$1
 subscription=$2
 
-#set -x
+set -x
 ready="false"
 retry_attempts=60
 healthy="AllCatalogSourcesHealthy"
@@ -17,6 +17,7 @@ do
     ((retry_attempts--))
   else
     echo "$1/$2 is ready"
+    sleep 30
   fi
 done
 
