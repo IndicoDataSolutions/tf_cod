@@ -1,5 +1,60 @@
 
 
+# Create SA to access thanos queries
+resource "kubernetes_service_account_v1" "querier" {
+  depends_on = [
+    module.cluster
+  ]
+  metadata {
+    name      = "querier"
+    namespace = "openshift-monitoring"
+  }
+  secret {
+    name = "querier"
+  }
+  automount_service_account_token = true
+}
+
+resource "kubernetes_secret_v1" "querier" {
+  depends_on = [
+    module.cluster,
+    kubernetes_service_account_v1.querier
+  ]
+
+  metadata {
+    name      = "thanos-api-querier"
+    namespace = "openshift-monitoring"
+    annotations = {
+      "kubernetes.io/service-account.name"                      = "querier"
+      "reflector.v1.k8s.emberstack.com/reflection-allowed"      = "true"
+      "reflector.v1.k8s.emberstack.com/reflection-auto-enabled" = "true"
+    }
+  }
+  type = "kubernetes.io/service-account-token"
+}
+
+resource "kubernetes_cluster_role_binding" "querier" {
+  depends_on = [
+    module.cluster,
+    kubernetes_secret_v1.querier
+  ]
+
+  metadata {
+    name = "querier-monitoring-view"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "cluster-monitoring-view"
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_secret_v1.querier.metadata.0.name
+    namespace = "openshift-monitoring"
+  }
+}
+
 resource "kubectl_manifest" "cluster-monitoring-config" {
   depends_on = [
     module.cluster
