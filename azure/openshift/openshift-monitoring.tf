@@ -7,7 +7,7 @@ resource "kubernetes_service_account_v1" "querier" {
   ]
   metadata {
     name      = "querier"
-    namespace = "default"
+    namespace = "openshift-keda"
   }
   secret {
     name = "querier"
@@ -23,11 +23,9 @@ resource "kubernetes_secret_v1" "querier" {
 
   metadata {
     name      = "thanos-api-querier"
-    namespace = "default"
+    namespace = "openshift-keda"
     annotations = {
-      "kubernetes.io/service-account.name"                      = "querier"
-      "reflector.v1.k8s.emberstack.com/reflection-allowed"      = "true"
-      "reflector.v1.k8s.emberstack.com/reflection-auto-enabled" = "true"
+      "kubernetes.io/service-account.name" = "querier"
     }
   }
   type = "kubernetes.io/service-account-token"
@@ -51,7 +49,7 @@ resource "kubernetes_cluster_role_binding" "querier" {
   subject {
     kind      = "ServiceAccount"
     name      = "querier"
-    namespace = "default"
+    namespace = "openshift-keda"
   }
 }
 
