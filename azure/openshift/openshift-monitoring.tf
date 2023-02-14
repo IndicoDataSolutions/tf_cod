@@ -7,7 +7,7 @@ resource "kubernetes_service_account_v1" "querier" {
   ]
   metadata {
     name      = "querier"
-    namespace = "openshift-monitoring"
+    namespace = "default"
   }
   secret {
     name = "querier"
@@ -23,7 +23,7 @@ resource "kubernetes_secret_v1" "querier" {
 
   metadata {
     name      = "thanos-api-querier"
-    namespace = "openshift-monitoring"
+    namespace = "default"
     annotations = {
       "kubernetes.io/service-account.name"                      = "querier"
       "reflector.v1.k8s.emberstack.com/reflection-allowed"      = "true"
@@ -51,7 +51,7 @@ resource "kubernetes_cluster_role_binding" "querier" {
   subject {
     kind      = "ServiceAccount"
     name      = kubernetes_secret_v1.querier.metadata.0.name
-    namespace = "openshift-monitoring"
+    namespace = "default"
   }
 }
 
