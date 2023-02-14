@@ -20,7 +20,7 @@ locals {
   EOF
 
   # https://docs.openshift.com/container-platform/4.10/nodes/pods/nodes-pods-autoscaling-custom.html
-  prometheus_address = var.is_openshift ? "http://thanos-querier.openshift-monitoring.svc.cluster.local:9092" : "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090/prometheus"
+  prometheus_address = var.is_openshift ? "https://thanos-querier.openshift-monitoring.svc.cluster.local:9092" : "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090/prometheus"
 
 }
 resource "kubernetes_secret" "issuer-secret" {
@@ -520,7 +520,7 @@ spec:
             worker:
               autoscaling:
                 authentication:
-                  enabled: true
+                  enabled: ${var.is_openshift}
                   authModes: bearer
                   authTrigger: keda-trigger-auth-prometheus
                 serverAddress: ${local.prometheus_address}
