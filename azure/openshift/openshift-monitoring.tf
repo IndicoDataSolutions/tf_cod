@@ -86,7 +86,7 @@ resource "kubernetes_namespace" "openshift-keda" {
   }
 }
 
-
+/*
 resource "kubectl_manifest" "custom-metrics-autoscaler" {
   depends_on = [
     module.cluster,
@@ -160,6 +160,6 @@ spec:
   watchNamespace: ''
 YAML
 }
-
+*/
 
 
