@@ -50,7 +50,7 @@ resource "kubernetes_cluster_role_binding" "querier" {
 
   subject {
     kind      = "ServiceAccount"
-    name      = kubernetes_secret_v1.querier.metadata.0.name
+    name      = "querier"
     namespace = "default"
   }
 }
