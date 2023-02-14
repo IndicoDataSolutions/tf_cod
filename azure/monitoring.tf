@@ -167,6 +167,9 @@ resource "helm_release" "keda-monitoring" {
 
 # Create SA to access thanos queries
 resource "kubernetes_service_account_v1" "querier" {
+  depends_on = [
+    module.cluster
+  ]
   metadata {
     name      = "querier"
     namespace = "openshift-monitoring"
@@ -175,6 +178,28 @@ resource "kubernetes_service_account_v1" "querier" {
     name = kubernetes_secret_v1.querier.metadata.0.name
   }
   automount_service_account_token = true
+}
+
+resource "kubernetes_cluster_role_binding" "querier" {
+  depends_on = [
+    module.cluster,
+    kubernetes_service_account_v1.querier
+  ]
+
+  metadata {
+    name = "querier-monitoring-view"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "cluster-monitoring-view"
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_secret_v1.querier.metadata.0.name
+    namespace = "openshift-monitoring"
+  }
 }
 
 
