@@ -208,11 +208,18 @@ metadata:
 
 spec:
   customConfig:
-    configData: ""
+    configData: |
+      #    - name: "more.kernel.features"
+      #      matchOn:
+      #      - loadedKMod: ["example_kmod3"]
+      #    - name: "more.features.by.nodename"
+      #      value: customValue
+      #      matchOn:
 
   operand:
     servicePort: 12000
-    image: "registry.redhat.io/openshift4/ose-node-feature-discovery@sha256:07658ef3df4b264b02396e67af813a52ba416b47ab6e1d2d08025a350ccd2b7b"
+    image: >-
+      registry.redhat.io/openshift4/ose-node-feature-discovery@sha256:ab719c23e369c8e080180d720d3b6d355f536dada563667ee9cfd673a78426d5
 
   workerConfig:
     configData: |
@@ -266,45 +273,36 @@ metadata:
 spec:
   vgpuDeviceManager:
     config:
-      default: "default"
+      default: default
     enabled: true
-
   migManager:
     enabled: true
-  
   operator:
-    defaultRuntime: "crio"
+    defaultRuntime: crio
     initContainer: {}
-    runtimeClass: "nvidia"
+    runtimeClass: nvidia
     use_ocp_driver_toolkit: true
-  
   dcgm:
     enabled: true
-  
   gfd:
     enabled: true
-  
   dcgmExporter:
     config:
-      name: ""
-    
+      name: ''
+    enabled: true
     serviceMonitor:
       enabled: true
-    
-    enabled: true
-  
   driver:
-    enabled: true
-    licensingConfig:
-      nlsEnabled: false
-      configMapName: ""
-    
     certConfig:
-      name: ""
-    
+      name: ''
+    enabled: true
     kernelModuleConfig:
-      name: ""
-    
+      name: ''
+    licensingConfig:
+      configMapName: ''
+      nlsEnabled: false
+    repoConfig:
+      configMapName: ''
     upgradePolicy:
       autoUpgrade: true
       drain:
@@ -312,41 +310,44 @@ spec:
         enable: false
         force: false
         timeoutSeconds: 300
-      
       maxParallelUpgrades: 1
       podDeletion:
         deleteEmptyDir: false
         force: false
         timeoutSeconds: 300
-      
       waitForCompletion:
         timeoutSeconds: 0
-      
-    repoConfig:
-      configMapName: ""
-    
     virtualTopology:
-      config: ""
-    
-  
+      config: ''
   devicePlugin:
+    config:
+      default: ''
+      name: ''
     enabled: true
-  
   mig:
-    strategy: "single"
-  
+    strategy: single
+  sandboxDevicePlugin:
+    enabled: true
   validator:
     plugin:
-      env: 
-        - name: "WITH_WORKLOAD"
-          value: "true"
-    
-  
+      env:
+        - name: WITH_WORKLOAD
+          value: 'true'
   nodeStatusExporter:
     enabled: true
-  
-  daemonsets: {}
+  daemonsets:
+    rollingUpdate:
+      maxUnavailable: '1'
+    updateStrategy: RollingUpdate
+  sandboxWorkloads:
+    defaultWorkload: container
+    enabled: false
+  vgpuManager:
+    enabled: false
+  vfioManager:
+    enabled: true
   toolkit:
     enabled: true
+    installDir: /usr/local/nvidia
 YAML
 }
