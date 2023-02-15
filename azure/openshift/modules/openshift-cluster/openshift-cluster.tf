@@ -2,7 +2,7 @@
 
 
 resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
-  name                = var.label
+  name                = "${var.label}-deployment"
   resource_group_name = var.resource_group_name
 
   template_content = file("${path.module}/ARM-openShiftClusters.json")
@@ -33,11 +33,10 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
 
   provisioner "local-exec" {
     when        = destroy
-    command     = "az aro delete --name $NAME --resource-group ${self.resource_group_name} --yes --debug"
+    command     = <<CMD
+    az aro delete --name ${replace(self.name, "-deployment", "")} --resource-group ${self.resource_group_name} --yes --debug
+    CMD
     interpreter = ["/bin/bash", "-c"]
-    environment = {
-      NAME = var.label
-    }
   }
 }
 
