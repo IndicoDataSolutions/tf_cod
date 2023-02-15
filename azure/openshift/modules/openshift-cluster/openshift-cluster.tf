@@ -35,7 +35,9 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
   # login
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command     = "${path.module}/auth.sh ${replace(self.name, "-deployment", "")} ${self.resource_group_name}"
+    command     = <<CMD
+    ${path.module}/auth.sh ${replace(self.name, "-deployment", "")} ${self.resource_group_name}
+    CMD
   }
 
 
