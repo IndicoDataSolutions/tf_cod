@@ -230,6 +230,13 @@ spec:
           deviceClassWhiteList: ["0200", "03", "12"]
           deviceLabelFields: ["vendor"]
 YAML
+
+
+  provisioner "local-exec" {
+    when        = destroy
+    interpreter = ["/bin/bash", "-c"]
+    command     = "kubectl patch nodefeaturediscovery -n openshift-nfd nfd-instance -p '{\"metadata\":{\"finalizers\": []}}' --type=merge"
+  }
 }
 
 resource "null_resource" "wait-for-node-feature-discovery" {
