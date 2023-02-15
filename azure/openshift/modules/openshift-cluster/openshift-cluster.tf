@@ -33,7 +33,7 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
 
   provisioner "local-exec" {
     when        = destroy
-    command     = "${path.module}/create-user.sh ${var.label} ${var.resource_group_name}"
+    command     = "echo destroying"
     interpreter = ["/bin/bash", "-c"]
   }
 }
