@@ -315,12 +315,12 @@ variable "ipa_smoketest_repo" {
 
 variable "ipa_smoketest_container_tag" {
   type    = string
-  default = "acd89e1d"
+  default = "development-5cc16676"
 }
 
 variable "ipa_smoketest_version" {
   type    = string
-  default = "0.2.0-add-openshift-crds-705fccfc"
+  default = "0.2.1-add-openshift-crds-4a0b2155"
 }
 
 variable "ipa_smoketest_slack_channel" {

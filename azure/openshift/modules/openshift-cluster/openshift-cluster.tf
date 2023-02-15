@@ -30,6 +30,12 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
       parameters_content
     ]
   }
+
+  provisioner "local-exec" {
+    when        = destroy
+    command     = "${path.module}/create-user.sh ${var.label} ${var.resource_group_name}"
+    interpreter = ["/bin/bash", "-c"]
+  }
 }
 
 resource "null_resource" "create-terraform-sa" {
