@@ -184,7 +184,7 @@ clusterIssuer:
           environment: AzurePublicCloud
           hostedZoneName: ${data.azurerm_dns_zone.domain.name}
           managedIdentity:
-            clientID: ${resource.azuread_service_principal.workload_identity.object_id}
+            clientID: ${module.cluster.kubelet_identity.client_id}
           resourceGroupName: ${var.common_resource_group}
           subscriptionID: ${split("/", data.azurerm_subscription.primary.id)[2]}
       selector:
