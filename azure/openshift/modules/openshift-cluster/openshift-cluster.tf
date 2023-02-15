@@ -32,18 +32,10 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
   }
 
 
-  # login
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-c"]
-    command     = <<CMD
-    ${path.module}/auth.sh ${replace(self.name, "-deployment", "")} ${self.resource_group_name}
-    CMD
-  }
-
-
   provisioner "local-exec" {
     when        = destroy
     command     = <<CMD
+    ./auth.sh ${replace(self.name, "-deployment", "")} ${self.resource_group_name}
     az aro delete --name ${replace(self.name, "-deployment", "")} --resource-group ${self.resource_group_name} --yes --debug
     CMD
     interpreter = ["/bin/bash", "-c"]
