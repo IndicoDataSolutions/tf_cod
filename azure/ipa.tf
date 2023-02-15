@@ -61,13 +61,7 @@ resource "helm_release" "ipa-crds" {
   crunchy-pgo:
     enabled: true
   
-  cert-manager:
-    podLabels:
-      azure.workload.identity/use: "true"
-    serviceAccount:
-      labels:
-        azure.workload.identity/use: "true"
-    
+  cert-manager:    
     #dns01RecursiveNameserversOnly: true
     #dns01RecursiveNameservers: "$#{data.azurerm_dns_zone.domain.name_servers[0]}:53,$#{data.azurerm_dns_zone.domain.name_servers[1]}:53,$#{data.azurerm_dns_zone.domain.name_servers[2]}:53,$#{data.azurerm_dns_zone.domain.name_servers[3]}:53"
 
