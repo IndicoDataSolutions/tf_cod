@@ -33,7 +33,7 @@ resource "azurerm_resource_group_template_deployment" "openshift-cluster" {
 
   provisioner "local-exec" {
     when        = destroy
-    command     = "echo destroying"
+    command     = "az aro delete --name ${self.name} --resource-group ${self.resource_group_name} --yes --debug"
     interpreter = ["/bin/bash", "-c"]
   }
 }
