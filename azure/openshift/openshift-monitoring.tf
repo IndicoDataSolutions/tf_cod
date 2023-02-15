@@ -84,9 +84,27 @@ resource "kubernetes_namespace" "openshift-keda" {
   }
 }
 
+
+resource "kubectl_manifest" "custom-metrics-operator-group" {
+  depends_on = [
+    kubernetes_namespace.openshift-keda
+  ]
+
+  yaml_body = <<YAML
+apiVersion: "operators.coreos.com/v1"
+kind: "OperatorGroup"
+metadata:
+  generateName: "openshift-keda-"
+  name: "openshift-keda"
+  namespace: "openshift-keda"
+YAML
+}
+
+
 resource "kubectl_manifest" "custom-metrics-autoscaler" {
   depends_on = [
     module.cluster,
+    kubectl_manifest.custom-metrics-operator-group,
     kubernetes_namespace.openshift-keda
   ]
 
