@@ -442,7 +442,12 @@ spec:
           
         - name: RELEASE_NAME
           value: run
-      
+  
+        - name: HELM_TF_COD_VALUES
+          value: |
+            prometheus:
+              url: ${local.prometheus_address}
+
         - name: HELM_VALUES
           value: |
             ${indent(12, base64decode(var.ipa_smoketest_values))} 
