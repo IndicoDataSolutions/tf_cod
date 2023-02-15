@@ -97,6 +97,7 @@ resource "azurerm_role_assignment" "external_dns" {
   scope                = data.azurerm_dns_zone.domain.id
   role_definition_name = "DNS Zone Contributor"
   principal_id         = module.cluster.kubelet_identity.object_id
+  skip_service_principal_aad_check = true
 }
 
 resource "kubernetes_secret" "azure_storage_key" {
