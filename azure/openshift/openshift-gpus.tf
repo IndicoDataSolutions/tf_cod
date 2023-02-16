@@ -235,7 +235,9 @@ YAML
   provisioner "local-exec" {
     when        = destroy
     interpreter = ["/bin/bash", "-c"]
-    command     = "kubectl patch nodefeaturediscovery -n openshift-nfd nfd-instance -p '{\"metadata\":{\"finalizers\": []}}' --type=merge || true"
+    command     = <<CMD
+    kubectl patch nodefeaturediscovery -n openshift-nfd nfd-instance -p '{"metadata":{"finalizers": []}}' --type=merge 
+    CMD
   }
 }
 
