@@ -533,7 +533,6 @@ spec:
                 serverAddress: ${local.prometheus_address}
                 highmem:
                   serverAddress: ${local.prometheus_address}
-
             reloader:
               isOpenshift: ${var.is_openshift}
             aws-node-termination:
