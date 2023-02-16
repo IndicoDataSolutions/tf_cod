@@ -236,7 +236,7 @@ YAML
     when        = destroy
     interpreter = ["/bin/bash", "-c"]
     command     = <<CMD
-    kubectl patch nodefeaturediscovery -n openshift-nfd nfd-instance -p '{"metadata":{"finalizers": []}}' --type=merge 
+    kubectl patch nodefeaturediscovery -n openshift-nfd nfd-instance -p '{"metadata":{"finalizers": []}}' --type=merge || true
     CMD
   }
 }
