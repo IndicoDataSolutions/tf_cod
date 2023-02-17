@@ -121,6 +121,11 @@ resource "kubernetes_namespace" "nfd" {
   }
 
   provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "${path.module}/auth.sh ${var.label} ${local.resource_group_name}"
+  }
+
+  provisioner "local-exec" {
     when        = destroy
     interpreter = ["/bin/bash", "-c"]
     command     = <<CMD
@@ -240,6 +245,10 @@ spec:
           deviceLabelFields: ["vendor"]
 YAML
 
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "${path.module}/auth.sh ${var.label} ${local.resource_group_name}"
+  }
 
   provisioner "local-exec" {
     when        = destroy
