@@ -123,7 +123,7 @@ resource "kubernetes_namespace" "nfd" {
   provisioner "local-exec" {
     when        = destroy
     interpreter = ["/bin/bash", "-c"]
-    command     = "${path.module}/auth.sh ${var.label} ${local.resource_group_name}"
+    command     = "./auth.sh ${var.label} ${local.resource_group_name}"
   }
 
   provisioner "local-exec" {
@@ -249,7 +249,7 @@ YAML
   provisioner "local-exec" {
     when        = destroy
     interpreter = ["/bin/bash", "-c"]
-    command     = "${path.module}/auth.sh ${var.label} ${local.resource_group_name}"
+    command     = "./auth.sh ${var.label} ${local.resource_group_name}"
   }
 
   provisioner "local-exec" {
