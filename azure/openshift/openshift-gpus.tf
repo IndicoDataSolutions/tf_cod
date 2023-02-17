@@ -230,20 +230,6 @@ spec:
           deviceClassWhiteList: ["0200", "03", "12"]
           deviceLabelFields: ["vendor"]
 YAML
-
-  provisioner "local-exec" {
-    when        = destroy
-    interpreter = ["/bin/bash", "-c"]
-    command     = "./auth.sh ${var.label} ${local.resource_group_name}"
-  }
-
-  provisioner "local-exec" {
-    when        = destroy
-    interpreter = ["/bin/bash", "-c"]
-    command     = <<CMD
-    kubectl patch nodefeaturediscovery -n openshift-nfd nfd-instance -p '{"metadata":{"finalizers": []}}' --type=merge || true
-    CMD
-  }
 }
 
 
