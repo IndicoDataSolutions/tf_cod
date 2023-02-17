@@ -119,21 +119,6 @@ resource "kubernetes_namespace" "nfd" {
     }
     name = local.nfd_namespace
   }
-
-  provisioner "local-exec" {
-    when        = destroy
-    interpreter = ["/bin/bash", "-c"]
-    command     = "./auth.sh ${var.label} ${local.resource_group_name}"
-  }
-
-  provisioner "local-exec" {
-    when        = destroy
-    interpreter = ["/bin/bash", "-c"]
-    command     = <<CMD
-    kubectl patch namespace openshift-nfd -p '{"metadata":{"finalizers": []}}' --type=merge || true
-    CMD
-  }
-
 }
 
 
@@ -250,6 +235,34 @@ YAML
     when        = destroy
     interpreter = ["/bin/bash", "-c"]
     command     = "./auth.sh ${var.label} ${local.resource_group_name}"
+  }
+
+  provisioner "local-exec" {
+    when        = destroy
+    interpreter = ["/bin/bash", "-c"]
+    command     = <<CMD
+    kubectl patch nodefeaturediscovery -n openshift-nfd nfd-instance -p '{"metadata":{"finalizers": []}}' --type=merge || true
+    CMD
+  }
+}
+
+
+# This empties the buckets upon delete so terraform doesn't take forever.
+resource "null_resource" "remove-nfd-finalizer" {
+  depends_on = [
+    module.cluster,
+    kubectl_manifest.nfd
+  ]
+
+  triggers = {
+    label               = var.label
+    resource_group_name = local.resource_group_name
+  }
+
+  provisioner "local-exec" {
+    when        = destroy
+    interpreter = ["/bin/bash", "-c"]
+    command     = "./auth.sh ${self.triggers.label} ${self.triggers.resource_group_name}"
   }
 
   provisioner "local-exec" {
