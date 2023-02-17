@@ -119,6 +119,15 @@ resource "kubernetes_namespace" "nfd" {
     }
     name = local.nfd_namespace
   }
+
+  provisioner "local-exec" {
+    when        = destroy
+    interpreter = ["/bin/bash", "-c"]
+    command     = <<CMD
+    kubectl patch namespace openshift-nfd -p '{"metadata":{"finalizers": []}}' --type=merge || true
+    CMD
+  }
+
 }
 
 
