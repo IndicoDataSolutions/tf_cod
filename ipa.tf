@@ -643,6 +643,10 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
+            global:
+              podLabels:
+                "azure.workload.identity/use": "true"
+              serviceAccountName: "workload-identity-storage-account"
             runtime-scanner:
               enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
               authentication:
