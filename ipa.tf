@@ -386,6 +386,7 @@ crunchy-postgres:
           operator: Exists
     pgBackRestConfig:
       global:
+        archive-timeout: '10000'
         repo1-path: /pgbackrest/postgres-data/repo1
         repo1-retention-full: '5'
         repo1-s3-key-type: auto
@@ -454,6 +455,7 @@ crunchy-postgres:
           operator: Exists
     pgBackRestConfig:
       global:
+        archive-timeout: '10000'
         repo1-path: /pgbackrest/postgres-metrics/repo1
         repo1-retention-full: '5'
         repo1-s3-key-type: auto
