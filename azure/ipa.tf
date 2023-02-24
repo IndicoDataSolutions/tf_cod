@@ -61,12 +61,10 @@ resource "helm_release" "ipa-crds" {
   crunchy-pgo:
     enabled: true
   
-  cert-manager:
-    #extraArgs:
-    #  - --dns01-recursive-nameservers-only
-    #  - --dns01-recursive-nameservers='$#{data.azurerm_dns_zone.azure_zone.name_servers[0]}:53,$#{data.azurerm_dns_zone.azure_zone.name_servers[1]}:53,$#{dataazurerm_dns_zone.azure_zone.name_servers[2]}:53'
-    #  - --acme-http01-solver-nameservers='$#{data.azurerm_dns_zone.azure_zone.name_servers[0]}:53,$#{data.azurerm_dns_zone.azure_zone.name_servers[1]}:53,$#{data.azurerm_dns_zone.azure_zone.name_servers[2]}:53'
-     
+  cert-manager:    
+    #dns01RecursiveNameserversOnly: true
+    #dns01RecursiveNameservers: "$#{data.azurerm_dns_zone.domain.name_servers[0]}:53,$#{data.azurerm_dns_zone.domain.name_servers[1]}:53,$#{data.azurerm_dns_zone.domain.name_servers[2]}:53,$#{data.azurerm_dns_zone.domain.name_servers[3]}:53"
+
     nodeSelector:
       kubernetes.io/os: linux
     webhook:
@@ -93,6 +91,7 @@ resource "azurerm_role_assignment" "external_dns" {
   scope                = data.azurerm_dns_zone.domain.id
   role_definition_name = "DNS Zone Contributor"
   principal_id         = module.cluster.kubelet_identity.object_id
+  skip_service_principal_aad_check = true
 }
 
 resource "kubernetes_secret" "azure_storage_key" {
@@ -173,6 +172,19 @@ secrets:
       eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
      
+clusterIssuer:
+  additionalSolvers:
+    - dns01:
+        azureDNS:
+          environment: AzurePublicCloud
+          hostedZoneName: ${data.azurerm_dns_zone.domain.name}
+          managedIdentity:
+            clientID: ${module.cluster.kubelet_identity.client_id}
+          resourceGroupName: ${var.common_resource_group}
+          subscriptionID: ${split("/", data.azurerm_subscription.primary.id)[2]}
+      selector:
+        matchLabels:
+          "acme.cert-manager.io/dns01-solver": "true"
 
 apiModels:
   enabled: true

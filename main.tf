@@ -244,13 +244,14 @@ module "fsx-storage" {
   include_rox                 = var.include_rox
 }
 
+
 module "cluster" {
   cod_snapshots_enabled      = true
   allow_dns_management       = true
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "7.6.0"
+  version                    = "7.7.0"
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
