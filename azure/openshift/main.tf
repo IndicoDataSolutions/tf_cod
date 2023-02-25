@@ -272,12 +272,6 @@ module "storage" {
   resource_group_name = local.resource_group_name
 }
 
-
-data "vault_kv_secret_v2" "terraform-redhat" {
-  mount = "terraform"
-  name  = "redhat"
-}
-
 module "cluster" {
   depends_on = [
     module.networking,
@@ -288,7 +282,7 @@ module "cluster" {
   openshift-version   = var.openshift_version
   vault_path          = lower("${var.account}-${var.region}-${var.label}")
   subscriptionId      = split("/", data.azurerm_subscription.primary.id)[2]
-  pull_secret         = jsondecode(data.vault_kv_secret_v2.terraform-redhat.data_json)["openshift-pull-secret"]
+  pull_secret         = var.openshift_pull_secret
   cluster_domain      = lower("${var.label}-${var.account}")
   label               = var.label
   region              = var.region

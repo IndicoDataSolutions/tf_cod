@@ -412,3 +412,7 @@ variable "use_workload_identity" {
   type    = bool
   default = true
 }
+
+variable "openshift_pull_secret" {
+  type = string
+}
