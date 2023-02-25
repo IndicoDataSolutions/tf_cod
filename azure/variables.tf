@@ -375,7 +375,8 @@ variable "vault_mount_path" {
   default = "tools/argo"
 }
 
-variable "vault_username" {}
+variable "vault_username" {
+}
 variable "vault_password" {
   sensitive = true
 }

@@ -39,6 +39,10 @@ terraform {
       source  = "hashicorp/null"
       version = "3.2.1"
     }
+    vault = {
+      source  = "hashicorp/vault"
+      version = "3.13.0"
+    }
   }
 }
 
@@ -79,32 +83,9 @@ provider "github" {
 data "azurerm_subscription" "primary" {}
 data "azurerm_client_config" "current" {}
 
-data "http" "workstation-external-ip" {
-  url = "http://ipv4.icanhazip.com"
-}
-
 data "azuread_service_principal" "redhat-openshift" {
   display_name = "Azure Red Hat OpenShift RP"
 }
-
-/*
-resource "null_resource" "install_azure_cli" {
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-  provisioner "local-exec" {
-    command     = <<EOH
-     az version
-     env|sort
-     az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID"
-     az aro list-credentials --name os4 --resource-group os4-eastus --output json
-     az aro show --name os4 --resource-group os4-eastus --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' --output json
-
-    EOH
-    interpreter = ["/bin/bash", "-c"]
-  }
-}
-*/
 
 resource "azuread_application" "openshift-application" {
   display_name = "${var.label}-${var.region}"
