@@ -187,8 +187,8 @@ module "argo-registration" {
 provider "local" {}
 
 locals {
-  resource_group_name     = "${var.label}-${var.region}"
-  current_ip              = "${chomp(data.http.workstation-external-ip.response_body)}/20"
+  resource_group_name = "${var.label}-${var.region}"
+
   storage_account_name    = replace(lower("${var.account}snapshots"), "-", "")
   argo_app_name           = lower("${var.account}.${var.region}.${var.label}-ipa")
   argo_cluster_name       = "${var.account}.${var.region}.${var.label}"
