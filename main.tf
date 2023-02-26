@@ -136,7 +136,7 @@ module "sqs_sns" {
   region  = var.region
   label   = var.label
 }
-
+/*
 module "cluster-manager" {
   source                   = "app.terraform.io/indico/indico-aws-cluster-manager/mod"
   version                  = "1.1.1"
@@ -153,7 +153,7 @@ module "cluster-manager" {
   kms_key_arn              = module.kms_key.key_arn
   assumed_roles            = var.assumed_roles
 }
-
+*/
 module "kms_key" {
   source          = "app.terraform.io/indico/indico-aws-kms/mod"
   version         = "1.1.0"
