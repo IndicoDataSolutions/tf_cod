@@ -145,7 +145,7 @@ data "vault_kv_secret_v2" "kubernetes-credentials" {
   depends_on = [
     vault_kv_secret_v2.kubernetes-credentials
   ]
-  mount = "terraform"
+  mount = var.vault_mount
   name  = var.vault_path
 }
 
