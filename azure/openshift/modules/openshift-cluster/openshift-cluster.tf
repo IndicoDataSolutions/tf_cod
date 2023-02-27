@@ -121,7 +121,7 @@ data "local_file" "kube_config_file" {
 # kubernetes_host
 
 resource "vault_kv_secret_v2" "kubernetes-credentials" {
-  mount = "terraform"
+  mount = var.vault_mount
   name  = var.vault_path
   data_json = jsonencode(
     {

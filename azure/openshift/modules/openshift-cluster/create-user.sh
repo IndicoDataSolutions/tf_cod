@@ -126,7 +126,7 @@ retry_attempts=40
 until [ $logged_in == "true" ] || [ $retry_attempts -le 0 ]
 do
   # if you use --insecure-skip-tls-verify=true then the sa account will prompt for a password on the oc login below
-  oc login --loglevel=1 $api_url --username "${username}" --password "${password}" --kubeconfig $NEW_KUBECONFIG &> /dev/null
+  oc login --loglevel=1 $api_url --username "${username}" --password "${password}" --kubeconfig $NEW_KUBECONFIG
   if [ $? -eq 0 ]; then
     echo "Successfully Logged in to new cluster $api_url"
     logged_in="true"

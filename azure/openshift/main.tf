@@ -262,6 +262,7 @@ module "cluster" {
 
   openshift-version   = var.openshift_version
   vault_path          = lower("${var.account}-${var.region}-${var.label}")
+  vault_mount         = var.vault_mount
   subscriptionId      = split("/", data.azurerm_subscription.primary.id)[2]
   pull_secret         = var.openshift_pull_secret
   cluster_domain      = lower("${var.label}-${var.account}")
@@ -272,6 +273,7 @@ module "cluster" {
   master_subnet_id    = module.networking.subnet_id
   worker_subnet_id    = module.networking.worker_subnet_id
   resource_group_name = local.resource_group_name
+
 }
 
 data "kubernetes_resource" "infrastructure-cluster" {

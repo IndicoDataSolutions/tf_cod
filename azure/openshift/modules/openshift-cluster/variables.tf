@@ -58,6 +58,10 @@ variable "subscriptionId" {
   type = string
 }
 
+variable "vault_mount" {
+  default = "terraform"
+}
+
 variable "vault_path" {
   # account-region-label
 }

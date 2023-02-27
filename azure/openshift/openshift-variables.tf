@@ -53,3 +53,8 @@ variable "kubernetes_host" {
 variable "openshift_version" {
   default = "4.10.40"
 }
+
+variable "vault_mount" {
+  default = "terraform"
+}
+
