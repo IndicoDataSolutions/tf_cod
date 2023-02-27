@@ -262,7 +262,7 @@ module "cluster" {
 
   openshift-version   = var.openshift_version
   vault_path          = lower("${var.account}-${var.region}-${var.label}")
-  vault_mount         = var.vault_mount
+  vault_mount         = var.vault_mount_path
   subscriptionId      = split("/", data.azurerm_subscription.primary.id)[2]
   pull_secret         = var.openshift_pull_secret
   cluster_domain      = lower("${var.label}-${var.account}")
