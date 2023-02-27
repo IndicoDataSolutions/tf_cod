@@ -68,24 +68,28 @@ resource "azurerm_role_assignment" "blob_storage_account_queue_contributer" {
 
 # Add snapshot permissions to the sp that is mounted as workload identity into the cluster
 data "azurerm_storage_account" "snapshot" {
+  count               = var.restore_snapshot_enabled == true ? 1 : 0
   name                = replace(lower("${var.account}snapshots"), "-", "")
   resource_group_name = "indico-common"
 }
 
 resource "azurerm_role_assignment" "snapshot_storage_account_owner" {
-  scope                = data.azurerm_storage_account.snapshot.id
+  count                = var.restore_snapshot_enabled == true ? 1 : 0
+  scope                = data.azurerm_storage_account.snapshot.0.id
   role_definition_name = "Owner"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
 
 resource "azurerm_role_assignment" "snapshot_storage_account_blob_contributer" {
-  scope                = data.azurerm_storage_account.snapshot.id
+  count                = var.restore_snapshot_enabled == true ? 1 : 0
+  scope                = data.azurerm_storage_account.snapshot.0.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
 
 resource "azurerm_role_assignment" "snapshot_storage_account_queue_contributer" {
-  scope                = data.azurerm_storage_account.snapshot.id
+  count                = var.restore_snapshot_enabled == true ? 1 : 0
+  scope                = data.azurerm_storage_account.snapshot.0.id
   role_definition_name = "Storage Queue Data Contributor"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
