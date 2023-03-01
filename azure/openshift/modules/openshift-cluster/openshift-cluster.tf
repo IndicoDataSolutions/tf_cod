@@ -172,31 +172,6 @@ resource "null_resource" "unset-default-sc" {
   }
 }
 
-resource "kubernetes_storage_class" "default" {
-  depends_on = [
-    azurerm_resource_group_template_deployment.openshift-cluster,
-    null_resource.create-terraform-sa,
-    null_resource.unset-default-sc
-  ]
-  metadata {
-    annotations = {
-      "storageclass.kubernetes.io/is-default-class" : "true"
-    }
-    name = "default"
-    labels = {
-      "addonmanager.kubernetes.io/mode" = "EnsureExists"
-      "kubernetes.io/cluster-service"   = "true"
-    }
-  }
-  allow_volume_expansion = true
-  storage_provisioner    = "disk.csi.azure.com"
-  reclaim_policy         = "Delete"
-  volume_binding_mode    = "WaitForFirstConsumer"
-  parameters = {
-    skuname = "StandardSSD_LRS"
-  }
-}
-
 
 /*
   allowVolumeExpansion: true
