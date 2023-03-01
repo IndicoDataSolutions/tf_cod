@@ -160,6 +160,12 @@ resource "null_resource" "unset-default-sc" {
     always_run = "${timestamp()}"
   }
 
+  # login
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "${path.module}/auth.sh ${var.label} ${local.resource_group_name}"
+  }
+
   provisioner "local-exec" {
     command     = "${path.module}/post-cluster.sh ${var.label} ${var.resource_group_name}"
     interpreter = ["/bin/bash", "-c"]
