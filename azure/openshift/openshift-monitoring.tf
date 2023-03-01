@@ -3,7 +3,8 @@
 # Create SA to access thanos queries
 resource "kubernetes_service_account_v1" "querier" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    helm_release.monitoring
   ]
   metadata {
     name      = "querier"
