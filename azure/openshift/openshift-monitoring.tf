@@ -20,7 +20,8 @@ YAML
 
 resource "kubernetes_namespace" "openshift-keda" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    kubectl_manifest.cluster-monitoring-config
   ]
 
   metadata {

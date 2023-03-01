@@ -372,7 +372,7 @@ variable "cod_snapshot_restore_version" {
 
 variable "vault_mount_path" {
   type    = string
-  default = "tools/argo"
+  default = "terraform"
 }
 
 variable "vault_username" {
@@ -415,6 +415,6 @@ variable "use_workload_identity" {
 }
 
 variable "openshift_pull_secret" {
-  type = string
+  type    = string
   default = ""
 }
