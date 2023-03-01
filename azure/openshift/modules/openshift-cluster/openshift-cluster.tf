@@ -149,7 +149,7 @@ data "vault_kv_secret_v2" "kubernetes-credentials" {
   name  = var.vault_path
 }
 
-/*
+
 resource "null_resource" "unset-default-sc" {
   depends_on = [
     null_resource.create-terraform-sa,
@@ -165,7 +165,6 @@ resource "null_resource" "unset-default-sc" {
     interpreter = ["/bin/bash", "-c"]
   }
 }
-
 
 resource "kubernetes_storage_class" "default" {
   depends_on = [
@@ -183,15 +182,15 @@ resource "kubernetes_storage_class" "default" {
       "kubernetes.io/cluster-service"   = "true"
     }
   }
-  storage_provisioner = "disk.csi.azure.com"
-  reclaim_policy      = "Delete"
-  volume_binding_mode = "WaitForFirstConsumer"
+  allow_volume_expansion = true
+  storage_provisioner    = "disk.csi.azure.com"
+  reclaim_policy         = "Delete"
+  volume_binding_mode    = "WaitForFirstConsumer"
   parameters = {
     skuname = "StandardSSD_LRS"
   }
-
 }
-*/
+
 
 /*
   allowVolumeExpansion: true
