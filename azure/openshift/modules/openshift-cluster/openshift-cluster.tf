@@ -167,7 +167,7 @@ resource "null_resource" "unset-default-sc" {
   }
 
   provisioner "local-exec" {
-    command     = "${path.module}/post-cluster.sh ${var.label} ${var.resource_group_name}"
+    command     = "${path.module}/remove-default-sc.sh ${var.label} ${var.resource_group_name}"
     interpreter = ["/bin/bash", "-c"]
   }
 }
