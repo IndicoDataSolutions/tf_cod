@@ -1,10 +1,42 @@
 
 
+resource "kubectl_manifest" "cluster-monitoring-config" {
+  depends_on = [
+    module.cluster
+  ]
+
+  yaml_body = <<YAML
+apiVersion: "v1"
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+data:
+  config.yaml: |
+    enableUserWorkload: true
+YAML
+}
+
+
+resource "kubernetes_namespace" "openshift-keda" {
+  depends_on = [
+    module.cluster
+  ]
+
+  metadata {
+    labels = {
+      "indico.io/openshift" = "true"
+    }
+    name = "openshift-keda"
+  }
+}
+
+
 # Create SA to access thanos queries
 resource "kubernetes_service_account_v1" "querier" {
   depends_on = [
     module.cluster,
-    helm_release.monitoring
+    kubernetes_namespace.openshift-keda
   ]
   metadata {
     name      = "querier"
@@ -19,7 +51,8 @@ resource "kubernetes_service_account_v1" "querier" {
 resource "kubernetes_secret_v1" "querier" {
   depends_on = [
     module.cluster,
-    kubernetes_service_account_v1.querier
+    kubernetes_service_account_v1.querier,
+    kubernetes_namespace.openshift-keda
   ]
 
   metadata {
@@ -54,36 +87,6 @@ resource "kubernetes_cluster_role_binding" "querier" {
   }
 }
 
-resource "kubectl_manifest" "cluster-monitoring-config" {
-  depends_on = [
-    module.cluster
-  ]
-
-  yaml_body = <<YAML
-apiVersion: "v1"
-kind: ConfigMap
-metadata:
-  name: cluster-monitoring-config
-  namespace: openshift-monitoring
-data:
-  config.yaml: |
-    enableUserWorkload: true
-YAML
-}
-
-
-resource "kubernetes_namespace" "openshift-keda" {
-  depends_on = [
-    module.cluster
-  ]
-
-  metadata {
-    labels = {
-      "indico.io/openshift" = "true"
-    }
-    name = "openshift-keda"
-  }
-}
 
 
 resource "kubectl_manifest" "custom-metrics-operator-group" {
