@@ -149,7 +149,7 @@ data "vault_kv_secret_v2" "kubernetes-credentials" {
   name  = var.vault_path
 }
 
-
+/*
 resource "null_resource" "unset-default-sc" {
   depends_on = [
     null_resource.create-terraform-sa,
@@ -166,7 +166,7 @@ resource "null_resource" "unset-default-sc" {
   }
 }
 
-/*
+
 resource "kubernetes_storage_class" "default" {
   depends_on = [
     azurerm_resource_group_template_deployment.openshift-cluster,
