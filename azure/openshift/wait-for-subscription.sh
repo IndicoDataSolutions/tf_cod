@@ -7,10 +7,10 @@ ready="false"
 retry_attempts=60
 healthy="AllCatalogSourcesHealthy"
 
-until [ $ready == $healthy ] || [ $retry_attempts -le 0 ]
+until [ "$ready" == "$healthy" ] || [ $retry_attempts -le 0 ]
 do
   ready=$(kubectl get subscription -n $1 $2 -o json | jq -r '.status.conditions[] | select((.status == "False") and (.type == "CatalogSourcesUnhealthy")) | .reason')
-  if [ $ready != $healthy ]; then
+  if [ "$ready" != "$healthy" ]; then
     echo "Not ready, waiting ${retry_attempts} ${ready}"
     kubectl get subscription -n $1 $2 -o json | jq -r '.status.conditions[]'
     sleep 30
