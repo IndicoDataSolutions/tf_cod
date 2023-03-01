@@ -163,7 +163,7 @@ resource "null_resource" "unset-default-sc" {
   # login
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command     = "${path.module}/auth.sh ${var.label} ${local.resource_group_name}"
+    command     = "${path.module}/auth.sh ${var.label} ${var.resource_group_name}"
   }
 
   provisioner "local-exec" {
