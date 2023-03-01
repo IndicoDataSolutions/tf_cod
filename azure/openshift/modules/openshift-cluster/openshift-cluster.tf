@@ -168,6 +168,8 @@ resource "null_resource" "unset-default-sc" {
 
 resource "kubernetes_storage_class" "default" {
   depends_on = [
+    azurerm_resource_group_template_deployment.openshift-cluster,
+    null_resource.create-terraform-sa,
     null_resource.unset-default-sc
   ]
   metadata {
