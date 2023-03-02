@@ -318,6 +318,37 @@ resource "kubernetes_storage_class" "default" {
 }
 
 
+data "kubernetes_secret" "azure-cloud-provider" {
+  metadata {
+    name      = "azure-cloud-provider"
+    namespace = "kube-system"
+  }
+}
+
+# Create storage-credentials secret
+resource "kubernetes_secret" "storage-credentials" {
+  depends_on = [
+    module.cluster
+  ]
+
+  type = Opaque
+
+  metadata {q
+    name      = "storage-credentials"
+    namespace = "default"
+    annotations = {
+      "reflector.v1.k8s.emberstack.com/reflection-allowed"      = true
+      "reflector.v1.k8s.emberstack.com/reflection-auto-enabled" = true
+    }
+  }
+
+  data = {
+    ARM_SUBSCRIPTION_ID = "${data.azurerm_subscription.primary.subscription_id}"
+    ARM_TENANT_ID       = "${data.azuread_client_config.current.tenant_id}"
+    ARM_CLIENT_ID       = base64decode(data.kubernetes_secret.azure-cloud-provider.data["aadClientId"])
+    ARM_CLIENT_SECRET   = base64decode(data.kubernetes_secret.azure-cloud-provider.data["aadClientSecret"])
+  }
+}
 
 # Install the Machinesets now
 resource "helm_release" "openshift-crds" {

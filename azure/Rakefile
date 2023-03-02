@@ -15,6 +15,7 @@ required_vars = %w[
   OCR_LICENSE_KEY
 ]
 
+
 required_files = %w[
   $HOME/.terraformrc
   overrides.tfvars
@@ -87,6 +88,7 @@ task ipa: :verify do
 global:
   appDomains: [#{vars['label']}.#{vars['region']}.#{vars['account']}.#{vars['domain_suffix']}]
   secretRefs:
+    - openshift-secrets 
     - indico-generated-secrets
     - indico-static-secrets
     - rabbitmq
