@@ -46,10 +46,6 @@ variable "ipa_openshift_crds_version" {
   default = "0.1.1-add-openshift-crds-de912699"
 }
 
-variable "kubernetes_host" {
-  default = ""
-}
-
 variable "openshift_version" {
   default = "4.10.40"
 }

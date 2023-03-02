@@ -8,11 +8,9 @@ output "kubeadmin_username" {
   value = module.cluster.kubeadmin_username
 }
 
-
 output "kubeadmin_password" {
   value = module.cluster.kubeadmin_password
 }
-
 
 output "kubernetes_client_certificate" {
   value = module.cluster.kubernetes_client_certificate
@@ -34,5 +32,26 @@ output "openshift_console_ip" {
   value = module.cluster.openshift_console_ip
 }
 
+output "kubelet_identity_client_id" {
+  value = module.cluster.kubelet_identity.client_id
+}
 
+output "kubelet_identity_object_id" {
+  value = module.cluster.kubelet_identity.object_id
+}
 
+output "storage_account_name" {
+  value = module.storage.storage_account_name
+}
+
+output "fileshare_name" {
+  value = module.storage.fileshare_name
+}
+
+output "storage_account_primary_access_key" {
+  value = module.storage.storage_account_primary_access_key
+}
+
+output "blob_store_name" {
+  value = module.storage.blob_store_name
+}

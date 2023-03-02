@@ -1,4 +1,5 @@
 terraform {
+  foobar = "ahoy there"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -92,17 +93,17 @@ provider "argocd" {
 }
 
 provider "kubernetes" {
-  host                   = module.create.0.kubernetes_host
-  client_certificate     = module.create.0.kubernetes_client_certificate
-  client_key             = module.create.0.kubernetes_client_key
-  cluster_ca_certificate = module.create.0.kubernetes_cluster_ca_certificate
+  host                   = var.do_create_cluster == true ? module.create.0.kubernetes_host : var.kubernetes_host
+  client_certificate     = var.do_create_cluster == true ? module.create.0.kubernetes_client_certificate : var.kubernetes_client_certificate
+  client_key             = var.do_create_cluster == true ? module.create.0.kubernetes_client_key : var.kubernetes_client_key
+  cluster_ca_certificate = var.do_create_cluster == true ? module.create.0.kubernetes_cluster_ca_certificate : var.kubernetes_cluster_ca_certificate
 }
 
 provider "kubectl" {
-  host                   = module.create.0.kubernetes_host
-  client_certificate     = module.create.0.kubernetes_client_certificate
-  client_key             = module.create.0.kubernetes_client_key
-  cluster_ca_certificate = module.create.0.kubernetes_cluster_ca_certificate
+  host                   = var.do_create_cluster == true ? module.create.0.kubernetes_host : var.kubernetes_host
+  client_certificate     = var.do_create_cluster == true ? module.create.0.kubernetes_client_certificate : var.kubernetes_client_certificate
+  client_key             = var.do_create_cluster == true ? module.create.0.kubernetes_client_key : var.kubernetes_client_key
+  cluster_ca_certificate = var.do_create_cluster == true ? module.create.0.kubernetes_cluster_ca_certificate : var.kubernetes_cluster_ca_certificate
   load_config_file       = false
 }
 
@@ -110,10 +111,10 @@ provider "kubectl" {
 provider "helm" {
   debug = true
   kubernetes {
-    host                   = module.create.0.kubernetes_host
-    client_certificate     = module.create.0.kubernetes_client_certificate
-    client_key             = module.create.0.kubernetes_client_key
-    cluster_ca_certificate = module.create.0.kubernetes_cluster_ca_certificate
+    host                   = var.do_create_cluster == true ? module.create.0.kubernetes_host : var.kubernetes_host
+    client_certificate     = var.do_create_cluster == true ? module.create.0.kubernetes_client_certificate : var.kubernetes_client_certificate
+    client_key             = var.do_create_cluster == true ? module.create.0.kubernetes_client_key : var.kubernetes_client_key
+    cluster_ca_certificate = var.do_create_cluster == true ? module.create.0.kubernetes_cluster_ca_certificate : var.kubernetes_cluster_ca_certificate
   }
 }
 

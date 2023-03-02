@@ -227,6 +227,3 @@ ${yamlencode(local.machinesets)}
   EOF
   ]
 }
-
-
-
