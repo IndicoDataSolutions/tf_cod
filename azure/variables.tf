@@ -1,4 +1,10 @@
 #
+variable "do_create_cluster" {
+  type    = bool
+  default = true
+}
+
+
 variable "is_azure" {
   type    = bool
   default = true

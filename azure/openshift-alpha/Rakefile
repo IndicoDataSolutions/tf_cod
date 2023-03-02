@@ -44,7 +44,6 @@ task init: :verify do
 end
 
 task plan: :secrets do
-  
   sh %( terraform plan  )
 end
 
