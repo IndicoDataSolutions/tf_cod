@@ -1,8 +1,3 @@
-#
-variable "do_create_cluster" {
-  type    = bool
-  default = true
-}
 
 variable "kubernetes_host" {
   default = ""
@@ -443,4 +438,9 @@ variable "use_workload_identity" {
 variable "openshift_pull_secret" {
   type    = string
   default = ""
+}
+
+variable "enable_dns_infrastructure" {
+  type    = bool
+  default = true
 }
