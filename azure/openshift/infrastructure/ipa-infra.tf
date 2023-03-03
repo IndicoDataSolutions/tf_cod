@@ -25,8 +25,20 @@ locals {
 
 }
 
+resource "kubernetes_namespace" "indico" {
+  count = var.ipa_namespace != "default" ? 1 : 0
+
+  metadata {
+    name = var.ipa_namespace
+  }
+
+}
 #TODO: move to prereqs
 resource "kubernetes_secret" "harbor-pull-secret" {
+  depends_on = [
+    kubernetes_namespace.indico
+  ]
+
   metadata {
     name      = "harbor-pull-secret"
     namespace = var.ipa_namespace
@@ -46,6 +58,7 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 resource "helm_release" "ipa-crds" {
   depends_on = [
     kubernetes_secret.harbor-pull-secret,
+    kubernetes_namespace.indico
   ]
 
   verify           = false
@@ -80,12 +93,10 @@ resource "helm_release" "ipa-crds" {
   ]
 }
 
-
-
-
 resource "time_sleep" "wait_1_minutes_after_crds" {
   depends_on = [
-    helm_release.ipa-crds
+    helm_release.ipa-crds,
+    kubernetes_namespace.indico
   ]
 
   create_duration = "1m"
@@ -135,7 +146,8 @@ resource "helm_release" "ipa-pre-requisites" {
     data.vault_kv_secret_v2.zerossl_data,
     kubernetes_secret.azure_storage_key,
     kubernetes_config_map.azure_dns_credentials,
-    kubernetes_service_account.workload_identity
+    kubernetes_service_account.workload_identity,
+    kubernetes_namespace.indico
   ]
 
   verify           = false
@@ -154,8 +166,8 @@ resource "helm_release" "ipa-pre-requisites" {
 cluster:
   name: ${var.label}
   region: ${var.region}
-  domain: ${var.domain_suffix}
   account: ${var.account}
+  domain: ${var.domain_suffix}
 
 rabbitmq:
   enabled: true
@@ -185,7 +197,7 @@ external-dns:
   policy: sync
   txtOwnerId: "${var.label}-${var.region}"
   domainFilters:
-    - ${var.account}.${var.domain_suffix}.
+    - ${var.base_domain}.
 
   provider: azure
   
@@ -310,7 +322,8 @@ metrics-server:
 
 resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
   depends_on = [
-    helm_release.ipa-pre-requisites
+    helm_release.ipa-pre-requisites,
+    kubernetes_namespace.indico
   ]
 
   create_duration = "1m"

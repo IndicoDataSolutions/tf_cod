@@ -5,9 +5,9 @@ variable "label" {}
 variable "region" {}
 variable "account" {}
 variable "domain_suffix" {}
-variable "base_domain" {}
 variable "dns_name" {}
 variable "dns_prefix" {}
+variable "base_domain" {}
 variable "enable_dns_infrastructure" { type = bool }
 variable "enable_gpu_infrastructure" { type = bool }
 variable "enable_monitoring_infrastructure" { type = bool }

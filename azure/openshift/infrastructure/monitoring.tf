@@ -74,10 +74,10 @@ resource "null_resource" "replace-prometheus-crds" {
     command     = "kubectl scale deployment/cluster-version-operator -n openshift-cluster-version --replicas=0"
   }
 
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-c"]
-    command     = "kubectl scale deploy -n openshift-monitoring prometheus-operator --replicas=0"
-  }
+  #provisioner "local-exec" {
+  #  interpreter = ["/bin/bash", "-c"]
+  #  command     = "kubectl scale deploy -n openshift-monitoring prometheus-operator --replicas=0"
+  #}
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
@@ -184,10 +184,10 @@ resource "null_resource" "restore-prometheus-operator" {
     command     = "kubectl scale deploy -n openshift-monitoring cluster-monitoring-operator --replicas=1"
   }
 
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-c"]
-    command     = "kubectl scale deploy -n openshift-monitoring prometheus-operator --replicas=1"
-  }
+  #provisioner "local-exec" {
+  #  interpreter = ["/bin/bash", "-c"]
+  #  command     = "kubectl scale deploy -n openshift-monitoring prometheus-operator --replicas=1"
+  #}
 }
 
 

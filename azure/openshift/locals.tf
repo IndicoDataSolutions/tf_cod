@@ -9,9 +9,9 @@ locals {
   argo_smoketest_app_name = lower("${var.account}.${var.region}.${var.label}-smoketest")
 
   cluster_name = var.label
-  base_domain  = lower("${var.account}.${var.domain_suffix}")
-  dns_prefix   = lower("${var.label}.${var.region}")
   dns_name     = lower("${var.label}.${var.region}.${var.account}.${var.domain_suffix}")
+  dns_prefix   = lower("${var.label}.${var.region}")
+  base_domain  = lower("${var.account}.${var.domain_suffix}")
 
   kube_prometheus_stack_enabled = true
 

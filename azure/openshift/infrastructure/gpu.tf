@@ -377,7 +377,7 @@ resource "helm_release" "openshift-crds" {
   verify           = false
   name             = "ipa-ms"
   create_namespace = true
-  namespace        = "default"
+  namespace        = var.ipa_namespace
   repository       = var.ipa_repo
   chart            = "openshift-crds"
   version          = var.ipa_openshift_crds_version
