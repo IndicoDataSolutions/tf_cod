@@ -201,7 +201,7 @@ resource "helm_release" "keda-monitoring" {
 
   name             = "keda"
   create_namespace = true
-  namespace        = "default"
+  namespace        = "monitoring"
   repository       = "https://kedacore.github.io/charts"
   chart            = "keda"
   version          = var.keda_version
