@@ -69,6 +69,11 @@ resource "null_resource" "replace-prometheus-crds" {
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
+    command     = "kubectl scale deploy -n openshift-monitoring cluster-monitoring-operator --replicas=0"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
     command     = "kubectl replace -f ${path.module}/prometheus-crds --force"
   }
 }
@@ -133,9 +138,32 @@ resource "helm_release" "monitoring" {
   ]
 }
 
+resource "null_resource" "restore-prometheus-operator" {
+  depends_on = [
+    helm_release.monitoring
+  ]
+
+  # login
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "${path.module}/auth.sh ${var.label} ${var.resource_group_name}"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "kubectl scale deploy -n openshift-monitoring cluster-monitoring-operator --replicas=1"
+  }
+}
+
+
 resource "helm_release" "keda-monitoring" {
   count = var.enable_monitoring_infrastructure == true ? 1 : 0
   depends_on = [
+    null_resource.restore-prometheus-operator,
     helm_release.monitoring,
     null_resource.replace-prometheus-crds,
   ]
