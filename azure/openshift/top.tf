@@ -53,6 +53,9 @@ module "infrastructure" {
   ipa_repo                   = var.ipa_repo
   ipa_openshift_crds_version = var.ipa_openshift_crds_version
 
+  monitoring_version              = var.monitoring_version
+  opentelemetry-collector_version = var.opentelemetry-collector_version
+  keda_version                    = var.keda_version
 
   resource_group_name = local.resource_group_name
   label               = var.label
@@ -62,10 +65,12 @@ module "infrastructure" {
   enable_gpu_infrastructure        = var.enable_gpu_infrastructure
   enable_monitoring_infrastructure = var.enable_monitoring_infrastructure
 
+
   openshift_machine_sets = var.openshift_machine_sets
 
   common_resource_group     = var.common_resource_group
   base_domain               = local.base_domain
+  dns_name                  = local.dns_name
   dns_prefix                = local.dns_prefix
   nvidia_operator_namespace = var.nvidia_operator_namespace
   nfd_namespace             = "openshift-nfd"

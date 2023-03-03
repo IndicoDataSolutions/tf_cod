@@ -4,15 +4,19 @@ variable "resource_group_name" {}
 variable "label" {}
 variable "region" {}
 variable "base_domain" {}
+variable "dns_name" {}
 variable "dns_prefix" {}
 variable "enable_dns_infrastructure" { type = bool }
 variable "enable_gpu_infrastructure" { type = bool }
 variable "enable_monitoring_infrastructure" { type = bool }
+
 variable "nvidia_operator_namespace" {}
 variable "nfd_namespace" {}
 variable "ipa_openshift_crds_version" {}
 variable "ipa_repo" {}
-
+variable "monitoring_version" {}
+variable "opentelemetry-collector_version" {}
+variable "keda_version" {}
 
 
 variable "openshift_machine_sets" {

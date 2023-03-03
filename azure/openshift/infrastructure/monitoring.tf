@@ -1,192 +1,236 @@
-
-
-resource "kubectl_manifest" "cluster-monitoring-config" {
-  yaml_body = <<YAML
-apiVersion: "v1"
-kind: ConfigMap
-metadata:
-  name: cluster-monitoring-config
-  namespace: openshift-monitoring
-data:
-  config.yaml: |
-    enableUserWorkload: true
-YAML
-}
-
-
-resource "kubernetes_namespace" "openshift-keda" {
-  depends_on = [
-    kubectl_manifest.cluster-monitoring-config
-  ]
-
-  metadata {
-    labels = {
-      "indico.io/openshift" = "true"
-    }
-    name = "openshift-keda"
+resource "azurerm_dns_caa_record" "grafana-caa" {
+  count               = var.enable_dns_infrastructure == true && var.enable_monitoring_infrastructure == true ? 1 : 0
+  name                = lower("grafana.${var.dns_prefix}")
+  zone_name           = data.azurerm_dns_zone.domain.0.name
+  resource_group_name = var.common_resource_group
+  ttl                 = 300
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "sectigo.com"
   }
 }
 
 
-# Create SA to access thanos queries
-resource "kubernetes_service_account_v1" "querier" {
-  depends_on = [
-    kubernetes_namespace.openshift-keda
-  ]
-  metadata {
-    name      = "querier"
-    namespace = "openshift-keda"
+resource "azurerm_dns_caa_record" "prometheus-caa" {
+  count               = var.enable_dns_infrastructure == true && var.enable_monitoring_infrastructure == true ? 1 : 0
+  name                = lower("prometheus.${var.dns_prefix}")
+  zone_name           = data.azurerm_dns_zone.domain.0.name
+  resource_group_name = var.common_resource_group
+  ttl                 = 300
+
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "sectigo.com"
   }
-  secret {
-    name = "querier"
-  }
-  automount_service_account_token = true
 }
 
-resource "kubernetes_secret_v1" "querier" {
-  depends_on = [
-    kubernetes_service_account_v1.querier,
-    kubernetes_namespace.openshift-keda
-  ]
+resource "azurerm_dns_caa_record" "alertmanager-caa" {
+  count               = var.enable_dns_infrastructure == true && var.enable_monitoring_infrastructure == true ? 1 : 0
+  name                = lower("alertmanager.${var.dns_prefix}")
+  zone_name           = data.azurerm_dns_zone.domain.0.name
+  resource_group_name = var.common_resource_group
+  ttl                 = 300
 
-  metadata {
-    name      = "thanos-api-querier"
-    namespace = "openshift-keda"
-    annotations = {
-      "kubernetes.io/service-account.name" = "querier"
-    }
-  }
-  type = "kubernetes.io/service-account-token"
-}
-
-resource "kubernetes_cluster_role_binding" "querier" {
-  depends_on = [
-    kubernetes_secret_v1.querier
-  ]
-
-  metadata {
-    name = "querier-monitoring-view"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = "cluster-monitoring-view"
-  }
-
-  subject {
-    kind      = "ServiceAccount"
-    name      = "querier"
-    namespace = "openshift-keda"
+  record {
+    flags = 0
+    tag   = "issue"
+    value = "sectigo.com"
   }
 }
 
 
+resource "random_password" "monitoring-password" {
+  length  = 16
+  special = false
+}
 
-resource "kubectl_manifest" "custom-metrics-operator-group" {
-  depends_on = [
-    kubernetes_namespace.openshift-keda
-  ]
+output "monitoring-username" {
+  value = "monitoring"
+}
 
-  yaml_body = <<YAML
-apiVersion: "operators.coreos.com/v1"
-kind: "OperatorGroup"
-metadata:
-  generateName: "openshift-keda-"
-  name: "openshift-keda"
-  namespace: "openshift-keda"
-YAML
+output "monitoring-password" {
+  sensitive = true
+  value     = random_password.monitoring-password.result
 }
 
 
-resource "kubectl_manifest" "custom-metrics-autoscaler" {
-  depends_on = [
-    kubectl_manifest.custom-metrics-operator-group,
-    kubernetes_namespace.openshift-keda
-  ]
-
-  yaml_body = <<YAML
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: openshift-custom-metrics-autoscaler-operator
-  namespace: openshift-keda
-spec:
-  channel: stable
-  installPlanApproval: Automatic
-  name: openshift-custom-metrics-autoscaler-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-  startingCSV: custom-metrics-autoscaler.v2.7.1
-YAML
-}
-
-
-resource "null_resource" "wait-for-custom-metrics-subscription" {
-  depends_on = [
-    kubectl_manifest.custom-metrics-autoscaler
-  ]
-
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-
+resource "null_resource" "replace-prometheus-crds" {
   # login
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command     = "${path.module}/auth.sh ${var.label} ${var.resource_group_name}"
+    command     = "${path.module}/auth.sh ${var.label} ${local.resource_group_name}"
   }
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command     = "${path.module}/wait-for-subscription.sh openshift-keda openshift-custom-metrics-autoscaler-operator"
+    command     = "kubectl replace -f ./prometheus-crds --force"
   }
 }
 
-
-
-resource "kubectl_manifest" "keda-controller" {
+resource "helm_release" "monitoring" {
+  count = var.enable_monitoring_infrastructure == true ? 1 : 0
   depends_on = [
-    kubectl_manifest.custom-metrics-autoscaler,
-    null_resource.wait-for-custom-metrics-subscription
+    null_resource.replace-prommetheus-crds,
+    azurerm_dns_caa_record.alertmanager-caa,
+    azurerm_dns_caa_record.grafana-caa,
+    azurerm_dns_caa_record.prometheus-caa
   ]
 
-  yaml_body = <<YAML
-apiVersion: keda.sh/v1alpha1
-kind: KedaController
-metadata:
-  finalizers:
-    - finalizer.kedacontroller.keda.k8s.io
-  name: keda
-  namespace: openshift-keda
-spec:
-  metricsServer:
-    logLevel: '0'
-  operator:
-    logEncoder: console
-    logLevel: info
-  serviceAccount: {}
-  watchNamespace: ''
-YAML
+  verify           = false
+  name             = "monitoring"
+  create_namespace = true
+  namespace        = "monitoring"
+  repository       = var.ipa_repo
+  chart            = "monitoring"
+  version          = var.monitoring_version
+  wait             = false
+  timeout          = "900" # 15 minutes
+
+  values = [<<EOF
+  global:
+    host: "${var.dns_name}"
+  
+  prometheus-postgres-exporter:
+    enabled: true
+
+  ingress-nginx:
+    enabled: ${var.enable_dns_infrastructure == true && var.enable_monitoring_infrastructure == true}
+
+    rbac:
+      create: true
+
+    admissionWebhooks:
+      patch:
+        nodeSelector.beta.kubernetes.io/os: linux
+  
+    defaultBackend:
+      nodeSelector.beta.kubernetes.io/os: linux
+  
+  authentication:
+    ingressUsername: monitoring
+    ingressPassword: ${random_password.monitoring-password.result}
+
+  kube-prometheus-stack:
+    enabled: true
+    prometheus:
+      prometheusSpec:
+        nodeSelector:
+          node_group: static-workers
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: default
+
+  prometheus-adapter:
+    enabled: false
+ EOF
+  ]
 }
 
-
-resource "kubectl_manifest" "trigger-authentication" {
+resource "helm_release" "keda-monitoring" {
+  count = var.enable_monitoring_infrastructure == true ? 1 : 0
   depends_on = [
-    kubectl_manifest.keda-controller,
-    kubernetes_secret_v1.querier
+    helm_release.monitoring,
+    null_resource.replace-prommetheus-crds,
   ]
-  yaml_body = <<YAML
-apiVersion: keda.sh/v1alpha1
-kind: ClusterTriggerAuthentication
-metadata:
-  name: keda-trigger-auth-prometheus
-spec:
-  secretTargetRef: 
-  - parameter: bearerToken 
-    name: thanos-api-querier
-    key: token 
-  - parameter: ca
-    name: thanos-api-querier
-    key: ca.crt
-YAML
+
+  name             = "keda"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://kedacore.github.io/charts"
+  chart            = "keda"
+  version          = var.keda_version
+
+
+  values = [<<EOF
+    crds:
+      install: true
+    
+    podAnnotations:
+      keda:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8080"
+      metricsAdapter: 
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "9022"
+
+    prometheus:
+      metricServer:
+        enabled: true
+        serviceMonitor:
+          enabled: true
+        podMonitor:
+          enabled: true
+      operator:
+        enabled: true
+        serviceMonitor:
+          enabled: true
+        podMonitor:
+          enabled: true
+ EOF
+  ]
+}
+
+resource "helm_release" "opentelemetry-collector" {
+  count = var.enable_monitoring_infrastructure == true ? 1 : 0
+  depends_on = [
+    helm_release.monitoring,
+    null_resource.replace-prommetheus-crds,
+  ]
+
+  name             = "opentelemetry-collector"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
+  chart            = "opentelemetry-collector"
+  version          = var.opentelemetry-collector_version
+
+
+  values = [<<EOF
+    enabled: true
+    fullnameOverride: "collector-collector"
+    mode: deployment
+    tolerations:
+    - effect: NoSchedule
+      key: indico.io/monitoring
+      operator: Exists
+    nodeSelector:
+      node_group: monitoring-workers
+    ports:
+      jaeger-compact:
+        enabled: false
+      jaeger-thrift:
+        enabled: false
+      jaeger-grpc:
+        enabled: false
+      zipkin:
+        enabled: false
+
+    config:
+      receivers:
+        jaeger: null
+        prometheus: null
+        zipkin: null
+      exporters:
+        otlp:
+          endpoint: monitoring-tempo.monitoring.svc:4317
+          tls:
+            insecure: true
+      service:
+        pipelines:
+          traces:
+            receivers:
+              - otlp
+            processors:
+              - batch
+            exporters:
+              - otlp
+          metrics: null
+          logs: null
+ EOF
+  ]
 }

@@ -27,4 +27,3 @@ variable "enable_monitoring_infrastructure" {
   type    = bool
   default = true
 }
-
