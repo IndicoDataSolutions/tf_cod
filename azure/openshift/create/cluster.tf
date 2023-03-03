@@ -158,37 +158,3 @@ resource "kubernetes_storage_class" "default" {
   }
 }
 
-
-
-# Install the Machinesets now
-resource "helm_release" "openshift-crds" {
-  depends_on = [
-    module.cluster,
-    data.kubernetes_resource.infrastructure-cluster
-  ]
-
-  verify           = false
-  name             = "ipa-ms"
-  create_namespace = true
-  namespace        = "default"
-  repository       = var.ipa_repo
-  chart            = "openshift-crds"
-  version          = var.ipa_openshift_crds_version
-  timeout          = "600" # 10 minutes
-  wait             = true
-
-  values = [<<EOF
-machineset:
-  # oc get -o jsonpath='{.status.infrastructureName}{"\n"}' infrastructure cluster
-  infrastructureId: ${local.infrastructure_id}
-  region: ${var.region}
-  networkResourceGroup: ${var.label}-${var.region}
-  clusterResourceGroup: aro-${var.label}-${var.region}
-  workerSubnetId: indico-worker-${var.label}-${var.region}
-  vnetId: ${var.label}-vnet
-
-machineSets:
-${yamlencode(local.machinesets)}
-  EOF
-  ]
-}

@@ -12,8 +12,6 @@ module "create" {
   argo_username          = var.argo_username
   argo_password          = var.argo_password
 
-  ipa_repo = var.ipa_repo
-
   domain_suffix = var.domain_suffix
   name          = var.name
   label         = var.label
@@ -26,22 +24,22 @@ module "create" {
   kubernetes_cluster_ca_certificate = local.kubernetes_cluster_ca_certificate
   kubernetes_host                   = local.kubernetes_host
 
-  vault_mount_path           = var.vault_mount_path
-  vault_mount                = var.vault_mount
-  subnet_cidrs               = var.subnet_cidrs
-  vnet_cidr                  = var.vnet_cidr
-  svp_client_id              = var.svp_client_id
-  svp_client_secret          = var.svp_client_secret
-  harbor_pull_secret_b64     = var.harbor_pull_secret_b64
-  openshift_pull_secret      = var.openshift_pull_secret
-  openshift_machine_sets     = var.openshift_machine_sets
-  openshift_version          = var.openshift_version
-  worker_subnet_cidrs        = var.worker_subnet_cidrs
-  admin_group_name           = var.admin_group_name
-  ad_group_name              = var.ad_group_name
-  enable_ad_group_mapping    = var.enable_ad_group_mapping
-  k8s_version                = var.k8s_version
-  ipa_openshift_crds_version = var.ipa_openshift_crds_version
+  vault_mount_path       = var.vault_mount_path
+  vault_mount            = var.vault_mount
+  subnet_cidrs           = var.subnet_cidrs
+  vnet_cidr              = var.vnet_cidr
+  svp_client_id          = var.svp_client_id
+  svp_client_secret      = var.svp_client_secret
+  harbor_pull_secret_b64 = var.harbor_pull_secret_b64
+  openshift_pull_secret  = var.openshift_pull_secret
+
+  openshift_version       = var.openshift_version
+  worker_subnet_cidrs     = var.worker_subnet_cidrs
+  admin_group_name        = var.admin_group_name
+  ad_group_name           = var.ad_group_name
+  enable_ad_group_mapping = var.enable_ad_group_mapping
+  k8s_version             = var.k8s_version
+
 }
 
 
@@ -52,6 +50,9 @@ module "infrastructure" {
   count  = var.do_build_infrastructure == true ? 1 : 0
   source = "./infrastructure"
 
+  ipa_repo                   = var.ipa_repo
+  ipa_openshift_crds_version = var.ipa_openshift_crds_version
+
 
   resource_group_name = local.resource_group_name
   label               = var.label
@@ -60,6 +61,8 @@ module "infrastructure" {
   enable_dns_infrastructure        = var.enable_dns_infrastructure
   enable_gpu_infrastructure        = var.enable_gpu_infrastructure
   enable_monitoring_infrastructure = var.enable_monitoring_infrastructure
+
+  openshift_machine_sets = var.openshift_machine_sets
 
   common_resource_group     = var.common_resource_group
   base_domain               = local.base_domain

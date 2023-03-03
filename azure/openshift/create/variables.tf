@@ -221,29 +221,6 @@ variable "openshift_pull_secret" {
   type = string
 }
 
-variable "openshift_machine_sets" {
-  type = map(object({
-    node_count                     = number
-    vm_size                        = string
-    zones                          = list(string)
-    node_os                        = string
-    pool_name                      = string
-    taints                         = list(string)
-    labels                         = map(string)
-    cluster_auto_scaling           = bool
-    cluster_auto_scaling_min_count = number
-    cluster_auto_scaling_max_count = number
-    storageAccountType             = string
-    image = object({
-      offer      = string
-      publisher  = string
-      resourceID = string
-      sku        = string
-      version    = string
-    })
-  }))
-}
-
 variable "roles" {
   description = "Roles to be assigned to the Principal"
   type        = list(object({ role = string }))
@@ -256,16 +233,8 @@ variable "roles" {
     }
   ]
 }
-variable "ipa_openshift_crds_version" {
-  type = string
-}
 
 variable "openshift_version" {
-}
-
-
-variable "ipa_repo" {
-  type = string
 }
 
 

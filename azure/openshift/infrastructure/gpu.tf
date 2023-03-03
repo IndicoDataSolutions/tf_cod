@@ -10,6 +10,7 @@ output "package" {
 
 
 resource "kubernetes_namespace" "gpu" {
+  count = var.enable_gpu_infrastructure == true ? 1 : 0
   metadata {
     labels = {
       "indico.io/openshift" = "true"
@@ -19,6 +20,7 @@ resource "kubernetes_namespace" "gpu" {
 }
 
 resource "kubectl_manifest" "gpu" {
+  count = var.enable_gpu_infrastructure == true ? 1 : 0
   depends_on = [
     kubernetes_namespace.gpu
   ]
@@ -36,6 +38,7 @@ resource "kubectl_manifest" "gpu" {
 
 
 resource "kubectl_manifest" "gpu-operator-subscription" {
+  count = var.enable_gpu_infrastructure == true ? 1 : 0
   depends_on = [
     kubernetes_namespace.gpu,
     data.kubernetes_resource.package
@@ -60,6 +63,7 @@ resource "kubectl_manifest" "gpu-operator-subscription" {
 
 
 resource "null_resource" "wait-for-gpu-operator" {
+  count = var.enable_gpu_infrastructure == true ? 1 : 0
   depends_on = [
     kubectl_manifest.gpu-operator-subscription
   ]
@@ -81,6 +85,7 @@ resource "null_resource" "wait-for-gpu-operator" {
 }
 
 resource "kubernetes_namespace" "nfd" {
+  count = var.enable_gpu_infrastructure == true ? 1 : 0
   depends_on = [
     null_resource.wait-for-gpu-operator
   ]
@@ -95,6 +100,8 @@ resource "kubernetes_namespace" "nfd" {
 
 
 resource "kubectl_manifest" "nfd-operator" {
+  count = var.enable_gpu_infrastructure == true ? 1 : 0
+
   depends_on = [
     null_resource.wait-for-gpu-operator,
     kubernetes_namespace.nfd
@@ -111,6 +118,7 @@ YAML
 }
 
 resource "kubectl_manifest" "nfd-subscription" {
+  count = var.enable_gpu_infrastructure == true ? 1 : 0
   depends_on = [
     kubectl_manifest.nfd-operator
   ]
@@ -140,6 +148,8 @@ YAML
 
 
 resource "null_resource" "wait-for-nfd-subscription" {
+  count = var.enable_gpu_infrastructure == true ? 1 : 0
+
   depends_on = [
     kubectl_manifest.nfd-subscription
   ]
@@ -162,6 +172,8 @@ resource "null_resource" "wait-for-nfd-subscription" {
 
 
 resource "kubectl_manifest" "nfd" {
+  count = var.enable_gpu_infrastructure == true ? 1 : 0
+
   depends_on = [
     kubernetes_namespace.nfd,
     null_resource.wait-for-gpu-operator,
@@ -204,6 +216,8 @@ YAML
 
 # This empties the buckets upon delete so terraform doesn't take forever.
 resource "null_resource" "remove-nfd-finalizer" {
+  count = var.enable_gpu_infrastructure == true ? 1 : 0
+
   depends_on = [
     kubectl_manifest.nfd
   ]
@@ -229,6 +243,8 @@ resource "null_resource" "remove-nfd-finalizer" {
 }
 
 resource "null_resource" "wait-for-node-feature-discovery" {
+  count = var.enable_gpu_infrastructure == true ? 1 : 0
+
   depends_on = [
     kubectl_manifest.nfd
   ]
@@ -251,6 +267,8 @@ resource "null_resource" "wait-for-node-feature-discovery" {
 
 
 resource "kubectl_manifest" "gpu-cluster-policy" {
+  count = var.enable_gpu_infrastructure == true ? 1 : 0
+
   depends_on = [
     null_resource.wait-for-gpu-operator,
     null_resource.wait-for-node-feature-discovery,
@@ -345,3 +363,40 @@ spec:
     installDir: /usr/local/nvidia
 YAML
 }
+
+
+
+# Install the Machinesets now
+resource "helm_release" "openshift-crds" {
+  depends_on = [
+    data.kubernetes_resource.infrastructure-cluster
+  ]
+
+  count = var.enable_gpu_infrastructure == true ? 1 : 0
+
+  verify           = false
+  name             = "ipa-ms"
+  create_namespace = true
+  namespace        = "default"
+  repository       = var.ipa_repo
+  chart            = "openshift-crds"
+  version          = var.ipa_openshift_crds_version
+  timeout          = "600" # 10 minutes
+  wait             = true
+
+  values = [<<EOF
+machineset:
+  # oc get -o jsonpath='{.status.infrastructureName}{"\n"}' infrastructure cluster
+  infrastructureId: ${local.infrastructure_id}
+  region: ${var.region}
+  networkResourceGroup: ${var.label}-${var.region}
+  clusterResourceGroup: aro-${var.label}-${var.region}
+  workerSubnetId: indico-worker-${var.label}-${var.region}
+  vnetId: ${var.label}-vnet
+
+machineSets:
+${yamlencode(local.machinesets)}
+  EOF
+  ]
+}
+

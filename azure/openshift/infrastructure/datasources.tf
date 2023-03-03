@@ -20,3 +20,13 @@ data "kubernetes_resource" "package" {
   }
 }
 
+
+data "kubernetes_resource" "infrastructure-cluster" {
+  api_version = "config.openshift.io/v1"
+  kind        = "Infrastructure"
+
+  metadata {
+    name = "cluster"
+  }
+}
+
