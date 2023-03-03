@@ -91,7 +91,7 @@ resource "null_resource" "replace-prometheus-crds" {
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command     = "kubectl adm policy add-scc-to-group anyuid system:authenticated"
+    command     = "oc adm policy add-scc-to-group anyuid system:authenticated"
   }
 }
 
