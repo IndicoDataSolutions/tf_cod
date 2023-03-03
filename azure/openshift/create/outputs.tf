@@ -1,5 +1,20 @@
 
 
+output "kubelet_identity" {
+  value = {
+    object_id = "ERROR:OPENSHIFT-NOT-APPLICABLE"
+    client_id = "ERROR:OPENSHIFT-NOT-APPLICABLE"
+  }
+}
+
+output "oidc_issuer_url" {
+  value = "ERROR:OPENSHIFT-NOT-APPLICABLE"
+}
+
+output "id" {
+  value = "ERROR:cluster.idOPENSHIFT-NOT-APPLICABLE"
+}
+
 output "kubernetes_host" {
   value = module.cluster.kubernetes_host
 }
