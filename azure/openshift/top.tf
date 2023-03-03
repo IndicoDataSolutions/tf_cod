@@ -3,6 +3,7 @@ module "create" {
   count  = var.do_create_cluster == true ? 1 : 0
   source = "./create"
 
+  resource_group_name    = local.resource_group_name
   vault_username         = var.vault_username
   vault_password         = var.vault_password
   subnet_cidrs           = var.subnet_cidrs
@@ -24,8 +25,9 @@ module "infrastructure" {
   count  = var.do_build_infrastructure == true ? 1 : 0
   source = "./infrastructure"
 
-  label  = var.label
-  region = var.region
+  resource_group_name = local.resource_group_name
+  label               = var.label
+  region              = var.region
 
   enable_dns_infrastructure        = var.enable_dns_infrastructure
   enable_gpu_infrastructure        = var.enable_gpu_infrastructure
@@ -33,9 +35,10 @@ module "infrastructure" {
 
   common_resource_group     = var.common_resource_group
   base_domain               = local.base_domain
+  dns_prefix                = local.dns_prefix
   nvidia_operator_namespace = var.nvidia_operator_namespace
 }
-
+/*
 
 module "ipa" {
   depends_on = [
@@ -97,3 +100,4 @@ module "ipa-testing" {
   ipa_smoketest_cronjob_schedule = var.ipa_smoketest_cronjob_schedule
   ipa_smoketest_slack_channel    = var.ipa_smoketest_slack_channel
 }
+*/

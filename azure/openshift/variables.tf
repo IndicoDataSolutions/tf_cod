@@ -1,3 +1,7 @@
+variable "resource_group_name" {
+  description = "Resource group everything is placed in"
+  default     = null
+}
 
 variable "kubernetes_host" {
   default = ""
@@ -13,12 +17,10 @@ variable "kubernetes_cluster_ca_certificate" {
   default = ""
 }
 
-#
 variable "do_create_infrastructure" {
   type    = bool
   default = true
 }
-
 
 variable "is_azure" {
   type    = bool

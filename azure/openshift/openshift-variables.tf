@@ -54,3 +54,7 @@ variable "vault_mount" {
   default = "terraform"
 }
 
+variable "nvidia_operator_namespace" {
+  default = "nvidia-gpu-operator"
+}
+
