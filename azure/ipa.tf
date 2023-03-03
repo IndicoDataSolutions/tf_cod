@@ -379,7 +379,7 @@ spec:
         - name: HELM_TF_COD_VALUES
           value: |
             aws-node-termination:
-              enabled: false
+              enabled: false 
             global:
               podLabels:
                 "azure.workload.identity/use": "true"
