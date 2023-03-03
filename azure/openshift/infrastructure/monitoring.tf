@@ -58,6 +58,10 @@ output "monitoring-password" {
 
 resource "null_resource" "replace-prometheus-crds" {
   # login
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command     = "${path.module}/auth.sh ${var.label} ${var.resource_group_name}"
