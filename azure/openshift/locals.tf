@@ -1,7 +1,7 @@
 
 
 locals {
-  resource_group_name = var.resource_group_name != null ? var.resource_group_name : lower("${var.label}.${var.region}")
+  resource_group_name = var.resource_group_name != null ? var.resource_group_name : lower("${var.label}-${var.region}")
 
   storage_account_name    = replace(lower("${var.account}snapshots"), "-", "")
   argo_app_name           = lower("${var.account}.${var.region}.${var.label}-ipa")
