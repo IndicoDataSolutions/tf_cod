@@ -419,8 +419,6 @@ variable "enable_ad_group_mapping" {
   description = "Enable the Mapping of AD Group"
 }
 
-#openshift & azure common variables
-
 # enable for openshift
 variable "is_openshift" {
   type    = bool
