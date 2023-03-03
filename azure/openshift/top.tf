@@ -25,6 +25,7 @@ module "infrastructure" {
   count  = var.do_build_infrastructure == true ? 1 : 0
   source = "./infrastructure"
 
+
   resource_group_name = local.resource_group_name
   label               = var.label
   region              = var.region
@@ -37,6 +38,7 @@ module "infrastructure" {
   base_domain               = local.base_domain
   dns_prefix                = local.dns_prefix
   nvidia_operator_namespace = var.nvidia_operator_namespace
+  nfd_namespace             = "openshift-nfd"
 }
 /*
 
