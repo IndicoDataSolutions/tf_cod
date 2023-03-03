@@ -10,6 +10,21 @@ variable "enable_dns_infrastructure" { type = bool }
 variable "enable_gpu_infrastructure" { type = bool }
 variable "enable_monitoring_infrastructure" { type = bool }
 
+variable "restore_snapshot_enabled" { type = bool }
+variable "use_workload_identity" { type = bool }
+variable "cluster_oidc_issuer_url" {}
+variable "kubelet_identity_client_id" {}
+vairable "harbor_pull_secret_b64" {}
+
+variable "ipa_namespace" {}
+variable "ipa_repo" {}
+variable "ipa_crds_version" {}
+variable "storage_account_name" {}
+variable "storage_account_primary_access_key" {}
+variable "blob_store_name" {}
+
+
+
 variable "nvidia_operator_namespace" {}
 variable "nfd_namespace" {}
 variable "ipa_openshift_crds_version" {}
