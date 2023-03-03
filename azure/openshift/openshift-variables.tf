@@ -43,7 +43,7 @@ variable "roles" {
 }
 variable "ipa_openshift_crds_version" {
   type    = string
-  default = "0.1.1-add-openshift-crds-de912699"
+  default = "0.4.0-IPA-6.1.0.rc-4e17ac41"
 }
 
 variable "openshift_version" {

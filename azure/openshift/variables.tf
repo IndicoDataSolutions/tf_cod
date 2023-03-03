@@ -169,7 +169,7 @@ variable "ipa_pre_reqs_version" {
 
 variable "ipa_crds_version" {
   type    = string
-  default = "0.4.0-IPA-6.1.0.rc-4e17ac41"
+  default = "0.2.1"
 }
 
 variable "ipa_enabled" {
@@ -444,6 +444,10 @@ variable "openshift_pull_secret" {
 }
 
 variable "enable_dns_infrastructure" {
+  type    = bool
+  default = true
+}
+variable "replace_prometheus_crds" {
   type    = bool
   default = true
 }

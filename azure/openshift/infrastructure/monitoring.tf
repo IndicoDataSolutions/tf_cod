@@ -57,6 +57,8 @@ output "monitoring-password" {
 
 
 resource "null_resource" "replace-prometheus-crds" {
+  count = var.replace_prometheus_crds == true ? 1 : 0
+
   # login
   triggers = {
     always_run = "${timestamp()}"
@@ -149,9 +151,13 @@ resource "helm_release" "monitoring" {
 }
 
 resource "null_resource" "restore-prometheus-operator" {
+  count = var.replace_prometheus_crds == true ? 1 : 0
+
   depends_on = [
     helm_release.monitoring
   ]
+
+
 
   # login
   triggers = {
