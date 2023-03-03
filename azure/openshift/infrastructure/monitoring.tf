@@ -65,7 +65,7 @@ resource "null_resource" "replace-prometheus-crds" {
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command     = "kubectl replace -f ./prometheus-crds --force"
+    command     = "kubectl replace -f ${path.module}/prometheus-crds --force"
   }
 }
 
