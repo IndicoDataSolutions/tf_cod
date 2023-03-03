@@ -23,7 +23,6 @@ variable "enable_gpu_infrastructure" {
   default = true
 }
 
-
 variable "enable_monitoring_infrastructure" {
   type    = bool
   default = true

@@ -13,7 +13,6 @@ subnet_cidrs            = ["192.168.0.0/22"]
 worker_subnet_cidrs     = ["192.168.4.0/26"]
 storage_account_name    = "indicodatatest"
 cluster_manager_vm_size = "Standard_F2s"
-private_cluster_enabled = false
 
 #
 #  az vm image list --all --offer aro4 --publisher azureopenshift -o table

@@ -17,11 +17,6 @@ variable "kubernetes_cluster_ca_certificate" {
   default = ""
 }
 
-variable "do_create_infrastructure" {
-  type    = bool
-  default = true
-}
-
 variable "is_azure" {
   type    = bool
   default = true
