@@ -451,3 +451,7 @@ variable "replace_prometheus_crds" {
   type    = bool
   default = true
 }
+
+variable "monitoring_namespace" {
+  default = "monitoring"
+}

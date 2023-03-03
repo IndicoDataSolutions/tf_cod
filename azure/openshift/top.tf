@@ -74,6 +74,7 @@ module "infrastructure" {
   dns_prefix                = local.dns_prefix
   nvidia_operator_namespace = var.nvidia_operator_namespace
   nfd_namespace             = "openshift-nfd"
+  monitoring_namespace      = var.monitoring_namespace
 }
 /*
 

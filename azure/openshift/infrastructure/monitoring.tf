@@ -107,7 +107,7 @@ resource "helm_release" "monitoring" {
   verify           = false
   name             = "monitoring"
   create_namespace = true
-  namespace        = "monitoring"
+  namespace        = var.monitoring_namespace
   repository       = var.ipa_repo
   chart            = "monitoring"
   version          = var.monitoring_version
@@ -201,7 +201,7 @@ resource "helm_release" "keda-monitoring" {
 
   name             = "keda"
   create_namespace = true
-  namespace        = "monitoring"
+  namespace        = var.monitoring_namespace
   repository       = "https://kedacore.github.io/charts"
   chart            = "keda"
   version          = var.keda_version
@@ -247,7 +247,7 @@ resource "helm_release" "opentelemetry-collector" {
 
   name             = "opentelemetry-collector"
   create_namespace = true
-  namespace        = "default"
+  namespace        = var.monitoring_namespace
   repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
   chart            = "opentelemetry-collector"
   version          = var.opentelemetry-collector_version

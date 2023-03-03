@@ -18,7 +18,7 @@ variable "ipa_repo" {}
 variable "monitoring_version" {}
 variable "opentelemetry-collector_version" {}
 variable "keda_version" {}
-
+variable "monitoring_namespace" {}
 
 variable "openshift_machine_sets" {
   type = map(object({

@@ -58,3 +58,4 @@ variable "nvidia_operator_namespace" {
   default = "nvidia-gpu-operator"
 }
 
+
