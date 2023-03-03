@@ -36,8 +36,6 @@ resource "azurerm_role_assignment" "resource-provider-assignment" {
   principal_id         = data.azuread_service_principal.redhat-openshift.object_id
 }
 
-
-
 module "argo-registration" {
   depends_on = [
     module.cluster
@@ -131,30 +129,5 @@ data "kubernetes_resource" "infrastructure-cluster" {
 
 output "infrastructure_id" {
   value = local.infrastructure_id
-}
-
-
-resource "kubernetes_storage_class" "default" {
-  depends_on = [
-    module.cluster
-  ]
-
-  metadata {
-    annotations = {
-      "storageclass.kubernetes.io/is-default-class" : "true"
-    }
-    name = "default"
-    labels = {
-      "addonmanager.kubernetes.io/mode" = "EnsureExists"
-      "kubernetes.io/cluster-service"   = "true"
-    }
-  }
-  allow_volume_expansion = true
-  storage_provisioner    = "disk.csi.azure.com"
-  reclaim_policy         = "Delete"
-  volume_binding_mode    = "WaitForFirstConsumer"
-  parameters = {
-    skuname = "StandardSSD_LRS"
-  }
 }
 
