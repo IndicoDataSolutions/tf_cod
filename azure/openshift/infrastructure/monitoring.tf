@@ -72,7 +72,7 @@ resource "null_resource" "replace-prometheus-crds" {
 resource "helm_release" "monitoring" {
   count = var.enable_monitoring_infrastructure == true ? 1 : 0
   depends_on = [
-    null_resource.replace-prommetheus-crds,
+    null_resource.replace-prometheus-crds,
     azurerm_dns_caa_record.alertmanager-caa,
     azurerm_dns_caa_record.grafana-caa,
     azurerm_dns_caa_record.prometheus-caa
@@ -133,7 +133,7 @@ resource "helm_release" "keda-monitoring" {
   count = var.enable_monitoring_infrastructure == true ? 1 : 0
   depends_on = [
     helm_release.monitoring,
-    null_resource.replace-prommetheus-crds,
+    null_resource.replace-prometheus-crds,
   ]
 
   name             = "keda"
@@ -179,7 +179,7 @@ resource "helm_release" "opentelemetry-collector" {
   count = var.enable_monitoring_infrastructure == true ? 1 : 0
   depends_on = [
     helm_release.monitoring,
-    null_resource.replace-prommetheus-crds,
+    null_resource.replace-prometheus-crds,
   ]
 
   name             = "opentelemetry-collector"
