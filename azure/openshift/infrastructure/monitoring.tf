@@ -119,7 +119,7 @@ resource "helm_release" "monitoring" {
     host: "${var.dns_name}"
   
   prometheus-postgres-exporter:
-    enabled: true
+    enabled: false
 
   ingress-nginx:
     enabled: ${var.enable_dns_infrastructure == true && var.enable_monitoring_infrastructure == true}
