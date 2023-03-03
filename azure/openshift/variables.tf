@@ -447,3 +447,7 @@ variable "enable_dns_infrastructure" {
   type    = bool
   default = true
 }
+variable "replace_prometheus_crds" {
+  type    = bool
+  default = true
+}

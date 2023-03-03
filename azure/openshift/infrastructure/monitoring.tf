@@ -57,7 +57,13 @@ output "monitoring-password" {
 
 
 resource "null_resource" "replace-prometheus-crds" {
+  count = var.replace_prometheus_crds == true ? 1 : 0
+
   # login
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command     = "${path.module}/auth.sh ${var.label} ${var.resource_group_name}"
@@ -65,14 +71,34 @@ resource "null_resource" "replace-prometheus-crds" {
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command     = "kubectl replace -f ./prometheus-crds --force"
+    command     = "kubectl scale deployment/cluster-version-operator -n openshift-cluster-version --replicas=0"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "kubectl scale deploy -n openshift-monitoring prometheus-operator --replicas=0"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "kubectl scale deploy -n openshift-monitoring cluster-monitoring-operator --replicas=0"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "kubectl replace -f ${path.module}/prometheus-crds --force"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "oc adm policy add-scc-to-group anyuid system:authenticated"
   }
 }
 
 resource "helm_release" "monitoring" {
   count = var.enable_monitoring_infrastructure == true ? 1 : 0
   depends_on = [
-    null_resource.replace-prommetheus-crds,
+    null_resource.replace-prometheus-crds,
     azurerm_dns_caa_record.alertmanager-caa,
     azurerm_dns_caa_record.grafana-caa,
     azurerm_dns_caa_record.prometheus-caa
@@ -93,7 +119,7 @@ resource "helm_release" "monitoring" {
     host: "${var.dns_name}"
   
   prometheus-postgres-exporter:
-    enabled: true
+    enabled: false
 
   ingress-nginx:
     enabled: ${var.enable_dns_infrastructure == true && var.enable_monitoring_infrastructure == true}
@@ -129,16 +155,53 @@ resource "helm_release" "monitoring" {
   ]
 }
 
+resource "null_resource" "restore-prometheus-operator" {
+  count = var.replace_prometheus_crds == true ? 1 : 0
+
+  depends_on = [
+    helm_release.monitoring
+  ]
+
+
+
+  # login
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "${path.module}/auth.sh ${var.label} ${var.resource_group_name}"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "kubectl scale deployment/cluster-version-operator -n openshift-cluster-version --replicas=1"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "kubectl scale deploy -n openshift-monitoring cluster-monitoring-operator --replicas=1"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "kubectl scale deploy -n openshift-monitoring prometheus-operator --replicas=1"
+  }
+}
+
+
 resource "helm_release" "keda-monitoring" {
   count = var.enable_monitoring_infrastructure == true ? 1 : 0
   depends_on = [
+    null_resource.restore-prometheus-operator,
     helm_release.monitoring,
-    null_resource.replace-prommetheus-crds,
+    null_resource.replace-prometheus-crds,
   ]
 
   name             = "keda"
   create_namespace = true
-  namespace        = "default"
+  namespace        = "monitoring"
   repository       = "https://kedacore.github.io/charts"
   chart            = "keda"
   version          = var.keda_version
@@ -179,7 +242,7 @@ resource "helm_release" "opentelemetry-collector" {
   count = var.enable_monitoring_infrastructure == true ? 1 : 0
   depends_on = [
     helm_release.monitoring,
-    null_resource.replace-prommetheus-crds,
+    null_resource.replace-prometheus-crds,
   ]
 
   name             = "opentelemetry-collector"

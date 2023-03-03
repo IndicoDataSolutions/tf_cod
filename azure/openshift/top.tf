@@ -50,9 +50,9 @@ module "infrastructure" {
   count  = var.do_build_infrastructure == true ? 1 : 0
   source = "./infrastructure"
 
-  ipa_repo                   = var.ipa_repo
-  ipa_openshift_crds_version = var.ipa_openshift_crds_version
-
+  ipa_repo                        = var.ipa_repo
+  ipa_openshift_crds_version      = var.ipa_openshift_crds_version
+  replace_prometheus_crds         = var.replace_prometheus_crds
   monitoring_version              = var.monitoring_version
   opentelemetry-collector_version = var.opentelemetry-collector_version
   keda_version                    = var.keda_version
