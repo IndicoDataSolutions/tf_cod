@@ -455,3 +455,37 @@ variable "replace_prometheus_crds" {
 variable "monitoring_namespace" {
   default = "monitoring"
 }
+
+variable "cluster_oidc_issuer_url" {
+  default = ""
+}
+
+variable "kubelet_identity_client_id" {
+  default = ""
+}
+
+variable "kubelet_identity_object_id" {
+  default = ""
+}
+
+variable "fileshare_name" {
+  default = ""
+}
+
+variable "storage_account_primary_access_key" {
+  default = ""
+}
+
+variable "blob_store_name" {
+  default = ""
+}
+
+variable "storage_account_id" {
+  default = ""
+}
+
+variable "ipa_namespace" {
+  default = "default"
+}
+
+

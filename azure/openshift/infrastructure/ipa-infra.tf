@@ -26,10 +26,6 @@ locals {
 
 #TODO: move to prereqs
 resource "kubernetes_secret" "harbor-pull-secret" {
-  depends_on = [
-    module.cluster
-  ]
-
   metadata {
     name      = "harbor-pull-secret"
     namespace = var.ipa_namespace
@@ -87,25 +83,22 @@ resource "helm_release" "ipa-crds" {
 
 
 resource "time_sleep" "wait_1_minutes_after_crds" {
-  depends_on = [helm_release.ipa-crds]
+  depends_on = [
+    helm_release.ipa-crds
+  ]
 
   create_duration = "1m"
 }
 
 resource "azurerm_role_assignment" "external_dns" {
-  count = var.include_external_dns == true ? 1 : 0
-  depends_on = [
-    module.cluster
-  ]
-  scope                = data.azurerm_dns_zone.domain.id
+  count = var.enable_dns_infrastructure == true ? 1 : 0
+
+  scope                = data.azurerm_dns_zone.domain.0.id
   role_definition_name = "DNS Zone Contributor"
-  principal_id         = module.cluster.kubelet_identity.object_id
+  principal_id         = var.kubelet_identity_object_id
 }
 
 resource "kubernetes_secret" "azure_storage_key" {
-  depends_on = [
-    module.cluster
-  ]
   metadata {
     name = "azure-storage-key"
   }
@@ -120,11 +113,7 @@ resource "kubernetes_secret" "azure_storage_key" {
 }
 
 resource "kubernetes_config_map" "azure_dns_credentials" {
-  count = var.include_external_dns == true ? 1 : 0
-
-  depends_on = [
-    module.cluster
-  ]
+  count = var.enable_dns_infrastructure == true ? 1 : 0
 
   metadata {
     name = "dns-credentials-config"
@@ -229,7 +218,7 @@ storage:
   pvcSpec:
     azureFile:
       readOnly: false
-      secretName: ${kubernetes_secret.azure_storage_key.metadata.name}
+      secretName: ${kubernetes_secret.azure_storage_key.metadata.0.name}
       secretNamespace: null
       shareName: ${var.fileshare_name}
     mountOptions:
@@ -308,7 +297,7 @@ crunchy-postgres:
           full: 30 4 * * *
           incremental: 0 */1 * * *
     imagePullSecrets:
-      - name: ${kubernetes_secret.harbor-pull-secret.metadata.name}
+      - name: ${kubernetes_secret.harbor-pull-secret.metadata.0.name}
   postgres-metrics:
     enabled: false
     
@@ -321,7 +310,9 @@ metrics-server:
 }
 
 resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
-  depends_on = [helm_release.ipa-pre-requisites]
+  depends_on = [
+    helm_release.ipa-pre-requisites
+  ]
 
   create_duration = "1m"
 }

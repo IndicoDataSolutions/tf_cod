@@ -59,6 +59,10 @@ output "storage_account_name" {
   value = module.storage.storage_account_name
 }
 
+output "storage_account_id" {
+  value = module.storage.storage_account_id
+}
+
 output "fileshare_name" {
   value = module.storage.fileshare_name
 }

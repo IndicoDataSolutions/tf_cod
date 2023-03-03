@@ -1,5 +1,3 @@
-data "azuread_client_config" "current" {}
-
 resource "azuread_application" "workload_identity" {
   display_name = "${var.label}-${var.region}-workload-identity"
   owners       = [data.azuread_client_config.current.object_id]
@@ -12,13 +10,13 @@ resource "azuread_service_principal" "workload_identity" {
 }
 
 resource "azurerm_role_assignment" "dns-zone-contributor" {
-  scope                = data.azurerm_dns_zone.domain.id
+  scope                = data.azurerm_dns_zone.domain.0.id
   role_definition_name = "Contributor"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
 
 resource "azurerm_role_assignment" "dns-zone-dns-zone-contributor" {
-  scope                = data.azurerm_dns_zone.domain.id
+  scope                = data.azurerm_dns_zone.domain.0.id
   role_definition_name = "DNS Zone Contributor"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
@@ -29,10 +27,6 @@ resource "azuread_application_password" "workload_identity" {
 }
 
 resource "kubernetes_secret" "workload_identity" {
-  depends_on = [
-    module.cluster
-  ]
-
   metadata {
     name = "workload-identity"
   }
@@ -49,19 +43,19 @@ resource "kubernetes_secret" "workload_identity" {
 
 
 resource "azurerm_role_assignment" "blob_storage_account_owner" {
-  scope                = module.storage.storage_account_id
+  scope                = var.storage_account_id
   role_definition_name = "Owner"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
 
 resource "azurerm_role_assignment" "blob_storage_account_blob_contributer" {
-  scope                = module.storage.storage_account_id
+  scope                = var.storage_account_id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
 
 resource "azurerm_role_assignment" "blob_storage_account_queue_contributer" {
-  scope                = module.storage.storage_account_id
+  scope                = var.storage_account_id
   role_definition_name = "Storage Queue Data Contributor"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
@@ -96,9 +90,6 @@ resource "azurerm_role_assignment" "snapshot_storage_account_queue_contributer" 
 
 resource "kubernetes_service_account" "workload_identity" {
   count = var.use_workload_identity == true ? 1 : 0
-  depends_on = [
-    module.cluster
-  ]
 
   metadata {
     name      = "workload-identity-storage-account"

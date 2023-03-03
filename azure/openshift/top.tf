@@ -50,31 +50,57 @@ module "infrastructure" {
   count  = var.do_build_infrastructure == true ? 1 : 0
   source = "./infrastructure"
 
-  ipa_repo                        = var.ipa_repo
-  ipa_openshift_crds_version      = var.ipa_openshift_crds_version
-  replace_prometheus_crds         = var.replace_prometheus_crds
+
   monitoring_version              = var.monitoring_version
   opentelemetry-collector_version = var.opentelemetry-collector_version
   keda_version                    = var.keda_version
 
-  resource_group_name = local.resource_group_name
-  label               = var.label
-  region              = var.region
+
+  label         = var.label
+  region        = var.region
+  account       = var.account
+  domain_suffix = var.domain_suffix
+  base_domain   = local.base_domain
+  dns_name      = local.dns_name
+  dns_prefix    = local.dns_prefix
+
+  common_resource_group = var.common_resource_group
+  resource_group_name   = local.resource_group_name
 
   enable_dns_infrastructure        = var.enable_dns_infrastructure
   enable_gpu_infrastructure        = var.enable_gpu_infrastructure
   enable_monitoring_infrastructure = var.enable_monitoring_infrastructure
-
+  replace_prometheus_crds          = var.replace_prometheus_crds
+  restore_snapshot_enabled         = var.restore_snapshot_enabled
+  use_workload_identity            = var.use_workload_identity
 
   openshift_machine_sets = var.openshift_machine_sets
 
-  common_resource_group     = var.common_resource_group
-  base_domain               = local.base_domain
-  dns_name                  = local.dns_name
-  dns_prefix                = local.dns_prefix
+
+
   nvidia_operator_namespace = var.nvidia_operator_namespace
   nfd_namespace             = "openshift-nfd"
   monitoring_namespace      = var.monitoring_namespace
+
+
+  cluster_oidc_issuer_url    = local.cluster_oidc_issuer_url
+  kubelet_identity_client_id = local.kubelet_identity_client_id
+  kubelet_identity_object_id = local.kubelet_identity_object_id
+
+  ipa_namespace              = var.ipa_namespace
+  ipa_repo                   = var.ipa_repo
+  ipa_crds_version           = var.ipa_crds_version
+  ipa_pre_reqs_version       = var.ipa_pre_reqs_version
+  ipa_openshift_crds_version = var.ipa_openshift_crds_version
+
+  vault_mount_path                   = var.vault_mount_path
+  harbor_pull_secret_b64             = var.harbor_pull_secret_b64
+  storage_account_name               = local.storage_account_name
+  storage_account_id                 = local.storage_account_id
+  fileshare_name                     = local.fileshare_name
+  storage_account_primary_access_key = local.storage_account_primary_access_key
+  blob_store_name                    = local.blob_store_name
+
 }
 /*
 

@@ -3,6 +3,8 @@ variable "common_resource_group" {}
 variable "resource_group_name" {}
 variable "label" {}
 variable "region" {}
+variable "account" {}
+variable "domain_suffix" {}
 variable "base_domain" {}
 variable "dns_name" {}
 variable "dns_prefix" {}
@@ -15,21 +17,23 @@ variable "restore_snapshot_enabled" { type = bool }
 variable "use_workload_identity" { type = bool }
 variable "cluster_oidc_issuer_url" {}
 variable "kubelet_identity_client_id" {}
-vairable "harbor_pull_secret_b64" {}
+variable "kubelet_identity_object_id" {}
+variable "harbor_pull_secret_b64" {}
 
 variable "ipa_namespace" {}
 variable "ipa_repo" {}
 variable "ipa_crds_version" {}
+variable "ipa_pre_reqs_version" {}
+variable "vault_mount_path" {}
 variable "storage_account_name" {}
+variable "storage_account_id" {}
 variable "storage_account_primary_access_key" {}
 variable "blob_store_name" {}
-
-
+variable "fileshare_name" {}
 
 variable "nvidia_operator_namespace" {}
 variable "nfd_namespace" {}
 variable "ipa_openshift_crds_version" {}
-variable "ipa_repo" {}
 variable "monitoring_version" {}
 variable "opentelemetry-collector_version" {}
 variable "keda_version" {}
