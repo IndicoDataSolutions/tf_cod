@@ -1,5 +1,5 @@
 is_openshift          = true
-include_external_dns  = true
+include_external_dns  = false
 use_workload_identity = false
 
 svp_client_id     = "na"
