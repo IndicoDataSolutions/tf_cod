@@ -41,18 +41,12 @@ resource "helm_release" "ipa-crds" {
   ]
 }
 
-
-
-
 resource "time_sleep" "wait_1_minutes_after_crds" {
   depends_on = [helm_release.ipa-crds]
 
   create_duration = "1m"
 }
 
-
-
-# Install the Machinesets now
 resource "helm_release" "crunchy-postgres" {
   count = var.is_openshift == true ? 1 : 0
   depends_on = [

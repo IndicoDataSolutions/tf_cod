@@ -1,14 +1,4 @@
 
-data "kubernetes_resource" "package" {
-  api_version = "packages.operators.coreos.com/v1"
-  kind        = "PackageManifest"
-
-  metadata {
-    name      = "gpu-operator-certified"
-    namespace = "openshift-marketplace"
-  }
-}
-
 output "channel" {
   value = local.channel
 }
