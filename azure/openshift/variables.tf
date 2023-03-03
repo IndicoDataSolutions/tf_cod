@@ -3,6 +3,14 @@ variable "resource_group_name" {
   default     = null
 }
 
+variable "kubeadmin_username" {
+  default = ""
+}
+
+variable "kubeadmin_password" {
+  default = ""
+}
+
 variable "kubernetes_host" {
   default = ""
 }

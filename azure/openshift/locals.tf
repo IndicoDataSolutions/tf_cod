@@ -17,6 +17,8 @@ locals {
 
   indico_storage_class_name = "azurefile"
 
+  kubeadmin_username                = var.do_create_cluster == true ? module.create.0.kubeadmin_username : var.kubeadmin_username
+  kubeadmin_password                = var.do_create_cluster == true ? module.create.0.kubeadmin_password : var.kubeadmin_password
   kubernetes_host                   = var.do_create_cluster == true ? module.create.0.kubernetes_host : var.kubernetes_host
   kubernetes_client_certificate     = var.do_create_cluster == true ? module.create.0.kubernetes_client_certificate : var.kubernetes_client_certificate
   kubernetes_client_key             = var.do_create_cluster == true ? module.create.0.kubernetes_client_key : var.kubernetes_client_key

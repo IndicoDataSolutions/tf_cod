@@ -44,30 +44,32 @@ provider "argocd" {
   password    = var.argo_password
 }
 
-
 provider "kubernetes" {
-  host                   = local.kubernetes_host
-  client_certificate     = local.kubernetes_client_certificate
-  client_key             = local.kubernetes_client_key
-  cluster_ca_certificate = local.kubernetes_cluster_ca_certificate
-}
-
-provider "kubectl" {
-  host                   = local.kubernetes_host
-  client_certificate     = local.kubernetes_client_certificate
-  client_key             = local.kubernetes_client_key
-  cluster_ca_certificate = local.kubernetes_cluster_ca_certificate
-  load_config_file       = false
-}
-
-provider "helm" {
-  debug = true
-  kubernetes {
-    host                   = local.kubernetes_host
-    client_certificate     = local.kubernetes_client_certificate
-    client_key             = local.kubernetes_client_key
-    cluster_ca_certificate = local.kubernetes_cluster_ca_certificate
+  host = local.kubernetes_host
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = [local.kubernetes_host, local.kubeadmin_username, local.kubeadmin_password]
+    command     = "./get_token.sh"
   }
 }
 
+provider "kubectl" {
+  host = local.kubernetes_host
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = [local.kubernetes_host, local.kubeadmin_username, local.kubeadmin_password]
+    command     = "./get_token.sh"
+  }
+  load_config_file = true
+}
 
+provider "helm" {
+  kubernetes {
+    host = local.kubernetes_host
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      args        = [local.kubernetes_host, local.kubeadmin_username, local.kubeadmin_password]
+      command     = "./get_token.sh"
+    }
+  }
+}
