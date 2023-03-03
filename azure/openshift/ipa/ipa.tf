@@ -135,10 +135,6 @@ resource "helm_release" "crunchy-postgres" {
   ]
 }
 
-data "vault_kv_secret_v2" "zerossl_data" {
-  mount = var.vault_mount_path
-  name  = "zerossl"
-}
 
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
@@ -268,10 +264,6 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
   create_duration = "1m"
 }
 
-data "github_repository" "argo-github-repo" {
-  count     = var.argo_enabled == true ? 1 : 0
-  full_name = "${var.github_organization}/${var.argo_repo}"
-}
 
 resource "github_repository_file" "argocd-application-yaml" {
   count = var.argo_enabled == true ? 1 : 0
