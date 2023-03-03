@@ -19,6 +19,7 @@ locals {
   }
   EOF
 
+  external_dns_credentials = var.include_external_dns == true ? local.azure_dns_credentials : local.openshift_dns_credentials
   # https://docs.openshift.com/container-platform/4.10/nodes/pods/nodes-pods-autoscaling-custom.html
   prometheus_address = "http://monitoring-kube-prometheus-prometheus.${var.monitoring_namespace}.svc.cluster.local:9090/prometheus"
 
@@ -91,7 +92,7 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
 }
 
 resource "azurerm_role_assignment" "external_dns" {
-  count = var.enable_dns_infrastructure == true ? 1 : 0
+  count = var.include_external_dns == true ? 1 : 0
 
   scope                = data.azurerm_dns_zone.domain.0.id
   role_definition_name = "DNS Zone Contributor"
@@ -113,14 +114,12 @@ resource "kubernetes_secret" "azure_storage_key" {
 }
 
 resource "kubernetes_config_map" "azure_dns_credentials" {
-  count = var.enable_dns_infrastructure == true ? 1 : 0
-
   metadata {
     name = "dns-credentials-config"
   }
 
   data = {
-    "azure.json" = local.openshift_dns_credentials
+    "azure.json" = local.external_dns_credentials
   }
 }
 

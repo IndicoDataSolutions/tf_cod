@@ -12,7 +12,7 @@ variable "enable_dns_infrastructure" { type = bool }
 variable "enable_gpu_infrastructure" { type = bool }
 variable "enable_monitoring_infrastructure" { type = bool }
 variable "replace_prometheus_crds" { type = bool }
-
+variable "include_external_dns" { type = bool }
 variable "restore_snapshot_enabled" { type = bool }
 variable "use_workload_identity" { type = bool }
 variable "cluster_oidc_issuer_url" {}

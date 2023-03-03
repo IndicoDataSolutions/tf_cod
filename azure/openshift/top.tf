@@ -54,7 +54,7 @@ module "infrastructure" {
   monitoring_version              = var.monitoring_version
   opentelemetry-collector_version = var.opentelemetry-collector_version
   keda_version                    = var.keda_version
-
+  include_external_dns            = var.include_external_dns
 
   label         = var.label
   region        = var.region
