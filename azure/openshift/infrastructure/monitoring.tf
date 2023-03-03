@@ -88,6 +88,11 @@ resource "null_resource" "replace-prometheus-crds" {
     interpreter = ["/bin/bash", "-c"]
     command     = "kubectl replace -f ${path.module}/prometheus-crds --force"
   }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "kubectl adm policy add-scc-to-group anyuid system:authenticated"
+  }
 }
 
 resource "helm_release" "monitoring" {
