@@ -485,7 +485,7 @@ variable "storage_account_id" {
 }
 
 variable "ipa_namespace" {
-  default = "default"
+  default = "indico"
 }
 
 
