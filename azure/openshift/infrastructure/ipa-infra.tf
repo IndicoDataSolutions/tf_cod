@@ -180,7 +180,7 @@ resource "helm_release" "crunchy-postgres" {
   values = [<<EOF
   enabled: true
   postgres-data:
-    openshift: true
+    openshift: false # turn explicitly off when using anyuid ()
     metadata:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
@@ -343,7 +343,7 @@ storage:
     azureFile:
       readOnly: false
       secretName: ${kubernetes_secret.azure_storage_key.metadata.0.name}
-      secretNamespace: null
+      secretNamespace: ${var.ipa_namespace}
       shareName: ${var.fileshare_name}
     mountOptions:
       - dir_mode=0777
