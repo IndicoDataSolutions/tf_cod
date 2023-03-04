@@ -55,9 +55,28 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
+# this is needed in "default" for crds
+resource "kubernetes_secret" "harbor-pull-secret-cds" {
+  metadata {
+    name      = "harbor-pull-secret"
+    namespace = var.ipa_crds_namespace
+    annotations = {
+      "reflector.v1.k8s.emberstack.com/reflection-allowed"      = true
+      "reflector.v1.k8s.emberstack.com/reflection-auto-enabled" = true
+    }
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+
+  data = {
+    ".dockerconfigjson" = "${base64decode(var.harbor_pull_secret_b64)}"
+  }
+}
+
+
 resource "helm_release" "ipa-crds" {
   depends_on = [
-    kubernetes_secret.harbor-pull-secret,
+    kubernetes_secret.harbor-pull-secret-crds,
     kubernetes_namespace.indico
   ]
 
