@@ -170,6 +170,11 @@ resource "null_resource" "unset-default-sc" {
     command     = "${path.module}/remove-default-sc.sh ${var.label} ${var.resource_group_name}"
     interpreter = ["/bin/bash", "-c"]
   }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "oc adm policy add-scc-to-group anyuid system:authenticated"
+  }
 }
 
 

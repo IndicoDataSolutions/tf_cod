@@ -57,9 +57,7 @@ spec:
             worker:
               autoscaling:
                 authentication:
-                  enabled: ${var.is_openshift}
-                  authModes: bearer
-                  authTrigger: keda-trigger-auth-prometheus
+                  enabled: false
                 serverAddress: ${local.prometheus_address}
                 highmem:
                   serverAddress: ${local.prometheus_address}
