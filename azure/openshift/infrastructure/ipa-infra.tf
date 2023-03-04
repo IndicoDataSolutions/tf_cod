@@ -133,7 +133,8 @@ resource "azurerm_role_assignment" "external_dns" {
 
 resource "kubernetes_secret" "azure_storage_key" {
   metadata {
-    name = "azure-storage-key"
+    name      = "azure-storage-key"
+    namespace = var.ipa_namespace
   }
 
   data = {
@@ -147,7 +148,8 @@ resource "kubernetes_secret" "azure_storage_key" {
 
 resource "kubernetes_config_map" "azure_dns_credentials" {
   metadata {
-    name = "dns-credentials-config"
+    name      = "dns-credentials-config"
+    namespace = var.ipa_namespace
   }
 
   data = {
