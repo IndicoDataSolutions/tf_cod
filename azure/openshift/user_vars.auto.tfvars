@@ -2,6 +2,9 @@ is_openshift          = true
 include_external_dns  = false
 use_workload_identity = false
 
+ipa_namespace      = "indico"
+ipa_crds_namespace = "default"
+
 svp_client_id     = "na"
 svp_client_secret = "na"
 

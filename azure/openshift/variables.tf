@@ -488,4 +488,9 @@ variable "ipa_namespace" {
   default = "indico"
 }
 
+variable "ipa_crds_namespace" {
+  default = "indico"
+}
+
+
 

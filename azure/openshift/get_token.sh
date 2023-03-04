@@ -19,7 +19,6 @@ else
 an_hour_from_now=$(date -u -d '+1 hour' '+%Y-%m-%dT%H:%M:%SZ')
 fi
 
-echo date > lastrun.txt
 token=$(cat $kube_config | yq '.users[0].user.token')
 version='client.authentication.k8s.io/v1beta1'
 json=$( jq -n -c \

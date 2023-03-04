@@ -64,7 +64,7 @@ resource "helm_release" "ipa-crds" {
   verify           = false
   name             = "ipa-crds"
   create_namespace = true
-  namespace        = var.ipa_namespace
+  namespace        = var.ipa_crds_namespace
   repository       = var.ipa_repo
   chart            = "ipa-crds"
   version          = var.ipa_crds_version

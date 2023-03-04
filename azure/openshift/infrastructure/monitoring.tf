@@ -98,6 +98,7 @@ resource "null_resource" "replace-prometheus-crds" {
 resource "helm_release" "monitoring" {
   count = var.enable_monitoring_infrastructure == true ? 1 : 0
   depends_on = [
+    helm_release.ipa-crds,
     null_resource.replace-prometheus-crds,
     azurerm_dns_caa_record.alertmanager-caa,
     azurerm_dns_caa_record.grafana-caa,

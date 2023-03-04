@@ -21,6 +21,8 @@ variable "kubelet_identity_object_id" {}
 variable "harbor_pull_secret_b64" {}
 
 variable "ipa_namespace" {}
+variable "ipa_crds_namespace" {}
+
 variable "ipa_repo" {}
 variable "ipa_crds_version" {}
 variable "ipa_pre_reqs_version" {}
