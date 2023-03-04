@@ -20,6 +20,8 @@ variable "kubelet_identity_client_id" {}
 variable "kubelet_identity_object_id" {}
 variable "harbor_pull_secret_b64" {}
 
+
+variable "do_install_ipa_crds" { type = bool }
 variable "ipa_namespace" {}
 variable "ipa_crds_namespace" {}
 

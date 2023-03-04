@@ -87,6 +87,7 @@ module "infrastructure" {
   kubelet_identity_client_id = local.kubelet_identity_client_id
   kubelet_identity_object_id = local.kubelet_identity_object_id
 
+  do_install_ipa_crds        = var.do_install_ipa_crds
   ipa_crds_namespace         = var.ipa_crds_namespace
   ipa_namespace              = var.ipa_namespace
   ipa_repo                   = var.ipa_repo

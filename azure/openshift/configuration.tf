@@ -27,3 +27,8 @@ variable "enable_monitoring_infrastructure" {
   type    = bool
   default = true
 }
+
+variable "do_install_ipa_crds" {
+  type    = bool
+  default = true
+}

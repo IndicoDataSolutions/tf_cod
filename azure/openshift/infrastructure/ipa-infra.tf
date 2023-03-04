@@ -56,7 +56,8 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 }
 
 # this is needed in "default" for crds
-resource "kubernetes_secret" "harbor-pull-secret-cds" {
+resource "kubernetes_secret" "harbor-pull-secret-crds" {
+  count = var.do_install_ipa_crds == true ? 1 : 0
   metadata {
     name      = "harbor-pull-secret"
     namespace = var.ipa_crds_namespace
@@ -75,6 +76,7 @@ resource "kubernetes_secret" "harbor-pull-secret-cds" {
 
 
 resource "helm_release" "ipa-crds" {
+  count = var.do_install_ipa_crds == true ? 1 : 0
   depends_on = [
     kubernetes_secret.harbor-pull-secret-crds,
     kubernetes_namespace.indico
