@@ -167,16 +167,17 @@ resource "null_resource" "unset-default-sc" {
   }
 
   provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "oc adm policy add-scc-to-group privileged system:authenticated"
+  }
+
+  provisioner "local-exec" {
     command     = "${path.module}/remove-default-sc.sh ${var.label} ${var.resource_group_name}"
     interpreter = ["/bin/bash", "-c"]
   }
 
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-c"]
-    command     = "oc adm policy add-scc-to-group anyuid system:authenticated"
-  }
-}
 
+}
 
 /*
   allowVolumeExpansion: true
