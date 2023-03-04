@@ -4,6 +4,7 @@ use_workload_identity = false
 do_install_ipa_crds   = true
 ipa_namespace         = "indico"
 ipa_crds_namespace    = "default"
+argo_enabled          = false
 
 svp_client_id     = "na"
 svp_client_secret = "na"
