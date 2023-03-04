@@ -160,6 +160,95 @@ data "vault_kv_secret_v2" "zerossl_data" {
   name  = "zerossl"
 }
 
+resource "helm_release" "crunchy-postgres" {
+  depends_on = [
+    helm_release.ipa-crds,
+    time_sleep.wait_1_minutes_after_crds
+  ]
+
+  name             = "crunchy"
+  create_namespace = true
+  namespace        = "crunchy"
+  repository       = var.ipa_repo
+  chart            = "crunchy-postgres"
+  version          = "0.3.0"
+  timeout          = "600" # 10 minutes
+  wait             = true
+
+  values = [<<EOF
+  enabled: true
+  postgres-data:
+    openshift: true
+    metadata:
+      annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+    instances:
+    - affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node_group
+                operator: In
+                values:
+                - pgo-workers
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: postgres-operator.crunchydata.com/cluster
+                operator: In
+                values:
+                - postgres-data
+              - key: postgres-operator.crunchydata.com/instance-set
+                operator: In
+                values:
+                - pgha1
+            topologyKey: kubernetes.io/hostname
+      metadata:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      dataVolumeClaimSpec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 200Gi
+      name: pgha1
+      replicas: 1
+      resources:
+        requests:
+          cpu: 500m
+          memory: 3000Mi
+      tolerations:
+        - effect: NoSchedule
+          key: indico.io/crunchy
+          operator: Exists
+    pgBackRestConfig:
+      repos:
+      - name: repo1
+        volume:
+          volumeClaimSpec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 200Gi
+        schedules:
+          full: 30 4 * * *
+          incremental: 0 */1 * * *
+    imagePullSecrets:
+      - name: harbor-pull-secret
+  postgres-metrics:
+    enabled: false
+  EOF
+  ]
+}
+
+
+
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
     time_sleep.wait_1_minutes_after_crds,
@@ -168,7 +257,8 @@ resource "helm_release" "ipa-pre-requisites" {
     kubernetes_secret.azure_storage_key,
     kubernetes_config_map.azure_dns_credentials,
     kubernetes_service_account.workload_identity,
-    kubernetes_namespace.indico
+    kubernetes_namespace.indico,
+    helm_release.crunchy-postgres
   ]
 
   verify           = false
@@ -265,73 +355,9 @@ storage:
     volumeMode: Filesystem
 
 crunchy-postgres:
-  enabled: true
+  enabled: false
   postgres-data:
     openshift: true
-    metadata:
-      annotations:
-        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-    instances:
-    - affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node_group
-                operator: In
-                values:
-                - pgo-workers
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: postgres-operator.crunchydata.com/cluster
-                operator: In
-                values:
-                - postgres-data
-              - key: postgres-operator.crunchydata.com/instance-set
-                operator: In
-                values:
-                - pgha1
-            topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      dataVolumeClaimSpec:
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 200Gi
-      name: pgha1
-      replicas: 1
-      resources:
-        requests:
-          cpu: 500m
-          memory: 3000Mi
-      tolerations:
-        - effect: NoSchedule
-          key: indico.io/crunchy
-          operator: Exists
-    pgBackRestConfig:
-      repos:
-      - name: repo1
-        volume:
-          volumeClaimSpec:
-            accessModes:
-            - ReadWriteOnce
-            resources:
-              requests:
-                storage: 200Gi
-        schedules:
-          full: 30 4 * * *
-          incremental: 0 */1 * * *
-    imagePullSecrets:
-      - name: ${kubernetes_secret.harbor-pull-secret.metadata.0.name}
-  postgres-metrics:
-    enabled: false
     
 aws-fsx-csi-driver:
   enabled: false
