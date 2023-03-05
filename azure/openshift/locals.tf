@@ -3,7 +3,6 @@
 locals {
   resource_group_name = var.resource_group_name != null ? var.resource_group_name : lower("${var.label}-${var.region}")
 
-  storage_account_name    = replace(lower("${var.account}snapshots"), "-", "")
   argo_app_name           = lower("${var.account}.${var.region}.${var.label}-ipa")
   argo_cluster_name       = "${var.account}.${var.region}.${var.label}"
   argo_smoketest_app_name = lower("${var.account}.${var.region}.${var.label}-smoketest")
@@ -23,6 +22,7 @@ locals {
   fileshare_name                     = var.do_create_cluster == true ? module.create.0.fileshare_name : var.fileshare_name
   storage_account_primary_access_key = var.do_create_cluster == true ? module.create.0.storage_account_primary_access_key : var.storage_account_primary_access_key
   blob_store_name                    = var.do_create_cluster == true ? module.create.0.blob_store_name : var.blob_store_name
+  storage_account_name               = var.do_create_cluster == true ? module.create.0.storage_account_name : var.storage_account_name
   storage_account_id                 = var.do_create_cluster == true ? module.create.0.storage_account_id : var.storage_account_id
   kubeadmin_username                 = var.do_create_cluster == true ? module.create.0.kubeadmin_username : var.kubeadmin_username
   kubeadmin_password                 = var.do_create_cluster == true ? module.create.0.kubeadmin_password : var.kubeadmin_password

@@ -95,11 +95,13 @@ module "infrastructure" {
   ipa_pre_reqs_version       = var.ipa_pre_reqs_version
   ipa_openshift_crds_version = var.ipa_openshift_crds_version
 
-  vault_mount_path                   = var.vault_mount_path
-  harbor_pull_secret_b64             = var.harbor_pull_secret_b64
-  storage_account_name               = local.storage_account_name
-  storage_account_id                 = local.storage_account_id
-  fileshare_name                     = local.fileshare_name
+  vault_mount_path       = var.vault_mount_path
+  harbor_pull_secret_b64 = var.harbor_pull_secret_b64
+
+  storage_account_name = local.storage_account_name
+  storage_account_id   = local.storage_account_id
+  fileshare_name       = local.fileshare_name
+
   storage_account_primary_access_key = local.storage_account_primary_access_key
   blob_store_name                    = local.blob_store_name
 
