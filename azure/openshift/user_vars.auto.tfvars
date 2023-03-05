@@ -3,7 +3,7 @@ include_external_dns  = false
 use_workload_identity = false
 do_install_ipa_crds   = true
 ipa_namespace         = "indico"
-ipa_crds_namespace    = "default"
+ipa_crds_namespace    = "indico"
 argo_enabled          = false
 
 svp_client_id     = "na"
