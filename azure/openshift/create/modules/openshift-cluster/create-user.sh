@@ -232,7 +232,7 @@ oc whoami
 test_ns=terraform-test
 export KUBECONFIG=$NEW_KUBECONFIG
 set -e
-oc login -u $test_ns
+oc login -u terraform-sa
 set +e
 oc whoami
 oc get ns | grep $test_ns
