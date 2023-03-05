@@ -229,16 +229,17 @@ oc config set-context terraform-sa --cluster=$(oc --kubeconfig $NEW_KUBECONFIG c
 oc config use-context terraform-sa --kubeconfig=$NEW_KUBECONFIG
 
 oc whoami 
+test_ns=terraform-test
 export KUBECONFIG=$NEW_KUBECONFIG
 set -e
-oc login -u terraform-sa
+oc login -u $test_ns
 set +e
 oc whoami
-oc get ns | grep terraform-sa
-[ $? -ne 0 ] && oc create ns terraform-sa
+oc get ns | grep $test_ns
+[ $? -ne 0 ] && oc create ns $test_ns
 
-oc get ns terraform-sa
-oc delete ns terraform-sa
+oc get ns $test_ns
+oc delete ns $test_ns
 
 #oc create sa -n default foobar
 #oc get sa -n default
