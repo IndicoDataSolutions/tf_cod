@@ -173,15 +173,18 @@ if [ $? -eq 0 ]; then
   oc get user
 fi
 
-oc get user terraform-sa
-[ $? -eq 0 ] && oc delete user terraform-sa
-oc create user terraform-sa
+sa_username="terraform-sa"
+test_ns=terraform-test
+
+oc get user $sa_username
+[ $? -eq 0 ] && oc delete user $sa_username
+oc create user $sa_username
 
 cat << EOF >> $crb_yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: terraform-sa-admin
+  name: $sa_username-admin
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -189,15 +192,15 @@ roleRef:
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: User
-  name: terraform-sa
+  name:  $sa_username
 EOF
 
-oc get clusterrolebinding terraform-sa-admin
-[ $? -eq 0 ] && oc delete clusterrolebinding terraform-sa-admin
+oc get clusterrolebinding  $sa_username-admin
+[ $? -eq 0 ] && oc delete clusterrolebinding  $sa_username-admin
 
 oc create -f $crb_yaml
 
-openssl req -new -newkey rsa:4096 -nodes -keyout $key_file -out $csr_file -subj "/CN=terraform-sa"
+openssl req -new -newkey rsa:4096 -nodes -keyout $key_file -out $csr_file -subj "/CN=$sa_username"
 
 cat << EOF >> $csr_yaml
 apiVersion: certificates.k8s.io/v1
@@ -223,16 +226,16 @@ oc create -f $csr_yaml
 oc adm certificate approve ${name}-${resource_group}-access
 oc get csr ${name}-${resource_group}-access -o jsonpath='{.status.certificate}' | base64 -d > $access_crt
 
+
 oc -n openshift-authentication rsh `oc --kubeconfig $NEW_KUBECONFIG get pods -n openshift-authentication -o name | head -1` cat /run/secrets/kubernetes.io/serviceaccount/ca.crt | base64  > $ca_crt
-oc config set-credentials terraform-sa --client-certificate=$access_crt --client-key=$key_file --embed-certs --kubeconfig=$NEW_KUBECONFIG
-oc config set-context terraform-sa --cluster=$(oc --kubeconfig $NEW_KUBECONFIG config view -o jsonpath='{.clusters[0].name}') --namespace=default --user=terraform-sa  --kubeconfig=$NEW_KUBECONFIG
-oc config use-context terraform-sa --kubeconfig=$NEW_KUBECONFIG
+oc config set-credentials $sa_username --client-certificate=$access_crt --client-key=$key_file --embed-certs --kubeconfig=$NEW_KUBECONFIG
+oc config set-context $sa_username --cluster=$(oc --kubeconfig $NEW_KUBECONFIG config view -o jsonpath='{.clusters[0].name}') --namespace=default --user=$sa_username  --kubeconfig=$NEW_KUBECONFIG
+oc config use-context $sa_username--kubeconfig=$NEW_KUBECONFIG
 
 oc whoami 
-test_ns=terraform-test
 export KUBECONFIG=$NEW_KUBECONFIG
 set -e
-oc login -u terraform-sa
+oc login -u $sa_username
 set +e
 oc whoami
 oc get ns | grep $test_ns
