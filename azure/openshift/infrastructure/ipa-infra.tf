@@ -57,7 +57,7 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 
 # this is needed in "default" for crds
 resource "kubernetes_secret" "harbor-pull-secret-crds" {
-  count = var.do_install_ipa_crds == true ? 1 : 0
+  count = var.do_install_ipa_crds == true && var.ipa_crds_namespace != var.ipa_namespace ? 1 : 0
   metadata {
     name      = "harbor-pull-secret"
     namespace = var.ipa_crds_namespace
