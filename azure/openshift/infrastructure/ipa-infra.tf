@@ -180,7 +180,7 @@ resource "helm_release" "crunchy-postgres" {
   values = [<<EOF
   enabled: true
   postgres-data:
-    openshift: false # turn explicitly off when using anyuid ()
+    openshift: true
     metadata:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"

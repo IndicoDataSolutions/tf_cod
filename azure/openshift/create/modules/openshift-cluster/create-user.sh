@@ -100,7 +100,8 @@ success_attempts=0
 needed_success_attempts=6
 until [ "$SKIP_VALIDATE" == "YES" ] || [ $cert_valid == "true" ] || [ $retry_attempts -le 0 ]
 do
-  curl -q --connect-timeout 30 ${api_url}version &> /dev/null
+  echo curl -f -q --connect-timeout 30 ${api_url}/version | jq '.gitVersion' -e
+  curl -s -q --connect-timeout 30 ${api_url}version &> /dev/null
   if [ $? -eq 0 ]; then
     echo "Certificate is valid [$retry_attempts] ($success_attempts/$needed_success_attempts)"
     ((success_attempts++))
