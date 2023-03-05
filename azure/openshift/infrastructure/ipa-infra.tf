@@ -170,7 +170,7 @@ resource "helm_release" "crunchy-postgres" {
 
   name             = "crunchy"
   create_namespace = true
-  namespace        = "crunchy"
+  namespace        = var.ipa_namespace
   repository       = var.ipa_repo
   chart            = "crunchy-postgres"
   version          = "0.3.0"
