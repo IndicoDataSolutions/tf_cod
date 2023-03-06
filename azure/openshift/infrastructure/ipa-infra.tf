@@ -283,7 +283,6 @@ cluster:
   domain: ${var.domain_suffix}
 
 rabbitmq:
-  enabled: true
   rabbitmq:
     metrics:
       enabled: true
