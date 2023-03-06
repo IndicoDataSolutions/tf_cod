@@ -156,9 +156,9 @@ resource "null_resource" "unset-default-sc" {
     azurerm_resource_group_template_deployment.openshift-cluster
   ]
 
-  triggers = {
-    always_run = "${timestamp()}"
-  }
+  #triggers = {
+  #  always_run = "${timestamp()}"
+  #}
 
   # login
   provisioner "local-exec" {

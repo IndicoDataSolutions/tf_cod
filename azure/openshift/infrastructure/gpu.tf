@@ -68,9 +68,9 @@ resource "null_resource" "wait-for-gpu-operator" {
     kubectl_manifest.gpu-operator-subscription
   ]
 
-  triggers = {
-    always_run = "${timestamp()}"
-  }
+  #triggers = {
+  #  always_run = "${timestamp()}"
+  #}
 
   # login
   provisioner "local-exec" {
@@ -154,9 +154,9 @@ resource "null_resource" "wait-for-nfd-subscription" {
     kubectl_manifest.nfd-subscription
   ]
 
-  triggers = {
-    always_run = "${timestamp()}"
-  }
+  #triggers = {
+  #  always_run = "${timestamp()}"
+  #}
 
   # login
   provisioner "local-exec" {
@@ -249,9 +249,9 @@ resource "null_resource" "wait-for-node-feature-discovery" {
     kubectl_manifest.nfd
   ]
 
-  triggers = {
-    always_run = "${timestamp()}"
-  }
+  #triggers = {
+  #  always_run = "${timestamp()}"
+  #}
 
   # login
   provisioner "local-exec" {
