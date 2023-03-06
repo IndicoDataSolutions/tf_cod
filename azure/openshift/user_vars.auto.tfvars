@@ -1,10 +1,14 @@
+do_install_ipa_crds = true
+do_deploy_ipa       = true
+argo_enabled        = true
+
 is_openshift          = true
 include_external_dns  = false
 use_workload_identity = false
-do_install_ipa_crds   = true
-ipa_namespace         = "indico"
-ipa_crds_namespace    = "indico"
-argo_enabled          = false
+
+ipa_namespace      = "indico"
+ipa_crds_namespace = "indico"
+
 
 svp_client_id     = "na"
 svp_client_secret = "na"
