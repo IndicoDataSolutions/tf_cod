@@ -105,14 +105,12 @@ resource "helm_release" "monitoring" {
     azurerm_dns_caa_record.prometheus-caa
   ]
 
-  verify           = false
   name             = "monitoring"
   create_namespace = true
   namespace        = var.monitoring_namespace
   repository       = var.ipa_repo
   chart            = "monitoring"
   version          = var.monitoring_version
-  wait             = false
   timeout          = "900" # 15 minutes
 
   values = [<<EOF
@@ -141,7 +139,6 @@ resource "helm_release" "monitoring" {
 
   kube-prometheus-stack:
     enabled: true
-
     nodeExporter:
       enabled: false
 
