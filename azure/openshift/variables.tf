@@ -493,10 +493,10 @@ variable "ipa_crds_namespace" {
 }
 
 variable "openshift_admission_chart_version" {
-  default = "0.0.1-dop-1536-c82028f5"
+  default = "0.0.1-dop-1536-a577783e"
 }
 variable "openshift_webhook_chart_version" {
-  default = "0.1.9-dop-1536-c82028f5"
+  default = "0.1.9-dop-1536-a577783e"
 }
 variable "crunchy_chart_version" {
   default = "0.3.0"
