@@ -282,8 +282,6 @@ cluster:
   account: ${var.account}
   domain: ${var.domain_suffix}
 
-fak: eric
-
 rabbitmq:
   rabbitmq:
     metrics:

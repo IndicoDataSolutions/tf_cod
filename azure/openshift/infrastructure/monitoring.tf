@@ -137,8 +137,6 @@ resource "helm_release" "monitoring" {
     ingressUsername: monitoring
     ingressPassword: ${random_password.monitoring-password.result}
 
-  fake: eric
-
   kube-prometheus-stack:
     enabled: true
     nodeExporter:
