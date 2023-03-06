@@ -492,5 +492,11 @@ variable "ipa_crds_namespace" {
   default = "indico"
 }
 
+variable "openshift_admission_chart_version" {
+  default = "0.0.1-dop-1536-b9206c09"
+}
+
+
+
 
 

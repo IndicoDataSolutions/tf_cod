@@ -32,3 +32,8 @@ variable "do_install_ipa_crds" {
   type    = bool
   default = true
 }
+
+variable "use_openshift_admission_controller" {
+  type    = bool
+  default = true
+}

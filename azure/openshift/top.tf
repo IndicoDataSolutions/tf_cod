@@ -50,7 +50,10 @@ module "infrastructure" {
   count  = var.do_build_infrastructure == true ? 1 : 0
   source = "./infrastructure"
 
+  openshift_admission_chart_version = var.openshift_admission_chart_version
 
+  use_admission_controller        = var.use_openshift_admission_controller
+  is_openshift                    = var.is_openshift
   monitoring_version              = var.monitoring_version
   opentelemetry-collector_version = var.opentelemetry-collector_version
   keda_version                    = var.keda_version
