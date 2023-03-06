@@ -146,6 +146,7 @@ resource "helm_release" "monitoring" {
       enabled: false
 
     prometheus:
+      enabled: true
       prometheusSpec:
         nodeSelector:
           node_group: static-workers
