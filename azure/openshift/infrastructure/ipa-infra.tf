@@ -284,6 +284,11 @@ cluster:
 
 rabbitmq:
   enabled: true
+  rabbitmq:
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
 
 secrets:
   rabbitmq:
