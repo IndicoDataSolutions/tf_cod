@@ -172,7 +172,6 @@ resource "helm_release" "ipa-pre-requisites" {
     kubernetes_config_map.azure_dns_credentials,
     kubernetes_service_account.workload_identity,
     kubernetes_namespace.indico,
-    helm_release.crunchy-postgres
   ]
 
   verify           = false
@@ -355,4 +354,18 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
   ]
 
   create_duration = "1m"
+}
+
+module "openshift-infrastructure" {
+  count  = var.is_openshift == true ? 1 : 0
+  source = "./openshift"
+
+  ipa_namespace            = var.ipa_namespace
+  ipa_repo                 = var.ipa_repo
+  use_admission_controller = var.use_admission_controller
+
+  openshift_admission_chart_version = var.openshift_admission_chart_version
+  openshift_webhook_chart_version   = var.openshift_webhook_chart_version
+  crunchy_chart_version             = var.crunchy_chart_version
+
 }

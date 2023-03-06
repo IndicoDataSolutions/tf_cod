@@ -1,40 +1,4 @@
 
-resource "helm_release" "indico-admission-controller" {
-  depends_on = [
-    time_sleep.wait_1_minutes_after_pre_reqs
-  ]
-
-  count = var.use_admission_controller == true ? 1 : 0
-
-  name             = "adm"
-  create_namespace = true
-  namespace        = var.ipa_namespace
-  repository       = var.ipa_repo
-  chart            = "indico-openshift-adm"
-  version          = var.openshift_admission_chart_version
-  timeout          = "600" # 10 minutes
-  wait             = true
-
-}
-
-
-resource "helm_release" "indico-admission-webhook" {
-  depends_on = [
-    time_sleep.wait_1_minutes_after_pre_reqs
-  ]
-
-  count = var.use_admission_controller == true ? 1 : 0
-
-  name             = "wh"
-  create_namespace = true
-  namespace        = var.ipa_namespace
-  repository       = var.ipa_repo
-  chart            = "indico-openshift-webhook"
-  version          = var.openshift_admission_chart_version
-  wait             = true
-}
-
-
 
 resource "helm_release" "crunchy-postgres" {
   depends_on = [
@@ -47,7 +11,7 @@ resource "helm_release" "crunchy-postgres" {
   namespace        = var.ipa_namespace
   repository       = var.ipa_repo
   chart            = "crunchy-postgres"
-  version          = "0.3.0"
+  version          = var.crunchy_chart_version
   timeout          = "600" # 10 minutes
   wait             = true
 

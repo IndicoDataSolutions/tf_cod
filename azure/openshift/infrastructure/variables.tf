@@ -19,8 +19,12 @@ variable "cluster_oidc_issuer_url" {}
 variable "kubelet_identity_client_id" {}
 variable "kubelet_identity_object_id" {}
 variable "harbor_pull_secret_b64" {}
-variable "openshift_admission_chart_version" {}
+
 variable "use_admission_controller" { type = bool }
+variable "openshift_admission_chart_version" {}
+variable "openshift_webhook_chart_version" {}
+variable "crunchy_chart_version" {}
+
 variable "is_openshift" { type = bool }
 
 variable "do_install_ipa_crds" { type = bool }
