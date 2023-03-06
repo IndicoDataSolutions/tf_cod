@@ -147,7 +147,7 @@ YAML
 }
 
 
-resource "null_resource" "wait-for-nfd-subscription" {
+resource "null_resource" "wait-for-nfd-subcription" {
   count = var.enable_gpu_infrastructure == true ? 1 : 0
 
   depends_on = [

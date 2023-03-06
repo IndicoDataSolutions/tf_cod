@@ -141,6 +141,10 @@ resource "helm_release" "monitoring" {
 
   kube-prometheus-stack:
     enabled: true
+
+    nodeExporter:
+      enabled: false
+
     prometheus:
       prometheusSpec:
         nodeSelector:
