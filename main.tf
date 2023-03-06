@@ -39,6 +39,10 @@ terraform {
       source  = "hashicorp/vault"
       version = "3.8.0"
     }
+    snowflake = {
+      source  = "Snowflake-Labs/snowflake"
+      version = "~> 0.35"
+    }
   }
 }
 
@@ -75,6 +79,14 @@ provider "aws" {
   default_tags {
     tags = var.default_tags
   }
+}
+
+provider "snowflake" {
+  role  = "ACCOUNTADMIN"
+  username = var.snowflake_username
+  account  = var.snowflake_account
+  region  = var.snowflake_region
+  private_key = var.snowflake_private_key
 }
 
 data "aws_caller_identity" "current" {}
@@ -274,6 +286,15 @@ module "cluster" {
   cluster_version            = var.cluster_version
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
   access_security_group      = module.cluster-manager.cluster_manager_sg
+}
+
+module "snowflake" {
+  count   = var.enable_weather_station == true ? 1 : 0
+  source = "app.terraform.io/indico/indico-aws-snowflake/mod"
+  label = var.label
+  additional_tags = var.additional_tags
+  snowflake_db_name = var.snowflake_db_name
+  kms_key_arn  = module.kms_key.key_arn
 }
 
 resource "aws_security_group" "indico_allow_access" {
