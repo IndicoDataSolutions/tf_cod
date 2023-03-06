@@ -111,7 +111,7 @@ module "infrastructure" {
   blob_store_name                    = local.blob_store_name
 
 }
-/*
+
 
 module "ipa" {
   depends_on = [
@@ -148,7 +148,7 @@ module "ipa" {
   blob_store_name                    = local.blob_store_name
   applications                       = var.applications
 }
-
+/*
 module "ipa-testing" {
   depends_on = [
     module.create,
