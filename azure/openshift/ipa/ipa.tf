@@ -29,7 +29,7 @@ metadata:
 spec:
   destination:
     server: ${var.kubernetes_host}
-    namespace: default
+    namespace: ${var.ipa_namespace}
   project: "${lower("${var.account}.${var.label}.${var.region}")}"
   syncPolicy:
     automated:
@@ -74,8 +74,8 @@ spec:
             runtime-scanner:
               enabled: ${replace(lower(var.account), "indico", "") == lower(var.account) ? "false" : "true"}
               authentication:
-                ingressUser: monitoring
-                ingressPassword: ${random_password.monitoring-password.result}
+                ingressUser: ${var.monitoring_username}
+                ingressPassword: ${var.monitoring_password}
         
         - name: HELM_VALUES
           value: |
@@ -85,12 +85,7 @@ EOT
 
 resource "argocd_application" "ipa" {
   depends_on = [
-    helm_release.ipa-pre-requisites,
-    time_sleep.wait_1_minutes_after_pre_reqs,
-    helm_release.cod-snapshot-restore,
-    github_repository_file.smoketest-application-yaml,
     github_repository_file.argocd-application-yaml,
-    helm_release.keda-monitoring
   ]
 
   count = var.argo_enabled == true && var.ipa_enabled == true ? 1 : 0

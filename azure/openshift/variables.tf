@@ -505,6 +505,15 @@ variable "use_admission_controller" {
   default = true
 }
 
+variable "monitoring_username" {
+  type    = string
+  default = "monitoring"
+}
+
+variable "monitoring_password" {
+  type    = string
+  default = "changeit"
+}
 
 
 

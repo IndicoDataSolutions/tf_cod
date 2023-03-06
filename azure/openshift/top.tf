@@ -122,22 +122,34 @@ module "ipa" {
   count  = var.do_deploy_ipa == true ? 1 : 0
   source = "./ipa"
 
-  label                              = var.label
-  region                             = var.region
-  account                            = var.account
-  domain_suffix                      = var.domain_suffix
-  k8s_version                        = var.k8s_version
-  cluster_type                       = "openshift-azure"
-  argo_enabled                       = var.argo_enabled
-  github_organization                = var.github_organization
-  ipa_repo                           = var.ipa_repo
-  ipa_crds_version                   = var.ipa_crds_version
-  ipa_pre_reqs_version               = var.ipa_pre_reqs_version
-  argo_repo                          = var.argo_repo
-  argo_branch                        = var.argo_branch
-  argo_path                          = var.argo_path
-  commit_message                     = var.message
-  storage_key_secret                 = module.infrastructure.0.storage_key_secret
+
+  is_openshift = var.is_openshift
+
+
+  label               = var.label
+  region              = var.region
+  account             = var.account
+  domain_suffix       = var.domain_suffix
+  k8s_version         = var.k8s_version
+  cluster_type        = "openshift-azure"
+  argo_enabled        = var.argo_enabled
+  github_organization = var.github_organization
+
+  ipa_namespace        = var.ipa_namespace
+  ipa_repo             = var.ipa_repo
+  ipa_crds_version     = var.ipa_crds_version
+  ipa_pre_reqs_version = var.ipa_pre_reqs_version
+  ipa_version          = var.ipa_version
+  ipa_values           = var.ipa_values
+  ipa_enabled = var.ipa_enabled
+
+  monitoring_namespace = var.monitoring_namespace
+
+  argo_repo   = var.argo_repo
+  argo_branch = var.argo_branch
+  argo_path   = var.argo_path
+
+  message                            = var.message
   harbor_pull_secret_b64             = var.harbor_pull_secret_b64
   kubernetes_host                    = local.kubernetes_host
   kubelet_identity_client_id         = local.kubelet_identity_client_id
@@ -147,6 +159,11 @@ module "ipa" {
   storage_account_primary_access_key = local.storage_account_primary_access_key
   blob_store_name                    = local.blob_store_name
   applications                       = var.applications
+  monitoring_password                = local.monitoring_password
+  monitoring_username                = local.monitoring_username
+
+  vault_mount_path = var.vault_mount_path
+
 }
 /*
 module "ipa-testing" {

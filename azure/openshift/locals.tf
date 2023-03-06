@@ -16,6 +16,10 @@ locals {
 
   indico_storage_class_name = "azurefile"
 
+
+  monitoring_password = var.do_build_infrastructure == true ? module.infrastructure.0.monitoring_password : var.monitoring_password
+  monitoring_username = var.do_build_infrastructure == true ? module.infrastructure.0.monitoring_username : var.monitoring_username
+
   cluster_oidc_issuer_url            = var.do_create_cluster == true ? module.create.0.oidc_issuer_url : var.cluster_oidc_issuer_url
   kubelet_identity_client_id         = var.do_create_cluster == true ? module.create.0.kubelet_identity.client_id : var.kubelet_identity_client_id
   kubelet_identity_object_id         = var.do_create_cluster == true ? module.create.0.kubelet_identity.object_id : var.kubelet_identity_object_id
