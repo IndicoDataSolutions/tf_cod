@@ -137,6 +137,8 @@ resource "helm_release" "monitoring" {
     ingressUsername: monitoring
     ingressPassword: ${random_password.monitoring-password.result}
 
+  fake: eric
+  
   kube-prometheus-stack:
     enabled: true
     nodeExporter:
@@ -283,7 +285,7 @@ resource "helm_release" "opentelemetry-collector" {
         zipkin: null
       exporters:
         otlp:
-          endpoint: monitoring-tempo.monitoring.svc:4317
+          endpoint: monitoring-tempo.${var.monitoring_namespace}.svc:4317
           tls:
             insecure: true
       service:
