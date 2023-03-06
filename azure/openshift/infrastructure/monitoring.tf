@@ -60,9 +60,9 @@ resource "null_resource" "replace-prometheus-crds" {
   count = var.replace_prometheus_crds == true ? 1 : 0
 
   # login
-  triggers = {
-    always_run = "${timestamp()}"
-  }
+  #triggers = {
+  #  always_run = "${timestamp()}"
+  #}
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
@@ -138,7 +138,7 @@ resource "helm_release" "monitoring" {
     ingressPassword: ${random_password.monitoring-password.result}
 
   fake: eric
-  
+
   kube-prometheus-stack:
     enabled: true
     nodeExporter:
