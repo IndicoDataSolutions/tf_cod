@@ -141,7 +141,7 @@ module "ipa" {
   ipa_pre_reqs_version = var.ipa_pre_reqs_version
   ipa_version          = var.ipa_version
   ipa_values           = var.ipa_values
-  ipa_enabled = var.ipa_enabled
+  ipa_enabled          = var.ipa_enabled
 
   monitoring_namespace = var.monitoring_namespace
 
@@ -149,11 +149,14 @@ module "ipa" {
   argo_branch = var.argo_branch
   argo_path   = var.argo_path
 
-  message                            = var.message
-  harbor_pull_secret_b64             = var.harbor_pull_secret_b64
-  kubernetes_host                    = local.kubernetes_host
-  kubelet_identity_client_id         = local.kubelet_identity_client_id
-  kubelet_identity_object_id         = local.kubelet_identity_object_id
+  message                = var.message
+  harbor_pull_secret_b64 = var.harbor_pull_secret_b64
+
+
+  kubernetes_host            = local.kubernetes_host
+  kubelet_identity_client_id = local.kubelet_identity_client_id
+  kubelet_identity_object_id = local.kubelet_identity_object_id
+
   storage_account_name               = local.storage_account_name
   fileshare_name                     = local.fileshare_name
   storage_account_primary_access_key = local.storage_account_primary_access_key

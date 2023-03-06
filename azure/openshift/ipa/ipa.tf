@@ -1,5 +1,7 @@
 
 resource "github_repository_file" "argocd-application-yaml" {
+  count = var.argo_enabled == true && var.ipa_enabled == true ? 1 : 0
+
   repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/ipa_application.yaml"
