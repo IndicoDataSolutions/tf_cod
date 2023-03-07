@@ -59,7 +59,6 @@ spec:
                 - indico-static-secrets
                 - rabbitmq
                 - workload-identity
-
             kafka-strimzi:
               enabled: true
               postgres:
@@ -71,7 +70,6 @@ spec:
                   # -- By default, this points to the crunchy-postgres service for the metrics database
                   host: postgres-data-primary.${var.ipa_namespace}.svc
                   user: indico
-
             nvidia-device-plugin:
               enabled: ${!var.is_openshift}
             ${var.is_openshift ? "kafka-strimzi: {podSecurityContext: {fsGroup: 1001}}" : "#azure kafka-strmzi"}
