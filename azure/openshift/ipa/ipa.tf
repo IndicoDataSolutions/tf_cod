@@ -75,6 +75,8 @@ spec:
                 enabled: ${var.is_openshift}
             runtime-scanner:
               enabled: ${replace(lower(var.account), "indico", "") == lower(var.account) ? "false" : "true"}
+              labels:
+                prometheus: indico-general
               authentication:
                 ingressUser: ${var.monitoring_username}
                 ingressPassword: ${var.monitoring_password}
