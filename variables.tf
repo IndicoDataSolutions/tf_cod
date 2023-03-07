@@ -513,3 +513,9 @@ variable "aws_primary_dns_role_arn" {
   default     = ""
   description = "The AWS arn for the role needed to manage route53 DNS in a different account."
 }
+
+variable "alternate_domain" {
+  type        = string
+  default     = ""
+  description = "Optional alternate domain to use with cluster."
+}
