@@ -104,7 +104,7 @@ clusterIssuer:
       selector:
         matchLabels:
           "acme.cert-manager.io/dns02-solver": "true"
-alternateExternalDns:
+alternate-external-dns:
   enabled: true
   logLevel: debug
   policy: sync
