@@ -67,7 +67,7 @@ variable "argo_branch" {}
 variable "argo_path" {}
 
 
-
+variable "ipa_namespace" {}
 variable "argo_enabled" { type = bool }
 variable "monitoring_namespace" {}
 variable "message" {}

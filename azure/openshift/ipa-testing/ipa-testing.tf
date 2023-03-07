@@ -34,7 +34,7 @@ metadata:
 spec:
   destination:
     server: ${var.kubernetes_host}
-    namespace: default
+    namespace: ${var.ipa_namespace}
   project: "${lower("${var.account}.${var.label}.${var.region}")}"
   syncPolicy:
     automated:

@@ -194,6 +194,7 @@ module "ipa-testing" {
   k8s_version          = var.k8s_version
   github_organization  = var.github_organization
 
+  ipa_namespace                  = var.ipa_namespace
   ipa_smoketest_enabled          = var.do_test_ipa
   ipa_smoketest_repo             = var.ipa_smoketest_repo
   ipa_smoketest_version          = var.ipa_smoketest_version
