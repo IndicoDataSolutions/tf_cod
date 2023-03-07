@@ -295,6 +295,7 @@ module "snowflake" {
   additional_tags = var.additional_tags
   snowflake_db_name = var.snowflake_db_name
   kms_key_arn  = module.kms_key.key_arn
+  s3_bucket_name = module.s3-storage.data_s3_bucket_name
 }
 
 resource "aws_security_group" "indico_allow_access" {
