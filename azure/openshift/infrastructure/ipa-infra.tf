@@ -357,7 +357,7 @@ aws-fsx-csi-driver:
   enabled: false
 
 metrics-server:
-  enabled: true
+  enabled: false
   EOF
   ]
 }
