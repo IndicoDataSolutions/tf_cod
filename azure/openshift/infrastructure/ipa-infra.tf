@@ -355,8 +355,9 @@ crunchy-postgres:
 
 aws-fsx-csi-driver:
   enabled: false
+
 metrics-server:
-  enabled: false
+  enabled: true
   EOF
   ]
 }

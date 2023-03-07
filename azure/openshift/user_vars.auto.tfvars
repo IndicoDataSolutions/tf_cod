@@ -42,7 +42,7 @@ openshift_machine_sets = {
     taints     = ["nvidia.com/gpu=true:NoSchedule"]
     labels = {
       "node_group" : "gpu-workers",
-      "k8s.amazonaws.com/accelerator" : "nvidia"
+      "cluster-api/accelerator" : "nvidia.com"
     }
     cluster_auto_scaling           = true
     cluster_auto_scaling_min_count = 0
