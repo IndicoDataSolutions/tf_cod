@@ -61,6 +61,8 @@ spec:
                 - workload-identity
             kafka-strimzi:
               enabled: true
+              podSecurityContext:
+                fsGroup: 1001
               postgres:
                 app:
                   # -- By default, this points to the crunchy-postgres service for the application database
@@ -72,7 +74,7 @@ spec:
                   user: indico
             nvidia-device-plugin:
               enabled: ${!var.is_openshift}
-            ${var.is_openshift ? "kafka-strimzi: {podSecurityContext: {fsGroup: 1001}}" : "#azure kafka-strmzi"}
+          
             worker:
               autoscaling:
                 authentication:
