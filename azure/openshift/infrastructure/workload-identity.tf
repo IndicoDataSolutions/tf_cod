@@ -28,7 +28,8 @@ resource "azuread_application_password" "workload_identity" {
 
 resource "kubernetes_secret" "workload_identity" {
   metadata {
-    name = "workload-identity"
+    name      = "workload-identity"
+    namespace = var.ipa_namespace
   }
 
   data = {

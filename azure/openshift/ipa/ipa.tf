@@ -53,6 +53,13 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
+            global:
+              secretRefs:
+                - indico-generated-secrets
+                - indico-static-secrets
+                - rabbitmq
+                - workload-identity
+
             nvidia-device-plugin:
               enabled: ${!var.is_openshift}
             ${var.is_openshift ? "kafka-strimzi: {podSecurityContext: {fsGroup: 1001}}" : "#azure kafka-strmzi"}
