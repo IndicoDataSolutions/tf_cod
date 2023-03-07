@@ -1,4 +1,5 @@
 data "github_repository" "argo-github-repo" {
+  count     = var.argo_enabled == true ? 1 : 0
   full_name = "${var.github_organization}/${var.argo_repo}"
 }
 

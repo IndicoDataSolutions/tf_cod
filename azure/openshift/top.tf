@@ -168,7 +168,7 @@ module "ipa" {
   vault_mount_path = var.vault_mount_path
 
 }
-/*
+
 module "ipa-testing" {
   depends_on = [
     module.create,
@@ -176,15 +176,25 @@ module "ipa-testing" {
     module.ipa
   ]
 
-  count                          = var.do_test_ipa == true ? 1 : 0
-  source                         = "./ipa-testing"
-  kubernetes_host                = local.kubernetes_host
-  label                          = var.label
-  region                         = var.region
-  account                        = var.account
-  domain_suffix                  = var.domain_suffix
-  k8s_version                    = var.k8s_version
-  github_organization            = var.github_organization
+  count = var.do_test_ipa == true ? 1 : 0
+
+  argo_repo    = var.argo_repo
+  argo_enabled = var.argo_enabled
+  argo_branch  = var.argo_branch
+  argo_path    = var.argo_path
+
+  monitoring_namespace = var.monitoring_namespace
+  message              = var.message
+  source               = "./ipa-testing"
+  kubernetes_host      = local.kubernetes_host
+  label                = var.label
+  region               = var.region
+  account              = var.account
+  domain_suffix        = var.domain_suffix
+  k8s_version          = var.k8s_version
+  github_organization  = var.github_organization
+
+  ipa_smoketest_enabled          = var.do_test_ipa
   ipa_smoketest_repo             = var.ipa_smoketest_repo
   ipa_smoketest_version          = var.ipa_smoketest_version
   ipa_smoketest_values           = var.ipa_smoketest_values
@@ -193,4 +203,4 @@ module "ipa-testing" {
   ipa_smoketest_cronjob_schedule = var.ipa_smoketest_cronjob_schedule
   ipa_smoketest_slack_channel    = var.ipa_smoketest_slack_channel
 }
-*/
+

@@ -1,77 +1,73 @@
 
 variable "label" {
   type        = string
-  default     = "indico"
   description = "The unique string to be prepended to resources names"
 }
 
 variable "region" {
   type        = string
-  default     = "eastus"
   description = "The Azure region in which to launch the indico stack"
 }
 
 variable "account" {
   type        = string
-  default     = "Azure-Dev"
   description = "The name of the subscription that this cluster falls under"
 }
 
 variable "domain_suffix" {
   type        = string
-  default     = "indico.io"
   description = "Domain suffix"
 }
 
 variable "k8s_version" {
   type        = string
-  default     = "1.23.12"
   description = "The version of the kubernetes cluster"
 }
 
 variable "github_organization" {
-  default = "IndicoDataSolutions"
 }
 
 variable "ipa_smoketest_values" {
-  type    = string
-  default = "Cg==" # empty newline string
+  type = string
 }
 
 variable "ipa_smoketest_repo" {
-  type    = string
-  default = "https://harbor.devops.indico.io/chartrepo/indico-charts"
+  type = string
 }
 
 variable "ipa_smoketest_container_tag" {
-  type    = string
-  default = "development-5cc16676"
+  type = string
 }
 
 variable "ipa_smoketest_version" {
-  type    = string
-  default = "0.2.1-add-openshift-crds-4a0b2155"
+  type = string
 }
 
 variable "ipa_smoketest_slack_channel" {
-  type    = string
-  default = "cod-smoketest-results"
+  type = string
 }
 
 variable "ipa_smoketest_enabled" {
-  type    = bool
-  default = true
+  type = bool
 }
 
 variable "ipa_smoketest_cronjob_enabled" {
-  type    = bool
-  default = false
+  type = bool
 }
 
 variable "ipa_smoketest_cronjob_schedule" {
-  type    = string
-  default = "0 0 * * *" # every night at midnight
+  type = string
 }
 
 variable "kubernetes_host" {
 }
+
+variable "argo_repo" {}
+variable "argo_branch" {}
+variable "argo_path" {}
+
+
+
+variable "argo_enabled" { type = bool }
+variable "monitoring_namespace" {}
+variable "message" {}
