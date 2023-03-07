@@ -211,10 +211,6 @@ rabbitmq:
   rabbitmq:
     metrics:
       enabled: true
-      serviceMonitor:
-        enabled: true
-        labels:
-          prometheus: indico-general
 
 secrets:
   rabbitmq:
