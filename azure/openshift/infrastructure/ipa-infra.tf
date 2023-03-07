@@ -357,7 +357,12 @@ aws-fsx-csi-driver:
   enabled: false
 
 metrics-server:
-  enabled: false
+  enabled: true
+  apiService:
+    create: true
+  args: 
+    - --kubelet-insecure-tls
+    - --secure-port=8443
   EOF
   ]
 }

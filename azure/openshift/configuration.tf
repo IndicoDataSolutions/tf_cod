@@ -1,16 +1,19 @@
 variable "do_create_cluster" {
-  type    = bool
-  default = true
+  description = "Enables construction of an Openshift Cluster"
+  type        = bool
+  default     = true
 }
 
 variable "do_build_infrastructure" {
-  type    = bool
-  default = true
+  description = "Enables deployment of the IPA Pre-Reqs and Crunchy Database"
+  type        = bool
+  default     = true
 }
 
 variable "do_deploy_ipa" {
-  type    = bool
-  default = true
+  description = "Enables deployment of the IPA Helm Chart"
+  type        = bool
+  default     = true
 }
 
 variable "do_test_ipa" {
@@ -19,21 +22,25 @@ variable "do_test_ipa" {
 }
 
 variable "enable_gpu_infrastructure" {
-  type    = bool
-  default = true
+  description = "Enables construction of GPU Machinesets, Machines, ClusterAutoscaler"
+  type        = bool
+  default     = true
 }
 
 variable "enable_monitoring_infrastructure" {
-  type    = bool
-  default = true
+  description = "Enables the deployment of the Indico Monitoring helm chart"
+  type        = bool
+  default     = true
 }
 
 variable "do_install_ipa_crds" {
-  type    = bool
-  default = true
+  description = "Enables the deployment of the Indico CRDs helm chart"
+  type        = bool
+  default     = true
 }
 
 variable "use_openshift_admission_controller" {
-  type    = bool
-  default = true
+  description = "Enables the deployment of the Openshift Admission Controller to support Crunchy PostGres Database creation"
+  type        = bool
+  default     = true
 }
