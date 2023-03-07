@@ -76,7 +76,7 @@ app-edge:
 no-overrides: "true"
 EOT
   )
-  dns_configuration_values = var.alternate_domain != "" ? (<<EOT
+  dns_configuration_values = var.alternate_domain == "" ? (<<EOT
 clusterIssuer:
   additionalSolvers:
     - dns01:
