@@ -60,6 +60,18 @@ spec:
                 - rabbitmq
                 - workload-identity
 
+            kafka-strimzi:
+              enabled: true
+              postgres:
+                app:
+                  # -- By default, this points to the crunchy-postgres service for the application database
+                  host: postgres-data-primary.${var.ipa_namespace}.svc
+                  user: indico
+                metrics:
+                  # -- By default, this points to the crunchy-postgres service for the metrics database
+                  host: postgres-data-primary.${var.ipa_namespace}.svc
+                  user: indico
+
             nvidia-device-plugin:
               enabled: ${!var.is_openshift}
             ${var.is_openshift ? "kafka-strimzi: {podSecurityContext: {fsGroup: 1001}}" : "#azure kafka-strmzi"}

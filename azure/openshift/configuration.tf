@@ -11,12 +11,13 @@ variable "do_build_infrastructure" {
 }
 
 variable "do_deploy_ipa" {
-  description = "Enables deployment of the IPA Helm Chart"
+  description = "Enables deployment of the IPA Helm Chart via Argo"
   type        = bool
   default     = true
 }
 
 variable "do_test_ipa" {
+   description = "Launches the COD smoketest deployment of the IPA Helm Chart via Argo"
   type    = bool
   default = true
 }
