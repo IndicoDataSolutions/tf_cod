@@ -49,6 +49,7 @@ locals {
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
   acm_ipa_values = var.use_acm == true ? (<<EOT
 app-edge:
+  alternateDomain: ${var.alternate_domain}
   aws-load-balancer-controller:
     enabled: true
     ingress:
@@ -73,7 +74,8 @@ app-edge:
               pathType: Prefix
   EOT
     ) : (<<EOT
-no-overrides: "true"
+app-edge:
+  alternateDomain: ${var.alternate_domain}
 EOT
   )
   dns_configuration_values = var.alternate_domain == "" ? (<<EOT
@@ -605,8 +607,6 @@ spec:
             host: ${local.dns_name}
             slack:
               channel: ${var.ipa_smoketest_slack_channel}
-            app-edge:
-              alternateDomain: ${var.alternate_domain}
             ${indent(12, base64decode(var.ipa_smoketest_values))}    
 EOT
 }
