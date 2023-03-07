@@ -605,6 +605,8 @@ spec:
             host: ${local.dns_name}
             slack:
               channel: ${var.ipa_smoketest_slack_channel}
+            app-edge:
+              alternateDomain: ${var.alternate_domain}
             ${indent(12, base64decode(var.ipa_smoketest_values))}    
 EOT
 }
