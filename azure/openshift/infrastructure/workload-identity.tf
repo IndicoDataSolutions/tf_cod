@@ -32,11 +32,16 @@ resource "kubernetes_secret" "workload_identity" {
     namespace = var.ipa_namespace
   }
 
+  # https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/identity/azure-identity/TROUBLESHOOTING.md#troubleshoot-environmentcredential-authentication-issues
+  # AZURE_CLIENT_ID, AZURE_TENANT_ID and AZURE_CLIENT_SECRET 
   data = {
     ARM_SUBSCRIPTION_ID = "${data.azurerm_subscription.primary.subscription_id}"
     ARM_TENANT_ID       = "${data.azuread_client_config.current.tenant_id}"
+    AZURE_TENANT_ID     = "${data.azuread_client_config.current.tenant_id}"
     ARM_CLIENT_ID       = "${azuread_application.workload_identity.application_id}"
+    AZURE_CLIENT_ID     = "${azuread_application.workload_identity.application_id}"
     ARM_CLIENT_SECRET   = "${azuread_application_password.workload_identity.value}"
+    AZURE_CLIENT_SECRET = "${azuread_application_password.workload_identity.value}"
   }
 
   type = "Opaque"
