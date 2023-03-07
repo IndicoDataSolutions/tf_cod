@@ -97,7 +97,7 @@ clusterIssuer:
       selector:
         matchLabels:
           "acme.cert-manager.io/dns01-solver": "true"
-    - dns02:
+    - dns01:
         route53:
           region: ${var.region}
           role: ${var.aws_primary_dns_role_arn}
