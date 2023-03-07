@@ -346,7 +346,7 @@ variable "ipa_smoketest_container_tag" {
 
 variable "ipa_smoketest_version" {
   type    = string
-  default = "0.1.14-dop-1536-c1158a6"
+  default = "0.1.14-dop-1536-18805132"
 }
 
 variable "ipa_smoketest_slack_channel" {
