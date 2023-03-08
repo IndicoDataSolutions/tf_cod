@@ -107,6 +107,8 @@ resource "helm_release" "ipa-crds" {
         kubernetes.io/os: linux
     enabled: true
     installCRDs: true
+  aws-ebs-csi-driver:
+    enabled: false
  EOF
   ]
 }
@@ -450,7 +452,6 @@ spec:
 
         - name: HELM_VALUES
           value: |
-            ${indent(12, base64decode(var.ipa_smoketest_values))} 
             image:
               tag: ${var.ipa_smoketest_container_tag}
             cronjob:
@@ -463,6 +464,7 @@ spec:
             host: ${local.dns_name}
             slack:
               channel: ${var.ipa_smoketest_slack_channel}
+            ${indent(12, base64decode(var.ipa_smoketest_values))} 
 EOT
 }
 
@@ -521,28 +523,12 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
-            nvidia-device-plugin:
-              enabled: ${!var.is_openshift}
-            ${var.is_openshift ? "kafka-strimzi: {podSecurityContext: {fsGroup: 1001}}" : "#azure kafka-strmzi"}
-            worker:
-              autoscaling:
-                authentication:
-                  enabled: ${var.is_openshift}
-                  authModes: bearer
-                  authTrigger: keda-trigger-auth-prometheus
-                serverAddress: ${local.prometheus_address}
-                highmem:
-                  serverAddress: ${local.prometheus_address}
-            reloader:
-              isOpenshift: ${var.is_openshift}
             aws-node-termination:
-              enabled: false
-            app-edge:
-              openshift:
-                enabled: ${var.is_openshift}
-            rainbow-nginx:
-              openshift:
-                enabled: ${var.is_openshift}
+              enabled: false 
+            global:
+              podLabels:
+                "azure.workload.identity/use": "true"
+              serviceAccountName: "workload-identity-storage-account"
             runtime-scanner:
               enabled: ${replace(lower(var.account), "indico", "") == lower(var.account) ? "false" : "true"}
               authentication:

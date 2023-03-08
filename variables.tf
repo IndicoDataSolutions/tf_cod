@@ -480,6 +480,12 @@ variable "include_efs" {
   description = "Create efs"
 }
 
+#Added to support dop-1500 - QA needs programmatic access to push data to the s3 bucket indico-locust-benchmark-test-results in us-east-2.
+variable "performance_bucket" {
+  type        = bool
+  default     = false
+  description = "Add permission to connect to indico-locust-benchmark-test-results"
+}
 variable "crds-values-yaml-b64" {
   default = "Cg=="
 }
