@@ -110,7 +110,7 @@ alternate-external-dns:
   policy: sync
   txtOwnerId: "${var.alternate_domain}-${var.label}-${var.region}"
   domainFilters:
-    - ${var.alternate_domain}
+    - ${alternate_domain_root}
   extraArgs:
     - "--exclude-domains=${var.aws_account}.indico.io"
     - "--aws-assume-role=${var.aws_primary_dns_role_arn}"
@@ -125,6 +125,12 @@ alternate-external-dns:
     - ingress
 EOT
   )
+  #need to get the root of alternate_domain
+  the_splits            = var.alternate_domain != "" ? split(".", var.alternate_domain) : split(".", "test.domain.com")
+  the_length            = length(local.the_splits)
+  the_tld               = local.the_splits[local.the_length - 1]
+  the_domain            = local.the_splits[local.the_length - 2]
+  alternate_domain_root = join(".", [local.the_domain, local.the_tld])
 }
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
