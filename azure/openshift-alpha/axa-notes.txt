@@ -1,0 +1,58 @@
+1. We would prefer that you use Azure Namespace rather than a standalone cluster. Is this possible? If it is not possible, please explain why?
+
+a. No. We are designed, built and deployed with the fundamental assumption 
+   that we are the only application competing for resources, so we size 
+   and test this way.   These assumptions are all coded into our Terraform and Helm Charts
+   and are not separable.
+
+b. We build and deploy the cluster as part of our software package. 
+
+c. The cluster is pre-built, configured and has fundamental assumptions which are 
+   coded into the Terraform, these are not separable. We don't test it this way
+   nor do we specify what these assumptions are, they are coded into the Terraform.
+   These are things like Node labels, Taints and Tolerations as well as low-level
+   expectations regarding the Monitoring Infrastructure which is a key part of the
+   Cluster Autoscaler which inter-releates to Keda and or storage assumptions and
+   configurations too numerous to define. We expect complete control over the cluster 
+   definition when the cluster is built, Azure Roles and Workload Identity to name a few.
+
+   We install/configure the Nvidia driver along with the operator(s) as well as
+   the subscriptions.
+
+   We require complete control of the installation of Operators and their configurations.
+
+   We require complete control over the Prometheus monitor in order to setup Keda (openshift custom metrics operator) to be
+   able to perform autoscaling.  We create ClusterRole(s) and ClusterRole bindings in order
+   to setup ServiceMonitors.   
+
+
+d. There are many other complications that a shared cluster brings, none of which we have 
+   tested against.
+
+e. We configure and deploy custom kubelet-identity based policies which allow nodes to access
+   the storage (blob and files) w/o putting credentials into the clusters.   We have dozens
+   of such policies, including Storage and DNS (external-dns) to name a few.
+   
+2. Can you cope with other Network Traffic as the cluster will be shared?
+   
+   No.  We expect our sofware to be the only thing in the cluster, we test it this
+   way and expect it this way.
+
+
+
+3. Could you explain why you need 2 x Nvidia GPUs (Nvidia- GPUS NCAST4-v3 series)? We need to know as it will be a special request to our PaaS team to add these.
+   
+   We are currently expecting Standard_NC4as_T4_v3 nodes, this is what we size for and expect availability on.
+
+4. Can we re-use your Terraform code?
+   
+   The code is on a public repository. 
+
+5. What is ZeroSSL used for?
+
+  It issues 90 day auto-renewing certificates.
+
+
+
+
+

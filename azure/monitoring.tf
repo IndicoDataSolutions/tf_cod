@@ -1,5 +1,5 @@
 resource "azurerm_dns_caa_record" "grafana-caa" {
-  count               = var.monitoring_enabled == true ? 1 : 0
+  count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true ? 1 : 0
   name                = lower("grafana.${local.dns_prefix}")
   zone_name           = data.azurerm_dns_zone.domain.name
   resource_group_name = var.common_resource_group
@@ -13,7 +13,7 @@ resource "azurerm_dns_caa_record" "grafana-caa" {
 
 
 resource "azurerm_dns_caa_record" "prometheus-caa" {
-  count               = var.monitoring_enabled == true ? 1 : 0
+  count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true ? 1 : 0
   name                = lower("prometheus.${local.dns_prefix}")
   zone_name           = data.azurerm_dns_zone.domain.name
   resource_group_name = var.common_resource_group
@@ -28,7 +28,7 @@ resource "azurerm_dns_caa_record" "prometheus-caa" {
 
 
 resource "azurerm_dns_caa_record" "alertmanager-caa" {
-  count               = var.monitoring_enabled == true ? 1 : 0
+  count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true ? 1 : 0
   name                = lower("alertmanager.${local.dns_prefix}")
   zone_name           = data.azurerm_dns_zone.domain.name
   resource_group_name = var.common_resource_group
@@ -82,8 +82,11 @@ resource "helm_release" "monitoring" {
   global:
     host: "${local.dns_name}"
   
+  prometheus-postgres-exporter:
+    enabled: ${local.kube_prometheus_stack_enabled}
+
   ingress-nginx:
-    enabled: true
+    enabled: ${local.kube_prometheus_stack_enabled}
 
     rbac:
       create: true
@@ -100,6 +103,7 @@ resource "helm_release" "monitoring" {
     ingressPassword: ${random_password.monitoring-password.result}
 
   kube-prometheus-stack:
+    enabled: ${local.kube_prometheus_stack_enabled}
     prometheus:
       prometheusSpec:
         nodeSelector:
@@ -116,7 +120,7 @@ resource "helm_release" "monitoring" {
 }
 
 resource "helm_release" "keda-monitoring" {
-  count = var.monitoring_enabled == true ? 1 : 0
+  count = !var.is_openshift == true && var.monitoring_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
     helm_release.monitoring
@@ -147,10 +151,14 @@ resource "helm_release" "keda-monitoring" {
     prometheus:
       metricServer:
         enabled: true
+        serviceMonitor:
+          enabled: true
         podMonitor:
           enabled: true
       operator:
         enabled: true
+        serviceMonitor:
+          enabled: true
         podMonitor:
           enabled: true
  EOF
@@ -158,7 +166,7 @@ resource "helm_release" "keda-monitoring" {
 }
 
 resource "helm_release" "opentelemetry-collector" {
-  count = var.monitoring_enabled == true ? 1 : 0
+  count = local.kube_prometheus_stack_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
     helm_release.monitoring

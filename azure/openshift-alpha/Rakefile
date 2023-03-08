@@ -1,0 +1,136 @@
+require 'json'
+
+required_vars = %w[
+  ARM_CLIENT_ID
+  ARM_CLIENT_SECRET
+  ARM_SUBSCRIPTION_ID
+  ARM_TENANT_ID
+]
+
+vars = {}
+user_vars = {}
+label = nil
+region = nil
+account = "indico-dev-azure"
+dns_zone = "#{account}.indico.io"
+dns_zone_rg = "indico-common"
+
+WORKSPACE=`terraform workspace show`.strip
+
+task :verify do
+  ENV['TF_VAR_vault_password'] = ENV['VAULT_PASSWORD']
+  ENV['TF_VAR_vault_username'] = ENV['VAULT_USERNAME']
+  ENV['TF_VAR_account'] = 'indico-dev-azure'
+  ENV['TF_VAR_label'] = 'os4'
+  ENV['TF_VAR_argo_enabled'] = 'false'
+  ENV['TF_VAR_ipa_smoketest_enabled'] = 'false'
+
+  required_vars.each do |evar|
+    raise "Missing required environment variable #{evar}" unless ENV[evar]
+    raise "Empty environment variable #{evar} not allowed" if ENV[evar].empty?
+  end
+
+  user_vars = JSON.parse(`hcltool user_vars.auto.tfvars`)
+
+
+
+end
+
+task secrets: :verify do
+end
+
+task init: :verify do
+  sh %( terraform init )
+end
+
+task plan: :secrets do
+  sh %( terraform plan  )
+end
+
+
+task info: :verify do
+  #sh %( az aro show --name openshift-cluster-#{WORKSPACE} --resource-group openshift-cluster-#{WORKSPACE} )
+  sh %( az aro show --name openshift-cluster-#{WORKSPACE} --resource-group openshift-cluster-#{WORKSPACE} --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip, consoleUrl:consoleProfile.url, apiUrl:apiserverProfile.url}' )
+  sh %( az aro list-credentials --name openshift-cluster-#{WORKSPACE} --resource-group openshift-cluster-#{WORKSPACE} )
+end
+
+
+def get_argo_project(name)
+  projects = JSON.parse(`argocd proj list -o json`)
+end
+
+def get_zone_records(dns_zone_rg, dns_zone, record_type='A')
+ records = JSON.parse(`az network dns record-set #{record_type} list --resource-group #{dns_zone_rg} --zone-name #{dns_zone}`)
+end
+
+def delete_zone_record(dns_zone_rg, dns_zone, record_type, record_name)
+  # az network dns record-set caa delete --name MyRecordSet --resource-group MyResourceGroup --subscription MySubscription --zone-name www.mysite.com
+  sh %(az network dns record-set #{record_type.downcase} delete --yes --name #{record_name} --resource-group #{dns_zone_rg} --zone-name #{dns_zone} )
+end
+
+def find_zone_record(dns_zone_rg, dns_zone, record_type, record_name) 
+  records = get_zone_records(dns_zone_rg, dns_zone, record_type)
+  records.each do |record|
+    if record['name'] == record_name
+      return record
+    end
+  end
+  nil
+end
+
+
+def find_app_registrations(name)
+  all_apps = JSON.parse(`az ad app list`)
+  apps = []
+  all_apps.each do |app|
+    if app['displayName'] == name
+      apps.append(app)
+    end
+  end
+  apps
+end
+
+
+def delete_app_registrations(apps)
+  apps.each do |app|
+    begin
+      sh %(az ad sp delete --id #{app['appId']})
+    rescue
+    end
+  end
+end
+
+
+
+task clean: :verify do
+  raise "Missing argument" unless ARGV[1].length > 0
+
+  sh %(az login --service-principal -u "$ARM_CLIENT_ID" -p "$ARM_CLIENT_SECRET" --tenant "$ARM_TENANT_ID")
+
+  zone_name = "indico-dev-azure.indico.io"
+
+  # indico-dev-azure.indico.io
+  
+  label = ARGV[1]
+  region = user_vars['region']
+
+  app_name = "#{label}-#{region}"
+  app_name_workload = "#{label}-#{region}-workload-identity"
+
+  sh %(argocd login argo.devops.indico.io --username "$ARGOCD_USERNAME" --password "$ARGOCD_PASSWORD" --grpc-web)
+
+  prefix = "#{label}.#{region}"
+
+  delete_zone_record(dns_zone_rg, dns_zone, 'CAA', prefix) if find_zone_record(dns_zone_rg, dns_zone, 'CAA', prefix)
+  
+  apps = find_app_registrations(app_name)
+  delete_app_registrations(apps) if apps && apps.length > 0
+
+  apps = find_app_registrations(app_name_workload)
+  delete_app_registrations(apps) if apps && apps.length > 0
+
+  sh %( az group delete -n #{app_name} )
+  exit 
+end
+
+

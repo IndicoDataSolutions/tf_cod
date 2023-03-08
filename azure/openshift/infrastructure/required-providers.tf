@@ -1,0 +1,1 @@
+../required-providers.tf

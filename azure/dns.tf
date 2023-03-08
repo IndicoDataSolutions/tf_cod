@@ -19,4 +19,3 @@ resource "azurerm_dns_caa_record" "fqdn" {
     value = "sectigo.com"
   }
 }
-

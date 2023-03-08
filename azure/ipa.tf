@@ -1,3 +1,28 @@
+locals {
+  openshift_dns_credentials = <<EOF
+  {
+  "tenantId" : "${data.azurerm_client_config.current.tenant_id}",
+  "subscriptionId" : "${split("/", data.azurerm_subscription.primary.id)[2]}",
+  "resourceGroup" : "${var.common_resource_group}",
+  "aadClientId": "${azuread_application.workload_identity.application_id}",
+  "aadClientSecret": "${azuread_application_password.workload_identity.value}"
+  }
+  EOF
+
+  azure_dns_credentials = <<EOF
+  {
+    "tenantId" : "${data.azurerm_client_config.current.tenant_id}",
+    "subscriptionId" : "${split("/", data.azurerm_subscription.primary.id)[2]}",
+    "resourceGroup" : "${var.common_resource_group}",
+    "useManagedIdentityExtension" : true,
+    "userAssignedIdentityID" : "${module.cluster.kubelet_identity.client_id}"
+  }
+  EOF
+
+  # https://docs.openshift.com/container-platform/4.10/nodes/pods/nodes-pods-autoscaling-custom.html
+  prometheus_address = var.is_openshift ? "https://thanos-querier.openshift-monitoring.svc.cluster.local:9091" : "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090/prometheus"
+
+}
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
     module.cluster
@@ -44,7 +69,9 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 
 resource "helm_release" "ipa-crds" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    kubernetes_secret.harbor-pull-secret,
+    kubernetes_secret.issuer-secret
   ]
 
   verify           = false
@@ -61,6 +88,9 @@ resource "helm_release" "ipa-crds" {
   crunchy-pgo:
     enabled: true
   
+  aws-ebs-csi-driver:
+    enabled: false
+
   cert-manager:
     #extraArgs:
     #  - --dns01-recursive-nameservers-only
@@ -83,19 +113,121 @@ resource "helm_release" "ipa-crds" {
   ]
 }
 
+
+
+
 resource "time_sleep" "wait_1_minutes_after_crds" {
   depends_on = [helm_release.ipa-crds]
 
   create_duration = "1m"
 }
 
+
+
+# Install the Machinesets now
+resource "helm_release" "crunchy-postgres" {
+  count = var.is_openshift == true ? 1 : 0
+  depends_on = [
+    module.cluster,
+    helm_release.ipa-crds,
+    time_sleep.wait_1_minutes_after_crds
+  ]
+
+  name             = "crunchy"
+  create_namespace = true
+  namespace        = "crunchy"
+  repository       = var.ipa_repo
+  chart            = "crunchy-postgres"
+  version          = "0.3.0"
+  timeout          = "600" # 10 minutes
+  wait             = true
+
+  values = [<<EOF
+  enabled: true
+  postgres-data:
+    openshift: true
+    metadata:
+      annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+    instances:
+    - affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node_group
+                operator: In
+                values:
+                - pgo-workers
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: postgres-operator.crunchydata.com/cluster
+                operator: In
+                values:
+                - postgres-data
+              - key: postgres-operator.crunchydata.com/instance-set
+                operator: In
+                values:
+                - pgha1
+            topologyKey: kubernetes.io/hostname
+      metadata:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      dataVolumeClaimSpec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 200Gi
+      name: pgha1
+      replicas: 1
+      resources:
+        requests:
+          cpu: 500m
+          memory: 3000Mi
+      tolerations:
+        - effect: NoSchedule
+          key: indico.io/crunchy
+          operator: Exists
+    pgBackRestConfig:
+      repos:
+      - name: repo1
+        volume:
+          volumeClaimSpec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 200Gi
+        schedules:
+          full: 30 4 * * *
+          incremental: 0 */1 * * *
+    imagePullSecrets:
+      - name: harbor-pull-secret
+  postgres-metrics:
+    enabled: false
+  EOF
+  ]
+}
+
 resource "azurerm_role_assignment" "external_dns" {
+  count = var.is_azure == true && var.is_openshift == false && var.include_external_dns == true ? 1 : 0
+  depends_on = [
+    module.cluster
+  ]
   scope                = data.azurerm_dns_zone.domain.id
   role_definition_name = "DNS Zone Contributor"
   principal_id         = module.cluster.kubelet_identity.object_id
 }
 
 resource "kubernetes_secret" "azure_storage_key" {
+  depends_on = [
+    module.cluster
+  ]
   metadata {
     name = "azure-storage-key"
   }
@@ -110,21 +242,18 @@ resource "kubernetes_secret" "azure_storage_key" {
 }
 
 resource "kubernetes_config_map" "azure_dns_credentials" {
+  count = var.include_external_dns == true ? 1 : 0
+
+  depends_on = [
+    module.cluster
+  ]
 
   metadata {
     name = "dns-credentials-config"
   }
 
   data = {
-    "azure.json" = <<EOF
-{
-  "tenantId" : "${data.azurerm_client_config.current.tenant_id}",
-  "subscriptionId" : "${split("/", data.azurerm_subscription.primary.id)[2]}",
-  "resourceGroup" : "${var.common_resource_group}",
-  "useManagedIdentityExtension" : true,
-  "userAssignedIdentityID" : "${module.cluster.kubelet_identity.client_id}"
-}
-    EOF
+    "azure.json" = var.is_openshift ? local.openshift_dns_credentials : local.azure_dns_credentials
   }
 }
 
@@ -158,6 +287,14 @@ cluster:
   region: ${var.region}
   domain: ${var.domain_suffix}
   account: ${var.account}
+
+rabbitmq:
+  enabled: true
+  rabbitmq:
+    metrics:
+      enabled: ${var.is_openshift}
+      serviceMonitor:
+        enabled: ${var.is_openshift}
 
 secrets:
   rabbitmq:
@@ -213,7 +350,7 @@ storage:
     enabled: false
   indicoStorageClass:
     enabled: false
-    name: "azurefile"
+    name: "${local.indico_storage_class_name}"
   pvcSpec:
     azureFile:
       readOnly: false
@@ -232,7 +369,10 @@ storage:
     volumeMode: Filesystem
 
 crunchy-postgres:
-  enabled: true
+  enabled: ${!var.is_openshift}
+  postgres-data:
+    openshift: ${var.is_openshift}
+    
 aws-fsx-csi-driver:
   enabled: false
 metrics-server:
@@ -304,7 +444,12 @@ spec:
           
         - name: RELEASE_NAME
           value: run
-      
+  
+        - name: HELM_TF_COD_VALUES
+          value: |
+            prometheus:
+              url: ${local.prometheus_address}
+
         - name: HELM_VALUES
           value: |
             image:
@@ -396,13 +541,6 @@ spec:
 EOT
 }
 
-
-resource "local_file" "kubeconfig" {
-  content  = module.cluster.kubectl_config
-  filename = "${path.module}/module.kubeconfig"
-}
-
-
 data "vault_kv_secret_v2" "zerossl_data" {
   mount = var.vault_mount_path
   name  = "zerossl"
@@ -415,7 +553,6 @@ output "zerossl" {
 
 resource "argocd_application" "ipa" {
   depends_on = [
-    local_file.kubeconfig,
     helm_release.ipa-pre-requisites,
     time_sleep.wait_1_minutes_after_pre_reqs,
     module.argo-registration,

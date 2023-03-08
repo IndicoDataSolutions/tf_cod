@@ -1,4 +1,10 @@
 #
+variable "do_create_cluster" {
+  type    = bool
+  default = true
+}
+
+
 variable "is_azure" {
   type    = bool
   default = true
@@ -62,10 +68,10 @@ variable "subnet_cidrs" {
   description = "CIDR ranges for the subnet(s)"
 }
 
-variable "database_subnet_cidr" {
+variable "worker_subnet_cidrs" {
   type        = list(string)
   default     = null
-  description = "CIDR range for the delegated database subnet"
+  description = "CIDR range for the worker database subnet"
 }
 
 ### storage account variables
@@ -203,6 +209,22 @@ variable "default_node_pool" {
     cluster_auto_scaling_min_count = number
     cluster_auto_scaling_max_count = number
   })
+
+  default = {
+    name                           = "empty"
+    cluster_auto_scaling           = false
+    cluster_auto_scaling_max_count = 0
+    cluster_auto_scaling_min_count = 0
+    labels = {
+      "key" = "value"
+    }
+    node_count = 0
+    node_os    = "value"
+    pool_name  = "value"
+    taints     = ["value"]
+    vm_size    = "value"
+    zones      = ["value"]
+  }
 }
 
 variable "additional_node_pools" {
@@ -218,6 +240,23 @@ variable "additional_node_pools" {
     cluster_auto_scaling_min_count = number
     cluster_auto_scaling_max_count = number
   }))
+
+  default = {
+    "empty" = {
+      cluster_auto_scaling           = false
+      cluster_auto_scaling_max_count = 0
+      cluster_auto_scaling_min_count = 0
+      labels = {
+        "key" = "value"
+      }
+      node_count = 1
+      node_os    = "value"
+      pool_name  = "value"
+      taints     = ["value"]
+      vm_size    = "value"
+      zones      = ["value"]
+    }
+  }
 }
 
 variable "applications" {
@@ -282,12 +321,12 @@ variable "ipa_smoketest_repo" {
 
 variable "ipa_smoketest_container_tag" {
   type    = string
-  default = "IPA-5.4-e1c5af3d"
+  default = "development-5cc16676"
 }
 
 variable "ipa_smoketest_version" {
   type    = string
-  default = "0.1.8"
+  default = "0.2.1-add-openshift-crds-4a0b2155"
 }
 
 variable "ipa_smoketest_slack_channel" {
@@ -339,10 +378,11 @@ variable "cod_snapshot_restore_version" {
 
 variable "vault_mount_path" {
   type    = string
-  default = "tools/argo"
+  default = "terraform"
 }
 
-variable "vault_username" {}
+variable "vault_username" {
+}
 variable "vault_password" {
   sensitive = true
 }
@@ -360,4 +400,27 @@ variable "enable_ad_group_mapping" {
   type        = bool
   default     = true
   description = "Enable the Mapping of AD Group"
+}
+
+#openshift & azure common variables
+
+# enable for openshift
+variable "is_openshift" {
+  type    = bool
+  default = false
+}
+
+variable "include_external_dns" {
+  type    = bool
+  default = true
+}
+
+variable "use_workload_identity" {
+  type    = bool
+  default = true
+}
+
+variable "openshift_pull_secret" {
+  type    = string
+  default = ""
 }
