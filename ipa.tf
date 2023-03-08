@@ -5,7 +5,7 @@ locals {
   the_tld               = local.the_splits[local.the_length - 1]
   the_domain            = local.the_splits[local.the_length - 2]
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
-  
+
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:
     enabled: false
@@ -117,7 +117,7 @@ alternate-external-dns:
   policy: sync
   txtOwnerId: "${var.alternate_domain}-${var.label}-${var.region}"
   domainFilters:
-    - ${alternate_domain_root}
+    - ${local.alternate_domain_root}
   extraArgs:
     - "--exclude-domains=${var.aws_account}.indico.io"
     - "--aws-assume-role=${var.aws_primary_dns_role_arn}"
