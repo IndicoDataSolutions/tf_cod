@@ -57,6 +57,11 @@ locals {
   acm_ipa_values = var.use_acm == true ? (<<EOT
 app-edge:
   alternateDomain: ${var.alternate_domain}
+  service:
+    type: "NodePort"
+    ports:
+      http_port: 31755
+      http_api_port: 31270
   aws-load-balancer-controller:
     enabled: true
     ingress:
