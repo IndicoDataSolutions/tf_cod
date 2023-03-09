@@ -101,24 +101,22 @@ clusterIssuer:
           "acme.cert-manager.io/dns01-solver": "true"
   EOT
     ) : (<<EOT
-nathan: testingstuff
-clusterIssuer: #solvers
+clusterIssuer: 
   additionalSolvers:
-    - dns01:
-        route53:
-          region: ${var.region}
-      selector:
-        matchLabels:
-          "acme.cert-manager.io/dns01-solver": "true" #Original solver
-    - dns02:
-        route53:
-          region: ${var.region}
-          role: ${var.aws_primary_dns_role_arn}
-      selector:
-        matchLabels:
-          "acme.cert-manager.io/dns02-solver": "true" #new solver
+  - dns01:
+      route53:
+        region: ${var.region}
+    selector:
+      matchLabels:
+        "acme.cert-manager.io/dns01-solver": "true"
+  - dns01:
+      route53:
+        region: ${var.region}
+        role: ${var.aws_primary_dns_role_arn}
+    selector:
+      matchLabels:
+        "acme.cert-manager.io/dns02-solver": "true"
 alternate-external-dns:
-  nathan: washere
   enabled: true
   logLevel: debug
   policy: sync
