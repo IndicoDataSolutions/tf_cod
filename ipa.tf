@@ -92,7 +92,7 @@ EOT
   )
   dns_configuration_values = var.alternate_domain == "" ? (<<EOT
 clusterIssuer:
-  nathan: dontwantthisline
+  emptyLine: toNotKeep
   additionalSolvers:
     - dns01:
         route53:
@@ -103,9 +103,9 @@ clusterIssuer:
   EOT
     ) : (<<EOT
 clusterIssuer: 
-  nathan: wantsthisline
+  emptyLine: toKeep
   additionalSolvers:
-  - dns02:
+  - dns01:
       route53:
         region: ${var.region}
         role: ${var.aws_primary_dns_role_arn}
