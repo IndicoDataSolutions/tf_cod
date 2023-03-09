@@ -101,21 +101,7 @@ clusterIssuer:
           "acme.cert-manager.io/dns01-solver": "true"
   EOT
     ) : (<<EOT
-clusterIssuer: 
-  additionalSolvers:
-  - dns01:
-      route53:
-        region: ${var.region}
-        role: ${var.aws_primary_dns_role_arn}
-    selector:
-      matchLabels:
-        "acme.cert-manager.io/dns02-solver": "true"
-  - dns01:
-      route53:
-        region: ${var.region}
-    selector:
-      matchLabels:
-        "acme.cert-manager.io/dns01-solver": "true"
+
 alternate-external-dns:
   enabled: true
   logLevel: debug
@@ -545,6 +531,10 @@ aws-load-balancer-controller:
     vpcId: ${local.network[0].indico_vpc_id}
     region: ${var.region}
 EOF
+    ,
+    <<EOT
+${data.github_repository_file.data-pre-reqs-values.content}
+EOT
   ])
 }
 
