@@ -244,13 +244,14 @@ module "fsx-storage" {
   include_rox                 = var.include_rox
 }
 
+
 module "cluster" {
   cod_snapshots_enabled      = true
   allow_dns_management       = true
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "7.6.0"
+  version                    = "7.8.0"
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
@@ -273,6 +274,7 @@ module "cluster" {
   cluster_version            = var.cluster_version
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
   access_security_group      = module.cluster-manager.cluster_manager_sg
+  aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
 }
 
 resource "aws_security_group" "indico_allow_access" {
