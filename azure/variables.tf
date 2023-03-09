@@ -71,8 +71,8 @@ variable "database_subnet_cidr" {
 ### storage account variables
 variable "storage_account_name" {
   type        = string
-  default     = "indicodatatest"
   description = "Name of the indico storage account"
+  default     = ""
 }
 
 variable "vault_address" {
@@ -360,9 +360,4 @@ variable "enable_ad_group_mapping" {
   type        = bool
   default     = true
   description = "Enable the Mapping of AD Group"
-}
-
-variable "storage_account_name" {
-  type = string
-  default = ""
 }
