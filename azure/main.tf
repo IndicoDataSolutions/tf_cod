@@ -135,7 +135,9 @@ provider "local" {}
 locals {
   resource_group_name = "${var.label}-${var.region}"
 
-  storage_account_name    = replace(lower("${var.account}snapshots"), "-", "")
+  snapshot_storage_account_name = replace(lower("${var.account}snapshots"), "-", "")
+  storage_account_name          = replace(lower(var.storage_account_name), "-", "")
+
   argo_app_name           = lower("${var.account}.${var.region}.${var.label}-ipa")
   argo_cluster_name       = "${var.account}.${var.region}.${var.label}"
   argo_smoketest_app_name = lower("${var.account}.${var.region}.${var.label}-smoketest")
@@ -192,11 +194,12 @@ module "storage" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  source              = "app.terraform.io/indico/indico-azure-blob/mod"
-  version             = "0.1.9"
-  label               = var.label
-  region              = var.region
-  resource_group_name = local.resource_group_name
+  source               = "app.terraform.io/indico/indico-azure-blob/mod"
+  version              = "0.1.11"
+  label                = var.label
+  region               = var.region
+  resource_group_name  = local.resource_group_name
+  storage_account_name = local.storage_account_name
 }
 
 module "cluster" {

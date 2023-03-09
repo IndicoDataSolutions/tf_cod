@@ -77,7 +77,7 @@ variable "worker_subnet_cidrs" {
 ### storage account variables
 variable "storage_account_name" {
   type        = string
-  default     = "indicodatatest"
+  default     = ""
   description = "Name of the indico storage account"
 }
 
