@@ -41,7 +41,7 @@ snapshot:
   name: "${var.restore_snapshot_name}"
   env:
     - name: STORAGE_ACCOUNT_NAME
-      value: ${local.storage_account_name}
+      value: ${local.snapshot_storage_account_name}
     - name: IDENTITY_CLIENT_ID
       valueFrom:
         secretKeyRef:

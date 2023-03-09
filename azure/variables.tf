@@ -361,3 +361,8 @@ variable "enable_ad_group_mapping" {
   default     = true
   description = "Enable the Mapping of AD Group"
 }
+
+variable "storage_account_name" {
+  type = string
+  default = ""
+}

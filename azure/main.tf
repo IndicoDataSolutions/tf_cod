@@ -128,7 +128,6 @@ locals {
   resource_group_name = "${var.label}-${var.region}"
   current_ip          = "${chomp(data.http.workstation-external-ip.response_body)}/20"
 
-  storage_account_name    = replace(lower("${var.account}snapshots"), "-", "")
   argo_app_name           = lower("${var.account}.${var.region}.${var.label}-ipa")
   argo_cluster_name       = "${var.account}.${var.region}.${var.label}"
   argo_smoketest_app_name = lower("${var.account}.${var.region}.${var.label}-smoketest")
@@ -137,6 +136,9 @@ locals {
   base_domain  = lower("${var.account}.${var.domain_suffix}")
   dns_prefix   = lower("${var.label}.${var.region}")
   dns_name     = lower("${var.label}.${var.region}.${var.account}.${var.domain_suffix}")
+
+  snapshot_storage_account_name = replace(lower("${var.account}snapshots"), "-", "")
+  storage_account_name          = var.storage_account_name != "" ? var.storage_account_name : "indico${var.label}${var.region}"
 }
 
 resource "tls_private_key" "pk" {
@@ -181,11 +183,12 @@ module "storage" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  source              = "app.terraform.io/indico/indico-azure-blob/mod"
-  version             = "0.1.9"
-  label               = var.label
-  region              = var.region
-  resource_group_name = local.resource_group_name
+  source               = "app.terraform.io/indico/indico-azure-blob/mod"
+  version              = "0.1.10"
+  label                = var.label
+  region               = var.region
+  resource_group_name  = local.resource_group_name
+  storage_account_name = local.storage_account_name
 }
 
 module "cluster" {
