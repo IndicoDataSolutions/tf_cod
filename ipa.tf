@@ -101,6 +101,7 @@ clusterIssuer:
           "acme.cert-manager.io/dns01-solver": "true"
   EOT
     ) : (<<EOT
+nathan: testingstuff
 clusterIssuer: #solvers
   additionalSolvers:
     - dns01:
