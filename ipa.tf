@@ -92,7 +92,7 @@ EOT
   )
   dns_configuration_values = var.alternate_domain == "" ? (<<EOT
 clusterIssuer:
-  emptyLine: toNotKeep
+  nathan: dontwantthisline
   additionalSolvers:
     - dns01:
         route53:
@@ -103,7 +103,7 @@ clusterIssuer:
   EOT
     ) : (<<EOT
 clusterIssuer: 
-  emptyLine: toKeep
+  nathan: wantsthisline
   additionalSolvers:
   - dns01:
       route53:
