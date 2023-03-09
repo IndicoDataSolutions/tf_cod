@@ -331,6 +331,15 @@ secrets:
 
 ${local.dns_configuration_values}
      
+clusterIssuer:
+  additionalSolvers:
+    - dns01:
+        route53:
+          region: ${var.region}
+      selector:
+        matchLabels:
+          "acme.cert-manager.io/dns01-solver": "true"
+
 monitoring:
   enabled: true
   global:
@@ -443,6 +452,7 @@ crunchy-postgres:
           operator: Exists
     pgBackRestConfig:
       global:
+        archive-timeout: '10000'
         repo1-path: /pgbackrest/postgres-data/repo1
         repo1-retention-full: '5'
         repo1-s3-key-type: auto
@@ -511,6 +521,7 @@ crunchy-postgres:
           operator: Exists
     pgBackRestConfig:
       global:
+        archive-timeout: '10000'
         repo1-path: /pgbackrest/postgres-metrics/repo1
         repo1-retention-full: '5'
         repo1-s3-key-type: auto

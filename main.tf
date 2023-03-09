@@ -244,6 +244,7 @@ module "fsx-storage" {
   include_rox                 = var.include_rox
 }
 
+
 module "cluster" {
   cod_snapshots_enabled      = true
   allow_dns_management       = true

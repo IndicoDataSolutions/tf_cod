@@ -53,6 +53,7 @@ resource "azurerm_role_assignment" "snapshot_storage_account_queue_contributer" 
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
 
+# Now add the kubernetes/azure infrastructure to link it all
 resource "kubernetes_service_account" "workload_identity" {
   depends_on = [
     module.cluster
