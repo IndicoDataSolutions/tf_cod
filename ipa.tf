@@ -545,10 +545,6 @@ aws-load-balancer-controller:
     vpcId: ${local.network[0].indico_vpc_id}
     region: ${var.region}
 EOF
-    ,
-    <<EOT
-${data.github_repository_file.data-pre-reqs-values.content}
-EOT
   ])
 }
 
