@@ -118,6 +118,7 @@ clusterIssuer: #solvers
         matchLabels:
           "acme.cert-manager.io/dns02-solver": "true" #new solver
 alternate-external-dns:
+  nathan: washere
   enabled: true
   logLevel: debug
   policy: sync
