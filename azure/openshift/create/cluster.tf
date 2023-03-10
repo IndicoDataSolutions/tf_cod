@@ -187,8 +187,8 @@ resource "kubernetes_cluster_role_binding" "terraform" {
 
   subject {
     kind      = "ServiceAccount"
-    name      = kubernetes_service_account.terraform.metadata.0.name
-    namespace = kubernetes_service_account.terraform.metadata.0.namespace
+    name      = kubernetes_service_account_v1.terraform.metadata.0.name
+    namespace = kubernetes_service_account_v1.terraform.metadata.0.namespace
   }
 }
 
@@ -200,7 +200,7 @@ data "kubernetes_secret" "terraform" {
 
   metadata {
     name      = "terraform"
-    namespace = kubernetes_service_account.terraform.metadata.0.namespace
+    namespace = kubernetes_service_account_v1.terraform.metadata.0.namespace
   }
 }
 
