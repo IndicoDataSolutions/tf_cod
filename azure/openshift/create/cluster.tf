@@ -133,6 +133,19 @@ resource "kubernetes_service_account_v1" "terraform" {
   }
 }
 
+resource "kubernetes_secret_v1" "terraform" {
+  depends_on = [
+    kubernetes_service_account_v1.terraform
+  ]
+  metadata {
+    annotations = {
+      "kubernetes.io/service-account.name" = kubernetes_service_account_v1.terraform.metadata.0.name
+    }
+  }
+  type = "kubernetes.io/service-account-token"
+}
+
+
 resource "kubernetes_cluster_role" "terraform" {
 
   depends_on = [
