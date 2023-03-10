@@ -193,7 +193,7 @@ resource "kubernetes_cluster_role_binding" "terraform" {
 }
 
 
-data "kubernetes_secret" "terraform" {
+data "kubernetes_secret_v1" "terraform" {
   depends_on = [
     kubernetes_secret_v1.terraform
   ]
