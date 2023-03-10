@@ -115,6 +115,69 @@ module "cluster" {
 
 }
 
+
+# Create the service account, cluster role + binding, which ArgoCD expects to be present in the targeted cluster
+resource "kubernetes_service_account_v1" "terraform" {
+  depends_on = [
+    module.cluster
+  ]
+
+  metadata {
+    name      = "terraform"
+    namespace = "kube-system"
+  }
+
+  automount_service_account_token = true
+  image_pull_secret {
+    name = "harbor-pull-secret"
+  }
+}
+
+resource "kubernetes_cluster_role" "terraform" {
+
+  depends_on = [
+    kubernetes_service_account.terraform
+  ]
+
+  metadata {
+    name = "terraform"
+  }
+
+  rule {
+    api_groups = ["*"]
+    resources  = ["*"]
+    verbs      = ["*"]
+  }
+
+  rule {
+    non_resource_urls = ["*"]
+    verbs             = ["*"]
+  }
+}
+
+resource "kubernetes_cluster_role_binding" "terraform" {
+  depends_on = [
+    kubernetes_cluster_role.terraform
+  ]
+
+  metadata {
+    name = "terraform"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.terraform.metadata.0.name
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account.terraform.metadata.0.name
+    namespace = kubernetes_service_account.terraform.metadata.0.namespace
+  }
+}
+
+
 data "kubernetes_resource" "infrastructure-cluster" {
   depends_on = [
     module.cluster
