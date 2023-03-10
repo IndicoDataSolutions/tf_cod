@@ -151,7 +151,7 @@ resource "kubernetes_secret_v1" "terraform" {
 resource "kubernetes_cluster_role" "terraform" {
 
   depends_on = [
-    kubernetes_service_account.terraform
+    kubernetes_service_account_v1.terraform
   ]
 
   metadata {
