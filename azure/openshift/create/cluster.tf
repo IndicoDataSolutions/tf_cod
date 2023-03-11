@@ -214,9 +214,9 @@ resource "vault_kv_secret_v2" "terraform-credentials" {
   data_json = jsonencode(
     {
       kubernetes_host                   = module.cluster.kubernetes_host
-      kubernetes_client_certificate     = base64decode(data.kubernetes_secret_v1.terraform.data["service-ca.crt"])
+      kubernetes_client_certificate     = data.kubernetes_secret_v1.terraform.data["service-ca.crt"]
       kubernetes_client_key             = data.kubernetes_secret_v1.terraform.data["token"]
-      kubernetes_cluster_ca_certificate = base64decode(data.kubernetes_secret_v1.terraform.data["ca.crt"]),
+      kubernetes_cluster_ca_certificate = data.kubernetes_secret_v1.terraform.data["ca.crt"],
       api_ip                            = module.cluster.openshift_api_server_ip
       console_ip                        = module.cluster.openshift_console_ip
     }
