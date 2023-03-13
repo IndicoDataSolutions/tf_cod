@@ -47,14 +47,15 @@ resource "null_resource" "add-identity-provider" {
   }
 
   provisioner "local-exec" {
-    when    = destroy
-    command = "curl -XDELETE -H 'Content-Type: application/json' -H \"Authorization: Bearer ${self.triggers.client_secret}\" -v https://keycloak-service.devops.indico.io/delete --data '{\"url\": \"${self.triggers.callback_url}\"}'"
+    when = destroy
+    command "echo destroy"
+    #command = "curl -XDELETE -H 'Content-Type: application/json' -H \"Authorization: Bearer ${self.triggers.client_secret}\" -v https://keycloak-service.devops.indico.io/delete --data '{\"url\": \"${self.triggers.callback_url}\"}'"
   }
 
 }
 
-output "callbackurl" {
-  value = resource.null_resource.add-identity-provider.0.triggers.callback_url
+output "triggers" {
+  value = resource.null_resource.add-identity-provider.0.triggers
 }
 
 
