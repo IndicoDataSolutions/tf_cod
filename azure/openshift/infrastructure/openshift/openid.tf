@@ -19,12 +19,13 @@ resource "kubernetes_secret" "openid-client-secret" {
 
 resource "null_resource" "add-identity-provider" {
   count = var.do_setup_openid_connect == true ? 1 : 0
+
   depends_on = [
     kubernetes_secret.openid-client-secret
   ]
 
   triggers = {
-    client_secret = var.openid_client_secret
+    client_secret = var.openid_client_secret,
     callback_url  = local.callback_url
   }
 
@@ -45,12 +46,12 @@ resource "null_resource" "add-identity-provider" {
   #  https://oauth-openshift.apps.dop1487-indico-dev-azure.eastus.aroapp.io/oauth2callback/openid
   #console-openshift-console.apps.dop1487-indico-dev-azure.eastus.aroapp.io
   provisioner "local-exec" {
-    command = "curl -XPOST -H 'Content-Type: application/json' -H \"Authorization: Bearer ${self.triggers.client_secret}\" -v https://keycloak-service.devops.indico.io/add --data '{\"url\": \"${self.triggers.callback_url}\"}'"
+    command = "curl -XPOST -H 'Content-Type: application/json' -H \"Authorization: Bearer ${null_resource.register-add-identity-provider.triggers.client_secret}\" -v https://keycloak-service.devops.indico.io/add --data '{\"url\": \"${null_resource.register-add-identity-provider..triggers.callback_url}\"}'"
   }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "curl -XDELETE -H 'Content-Type: application/json' -H \"Authorization: Bearer ${self.triggers.client_secret}\" -v https://keycloak-service.devops.indico.io/delete --data '{\"url\": \"${self.triggers.callback_url}\"}'"
+    command = "curl -XDELETE -H 'Content-Type: application/json' -H \"Authorization: Bearer ${null_resource.register-add-identity-provider..triggers.client_secret}\" -v https://keycloak-service.devops.indico.io/delete --data '{\"url\": \"${null_resource.register-add-identity-provider..triggers.callback_url}\"}'"
   }
 
 }
