@@ -167,6 +167,9 @@ module "openshift-infrastructure" {
   count  = var.is_openshift == true ? 1 : 0
   source = "./openshift"
 
+  resource_group_name = var.resource_group_name
+  label               = var.label
+
   ipa_namespace            = var.ipa_namespace
   ipa_repo                 = var.ipa_repo
   use_admission_controller = var.use_admission_controller
@@ -185,7 +188,7 @@ module "openshift-infrastructure" {
   openid_emailclaim         = var.openid_emailclaim
   openid_preferred_username = var.openid_preferred_username
   openid_idp_name           = var.openid_idp_name
-
+  openid_auth               = local.openid_auth
 
 }
 

@@ -17,34 +17,25 @@ resource "kubernetes_secret" "openid-client-secret" {
   }
 }
 
-resource "kubectl_manifest" "oauth" {
+
+resource "null_resource" "add-identity-provider" {
   count = var.do_setup_openid_connect == true ? 1 : 0
   depends_on = [
     kubernetes_secret.openid-client-secret
   ]
 
-  yaml_body = <<YAML
-    apiVersion: "config.openshift.io/v1"
-    kind: "OAuth"
-    metadata:
-      name: ${var.openid_idp_name}
-     
-    spec:
-      identityProviders:
-        - mappingMethod: claim
-          name: openid
-          openID:
-            claims:
-              email:
-                - ${var.openid_emailclaim}
-              groups:
-                - ${var.openid_groups_claim}
-              name:
-                - name
-              preferredUsername:
-                - ${var.openid_preferred_username}
-            clientId: ${var.openid_client_id}
-            clientSecret:
-              name: ${kubernetes_secret.openid-client-secret.0.metadata.0.name}
-  YAML
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "${path.module}/auth.sh ${var.label} ${var.resource_group_name}"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = "kubectl patch oauth cluster --type='json' -p='[{ \"op\": \"add\", \"path\": \"/spec/identityProviders\", \"value\": \"${var.openid_auth}\" }]'"
+  }
 }
