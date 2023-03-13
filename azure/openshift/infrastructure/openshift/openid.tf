@@ -47,8 +47,8 @@ resource "null_resource" "add-identity-provider" {
   }
 
   provisioner "local-exec" {
-    when = destroy
-    command "echo destroy"
+    when    = destroy
+    command = "echo destroy"
     #command = "curl -XDELETE -H 'Content-Type: application/json' -H \"Authorization: Bearer ${self.triggers.client_secret}\" -v https://keycloak-service.devops.indico.io/delete --data '{\"url\": \"${self.triggers.callback_url}\"}'"
   }
 
