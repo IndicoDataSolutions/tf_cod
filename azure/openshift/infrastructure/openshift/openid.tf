@@ -25,7 +25,7 @@ resource "kubectl_manifest" "oauth" {
 
   yaml_body = <<YAML
     apiVersion: "config.openshift.io/v1"
-    kind: "Oauth"
+    kind: "OAuth"
     metadata:
       name: ${var.openid_idp_name}
      
