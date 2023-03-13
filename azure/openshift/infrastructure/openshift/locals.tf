@@ -18,7 +18,7 @@ locals {
                 "name": ["name"],
                 "preferredUsername": ["${var.openid_preferred_username}"],
               },
-              "clientID": "${var.openid_client_id}"
+              "clientID": "${var.openid_client_id}",
               "clientSecret": {
                 "name": "${var.openid_idp_name}-client-secret"
               }
