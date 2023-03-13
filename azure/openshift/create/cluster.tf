@@ -210,15 +210,16 @@ resource "vault_kv_secret_v2" "terraform-credentials" {
     data.kubernetes_secret_v1.terraform
   ]
   mount = var.vault_mount
-  name  = "sa"
+  name  = var.vault_mount_path
+
   data_json = jsonencode(
     {
-      kubernetes_host                   = module.cluster.kubernetes_host
-      kubernetes_client_certificate     = data.kubernetes_secret_v1.terraform.data["service-ca.crt"]
-      kubernetes_client_key             = data.kubernetes_secret_v1.terraform.data["token"]
-      kubernetes_cluster_ca_certificate = data.kubernetes_secret_v1.terraform.data["ca.crt"],
-      api_ip                            = module.cluster.openshift_api_server_ip
-      console_ip                        = module.cluster.openshift_console_ip
+      k8s_host                   = module.cluster.kubernetes_host
+      k8s_client_certificate     = data.kubernetes_secret_v1.terraform.data["service-ca.crt"]
+      k8s_token                  = data.kubernetes_secret_v1.terraform.data["token"]
+      k8s_cluster_ca_certificate = data.kubernetes_secret_v1.terraform.data["ca.crt"],
+      k8s_api_ip                 = module.cluster.openshift_api_server_ip
+      k8s_console_ip             = module.cluster.openshift_console_ip
     }
   )
 }
