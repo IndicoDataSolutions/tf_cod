@@ -21,7 +21,7 @@ locals {
               "clientID": "${var.openid_client_id}",
               "clientSecret": {
                 "name": "${var.openid_idp_name}-client-secret"
-              }
+              },
               "issuer": "${var.openid_connect_issuer_url}"
             }
           }
