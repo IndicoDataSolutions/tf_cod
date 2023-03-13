@@ -72,13 +72,6 @@ data "local_file" "openshift_console_url" {
   filename = "/tmp/${var.label}-${var.resource_group_name}.openshift_console_url"
 }
 
-data "local_file" "openshift_console_ip" {
-  depends_on = [
-    null_resource.create-terraform-sa
-  ]
-  filename = "/tmp/${var.label}-${var.resource_group_name}.openshift_console_ip"
-}
-
 data "local_file" "openshift_api_ip" {
   depends_on = [
     null_resource.create-terraform-sa
