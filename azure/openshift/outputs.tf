@@ -1,3 +1,3 @@
 output "triggers" {
-  value = module.infrastructure.triggers
+  value = module.infrastructure.0.triggers
 }

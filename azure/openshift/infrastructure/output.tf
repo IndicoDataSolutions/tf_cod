@@ -7,5 +7,5 @@ output "monitoring_username" {
 }
 
 output "triggers" {
-  value = module.openshift-infrastructure.triggers
+  value = module.openshift-infrastructure.0.triggers
 }
