@@ -188,8 +188,6 @@ module "openshift-infrastructure" {
   openid_emailclaim         = var.openid_emailclaim
   openid_preferred_username = var.openid_preferred_username
   openid_idp_name           = var.openid_idp_name
-
-
 }
 
 resource "helm_release" "ipa-pre-requisites" {
