@@ -65,6 +65,20 @@ data "local_file" "openshift_console_ip" {
   filename = "/tmp/${var.label}-${var.resource_group_name}.openshift_console_ip"
 }
 
+data "local_file" "openshift_console_url" {
+  depends_on = [
+    null_resource.create-terraform-sa
+  ]
+  filename = "/tmp/${var.label}-${var.resource_group_name}.openshift_console_url"
+}
+
+data "local_file" "openshift_console_ip" {
+  depends_on = [
+    null_resource.create-terraform-sa
+  ]
+  filename = "/tmp/${var.label}-${var.resource_group_name}.openshift_console_ip"
+}
+
 data "local_file" "openshift_api_ip" {
   depends_on = [
     null_resource.create-terraform-sa
@@ -131,6 +145,7 @@ resource "vault_kv_secret_v2" "kubernetes-credentials" {
       kubernetes_cluster_ca_certificate = base64decode(data.local_file.kubernetes_cluster_ca_certificate.content),
       api_ip                            = data.local_file.openshift_api_ip.content,
       console_ip                        = data.local_file.openshift_console_ip.content,
+      console_url                       = data.local_file.openshift_console_url.content,
       kubernetes_credentials            = data.local_file.kubernetes_credentials.content
     }
   )

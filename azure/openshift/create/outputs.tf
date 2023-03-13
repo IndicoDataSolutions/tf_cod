@@ -47,6 +47,10 @@ output "openshift_console_ip" {
   value = module.cluster.openshift_console_ip
 }
 
+output "openshift_console_url" {
+  value = module.cluster.openshift_console_url
+}
+
 output "kubelet_identity_client_id" {
   value = module.cluster.kubelet_identity.client_id
 }

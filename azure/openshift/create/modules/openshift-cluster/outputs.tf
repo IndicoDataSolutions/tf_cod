@@ -14,22 +14,17 @@ output "id" {
   value = "ERROR:cluster.idOPENSHIFT-NOT-APPLICABLE"
 }
 
-
 output "kubernetes_host" {
   value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernetes_host"]
 }
-
-
 
 output "kubeadmin_username" {
   value = jsondecode(jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernetes_credentials"])["kubeadminUsername"]
 }
 
-
 output "kubeadmin_password" {
   value = jsondecode(jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernetes_credentials"])["kubeadminPassword"]
 }
-
 
 output "kubernetes_client_certificate" {
   value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["kubernetes_client_certificate"]
@@ -49,6 +44,10 @@ output "openshift_api_server_ip" {
 
 output "openshift_console_ip" {
   value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["console_ip"]
+}
+
+output "openshift_console_url" {
+  value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["console_url"]
 }
 
 

@@ -1,5 +1,8 @@
 
 locals {
+
+  callback_url = var.console-openshift-console
+
   openid_cluster_patch = jsonencode(<<JSON
     [
       {

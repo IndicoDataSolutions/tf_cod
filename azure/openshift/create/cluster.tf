@@ -220,6 +220,7 @@ resource "vault_kv_secret_v2" "terraform-credentials" {
       k8s_cluster_ca_certificate = data.kubernetes_secret_v1.terraform.data["ca.crt"],
       k8s_api_ip                 = module.cluster.openshift_api_server_ip
       k8s_console_ip             = module.cluster.openshift_console_ip
+      k8s_console_url            = module.cluster.openshift_console_url
     }
   )
 }
