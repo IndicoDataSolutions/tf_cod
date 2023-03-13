@@ -43,7 +43,7 @@ resource "null_resource" "add-identity-provider" {
   }
 
   provisioner "local-exec" {
-    command = "curl -XPOST -H 'Content-Type: application/json' -H \"Authorization: Bearer ${null_resource.add-identity-provider.0.triggers.client_secret}\" -v https://keycloak-service.devops.indico.io/add --data '{\"url\": \"${null_resource.add-identity-provider.0.triggers.callback_url}\"}'"
+    command = "curl -XPOST -H 'Content-Type: application/json' -H \"Authorization: Bearer ${var.openid_client_secret}\" -v https://keycloak-service.devops.indico.io/add --data '{\"url\": \"${local.callback_url}\"}'"
   }
 
   provisioner "local-exec" {
@@ -52,4 +52,9 @@ resource "null_resource" "add-identity-provider" {
   }
 
 }
+
+output "callbackurl" {
+  value = resource.null_resource.add-identity-provider.0.triggers.callback_url
+}
+
 
