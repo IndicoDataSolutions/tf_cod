@@ -48,7 +48,7 @@ resource "null_resource" "add-identity-provider" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command     = <<CMD
-      kubectl patch oauth cluster --type='json' -p='[{"op": "add", "path": "/spec/identityProviders", "value": "${var.openid_auth}" }]'
+      kubectl patch oauth cluster --type=json -p=[{"op": "add", "path": "/spec/identityProviders", "value": "${var.openid_auth}" }]
     CMD
   }
 }
