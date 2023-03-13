@@ -26,7 +26,7 @@ locals {
   openid_client_secret      = var.do_setup_openid_connect == true ? jsondecode(data.vault_kv_secret_v2.keycloak.0.data_json)["clientSecret"] : ""
   openid_connect_issuer_url = var.do_setup_openid_connect == true ? jsondecode(data.vault_kv_secret_v2.keycloak.0.data_json)["issuerURL"] : ""
 
-  openid_auth = jsonencode(<<YAML
+  openid_auth = jsonencode(yamldecode(yamlencode(<<YAML
     mappingMethod: claim
       name: openid
       openID:
@@ -43,6 +43,6 @@ locals {
         clientSecret:
           name: "${var.openid_idp_name}-client-secret"
   YAML
-  )
+  )))
 }
 
