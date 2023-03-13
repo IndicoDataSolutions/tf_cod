@@ -20,15 +20,14 @@ resource "kubernetes_secret" "openid-client-secret" {
 resource "null_resource" "add-identity-provider" {
   count = var.do_setup_openid_connect == true ? 1 : 0
 
-  depends_on = [
-    kubernetes_secret.openid-client-secret
-  ]
-
   triggers = {
     callback_url  = local.callback_url
     client_secret = var.openid_client_secret
   }
 
+  depends_on = [
+    kubernetes_secret.openid-client-secret
+  ]
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
