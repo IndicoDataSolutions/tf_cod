@@ -80,8 +80,7 @@ module "infrastructure" {
   use_workload_identity            = var.use_workload_identity
 
   openshift_machine_sets = var.openshift_machine_sets
-
-
+  openshift_console_url  = local.openshift_console_url
 
   nvidia_operator_namespace = var.nvidia_operator_namespace
   nfd_namespace             = "openshift-nfd"

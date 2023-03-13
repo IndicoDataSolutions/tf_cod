@@ -167,6 +167,8 @@ module "openshift-infrastructure" {
   count  = var.is_openshift == true ? 1 : 0
   source = "./openshift"
 
+  openshift_console_url = var.openshift_console_url
+
   resource_group_name = var.resource_group_name
   label               = var.label
 

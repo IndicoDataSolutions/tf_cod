@@ -71,3 +71,8 @@ variable "openid_emailclaim" { default = "" }
 variable "openid_preferred_username" { default = "" }
 variable "openid_idp_name" { default = "keycloak" }
 variable "openid_client_id" { default = "" }
+
+
+variable "openshift_console_url" {
+  default = ""
+}
