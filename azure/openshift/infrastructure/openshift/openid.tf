@@ -17,6 +17,17 @@ resource "kubernetes_secret" "openid-client-secret" {
   }
 }
 
+/* 
+data "keycloak_realm" "realm" {
+  count = var.do_setup_openid_connect == true ? 1 : 0
+  realm = "GoogleAuth"
+}
+
+data "keycloak_openid_client" "kube-oidc-proxy" {
+  count     = var.do_setup_openid_connect == true ? 1 : 0
+  realm_id  = data.keycloak_realm.realm.id
+  client_id = var.openid_client_id
+} */
 
 resource "null_resource" "add-identity-provider" {
   count = var.do_setup_openid_connect == true ? 1 : 0
@@ -36,6 +47,8 @@ resource "null_resource" "add-identity-provider" {
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command     = "kubectl patch oauth cluster --type='json' -p='[{ \"op\": \"add\", \"path\": \"/spec/identityProviders\", \"value\": \"${var.openid_auth}\" }]'"
+    command     = <<CMD
+      kubectl patch oauth cluster --type='json' -p='[{"op": "add", "path": "/spec/identityProviders", "value": "${var.openid_auth}" }]'
+    CMD
   }
 }
