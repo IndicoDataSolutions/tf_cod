@@ -26,23 +26,36 @@ locals {
   openid_client_secret      = var.do_setup_openid_connect == true ? jsondecode(data.vault_kv_secret_v2.keycloak.0.data_json)["clientSecret"] : ""
   openid_connect_issuer_url = var.do_setup_openid_connect == true ? jsondecode(data.vault_kv_secret_v2.keycloak.0.data_json)["issuerURL"] : ""
 
-  openid_auth = jsonencode(yamldecode(<<YAML
-    - mappingMethod: claim
-      name: openid
-      openID:
-        claims:
-          email:
-            - ${var.openid_emailclaim}
-          groups:
-            - ${var.openid_groups_claim}
-          name:
-            - name
-          preferredUsername:
-            - ${var.openid_preferred_username}
-        clientId: ${var.openid_client_id}
-        clientSecret:
-          name: "${var.openid_idp_name}-client-secret"
-  YAML
-  ))
+  openid_cluster_patch = jsonencode(<<JSON
+    [
+      {
+        "op": "add",
+        "path": "/spec/identityProviders",
+        "value": 
+        [
+          {
+            "mappingMethod": "claim",
+            "name": "openid",
+            "type": "OpenID",
+            "openID": {
+              "claims": {
+                "email": ["${var.openid_emailclaim}"], 
+                "groups": ["${var.openid_groups_claim}"],
+                "name": ["name"],
+                "preferredUsername": ["${var.openid_preferred_username}"],
+              },
+              "clientID": "${var.openid_client_id}"
+              "clientSecret": {
+                "name": "${var.openid_idp_name}-client-secret"
+              }
+              "issuer": "${var.openid_connect_issuer_url}"
+            }
+          }
+        ]
+      }
+    ]
+  JSON
+  )
+
 }
 
