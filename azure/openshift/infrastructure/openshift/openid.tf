@@ -21,6 +21,7 @@ resource "null_resource" "add-identity-provider" {
   count = var.do_setup_openid_connect == true ? 1 : 0
 
   triggers = {
+    always_run    = "${timestamp()}"
     callback_url  = local.callback_url
     client_secret = var.openid_client_secret
   }
@@ -48,8 +49,7 @@ resource "null_resource" "add-identity-provider" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "echo destroy"
-    #command = "curl -XDELETE -H 'Content-Type: application/json' -H \"Authorization: Bearer ${self.triggers.client_secret}\" -v https://keycloak-service.devops.indico.io/delete --data '{\"url\": \"${self.triggers.callback_url}\"}'"
+    command = "curl -XDELETE -H 'Content-Type: application/json' -H \"Authorization: Bearer ${self.triggers.client_secret}\" -v https://keycloak-service.devops.indico.io/delete --data '{\"url\": \"${self.triggers.callback_url}\"}'"
   }
 
 }
