@@ -25,8 +25,8 @@ resource "null_resource" "add-identity-provider" {
   ]
 
   triggers = {
-    client_secret = var.openid_client_secret
     callback_url  = local.callback_url
+    client_secret = var.openid_client_secret
   }
 
 
@@ -43,8 +43,6 @@ resource "null_resource" "add-identity-provider" {
     CMD
   }
 
-  #  https://oauth-openshift.apps.dop1487-indico-dev-azure.eastus.aroapp.io/oauth2callback/openid
-  #console-openshift-console.apps.dop1487-indico-dev-azure.eastus.aroapp.io
   provisioner "local-exec" {
     command = "curl -XPOST -H 'Content-Type: application/json' -H \"Authorization: Bearer ${null_resource.add-identity-provider.0.triggers.client_secret}\" -v https://keycloak-service.devops.indico.io/add --data '{\"url\": \"${null_resource.add-identity-provider.0.triggers.callback_url}\"}'"
   }
