@@ -157,10 +157,7 @@ resource "kubernetes_config_map" "azure_dns_credentials" {
   }
 }
 
-data "vault_kv_secret_v2" "zerossl_data" {
-  mount = var.vault_mount_path
-  name  = "zerossl"
-}
+#eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
 
 
 module "openshift-infrastructure" {
@@ -177,6 +174,19 @@ module "openshift-infrastructure" {
   openshift_admission_chart_version = var.openshift_admission_chart_version
   openshift_webhook_chart_version   = var.openshift_webhook_chart_version
   crunchy_chart_version             = var.crunchy_chart_version
+
+
+  # openid connect configuration
+  do_setup_openid_connect   = var.do_setup_openid_connect
+  openid_connect_issuer_url = local.openid_connect_issuer_url
+  openid_client_id          = local.openid_client_id
+  openid_client_secret      = local.openid_client_secret
+  openid_groups_claim       = var.openid_groups_claim
+  openid_emailclaim         = var.openid_emailclaim
+  openid_preferred_username = var.openid_preferred_username
+  openid_idp_name           = var.openid_idp_name
+
+
 }
 
 resource "helm_release" "ipa-pre-requisites" {

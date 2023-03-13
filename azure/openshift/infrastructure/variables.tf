@@ -28,6 +28,7 @@ variable "crunchy_chart_version" {}
 variable "is_openshift" { type = bool }
 
 variable "do_install_ipa_crds" { type = bool }
+
 variable "ipa_namespace" {}
 variable "ipa_crds_namespace" {}
 
@@ -71,4 +72,15 @@ variable "openshift_machine_sets" {
     })
   }))
 }
+
+variable "do_setup_openid_connect" { type = bool }
+variable "openid_client_id" {}
+variable "openid_connect_issuer_url" {}
+variable "openid_client_secret" {}
+variable "openid_groups_claim" {}
+variable "openid_emailclaim" {}
+variable "openid_preferred_username" {}
+variable "openid_idp_name" {}
+
+
 
