@@ -13,7 +13,7 @@ resource "kubernetes_secret" "openid-client-secret" {
   type = "Opaque"
 
   data = {
-    "clientSecret" = "foobar"
+    "clientSecret" = var.openid_client_secret
   }
 }
 
