@@ -48,6 +48,7 @@ resource "null_resource" "add-identity-provider" {
   provisioner "local-exec" {
     command = <<CMD
       echo ${local.openid_cluster_patch} > cluster-patch.json
+      cat cluster-patch.json
       kubectl patch oauth cluster --type=json  --patch-file cluster-patch.json
     CMD
   }
