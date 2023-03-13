@@ -18,4 +18,4 @@ variable "openid_groups_claim" {}
 variable "openid_emailclaim" {}
 variable "openid_preferred_username" {}
 variable "openid_idp_name" {}
-variable "openid_auth" {}
+
