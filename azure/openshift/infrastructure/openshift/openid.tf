@@ -21,7 +21,6 @@ resource "null_resource" "add-identity-provider" {
   count = var.do_setup_openid_connect == true ? 1 : 0
 
   triggers = {
-    always_run    = "${timestamp()}"
     callback_url  = local.callback_url
     client_secret = var.openid_client_secret
   }
@@ -69,7 +68,7 @@ roleRef:
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
-  name: ${local.openid_name}:devops@indico.io
+  name: devops@indico.io
 YAML
 }
 
