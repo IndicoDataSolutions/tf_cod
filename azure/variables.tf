@@ -424,3 +424,20 @@ variable "openshift_pull_secret" {
   type    = string
   default = ""
 }
+
+variable "servicebus_pricing_tier" {
+  type        = string
+  default     = "Standard"
+  description = "pricing tier for service bus, options are Basic, Standard or Premium. Premium should be used for production clusters"
+}
+
+variable "servicebus_message_filter" {
+  type        = map(string)
+  default     = null
+  description = "filter for servicebus messages"
+}
+
+variable "enable_servicebus" {
+  type    = bool
+  default = false
+}

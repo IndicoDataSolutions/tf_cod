@@ -227,3 +227,16 @@ module "cluster" {
   enable_oidc_issuer       = true
 }
 
+module "networking" {
+  depends_on = [
+    azurerm_resource_group.cod-cluster
+  ]
+  count               = var.enable_servicebus == true ? 1 : 0
+  source              = "app.terraform.io/indico/indico-azure-servicebus/mod"
+  version             = "1.0.0"
+  label               = var.label
+  resource_group_name = azurerm_resource_group.cod-cluster.name
+  region              = var.region
+  svp_client_id       = var.svp_client_id
+}
+
