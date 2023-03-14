@@ -1,9 +1,29 @@
-#
-variable "do_create_cluster" {
-  type    = bool
-  default = true
+variable "resource_group_name" {
+  description = "Resource group everything is placed in"
+  default     = null
 }
 
+variable "kubeadmin_username" {
+  default = ""
+}
+
+variable "kubeadmin_password" {
+  default = ""
+}
+
+variable "kubernetes_host" {
+  default = ""
+}
+
+variable "kubernetes_client_certificate" {
+  default = ""
+}
+variable "kubernetes_client_key" {
+  default = ""
+}
+variable "kubernetes_cluster_ca_certificate" {
+  default = ""
+}
 
 variable "is_azure" {
   type    = bool
@@ -77,7 +97,7 @@ variable "worker_subnet_cidrs" {
 ### storage account variables
 variable "storage_account_name" {
   type        = string
-  default     = ""
+  default     = "indicodatatest"
   description = "Name of the indico storage account"
 }
 
@@ -321,12 +341,12 @@ variable "ipa_smoketest_repo" {
 
 variable "ipa_smoketest_container_tag" {
   type    = string
-  default = "development-5cc16676"
+  default = "IPA-6.1.0"
 }
 
 variable "ipa_smoketest_version" {
   type    = string
-  default = "0.2.1-add-openshift-crds-4a0b2155"
+  default = "0.1.14-dop-1536-18805132"
 }
 
 variable "ipa_smoketest_slack_channel" {
@@ -402,8 +422,6 @@ variable "enable_ad_group_mapping" {
   description = "Enable the Mapping of AD Group"
 }
 
-#openshift & azure common variables
-
 # enable for openshift
 variable "is_openshift" {
   type    = bool
@@ -424,3 +442,80 @@ variable "openshift_pull_secret" {
   type    = string
   default = ""
 }
+
+variable "enable_dns_infrastructure" {
+  type    = bool
+  default = true
+}
+variable "replace_prometheus_crds" {
+  type    = bool
+  default = true
+}
+
+variable "monitoring_namespace" {
+  default = "monitoring"
+}
+
+variable "cluster_oidc_issuer_url" {
+  default = ""
+}
+
+variable "kubelet_identity_client_id" {
+  default = ""
+}
+
+variable "kubelet_identity_object_id" {
+  default = ""
+}
+
+variable "fileshare_name" {
+  default = ""
+}
+
+variable "storage_account_primary_access_key" {
+  default = ""
+}
+
+variable "blob_store_name" {
+  default = ""
+}
+
+variable "storage_account_id" {
+  default = ""
+}
+
+variable "ipa_namespace" {
+  default = "indico"
+}
+
+variable "ipa_crds_namespace" {
+  default = "indico"
+}
+
+variable "openshift_admission_chart_version" {
+  default = "0.0.1-dop-1536-a577783e"
+}
+variable "openshift_webhook_chart_version" {
+  default = "0.1.9-dop-1536-a577783e"
+}
+variable "crunchy_chart_version" {
+  default = "0.3.0"
+}
+variable "use_admission_controller" {
+  default = true
+}
+
+variable "monitoring_username" {
+  type    = string
+  default = "monitoring"
+}
+
+variable "monitoring_password" {
+  type    = string
+  default = "changeit"
+}
+
+
+
+
+

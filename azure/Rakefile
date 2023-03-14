@@ -93,6 +93,8 @@ global:
     - azure-storage-key
 rabbitmq:
   enabled: true
+  serviceMonitor:
+    enabled: true
 secrets:
   ocr_license_key: #{ENV['OCR_LICENSE_KEY']}
 configs:

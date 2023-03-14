@@ -1,5 +1,3 @@
-data "azuread_client_config" "current" {}
-
 resource "azuread_application" "workload_identity" {
   display_name = "${var.label}-${var.region}-workload-identity"
   owners       = [data.azuread_client_config.current.object_id]
@@ -12,13 +10,13 @@ resource "azuread_service_principal" "workload_identity" {
 }
 
 resource "azurerm_role_assignment" "dns-zone-contributor" {
-  scope                = data.azurerm_dns_zone.domain.id
+  scope                = data.azurerm_dns_zone.domain.0.id
   role_definition_name = "Contributor"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
 
 resource "azurerm_role_assignment" "dns-zone-dns-zone-contributor" {
-  scope                = data.azurerm_dns_zone.domain.id
+  scope                = data.azurerm_dns_zone.domain.0.id
   role_definition_name = "DNS Zone Contributor"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
@@ -29,19 +27,21 @@ resource "azuread_application_password" "workload_identity" {
 }
 
 resource "kubernetes_secret" "workload_identity" {
-  depends_on = [
-    module.cluster
-  ]
-
   metadata {
-    name = "workload-identity"
+    name      = "workload-identity"
+    namespace = var.ipa_namespace
   }
 
+  # https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/identity/azure-identity/TROUBLESHOOTING.md#troubleshoot-environmentcredential-authentication-issues
+  # AZURE_CLIENT_ID, AZURE_TENANT_ID and AZURE_CLIENT_SECRET 
   data = {
     ARM_SUBSCRIPTION_ID = "${data.azurerm_subscription.primary.subscription_id}"
     ARM_TENANT_ID       = "${data.azuread_client_config.current.tenant_id}"
+    AZURE_TENANT_ID     = "${data.azuread_client_config.current.tenant_id}"
     ARM_CLIENT_ID       = "${azuread_application.workload_identity.application_id}"
+    AZURE_CLIENT_ID     = "${azuread_application.workload_identity.application_id}"
     ARM_CLIENT_SECRET   = "${azuread_application_password.workload_identity.value}"
+    AZURE_CLIENT_SECRET = "${azuread_application_password.workload_identity.value}"
   }
 
   type = "Opaque"
@@ -49,19 +49,19 @@ resource "kubernetes_secret" "workload_identity" {
 
 
 resource "azurerm_role_assignment" "blob_storage_account_owner" {
-  scope                = module.storage.storage_account_id
+  scope                = var.storage_account_id
   role_definition_name = "Owner"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
 
 resource "azurerm_role_assignment" "blob_storage_account_blob_contributer" {
-  scope                = module.storage.storage_account_id
+  scope                = var.storage_account_id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
 
 resource "azurerm_role_assignment" "blob_storage_account_queue_contributer" {
-  scope                = module.storage.storage_account_id
+  scope                = var.storage_account_id
   role_definition_name = "Storage Queue Data Contributor"
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
@@ -94,12 +94,8 @@ resource "azurerm_role_assignment" "snapshot_storage_account_queue_contributer" 
   principal_id         = resource.azuread_service_principal.workload_identity.object_id
 }
 
-# Now add the kubernetes/azure infrastructure to link it all
 resource "kubernetes_service_account" "workload_identity" {
   count = var.use_workload_identity == true ? 1 : 0
-  depends_on = [
-    module.cluster
-  ]
 
   metadata {
     name      = "workload-identity-storage-account"
@@ -119,7 +115,7 @@ resource "azuread_application_federated_identity_credential" "workload_identity"
   display_name          = "${var.label}-${var.region}-workload-identity"
   description           = "Initial workload identity for cluster"
   audiences             = ["api://AzureADTokenExchange"]
-  issuer                = module.cluster.oidc_issuer_url
+  issuer                = var.cluster_oidc_issuer_url
   subject               = "system:serviceaccount:default:workload-identity-storage-account"
 }
 
@@ -130,6 +126,6 @@ resource "azuread_application_federated_identity_credential" "workload_snapshot_
   display_name          = "${var.label}-${var.region}-workload-snapshot-identity"
   description           = "Initial workload snapshot identity for cluster"
   audiences             = ["api://AzureADTokenExchange"]
-  issuer                = module.cluster.oidc_issuer_url
+  issuer                = var.cluster_oidc_issuer_url
   subject               = "system:serviceaccount:default:cod-snapshots"
 }
