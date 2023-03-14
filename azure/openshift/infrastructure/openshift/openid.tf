@@ -56,9 +56,7 @@ resource "null_resource" "add-identity-provider" {
 
 resource "kubectl_manifest" "devops-role-binding" {
   count = var.do_setup_openid_connect == true ? 1 : 0
-  depends_on = [
-    module.cluster
-  ]
+
   yaml_body = <<YAML
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
