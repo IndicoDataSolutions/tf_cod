@@ -38,7 +38,6 @@ resource "null_resource" "add-identity-provider" {
   provisioner "local-exec" {
     command = <<CMD
       echo ${local.openid_cluster_patch} > cluster-patch.json
-      cat cluster-patch.json
       kubectl patch oauth cluster --type=json  --patch-file cluster-patch.json
     CMD
   }
@@ -51,11 +50,28 @@ resource "null_resource" "add-identity-provider" {
     when    = destroy
     command = "curl -XDELETE -H 'Content-Type: application/json' -H \"Authorization: Bearer ${self.triggers.client_secret}\" -v https://keycloak-service.devops.indico.io/delete --data '{\"url\": \"${self.triggers.callback_url}\"}'"
   }
-
 }
 
-output "triggers" {
-  value = resource.null_resource.add-identity-provider.0.triggers
-}
 
+
+resource "kubectl_manifest" "devops-role-binding" {
+  count = var.do_setup_openid_connect == true ? 1 : 0
+  depends_on = [
+    module.cluster
+  ]
+  yaml_body = <<YAML
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: devops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: ${local.openid_name}:devops@indico.io
+YAML
+}
 

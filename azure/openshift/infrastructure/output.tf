@@ -6,6 +6,3 @@ output "monitoring_username" {
   value = "monitoring"
 }
 
-output "triggers" {
-  value = module.openshift-infrastructure.0.triggers
-}
