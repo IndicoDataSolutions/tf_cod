@@ -227,7 +227,7 @@ module "cluster" {
   enable_oidc_issuer       = true
 }
 
-module "networking" {
+module "servicebus" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
