@@ -210,7 +210,7 @@ resource "vault_kv_secret_v2" "terraform-credentials" {
     data.kubernetes_secret_v1.terraform
   ]
   mount = var.vault_mount
-  name  = lower("${var.account}-${var.region}-${var.label}")
+  name  = lower("${var.account}-${var.region}-${var.label}-k8s")
 
   data_json = jsonencode(
     {
