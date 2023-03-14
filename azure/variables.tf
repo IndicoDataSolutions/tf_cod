@@ -334,7 +334,7 @@ variable "name" {
 
 variable "cod_snapshot_restore_version" {
   type    = string
-  default = "0.1.3"
+  default = "0.1.5"
 }
 
 variable "vault_mount_path" {
