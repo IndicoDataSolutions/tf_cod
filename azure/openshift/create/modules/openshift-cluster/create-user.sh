@@ -242,7 +242,7 @@ oc get ns | grep $test_ns
 [ $? -ne 0 ] && oc create ns $test_ns
 
 oc get ns $test_ns
-oc delete ns $test_ns
+#oc delete ns $test_ns
 
 #oc create sa -n default foobar
 #oc get sa -n default
