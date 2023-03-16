@@ -4,7 +4,7 @@ locals {
   # 
   # to: https://oauth-openshift.apps.dop1487-indico-dev-azure.eastus.aroapp.io/oauth2callback/openid
   callback_host = replace(var.openshift_console_url, "console-openshift-console", "oauth-openshift")
-  callback_url  = "${local.callback_host}/oauth2callback/openid"
+  callback_url  = "${local.callback_host}oauth2callback/openid"
   openid_name   = "openid"
   openid_cluster_patch = jsonencode(<<JSON
     [
