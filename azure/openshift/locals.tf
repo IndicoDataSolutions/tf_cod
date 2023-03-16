@@ -34,4 +34,5 @@ locals {
   kubernetes_client_certificate      = var.do_create_cluster == true ? module.create.0.kubernetes_client_certificate : var.kubernetes_client_certificate
   kubernetes_client_key              = var.do_create_cluster == true ? module.create.0.kubernetes_client_key : var.kubernetes_client_key
   kubernetes_cluster_ca_certificate  = var.do_create_cluster == true ? module.create.0.kubernetes_cluster_ca_certificate : var.kubernetes_cluster_ca_certificate
+  openshift_console_url              = var.do_create_cluster == true ? module.create.0.openshift_console_url : var.openshift_console_url
 }

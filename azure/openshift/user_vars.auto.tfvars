@@ -1,7 +1,13 @@
 do_install_ipa_crds = true
 do_deploy_ipa       = true
-argo_enabled        = true
 
+do_setup_openid_connect   = true
+openid_emailclaim         = "email"
+openid_preferred_username = "preferred_username"
+openid_groups_claim       = "groups"
+openid_client_id          = "kube-oidc-proxy"
+
+argo_enabled          = true
 is_openshift          = true
 include_external_dns  = false
 use_workload_identity = false

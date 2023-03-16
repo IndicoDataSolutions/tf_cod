@@ -29,7 +29,6 @@ data "kubernetes_resource" "package" {
   }
 }
 
-
 data "kubernetes_resource" "infrastructure-cluster" {
   api_version = "config.openshift.io/v1"
   kind        = "Infrastructure"
@@ -38,4 +37,19 @@ data "kubernetes_resource" "infrastructure-cluster" {
     name = "cluster"
   }
 }
+
+data "vault_kv_secret_v2" "keycloak" {
+  count = var.do_setup_openid_connect == true ? 1 : 0
+  mount = var.vault_mount_path
+  name  = "keycloak"
+}
+
+
+data "vault_kv_secret_v2" "zerossl_data" {
+  mount = var.vault_mount_path
+  name  = "zerossl"
+}
+
+
+
 

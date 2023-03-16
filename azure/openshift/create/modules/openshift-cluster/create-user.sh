@@ -273,6 +273,7 @@ cp $NEW_KUBECONFIG $kube_config_file
 
 echo $api_ip > /tmp/${name}-${resource_group}.openshift_api_ip
 echo $console_ip > /tmp/${name}-${resource_group}.openshift_console_ip
+echo $console_url > /tmp/${name}-${resource_group}.openshift_console_url
 
 cp $creds_file /tmp/${name}-${resource_group}.kubernetes_credentials
 
