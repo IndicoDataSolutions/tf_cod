@@ -21,6 +21,7 @@ resource "null_resource" "add-identity-provider" {
   count = var.do_setup_openid_connect == true ? 1 : 0
 
   triggers = {
+    always_run    = "${timestamp()}"
     callback_url  = local.callback_url
     client_secret = var.openid_client_secret
   }
@@ -39,6 +40,9 @@ resource "null_resource" "add-identity-provider" {
       echo ${local.openid_cluster_patch} > cluster-patch.json
       kubectl patch oauth cluster --type=json  --patch-file cluster-patch.json
     CMD
+  }
+  provisioner "local-exec" {
+    command = "echo ${local.callback_url}"
   }
 
   provisioner "local-exec" {
