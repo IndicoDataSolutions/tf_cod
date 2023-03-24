@@ -90,6 +90,9 @@ spec:
             app-edge:
               openshift:
                 enabled: ${var.is_openshift}
+              ingress:
+                labels:
+                  "acme.cert-manager.io/http01-solver": "true"
             rainbow-nginx:
               openshift:
                 enabled: ${var.is_openshift}
