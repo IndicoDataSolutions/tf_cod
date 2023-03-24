@@ -238,6 +238,20 @@ secrets:
       eabEmail: devops-sa@indico.io
       eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
+    
+clusterIssuer:
+  additionalSolvers:
+    - dns01:
+        azureDNS:
+          environment: AzurePublicCloud
+          hostedZoneName: ${data.azurerm_dns_zone.domain.name}
+          managedIdentity:
+            clientID: ${module.cluster.kubelet_identity.client_id}
+          resourceGroupName: ${var.common_resource_group}
+          subscriptionID: ${split("/", data.azurerm_subscription.primary.id)[2]}
+      selector:
+        matchLabels:
+          "acme.cert-manager.io/dns01-solver": "true"
      
 apiModels:
   enabled: true
