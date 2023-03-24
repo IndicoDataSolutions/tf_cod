@@ -93,6 +93,7 @@ spec:
               ingress:
                 labels:
                   "acme.cert-manager.io/http01-solver": "true"
+                  "acme.cert-manager.io/dns01-solver": "false"
             rainbow-nginx:
               openshift:
                 enabled: ${var.is_openshift}
