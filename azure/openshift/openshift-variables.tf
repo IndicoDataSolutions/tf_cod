@@ -58,6 +58,7 @@ variable "nvidia_operator_namespace" {
   default = "nvidia-gpu-operator"
 }
 
+
 # openid connect
 variable "do_setup_openid_connect" {
   type    = bool

@@ -5,4 +5,3 @@ output "monitoring_password" {
 output "monitoring_username" {
   value = "monitoring"
 }
-

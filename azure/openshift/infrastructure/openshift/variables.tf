@@ -20,5 +20,3 @@ variable "openid_preferred_username" {}
 variable "openid_idp_name" {}
 
 variable "openshift_console_url" {}
-
-

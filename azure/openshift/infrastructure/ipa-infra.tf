@@ -157,8 +157,10 @@ resource "kubernetes_config_map" "azure_dns_credentials" {
   }
 }
 
-#eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
-
+data "vault_kv_secret_v2" "zerossl_data" {
+  mount = var.vault_mount_path
+  name  = "zerossl"
+}
 
 module "openshift-infrastructure" {
   depends_on = [
@@ -179,7 +181,6 @@ module "openshift-infrastructure" {
   openshift_admission_chart_version = var.openshift_admission_chart_version
   openshift_webhook_chart_version   = var.openshift_webhook_chart_version
   crunchy_chart_version             = var.crunchy_chart_version
-
 
   # openid connect configuration
   do_setup_openid_connect   = var.do_setup_openid_connect
@@ -224,7 +225,7 @@ rabbitmq:
   rabbitmq:
     metrics:
       enabled: true
-    
+
 clusterIssuer:
   additionalSolvers:
     - dns01:
@@ -262,7 +263,6 @@ apiModels:
   enabled: true
   nodeSelector:
     node_group: static-workers
-
 
 external-dns:
   enabled: true

@@ -216,7 +216,7 @@ resource "azurerm_role_assignment" "external_dns" {
   count = var.is_azure == true && var.is_openshift == false && var.include_external_dns == true ? 1 : 0
   depends_on = [
     module.cluster
-  ]
+
   scope                            = data.azurerm_dns_zone.domain.id
   role_definition_name             = "DNS Zone Contributor"
   principal_id                     = module.cluster.kubelet_identity.object_id

@@ -49,7 +49,3 @@ data "vault_kv_secret_v2" "zerossl_data" {
   mount = var.vault_mount_path
   name  = "zerossl"
 }
-
-
-
-

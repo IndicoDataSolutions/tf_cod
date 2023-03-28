@@ -49,6 +49,3 @@ output "openshift_console_ip" {
 output "openshift_console_url" {
   value = jsondecode(data.vault_kv_secret_v2.kubernetes-credentials.data_json)["console_url"]
 }
-
-
-

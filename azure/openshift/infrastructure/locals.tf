@@ -21,7 +21,6 @@ locals {
     }
   ])
 
-
   openid_client_id          = var.do_setup_openid_connect == true ? jsondecode(data.vault_kv_secret_v2.keycloak.0.data_json)["client"] : ""
   openid_client_secret      = var.do_setup_openid_connect == true ? jsondecode(data.vault_kv_secret_v2.keycloak.0.data_json)["clientSecret"] : ""
   openid_connect_issuer_url = var.do_setup_openid_connect == true ? jsondecode(data.vault_kv_secret_v2.keycloak.0.data_json)["issuerURL"] : ""

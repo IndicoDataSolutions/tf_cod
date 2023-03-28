@@ -115,7 +115,6 @@ module "cluster" {
 
 }
 
-
 # Create the service account, cluster role + binding, which ArgoCD expects to be present in the targeted cluster
 resource "kubernetes_service_account_v1" "terraform" {
   depends_on = [
