@@ -90,7 +90,7 @@ provider "snowflake" {
   username = var.snowflake_username
   account  = var.snowflake_account
   region  = var.snowflake_region
-  private_key = file(data.snowflake_private_key)
+  private_key = file(data.local_file.snowflake_private_key)
 }
 
 data "aws_caller_identity" "current" {}
