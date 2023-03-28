@@ -217,9 +217,9 @@ resource "azurerm_role_assignment" "external_dns" {
   depends_on = [
     module.cluster
   ]
-  scope                = data.azurerm_dns_zone.domain.id
-  role_definition_name = "DNS Zone Contributor"
-  principal_id         = module.cluster.kubelet_identity.object_id
+  scope                            = data.azurerm_dns_zone.domain.id
+  role_definition_name             = "DNS Zone Contributor"
+  principal_id                     = module.cluster.kubelet_identity.object_id
   skip_service_principal_aad_check = true
 }
 
@@ -535,6 +535,15 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
+            readapi:
+              annotations:
+                "azure.workload.identity/inject-proxy-sidecar": "true"
+                reloader.stakater.com/auto: "true"
+              
+              serviceAccountName: "workload-identity-storage-account"
+              labels:
+                "azure.workload.identity/use": "true"
+                
             aws-node-termination:
               enabled: false 
             global:
