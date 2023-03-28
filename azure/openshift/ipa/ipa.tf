@@ -60,6 +60,7 @@ spec:
                 - rabbitmq
                 - workload-identity
                 - azure-storage-key
+            
             kafka-strimzi:
               enabled: true
               podSecurityContext:
