@@ -61,6 +61,14 @@ spec:
                 - workload-identity
                 - azure-storage-key
             
+            readapi:
+              secretRefs:
+                - indico-generated-secrets
+                - indico-static-secrets
+                - rabbitmq
+                - workload-identity
+                - azure-storage-key
+
             kafka-strimzi:
               enabled: true
               podSecurityContext:
