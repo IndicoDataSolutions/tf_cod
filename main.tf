@@ -62,6 +62,10 @@ provider "vault" {
       token = var.git_pat
     }
   }
+#  auth_login_userpass {
+#    username = var.vault_username
+#    password = var.vault_password
+#  }
 }
 
 
@@ -86,7 +90,7 @@ provider "snowflake" {
   username = var.snowflake_username
   account  = var.snowflake_account
   region  = var.snowflake_region
-  private_key = var.snowflake_private_key
+  private_key = file(data.snowflake_private_key)
 }
 
 data "aws_caller_identity" "current" {}
@@ -296,6 +300,33 @@ module "snowflake" {
   snowflake_db_name = var.snowflake_db_name
   kms_key_arn  = module.kms_key.key_arn
   s3_bucket_name = module.s3-storage.data_s3_bucket_name
+}
+
+resource "vault_kv_secret_v2" "snowflake-credentials" {
+  mount = "terraform"
+  name  = "snowflake"
+  data_json = jsonencode(
+    {
+      snowflake_private_key = trimspace(data.local_file.snowflake_private_key.content)
+    }
+  )
+  lifecycle {
+    ignore_changes = [
+      data_json
+      ]
+  }
+}
+
+data "vault_kv_secret_v2" "snowflake-credentials" {
+  depends_on = [
+    vault_kv_secret_v2.snowflake-credentials
+  ]
+  mount = "terraform"
+  name  = "snowflake"
+}
+
+data "local_file" "snowflake_private_key" {
+  filename = "/tmp/${var.label}.snowflake_private_key"
 }
 
 resource "aws_security_group" "indico_allow_access" {
