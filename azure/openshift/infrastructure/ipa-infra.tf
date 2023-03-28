@@ -224,7 +224,26 @@ rabbitmq:
   rabbitmq:
     metrics:
       enabled: true
-
+    
+clusterIssuer:
+  additionalSolvers:
+    - dns01:
+        azureDNS:
+          clientID: ${azuread_application.workload_identity.application_id}
+          clientSecretSecretRef:
+          # The following is the secret we created in Kubernetes. Issuer will use this to present challenge to Azure DNS.
+            name: ${kubernetes_secret.workload_identity.metadata.0.name}
+            key: ARM_CLIENT_SECRET
+          subscriptionID: ${split("/", data.azurerm_subscription.primary.id)[2]}
+          tenantID: ${data.azurerm_client_config.current.tenant_id}
+          resourceGroupName: ${var.common_resource_group}
+          hostedZoneName: ${data.azurerm_dns_zone.domain.name}
+          # Azure Cloud Environment, default to AzurePublicCloud
+          environment: AzurePublicCloud 
+      selector:
+        matchLabels:
+          "acme.cert-manager.io/dns01-solver": "true"
+        
 secrets:
   rabbitmq:
     create: true
@@ -243,6 +262,7 @@ apiModels:
   enabled: true
   nodeSelector:
     node_group: static-workers
+
 
 external-dns:
   enabled: true
