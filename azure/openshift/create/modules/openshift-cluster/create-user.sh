@@ -242,7 +242,6 @@ oc get ns | grep $test_ns
 [ $? -ne 0 ] && oc create ns $test_ns
 
 oc get ns $test_ns
-oc delete ns $test_ns
 
 #oc create sa -n default foobar
 #oc get sa -n default
@@ -273,6 +272,7 @@ cp $NEW_KUBECONFIG $kube_config_file
 
 echo $api_ip > /tmp/${name}-${resource_group}.openshift_api_ip
 echo $console_ip > /tmp/${name}-${resource_group}.openshift_console_ip
+echo $console_url > /tmp/${name}-${resource_group}.openshift_console_url
 
 cp $creds_file /tmp/${name}-${resource_group}.kubernetes_credentials
 

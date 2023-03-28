@@ -162,13 +162,17 @@ data "vault_kv_secret_v2" "zerossl_data" {
   name  = "zerossl"
 }
 
-
 module "openshift-infrastructure" {
   depends_on = [
     time_sleep.wait_1_minutes_after_crds
   ]
   count  = var.is_openshift == true ? 1 : 0
   source = "./openshift"
+
+  openshift_console_url = var.openshift_console_url
+
+  resource_group_name = var.resource_group_name
+  label               = var.label
 
   ipa_namespace            = var.ipa_namespace
   ipa_repo                 = var.ipa_repo
@@ -177,6 +181,16 @@ module "openshift-infrastructure" {
   openshift_admission_chart_version = var.openshift_admission_chart_version
   openshift_webhook_chart_version   = var.openshift_webhook_chart_version
   crunchy_chart_version             = var.crunchy_chart_version
+
+  # openid connect configuration
+  do_setup_openid_connect   = var.do_setup_openid_connect
+  openid_connect_issuer_url = local.openid_connect_issuer_url
+  openid_client_id          = local.openid_client_id
+  openid_client_secret      = local.openid_client_secret
+  openid_groups_claim       = var.openid_groups_claim
+  openid_emailclaim         = var.openid_emailclaim
+  openid_preferred_username = var.openid_preferred_username
+  openid_idp_name           = var.openid_idp_name
 }
 
 resource "helm_release" "ipa-pre-requisites" {
@@ -212,6 +226,25 @@ rabbitmq:
     metrics:
       enabled: true
 
+clusterIssuer:
+  additionalSolvers:
+    - dns01:
+        azureDNS:
+          clientID: ${azuread_application.workload_identity.application_id}
+          clientSecretSecretRef:
+          # The following is the secret we created in Kubernetes. Issuer will use this to present challenge to Azure DNS.
+            name: ${kubernetes_secret.workload_identity.metadata.0.name}
+            key: ARM_CLIENT_SECRET
+          subscriptionID: ${split("/", data.azurerm_subscription.primary.id)[2]}
+          tenantID: ${data.azurerm_client_config.current.tenant_id}
+          resourceGroupName: ${var.common_resource_group}
+          hostedZoneName: ${data.azurerm_dns_zone.domain.name}
+          # Azure Cloud Environment, default to AzurePublicCloud
+          environment: AzurePublicCloud 
+      selector:
+        matchLabels:
+          "acme.cert-manager.io/dns01-solver": "true"
+        
 secrets:
   rabbitmq:
     create: true

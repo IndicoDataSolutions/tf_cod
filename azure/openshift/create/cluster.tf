@@ -115,6 +115,116 @@ module "cluster" {
 
 }
 
+# Create the service account, cluster role + binding, which ArgoCD expects to be present in the targeted cluster
+resource "kubernetes_service_account_v1" "terraform" {
+  depends_on = [
+    module.cluster
+  ]
+
+  metadata {
+    name      = "terraform"
+    namespace = "kube-system"
+  }
+
+  automount_service_account_token = true
+  image_pull_secret {
+    name = "harbor-pull-secret"
+  }
+}
+
+resource "kubernetes_secret_v1" "terraform" {
+  depends_on = [
+    kubernetes_service_account_v1.terraform
+  ]
+  metadata {
+    name      = "terraform"
+    namespace = "kube-system"
+    annotations = {
+      "kubernetes.io/service-account.name" = kubernetes_service_account_v1.terraform.metadata.0.name
+    }
+  }
+  type = "kubernetes.io/service-account-token"
+}
+
+
+resource "kubernetes_cluster_role" "terraform" {
+
+  depends_on = [
+    kubernetes_service_account_v1.terraform
+  ]
+
+  metadata {
+    name = "terraform"
+  }
+
+  rule {
+    api_groups = ["*"]
+    resources  = ["*"]
+    verbs      = ["*"]
+  }
+
+  rule {
+    non_resource_urls = ["*"]
+    verbs             = ["*"]
+  }
+}
+
+resource "kubernetes_cluster_role_binding" "terraform" {
+  depends_on = [
+    kubernetes_cluster_role.terraform
+  ]
+
+  metadata {
+    name = "terraform"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.terraform.metadata.0.name
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account_v1.terraform.metadata.0.name
+    namespace = kubernetes_service_account_v1.terraform.metadata.0.namespace
+  }
+}
+
+
+data "kubernetes_secret_v1" "terraform" {
+  depends_on = [
+    kubernetes_secret_v1.terraform
+  ]
+
+  metadata {
+    name      = "terraform"
+    namespace = kubernetes_service_account_v1.terraform.metadata.0.namespace
+  }
+}
+
+
+resource "vault_kv_secret_v2" "terraform-credentials" {
+  depends_on = [
+    data.kubernetes_secret_v1.terraform
+  ]
+  mount = var.vault_mount
+  name  = lower("${var.account}-${var.region}-${var.label}-k8s")
+
+  data_json = jsonencode(
+    {
+      k8s_host                   = module.cluster.kubernetes_host
+      k8s_client_certificate     = data.kubernetes_secret_v1.terraform.data["service-ca.crt"]
+      k8s_token                  = data.kubernetes_secret_v1.terraform.data["token"]
+      k8s_cluster_ca_certificate = data.kubernetes_secret_v1.terraform.data["ca.crt"],
+      k8s_api_ip                 = module.cluster.openshift_api_server_ip
+      k8s_console_ip             = module.cluster.openshift_console_ip
+      k8s_console_url            = module.cluster.openshift_console_url
+    }
+  )
+}
+
+
 data "kubernetes_resource" "infrastructure-cluster" {
   depends_on = [
     module.cluster

@@ -59,3 +59,21 @@ variable "nvidia_operator_namespace" {
 }
 
 
+# openid connect
+variable "do_setup_openid_connect" {
+  type    = bool
+  default = false
+}
+
+variable "openid_connect_issuer_url" { default = "" }
+variable "openid_client_secret" { default = "" }
+variable "openid_groups_claim" { default = "" }
+variable "openid_emailclaim" { default = "" }
+variable "openid_preferred_username" { default = "" }
+variable "openid_idp_name" { default = "keycloak" }
+variable "openid_client_id" { default = "" }
+
+
+variable "openshift_console_url" {
+  default = ""
+}

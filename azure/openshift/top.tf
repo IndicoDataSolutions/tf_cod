@@ -80,8 +80,7 @@ module "infrastructure" {
   use_workload_identity            = var.use_workload_identity
 
   openshift_machine_sets = var.openshift_machine_sets
-
-
+  openshift_console_url  = local.openshift_console_url
 
   nvidia_operator_namespace = var.nvidia_operator_namespace
   nfd_namespace             = "openshift-nfd"
@@ -109,6 +108,16 @@ module "infrastructure" {
 
   storage_account_primary_access_key = local.storage_account_primary_access_key
   blob_store_name                    = local.blob_store_name
+
+  # openid connect configuration
+  do_setup_openid_connect   = var.do_setup_openid_connect
+  openid_connect_issuer_url = var.openid_connect_issuer_url
+  openid_client_secret      = var.openid_client_secret
+  openid_groups_claim       = var.openid_groups_claim
+  openid_emailclaim         = var.openid_emailclaim
+  openid_preferred_username = var.openid_preferred_username
+  openid_client_id          = var.openid_client_id
+  openid_idp_name           = var.openid_idp_name
 
 }
 
