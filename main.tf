@@ -293,7 +293,7 @@ module "cluster" {
 }
 
 module "snowflake" {
-  count   = var.enable_weather_station == true ? 1 : 0
+#  count   = var.enable_weather_station == true ? 1 : 0
   source = "app.terraform.io/indico/indico-aws-snowflake/mod"
   label = var.label
   additional_tags = var.additional_tags
