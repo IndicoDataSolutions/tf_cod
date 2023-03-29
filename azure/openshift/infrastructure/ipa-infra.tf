@@ -157,11 +157,6 @@ resource "kubernetes_config_map" "azure_dns_credentials" {
   }
 }
 
-data "vault_kv_secret_v2" "zerossl_data" {
-  mount = var.vault_mount_path
-  name  = "zerossl"
-}
-
 module "openshift-infrastructure" {
   depends_on = [
     time_sleep.wait_1_minutes_after_crds
