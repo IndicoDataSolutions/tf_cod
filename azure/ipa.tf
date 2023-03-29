@@ -217,7 +217,6 @@ resource "azurerm_role_assignment" "external_dns" {
   depends_on = [
     module.cluster
   ]
-
   scope                            = data.azurerm_dns_zone.domain.id
   role_definition_name             = "DNS Zone Contributor"
   principal_id                     = module.cluster.kubelet_identity.object_id
