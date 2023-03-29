@@ -233,7 +233,7 @@ clusterIssuer:
           subscriptionID: ${split("/", data.azurerm_subscription.primary.id)[2]}
           tenantID: ${data.azurerm_client_config.current.tenant_id}
           resourceGroupName: ${var.common_resource_group}
-          hostedZoneName: ${data.azurerm_dns_zone.domain.0.name}
+          hostedZoneName: ${data.azurerm_dns_zone.domain.0.name} 
           # Azure Cloud Environment, default to AzurePublicCloud
           environment: AzurePublicCloud 
       selector:
