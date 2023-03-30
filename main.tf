@@ -37,7 +37,7 @@ terraform {
     }
     vault = {
       source  = "hashicorp/vault"
-      version = "3.8.0"
+      version = "3.13.0"
     }
     snowflake = {
       source  = "Snowflake-Labs/snowflake"
@@ -293,7 +293,7 @@ module "cluster" {
 }
 
 module "snowflake" {
-  version                    = "2.1.2"
+  version               = "2.1.2"
   source                = "app.terraform.io/indico/indico-aws-snowflake/mod"
   label                 = var.label
   additional_tags       = var.additional_tags
