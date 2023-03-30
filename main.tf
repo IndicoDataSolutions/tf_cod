@@ -80,7 +80,7 @@ provider "aws" {
 
 
 data "vault_kv_secret_v2" "terraform-snowflake" {
-  mount = var.vault_mount_path
+  mount = var.terraform_vault_mount_path
   name  = "snowflake"
 }
 
