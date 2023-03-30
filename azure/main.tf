@@ -2,11 +2,15 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">=3.29.1"
+      version = ">=3.40.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
-      version = "~> 2.15.0"
+      version = "~> 2.33.0"
+    }
+    azapi = {
+      source  = "Azure/azapi"
+      version = ">=1.2.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
@@ -31,6 +35,10 @@ terraform {
       source  = "integrations/github"
       version = "4.26.0"
     }
+    vault = {
+      source  = "hashicorp/vault"
+      version = "3.13.0"
+    }
   }
 }
 
@@ -39,6 +47,9 @@ provider "azurerm" {
 }
 
 provider "azuread" {
+}
+
+provider "azapi" {
 }
 
 provider "http" {}
@@ -61,9 +72,6 @@ provider "github" {
 data "azurerm_subscription" "primary" {}
 data "azurerm_client_config" "current" {}
 
-data "http" "workstation-external-ip" {
-  url = "http://ipv4.icanhazip.com"
-}
 
 # argo 
 provider "argocd" {
@@ -110,7 +118,7 @@ module "argo-registration" {
     argocd     = argocd
   }
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.1.11"
+  version                      = "1.1.12"
   cluster_name                 = var.label
   region                       = var.region
   argo_password                = var.argo_password
@@ -126,9 +134,10 @@ provider "local" {}
 
 locals {
   resource_group_name = "${var.label}-${var.region}"
-  current_ip          = "${chomp(data.http.workstation-external-ip.response_body)}/20"
 
-  storage_account_name    = replace(lower("${var.account}snapshots"), "-", "")
+  snapshot_storage_account_name = replace(lower("${var.account}snapshots"), "-", "")
+  storage_account_name          = replace(lower(var.storage_account_name), "-", "")
+
   argo_app_name           = lower("${var.account}.${var.region}.${var.label}-ipa")
   argo_cluster_name       = "${var.account}.${var.region}.${var.label}"
   argo_smoketest_app_name = lower("${var.account}.${var.region}.${var.label}-smoketest")
@@ -137,6 +146,10 @@ locals {
   base_domain  = lower("${var.account}.${var.domain_suffix}")
   dns_prefix   = lower("${var.label}.${var.region}")
   dns_name     = lower("${var.label}.${var.region}.${var.account}.${var.domain_suffix}")
+
+  kube_prometheus_stack_enabled = true
+
+  indico_storage_class_name = "azurefile"
 }
 
 resource "tls_private_key" "pk" {
@@ -181,11 +194,12 @@ module "storage" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  source              = "app.terraform.io/indico/indico-azure-blob/mod"
-  version             = "0.1.8"
-  label               = var.label
-  region              = var.region
-  resource_group_name = local.resource_group_name
+  source               = "app.terraform.io/indico/indico-azure-blob/mod"
+  version              = "0.1.11"
+  label                = var.label
+  region               = var.region
+  resource_group_name  = local.resource_group_name
+  storage_account_name = local.storage_account_name
 }
 
 module "cluster" {
@@ -213,4 +227,18 @@ module "cluster" {
   enable_oidc_issuer       = true
 }
 
+module "servicebus" {
+  depends_on = [
+    azurerm_resource_group.cod-cluster
+  ]
+  count                   = var.enable_servicebus == true ? 1 : 0
+  source                  = "app.terraform.io/indico/indico-azure-servicebus/mod"
+  version                 = "1.1.0"
+  label                   = var.label
+  resource_group_name     = azurerm_resource_group.cod-cluster.name
+  region                  = var.region
+  svp_client_id           = var.svp_client_id
+  servicebus_pricing_tier = var.servicebus_pricing_tier
+  workload_identity_id    = azuread_service_principal.workload_identity.id
+}
 

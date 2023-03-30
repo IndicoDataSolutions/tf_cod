@@ -1,0 +1,6 @@
+{
+  "api": "20.163.225.62",
+  "apiUrl": "https://api.os8-indico-dev-azure.eastus.aroapp.io:6443/",
+  "consoleUrl": "https://console-openshift-console.apps.os8-indico-dev-azure.eastus.aroapp.io/",
+  "ingress": "20.163.225.67"
+}

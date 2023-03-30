@@ -148,7 +148,7 @@ module "private_networking" {
 module "sqs_sns" {
   count   = var.sqs_sns == true ? 1 : 0
   source  = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
-  version = "1.1.1"
+  version = "1.1.2"
   region  = var.region
   label   = var.label
 }
@@ -267,7 +267,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "7.7.0"
+  version                    = "7.8.0"
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
@@ -290,6 +290,7 @@ module "cluster" {
   cluster_version            = var.cluster_version
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
   access_security_group      = module.cluster-manager.cluster_manager_sg
+  aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
 }
 
 module "snowflake" {

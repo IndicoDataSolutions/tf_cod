@@ -1,4 +1,11 @@
 locals {
+  #need to get the root of alternate_domain
+  the_splits            = var.alternate_domain != "" ? split(".", var.alternate_domain) : split(".", "test.domain.com")
+  the_length            = length(local.the_splits)
+  the_tld               = local.the_splits[local.the_length - 1]
+  the_domain            = local.the_splits[local.the_length - 2]
+  alternate_domain_root = join(".", [local.the_domain, local.the_tld])
+
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:
     enabled: false
@@ -49,11 +56,11 @@ locals {
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
   acm_ipa_values = var.use_acm == true ? (<<EOT
 app-edge:
+  alternateDomain: ${var.alternate_domain}
   service:
     type: "NodePort"
     ports:
       http_port: 31755
-      https_port: 31756
       http_api_port: 31270
   aws-load-balancer-controller:
     enabled: true
@@ -71,7 +78,7 @@ app-edge:
         acmArn: ${aws_acm_certificate_validation.alb[0].certificate_arn}
       service:
         name: app-edge
-        port: 443
+        port: 80
       hosts:
         - host: ${local.dns_name}
           paths:
@@ -79,7 +86,55 @@ app-edge:
               pathType: Prefix
   EOT
     ) : (<<EOT
-no-overrides: "true"
+app-edge:
+  alternateDomain: ${var.alternate_domain}
+EOT
+  )
+  dns_configuration_values = var.alternate_domain == "" ? (<<EOT
+clusterIssuer:
+  additionalSolvers:
+    - dns01:
+        route53:
+          region: ${var.region}
+      selector:
+        matchLabels:
+          "acme.cert-manager.io/dns01-solver": "true"
+  EOT
+    ) : (<<EOT
+clusterIssuer:
+  additionalSolvers:
+    - dns01:
+        route53:
+          region: ${var.region}
+      selector:
+        matchLabels:
+          "acme.cert-manager.io/dns01-solver": "true"
+    - dns01:
+        route53:
+          region: ${var.region}
+          role: ${var.aws_primary_dns_role_arn}
+      selector:
+        matchLabels:
+          "acme.cert-manager.io/dns02-solver": "true"
+alternate-external-dns:
+  enabled: true
+  logLevel: debug
+  policy: sync
+  txtOwnerId: "${var.alternate_domain}-${var.label}-${var.region}"
+  domainFilters:
+    - ${local.alternate_domain_root}
+  extraArgs:
+    - "--exclude-domains=${var.aws_account}.indico.io"
+    - "--aws-assume-role=${var.aws_primary_dns_role_arn}"
+
+  provider: aws
+  aws:
+    zoneType: public
+    region: ${var.region}
+
+  policy: sync
+  sources:
+    - ingress
 EOT
   )
 }
@@ -273,15 +328,8 @@ secrets:
       eabEmail: devops-sa@indico.io
       eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
-     
-clusterIssuer:
-  additionalSolvers:
-    - dns01:
-        route53:
-          region: ${var.region}
-      selector:
-        matchLabels:
-          "acme.cert-manager.io/dns01-solver": "true"
+
+${local.dns_configuration_values}
 
 monitoring:
   enabled: true
