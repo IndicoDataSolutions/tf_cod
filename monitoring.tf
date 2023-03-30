@@ -71,7 +71,7 @@ resource "helm_release" "monitoring" {
   wait             = false
   timeout          = "900" # 15 minutes
 
-  values = [<<EOF
+  values = [<<FONE
   kube-prometheus-stack:
     prometheus:
       ingress:
@@ -82,7 +82,8 @@ resource "helm_release" "monitoring" {
     alertmanager:
       ingress:
         labels: {}
-  EOF  ,<<EOF
+  FONE
+    , <<FTWO
   global:
     host: "${local.dns_name}"
   
@@ -120,7 +121,7 @@ resource "helm_release" "monitoring" {
         labels:
           acme.cert-manager.io/dns01-solver: "true"
 
- EOF
+ FTWO
   ]
 }
 
