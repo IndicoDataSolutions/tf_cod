@@ -81,7 +81,7 @@ provider "aws" {
 
 data "vault_kv_secret_v2" "terraform-snowflake" {
   mount = var.vault_mount_path
-  name  = "snowflaks"
+  name  = "snowflake"
 }
 
 provider "snowflake" {
@@ -302,36 +302,9 @@ module "snowflake" {
   snowflake_db_name     = var.snowflake_db_name
   kms_key_arn           = module.kms_key.key_arn
   s3_bucket_name        = module.s3-storage.data_s3_bucket_name
-  snowflake_private_key = var.snowflake_private_key
+  snowflake_private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
   snowflake_account     = var.snowflake_account
   snowflake_username    = var.snowflake_username
-}
-
-resource "vault_kv_secret_v2" "snowflake-credentials" {
-  mount = "terraform"
-  name  = "snowflake"
-  data_json = jsonencode(
-    {
-      snowflake_private_key = trimspace(data.local_file.snowflake_private_key.content)
-    }
-  )
-  lifecycle {
-    ignore_changes = [
-      data_json
-    ]
-  }
-}
-
-data "vault_kv_secret_v2" "snowflake-credentials" {
-  depends_on = [
-    vault_kv_secret_v2.snowflake-credentials
-  ]
-  mount = "terraform"
-  name  = "snowflake"
-}
-
-data "local_file" "snowflake_private_key" {
-  filename = "/tmp/${var.label}.snowflake_private_key"
 }
 
 resource "aws_security_group" "indico_allow_access" {
