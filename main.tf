@@ -37,7 +37,11 @@ terraform {
     }
     vault = {
       source  = "hashicorp/vault"
-      version = "3.8.0"
+      version = "3.13.0"
+    }
+    snowflake = {
+      source  = "Snowflake-Labs/snowflake"
+      version = "~> 0.35"
     }
   }
 }
@@ -51,12 +55,9 @@ provider "keycloak" {
 provider "vault" {
   address          = var.vault_address
   skip_child_token = true
-  auth_login {
-    method = "github"
-    path   = "auth/github/login"
-    parameters = {
-      token = var.git_pat
-    }
+  auth_login_userpass {
+    username = var.vault_username
+    password = var.vault_password
   }
 }
 
@@ -77,9 +78,38 @@ provider "aws" {
   }
 }
 
+
+data "vault_kv_secret_v2" "terraform-snowflake" {
+  mount = var.terraform_vault_mount_path
+  name  = "snowflake"
+}
+
+provider "snowflake" {
+  role        = "ACCOUNTADMIN"
+  username    = var.snowflake_username
+  account     = var.snowflake_account
+  region      = var.snowflake_region
+  private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
+}
+
 data "aws_caller_identity" "current" {}
 
+
+data "vault_kv_secret_v2" "terraform-snowflake" {
+  mount = var.terraform_vault_mount_path
+  name  = "snowflake"
+}
+
+provider "snowflake" {
+  role        = "ACCOUNTADMIN"
+  username    = var.snowflake_username
+  account     = var.snowflake_account
+  region      = var.snowflake_region
+  private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
+}
+
 # define the networking module we're using locally
+
 locals {
   network = var.direct_connect == true ? module.private_networking : module.public_networking
   aws_usernames = [
@@ -275,6 +305,19 @@ module "cluster" {
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
   access_security_group      = module.cluster-manager.cluster_manager_sg
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
+}
+
+module "snowflake" {
+  version               = "2.1.2"
+  source                = "app.terraform.io/indico/indico-aws-snowflake/mod"
+  label                 = var.label
+  additional_tags       = var.additional_tags
+  snowflake_db_name     = var.snowflake_db_name
+  kms_key_arn           = module.kms_key.key_arn
+  s3_bucket_name        = module.s3-storage.data_s3_bucket_name
+  snowflake_private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
+  snowflake_account     = var.snowflake_account
+  snowflake_username    = var.snowflake_username
 }
 
 resource "aws_security_group" "indico_allow_access" {
