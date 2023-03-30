@@ -75,15 +75,16 @@ resource "helm_release" "monitoring" {
   kube-prometheus-stack:
     prometheus:
       ingress:
-        labels: {}
+        labels: 
     grafana:
       ingress:
         labels: {}
     alertmanager:
       ingress:
         labels: {}
-  FONE
-    , <<FTWO
+  FONE 
+    ,
+    <<FTWO
   global:
     host: "${local.dns_name}"
   
