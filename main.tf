@@ -55,17 +55,10 @@ provider "keycloak" {
 provider "vault" {
   address          = var.vault_address
   skip_child_token = true
-  auth_login {
-    method = "github"
-    path   = "auth/github/login"
-    parameters = {
-      token = var.git_pat
-    }
+  auth_login_userpass {
+    username = var.vault_username
+    password = var.vault_password
   }
-#  auth_login_userpass {
-#    username = var.vault_username
-#    password = var.vault_password
-#  }
 }
 
 
@@ -85,12 +78,18 @@ provider "aws" {
   }
 }
 
+
+data "vault_kv_secret_v2" "terraform-snowflake" {
+  mount = var.vault_mount_path
+  name  = "snowflaks"
+}
+
 provider "snowflake" {
-  role  = "ACCOUNTADMIN"
-  username = var.snowflake_username
-  account  = var.snowflake_account
-  region  = var.snowflake_region
-  private_key = file(data.local_file.snowflake_private_key)
+  role        = "ACCOUNTADMIN"
+  username    = var.snowflake_username
+  account     = var.snowflake_account
+  region      = var.snowflake_region
+  private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
 }
 
 data "aws_caller_identity" "current" {}
@@ -297,15 +296,15 @@ module "snowflake" {
   depends_on = [
     data.vault_kv_secret_v2.snowflake-credentials
   ]
-  source = "app.terraform.io/indico/indico-aws-snowflake/mod"
-  label = var.label
-  additional_tags = var.additional_tags
-  snowflake_db_name = var.snowflake_db_name
-  kms_key_arn  = module.kms_key.key_arn
-  s3_bucket_name = module.s3-storage.data_s3_bucket_name
+  source                = "app.terraform.io/indico/indico-aws-snowflake/mod"
+  label                 = var.label
+  additional_tags       = var.additional_tags
+  snowflake_db_name     = var.snowflake_db_name
+  kms_key_arn           = module.kms_key.key_arn
+  s3_bucket_name        = module.s3-storage.data_s3_bucket_name
   snowflake_private_key = var.snowflake_private_key
-  snowflake_account = var.snowflake_account
-  snowflake_username = var.snowflake_username
+  snowflake_account     = var.snowflake_account
+  snowflake_username    = var.snowflake_username
 }
 
 resource "vault_kv_secret_v2" "snowflake-credentials" {
@@ -319,7 +318,7 @@ resource "vault_kv_secret_v2" "snowflake-credentials" {
   lifecycle {
     ignore_changes = [
       data_json
-      ]
+    ]
   }
 }
 

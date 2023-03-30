@@ -391,6 +391,11 @@ variable "vault_address" {
   default = "https://vault.devops.indico.io"
 }
 
+variable "vault_username" {}
+variable "vault_password" {
+  sensitive = true
+}
+
 variable "sqs_sns" {
   type        = bool
   default     = true
@@ -508,39 +513,45 @@ variable "use_acm" {
   description = "create cluster that will use acm"
 }
 
+
+variable "terraform_vault_mount_path" {
+  type    = string
+  default = "terraform"
+}
+
 variable "snowflake_region" {
-  default = "us-east-2.aws"
-  type = string
+  default     = "us-east-2.aws"
+  type        = string
   description = "region the snowflake instance resides"
 }
 
 variable "snowflake_username" {
-  default = "tf-snow"
-  type = string
+  default     = "tf-snow"
+  type        = string
   description = "snowflake master username"
 }
 
 variable "snowflake_account" {
-  default = "ZL54998"
-  type = string
+  default     = "ZL54998"
+  type        = string
   description = "account identifier"
 }
 
 variable "snowflake_private_key" {
-  default = null
-  type = string
+  default     = null
+  type        = string
   description = "Private Key for username+private-key snowflake auth"
 }
 
 variable "snowflake_db_name" {
-  type = string
-  default = "INDICO_DEV"
+  type        = string
+  default     = "INDICO_DEV"
   description = "the db name that snowflake resources will be connected with"
 }
 
 variable "enable_weather_station" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "whether or not to enable the weather station internal metrics collection service"
 }
 
