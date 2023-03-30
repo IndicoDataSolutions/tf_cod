@@ -75,13 +75,13 @@ resource "helm_release" "monitoring" {
   kube-prometheus-stack:
     prometheus:
       ingress:
-        labels: 
+        labels: null
     grafana:
       ingress:
-        labels: {}
+        labels: null
     alertmanager:
       ingress:
-        labels: {}
+        labels: null
   FONE 
     ,
     <<FTWO
