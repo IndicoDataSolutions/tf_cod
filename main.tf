@@ -293,6 +293,7 @@ module "cluster" {
 }
 
 module "snowflake" {
+  version                    = "2.1.2"
   source                = "app.terraform.io/indico/indico-aws-snowflake/mod"
   label                 = var.label
   additional_tags       = var.additional_tags
