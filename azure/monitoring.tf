@@ -112,6 +112,17 @@ resource "helm_release" "monitoring" {
           volumeClaimTemplate:
             spec:
               storageClassName: default
+      ingress:
+        labels:
+          acme.cert-manager.io/dns01-solver: "true"
+    grafana:
+      ingress:
+        labels:
+          acme.cert-manager.io/dns01-solver: "true"
+    alertmanager:
+      ingress:
+        labels:
+          acme.cert-manager.io/dns01-solver: "true"
 
   prometheus-adapter:
     enabled: false
