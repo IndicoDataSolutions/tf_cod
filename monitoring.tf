@@ -98,14 +98,17 @@ resource "helm_release" "monitoring" {
         nodeSelector:
           node_group: static-workers
       ingress:
+        labels: {}
         labels:
           acme.cert-manager.io/dns01-solver: "true"
     grafana:
       ingress:
+        labels: {}
         labels:
           acme.cert-manager.io/dns01-solver: "true"
     alertmanager:
       ingress:
+        labels: {}
         labels:
           acme.cert-manager.io/dns01-solver: "true"
 
