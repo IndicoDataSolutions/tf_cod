@@ -42,6 +42,7 @@ terraform {
     snowflake = {
       source  = "Snowflake-Labs/snowflake"
       version = "~> 0.35"
+    }
   }
 }
 
@@ -75,6 +76,20 @@ provider "aws" {
   default_tags {
     tags = var.default_tags
   }
+}
+
+
+data "vault_kv_secret_v2" "terraform-snowflake" {
+  mount = var.terraform_vault_mount_path
+  name  = "snowflake"
+}
+
+provider "snowflake" {
+  role        = "ACCOUNTADMIN"
+  username    = var.snowflake_username
+  account     = var.snowflake_account
+  region      = var.snowflake_region
+  private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
 }
 
 data "aws_caller_identity" "current" {}

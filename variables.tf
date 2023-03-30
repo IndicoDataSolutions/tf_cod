@@ -565,3 +565,4 @@ variable "alternate_domain" {
   default     = ""
   description = "Optional alternate domain to use with cluster."
 }
+
