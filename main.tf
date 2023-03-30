@@ -293,9 +293,6 @@ module "cluster" {
 }
 
 module "snowflake" {
-  depends_on = [
-    data.vault_kv_secret_v2.snowflake-credentials
-  ]
   source                = "app.terraform.io/indico/indico-aws-snowflake/mod"
   label                 = var.label
   additional_tags       = var.additional_tags
