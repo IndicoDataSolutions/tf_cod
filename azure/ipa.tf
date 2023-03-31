@@ -383,7 +383,71 @@ storage:
 crunchy-postgres:
   enabled: ${!var.is_openshift}
   postgres-data:
-    openshift: ${var.is_openshift}
+    metadata:
+      annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+    instances:
+    - affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node_group
+                operator: In
+                values:
+                - pgo-workers
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: postgres-operator.crunchydata.com/cluster
+                operator: In
+                values:
+                - postgres-data
+              - key: postgres-operator.crunchydata.com/instance-set
+                operator: In
+                values:
+                - pgha1
+            topologyKey: kubernetes.io/hostname
+      metadata:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      dataVolumeClaimSpec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 200Gi
+      name: pgha1
+      replicas: 1
+      resources:
+        requests:
+          cpu: 500m
+          memory: 3000Mi
+      tolerations:
+        - effect: NoSchedule
+          key: indico.io/crunchy
+          operator: Exists
+    pgBackRestConfig:
+      global: # https://access.crunchydata.com/documentation/postgres-operator/v5/tutorial/backups/#using-azure-blob-storage
+        archive-timeout: '10000'
+        repo1-path: /pgbackrest/postgres-data/repo1
+        repo1-retention-full: 5
+        repo1-azure-account: ${module.storage.storage_account_name}
+        repo1-azure-key: ${module.storage.storage_account_primary_access_key}
+      repos:
+      - name: repo1
+        azure:
+          container: " ${module.storage.crunchy_backup_name}"
+        schedules:
+          full: 30 4 * * *
+          incremental: 0 */1 * * *
+    imagePullSecrets:
+      - name: harbor-pull-secret
+  postgres-metrics:
+    enabled: false
     
 aws-fsx-csi-driver:
   enabled: false
