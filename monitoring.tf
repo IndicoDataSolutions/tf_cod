@@ -104,7 +104,8 @@ resource "helm_release" "monitoring" {
     grafana:
       ingress: 
         labels: null
-      extraLabels: acme.cert-manager.io/dns01-solver: "true"
+      extraLabels: 
+        acme.cert-manager.io/dns01-solver: "true"
     alertmanager:
       ingress: 
         labels: null
