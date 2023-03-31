@@ -141,7 +141,8 @@ resource "helm_release" "monitoring" {
     enabled: true
     nodeExporter:
       enabled: false
-
+    commonLabels:
+      acme.cert-manager.io/dns01-solver: "true"
     prometheus:
       enabled: true
       prometheusSpec:
@@ -152,16 +153,15 @@ resource "helm_release" "monitoring" {
             spec:
               storageClassName: default
       ingress:
-        labels:
-          acme.cert-manager.io/dns01-solver: "true"
+        labels: null
     grafana:
       ingress:
-        labels:
-          acme.cert-manager.io/dns01-solver: "true"
+        labels: null
+      extraLabels: 
+        acme.cert-manager.io/dns01-solver: "true"
     alertmanager:
       ingress:
-        labels:
-          acme.cert-manager.io/dns01-solver: "true"
+        labels: null
 
   prometheus-adapter:
     enabled: false
