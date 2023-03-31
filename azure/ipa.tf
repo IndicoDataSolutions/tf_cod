@@ -434,7 +434,7 @@ crunchy-postgres:
       global: # https://access.crunchydata.com/documentation/postgres-operator/v5/tutorial/backups/#using-azure-blob-storage
         archive-timeout: '10000'
         repo1-path: /pgbackrest/postgres-data/repo1
-        repo1-retention-full: 5
+        repo1-retention-full: '5'
         repo1-azure-account: ${module.storage.storage_account_name}
         repo1-azure-key: ${module.storage.storage_account_primary_access_key}
       repos:
