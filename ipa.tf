@@ -67,8 +67,10 @@ app-edge:
     ingress:
       enabled: true
       annotations:
-        acme.cert-manager.io/http01-edit-in-place: "true"
-        cert-manager.io/cluster-issuer: zerossl      
+        cert-manager.io/cluster-issuer: zerossl
+      useDefaultResolver: false
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
       tls:
         - secretName: indico-ssl-cm-cert
           hosts:
@@ -707,6 +709,10 @@ spec:
               authentication:
                 ingressUser: monitoring
                 ingressPassword: ${random_password.monitoring-password.result}
+              ingress: 
+                useDefaultResolver: false
+                labels:
+                  acme.cert-manager.io/dns01-solver: "true"
             ${indent(12, local.acm_ipa_values)}         
 
         - name: HELM_VALUES

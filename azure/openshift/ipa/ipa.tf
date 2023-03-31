@@ -107,6 +107,10 @@ spec:
               authentication:
                 ingressUser: ${var.monitoring_username}
                 ingressPassword: ${var.monitoring_password}
+              ingress: 
+                useDefaultResolver: false
+                labels:
+                  acme.cert-manager.io/dns01-solver: "true"
         
         - name: HELM_VALUES
           value: |
