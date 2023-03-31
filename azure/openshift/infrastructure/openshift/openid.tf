@@ -73,6 +73,12 @@ subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
   name: devops@indico.io
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: qa@indico.io
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: engineering@indico.io
 YAML
 }
 
