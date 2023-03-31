@@ -74,9 +74,6 @@ resource "helm_release" "monitoring" {
   values = [<<EOF
   global:
     host: "${local.dns_name}"
-  
-  commonLabels:
-    acme.cert-manager.io/dns01-solver: "true"
 
   ingress-nginx:
     enabled: true
@@ -96,6 +93,8 @@ resource "helm_release" "monitoring" {
     ingressPassword: ${random_password.monitoring-password.result}
 
   kube-prometheus-stack:
+    commonLabels:
+      acme.cert-manager.io/dns01-solver: "true"
     prometheus:
       prometheusSpec:
         nodeSelector:
