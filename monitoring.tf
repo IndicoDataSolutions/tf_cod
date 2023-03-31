@@ -71,23 +71,13 @@ resource "helm_release" "monitoring" {
   wait             = false
   timeout          = "900" # 15 minutes
 
-  values = [<<FONE
-  kube-prometheus-stack:
-    prometheus:
-      ingress:
-        labels: null
-    grafana:
-      ingress:
-        labels: null
-    alertmanager:
-      ingress:
-        labels: null
-  FONE 
-    ,
-    <<FTWO
+  values = [<<EOF
   global:
     host: "${local.dns_name}"
   
+  commonLabels:
+    acme.cert-manager.io/dns01-solver: "true"
+
   ingress-nginx:
     enabled: true
 
@@ -110,19 +100,13 @@ resource "helm_release" "monitoring" {
       prometheusSpec:
         nodeSelector:
           node_group: static-workers
-      ingress:
-        labels:
-          acme.cert-manager.io/dns01-solver: "true"
+      ingress: null
     grafana:
-      ingress:
-        labels:
-          acme.cert-manager.io/dns01-solver: "true"
+      ingress: null
     alertmanager:
-      ingress:
-        labels:
-          acme.cert-manager.io/dns01-solver: "true"
+      ingress: null
 
- FTWO
+ EOF
   ]
 }
 
