@@ -100,11 +100,14 @@ resource "helm_release" "monitoring" {
       prometheusSpec:
         nodeSelector:
           node_group: static-workers
-      ingress: null
+      ingress:
+        labels: null
     grafana:
-      ingress: null
+      ingress: 
+        labels: null
     alertmanager:
-      ingress: null
+      ingress: 
+        labels: null
 
  EOF
   ]
