@@ -210,7 +210,7 @@ resource "kubectl_manifest" "pod-security-admission-controller" {
   ]
   count = var.enable_pod_security == true ? 1 : 0
   yaml_body = <<YAML
-apiVersion: apiserver.config.k8s.io/v1 # see compatibility note
+apiVersion: apiserver.config.k8s.io/v1beta1 # see compatibility note
 kind: AdmissionConfiguration
 plugins:
 - name: PodSecurity
