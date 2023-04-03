@@ -204,42 +204,57 @@ resource "helm_release" "opentelemetry-collector" {
   ]
 }
 
-resource "kubectl_manifest" "pod-security-admission-controller" {
+resource "kubectl_manifest" "pod-security-policy" {
   depends_on = [
     module.cluster
   ]
   count = var.enable_pod_security == true ? 1 : 0
   yaml_body = <<YAML
-apiVersion: apiserver.config.k8s.io/v1beta1 # see compatibility note
-kind: AdmissionConfiguration
-plugins:
-- name: PodSecurity
-  configuration:
-    apiVersion: pod-security.admission.config.k8s.io/v1
-    kind: PodSecurityConfiguration
-    # Defaults applied when a mode label is not set.
-    #
-    # Level label values must be one of:
-    # - "privileged" (default)
-    # - "baseline"
-    # - "restricted"
-    #
-    # Version label values must be one of:
-    # - "latest" (default) 
-    # - specific version like "v1.26"
-    defaults:
-      enforce: "privileged"
-      enforce-version: "latest"
-      audit: "privileged"
-      audit-version: "latest"
-      warn: "privileged"
-      warn-version: "latest"
-    exemptions:
-      # Array of authenticated usernames to exempt.
-      usernames: []
-      # Array of runtime class names to exempt.
-      runtimeClasses: []
-      # Array of namespaces to exempt.
-      namespaces: []
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: Tenant
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'docker/default,runtime/default'
+    seccomp.security.alpha.kubernetes.io/defaultProfileName:  'runtime/default'
+spec:
+  privileged: false
+  # Required to prevent escalations to root.
+  allowPrivilegeEscalation: false
+  # This is redundant with non-root + disallow privilege escalation,
+  # but we can provide it for defense in depth.
+  requiredDropCapabilities:
+    - ALL
+  # Allow core volume types.
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    # Assume that persistentVolumes set up by the cluster admin are safe to use.
+    - 'persistentVolumeClaim'
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    # Require the container to run without root privileges.
+    rule: 'MustRunAsNonRoot'
+  seLinux:
+    # This policy assumes the nodes are using AppArmor rather than SELinux.
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'MustRunAs'
+    ranges:
+      # Forbid adding the root group.
+      - min: 1
+        max: 65535
+  fsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      # Forbid adding the root group.
+      - min: 1
+        max: 65535
+  
 YAML
 }
