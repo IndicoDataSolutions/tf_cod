@@ -244,7 +244,8 @@ data "github_repository_file" "data-pre-reqs-values" {
 resource "helm_release" "ipa-crds" {
   depends_on = [
     module.cluster,
-    data.github_repository_file.data-crds-values
+    data.github_repository_file.data-crds-values,
+    kubectl_manifest.pod-security-policy
   ]
 
   verify           = false
@@ -293,7 +294,8 @@ resource "helm_release" "ipa-pre-requisites" {
     module.fsx-storage,
     helm_release.ipa-crds,
     data.vault_kv_secret_v2.zerossl_data,
-    data.github_repository_file.data-pre-reqs-values
+    data.github_repository_file.data-pre-reqs-values,
+    kubectl_manifest.pod-security-policy
   ]
 
   verify           = false
@@ -740,7 +742,8 @@ resource "argocd_application" "ipa" {
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
     github_repository_file.argocd-application-yaml,
-    helm_release.monitoring
+    helm_release.monitoring,
+    kubectl_manifest.pod-security-policy
   ]
 
   count = var.ipa_enabled == true ? 1 : 0
