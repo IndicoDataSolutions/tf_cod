@@ -515,6 +515,11 @@ variable "monitoring_password" {
   default = "changeit"
 }
 
+variable "enable_pod_security" {
+  type = bool
+  default = true
+  description = "Flag to enable the pod security admission controller"
+}
 
 
 

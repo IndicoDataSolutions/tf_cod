@@ -442,3 +442,8 @@ variable "enable_servicebus" {
   default = false
 }
 
+variable "enable_pod_security" {
+  type = bool
+  default = true
+  description = "Flag to enable the pod security admission controller"
+}

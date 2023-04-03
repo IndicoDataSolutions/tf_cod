@@ -204,3 +204,39 @@ resource "helm_release" "opentelemetry-collector" {
   ]
 }
 
+resource "kubectl_manifest" "pod-security-admission-controller" {
+  count = var.enable_pod_security == "true" ? 1 : 0
+  yaml_body = <<YAML
+apiVersion: apiserver.config.k8s.io/v1 # see compatibility note
+kind: AdmissionConfiguration
+plugins:
+- name: PodSecurity
+  configuration:
+    apiVersion: pod-security.admission.config.k8s.io/v1
+    kind: PodSecurityConfiguration
+    # Defaults applied when a mode label is not set.
+    #
+    # Level label values must be one of:
+    # - "privileged" (default)
+    # - "baseline"
+    # - "restricted"
+    #
+    # Version label values must be one of:
+    # - "latest" (default) 
+    # - specific version like "v1.26"
+    defaults:
+      enforce: "privileged"
+      enforce-version: "latest"
+      audit: "privileged"
+      audit-version: "latest"
+      warn: "privileged"
+      warn-version: "latest"
+    exemptions:
+      # Array of authenticated usernames to exempt.
+      usernames: []
+      # Array of runtime class names to exempt.
+      runtimeClasses: []
+      # Array of namespaces to exempt.
+      namespaces: []
+YAML
+}

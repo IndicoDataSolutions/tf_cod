@@ -25,6 +25,8 @@ variable "openshift_admission_chart_version" {}
 variable "openshift_webhook_chart_version" {}
 variable "crunchy_chart_version" {}
 
+variable "enable_pod_security" { type = bool }
+
 variable "is_openshift" { type = bool }
 
 variable "do_install_ipa_crds" { type = bool }

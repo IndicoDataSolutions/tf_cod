@@ -78,6 +78,7 @@ module "infrastructure" {
   replace_prometheus_crds          = var.replace_prometheus_crds
   restore_snapshot_enabled         = var.restore_snapshot_enabled
   use_workload_identity            = var.use_workload_identity
+  enable_pod_security = var.enable_pod_security
 
   openshift_machine_sets = var.openshift_machine_sets
   openshift_console_url  = local.openshift_console_url

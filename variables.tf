@@ -567,3 +567,8 @@ variable "alternate_domain" {
   description = "Optional alternate domain to use with cluster."
 }
 
+variable "enable_pod_security" {
+  type = bool
+  default = true
+  description = "Flag to enable the pod security admission controller"
+}
