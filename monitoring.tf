@@ -214,7 +214,7 @@ resource "kubectl_manifest" "pod-security-policy" {
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: psp
+  name: eks.privileged 
   annotations:
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'docker/default,runtime/default'
     seccomp.security.alpha.kubernetes.io/defaultProfileName:  'runtime/default'
