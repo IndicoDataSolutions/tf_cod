@@ -210,6 +210,8 @@ resource "kubectl_manifest" "pod-security-policy" {
     module.cluster
   ]
   count = var.enable_pod_security == true ? 1 : 0
+  force_new = true
+  force_conflicts = true
   yaml_body = <<YAML
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
