@@ -1,3 +1,15 @@
+locals {
+  alerting_configuration_values = var.alerting_slack_channel == "" ? (<<EOT
+noExtraConfigs: true
+  EOT
+    ) : (<<EOT
+alerting:
+  slack:
+    apiURL: ${var.slack_token}
+    channel: ${var.alerting_slack_channel}
+EOT
+  )
+}
 
 resource "aws_route53_record" "grafana-caa" {
   count   = var.monitoring_enabled == true ? 1 : 0
@@ -72,34 +84,36 @@ resource "helm_release" "monitoring" {
   timeout          = "900" # 15 minutes
 
   values = [<<EOF
-  global:
-    host: "${local.dns_name}"
-  
-  ingress-nginx:
-    enabled: true
+global:
+  host: "${local.dns_name}"
 
-    rbac:
-      create: true
+ingress-nginx:
+  enabled: true
 
-    admissionWebhooks:
-      patch:
-        nodeSelector.beta.kubernetes.io/os: linux
-  
-    defaultBackend:
+  rbac:
+    create: true
+
+  admissionWebhooks:
+    patch:
       nodeSelector.beta.kubernetes.io/os: linux
+
+  defaultBackend:
+    nodeSelector.beta.kubernetes.io/os: linux
+
+authentication:
+  ingressUsername: monitoring
+  ingressPassword: ${random_password.monitoring-password.result}
   
-  authentication:
-    ingressUsername: monitoring
-    ingressPassword: ${random_password.monitoring-password.result}
+${local.alerting_configuration_values}
 
-  kube-prometheus-stack:
-    prometheus:
-      prometheusSpec:
-        nodeSelector:
-          node_group: static-workers
+kube-prometheus-stack:
+  prometheus:
+    prometheusSpec:
+      nodeSelector:
+        node_group: static-workers
 
- EOF
-  ]
+EOF
+]
 }
 
 resource "helm_release" "keda-monitoring" {

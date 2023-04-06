@@ -442,3 +442,14 @@ variable "enable_servicebus" {
   default = false
 }
 
+variable "slack_token" {
+  type        = string
+  default     = ""
+  description = "Secret url with embedded token needed for slack webhook delivery."
+}
+
+variable "alerting_slack_channel" {
+  type        = string
+  default     = ""
+  description = "Slack channel for sending notifications from alertmanager."
+}

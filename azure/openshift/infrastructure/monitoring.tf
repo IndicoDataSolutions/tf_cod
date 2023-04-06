@@ -1,3 +1,16 @@
+locals {
+  alerting_configuration_values = var.alerting_slack_channel == "" ? (<<EOT
+noExtraConfigs: true
+  EOT
+    ) : (<<EOT
+alerting:
+  slack:
+    apiURL: ${var.slack_token}
+    channel: ${var.alerting_slack_channel}
+EOT
+  )
+}
+
 resource "azurerm_dns_caa_record" "grafana-caa" {
   count               = var.enable_dns_infrastructure == true && var.enable_monitoring_infrastructure == true ? 1 : 0
   name                = lower("grafana.${var.dns_prefix}")
@@ -114,48 +127,50 @@ resource "helm_release" "monitoring" {
   timeout          = "900" # 15 minutes
 
   values = [<<EOF
-  global:
-    host: "${var.dns_name}"
-  
-  prometheus-postgres-exporter:
-    enabled: false
+global:
+  host: "${var.dns_name}"
 
-  ingress-nginx:
-    enabled: ${var.enable_dns_infrastructure == true && var.enable_monitoring_infrastructure == true}
+prometheus-postgres-exporter:
+  enabled: false
 
-    rbac:
-      create: true
+ingress-nginx:
+  enabled: ${var.enable_dns_infrastructure == true && var.enable_monitoring_infrastructure == true}
 
-    admissionWebhooks:
-      patch:
-        nodeSelector.beta.kubernetes.io/os: linux
-  
-    defaultBackend:
+  rbac:
+    create: true
+
+  admissionWebhooks:
+    patch:
       nodeSelector.beta.kubernetes.io/os: linux
-  
-  authentication:
-    ingressUsername: monitoring
-    ingressPassword: ${random_password.monitoring-password.result}
 
-  kube-prometheus-stack:
-    enabled: true
-    nodeExporter:
-      enabled: false
+  defaultBackend:
+    nodeSelector.beta.kubernetes.io/os: linux
 
-    prometheus:
-      enabled: true
-      prometheusSpec:
-        nodeSelector:
-          node_group: static-workers
-        storageSpec:
-          volumeClaimTemplate:
-            spec:
-              storageClassName: default
+authentication:
+  ingressUsername: monitoring
+  ingressPassword: ${random_password.monitoring-password.result}
 
-  prometheus-adapter:
+${local.alerting_configuration_values}
+
+kube-prometheus-stack:
+  enabled: true
+  nodeExporter:
     enabled: false
- EOF
-  ]
+
+  prometheus:
+    enabled: true
+    prometheusSpec:
+      nodeSelector:
+        node_group: static-workers
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: default
+
+prometheus-adapter:
+  enabled: false
+EOF
+]
 }
 
 resource "null_resource" "restore-prometheus-operator" {
