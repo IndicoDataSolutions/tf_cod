@@ -207,7 +207,8 @@ resource "helm_release" "opentelemetry-collector" {
 
 resource "kubectl_manifest" "pod-security-policy" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    helm_release.ipa-pre-requisites
   ]
   count = var.enable_pod_security == true ? 1 : 0
   force_new = true
