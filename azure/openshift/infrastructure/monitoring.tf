@@ -5,7 +5,7 @@ noExtraConfigs: true
     ) : (<<EOT
 alerting:
   slack:
-    apiURL: ${var.slack_token}
+    apiUrl: ${var.slack_token}
     channel: ${var.alerting_slack_channel}
 EOT
   )

@@ -5,7 +5,7 @@ noExtraConfigs: true
     ) : (<<EOT
 alerting:
   slack:
-    apiURL: ${var.slack_token}
+    apiUrl: ${var.slack_token}
     channel: ${var.alerting_slack_channel}
 EOT
   )
@@ -103,7 +103,7 @@ ingress-nginx:
 authentication:
   ingressUsername: monitoring
   ingressPassword: ${random_password.monitoring-password.result}
-  
+
 ${local.alerting_configuration_values}
 
 kube-prometheus-stack:
