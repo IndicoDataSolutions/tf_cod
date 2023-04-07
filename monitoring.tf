@@ -58,8 +58,7 @@ resource "helm_release" "monitoring" {
     aws_route53_record.alertmanager-caa,
     aws_route53_record.grafana-caa,
     aws_route53_record.prometheus-caa,
-    time_sleep.wait_1_minutes_after_pre_reqs,
-    kubectl_manifest.pod-security-policy
+    time_sleep.wait_1_minutes_after_pre_reqs
   ]
 
   verify           = false
@@ -204,7 +203,7 @@ resource "helm_release" "opentelemetry-collector" {
  EOF
   ]
 }
-
+/*
 resource "kubectl_manifest" "pod-security-policy" {
   depends_on = [
     module.cluster,
@@ -217,7 +216,7 @@ resource "kubectl_manifest" "pod-security-policy" {
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: eks.privileged 
+  name: psp
   annotations:
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'docker/default,runtime/default'
     seccomp.security.alpha.kubernetes.io/defaultProfileName:  'runtime/default'
@@ -261,4 +260,4 @@ spec:
         max: 65535
   
 YAML
-}
+}*/

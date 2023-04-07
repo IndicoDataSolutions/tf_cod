@@ -740,8 +740,7 @@ resource "argocd_application" "ipa" {
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
     github_repository_file.argocd-application-yaml,
-    helm_release.monitoring,
-    kubectl_manifest.pod-security-policy
+    helm_release.monitoring
   ]
 
   count = var.ipa_enabled == true ? 1 : 0
