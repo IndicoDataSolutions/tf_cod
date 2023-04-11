@@ -1,12 +1,24 @@
 locals {
-  alerting_configuration_values = var.alerting_slack_channel == "" ? (<<EOT
+  alerting_configuration_values = var.alerting_enabled == "false" ? (<<EOT
 noExtraConfigs: true
   EOT
     ) : (<<EOT
 alerting:
+  email:
+    enabled: ${var.alerting_email_enabled}
+    smarthost: '${var.alerting_email_host}'
+    from: '${var.alerting_email_from}'
+    auth_username: '${var.alerting_email_username}'
+    auth_password: '${var.alerting_email_password}'
+    targetEmail: "${var.alerting_email_to}"
   slack:
-    apiUrl: ${var.slack_token}
+    enabled: ${var.alerting_slack_enabled}
+    apiUrl: ${var.alerting_slack_token}
     channel: ${var.alerting_slack_channel}
+  pagerDuty:
+    enabled: ${var.alerting_pagerduty_enabled}
+    integrationKey: ${var.alerting_pagerduty_integration_key}
+    integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
 EOT
   )
 }
