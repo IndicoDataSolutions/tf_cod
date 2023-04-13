@@ -260,6 +260,9 @@ resource "helm_release" "ipa-crds" {
     <<EOF
   crunchy-pgo:
     enabled: true
+    updateCRDs: 
+      enabled: true
+
   
   cert-manager:
     nodeSelector:
