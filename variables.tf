@@ -593,49 +593,49 @@ variable "alerting_email_enabled" {
 
 variable "alerting_slack_token" {
   type        = string
-  default     = ""
+  default     = "blank"
   description = "Secret url with embedded token needed for slack webhook delivery."
 }
 
 variable "alerting_slack_channel" {
   type        = string
-  default     = ""
+  default     = "blank"
   description = "Slack channel for sending notifications from alertmanager."
 }
 
 variable "alerting_pagerduty_integration_key" {
   type        = string
-  default     = ""
+  default     = "blank"
   description = "Secret pagerduty_integration_key."
 }
 
 variable "alerting_email_from" {
   type        = string
-  default     = ""
+  default     = "blank"
   description = "alerting_email_from."
 }
 
 variable "alerting_email_to" {
   type        = string
-  default     = ""
+  default     = "blank"
   description = "alerting_email_to"
 }
 
 variable "alerting_email_host" {
   type        = string
-  default     = ""
+  default     = "blank"
   description = "alerting_email_host"
 }
 
 variable "alerting_email_username" {
   type        = string
-  default     = ""
+  default     = "blank"
   description = "alerting_email_username"
 }
 
 variable "alerting_email_password" {
   type        = string
-  default     = ""
+  default     = "blank"
   description = "alerting_email_password"
 }
 
