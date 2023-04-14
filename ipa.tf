@@ -460,7 +460,7 @@ crunchy-postgres:
           region: ${var.region}
         schedules:
           full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
-          diff: 0 0 * * * # Diff backup daily at midnight
+          differential: 0 0 * * * # Diff backup daily at midnight
     imagePullSecrets:
       - name: harbor-pull-secret
   postgres-metrics:
@@ -529,7 +529,7 @@ crunchy-postgres:
           region: ${var.region}
         schedules:
           full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
-          diff: 0 0 * * * # Diff backup daily at midnight
+          differential: 0 0 * * * # Diff backup daily at midnight
     imagePullSecrets:
       - name: harbor-pull-secret
 aws-load-balancer-controller:
