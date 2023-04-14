@@ -74,7 +74,7 @@ resource "helm_release" "monitoring" {
   values = [<<EOF
   global:
     host: "${local.dns_name}"
-  
+
   ingress-nginx:
     enabled: true
 
@@ -93,10 +93,22 @@ resource "helm_release" "monitoring" {
     ingressPassword: ${random_password.monitoring-password.result}
 
   kube-prometheus-stack:
+    commonLabels:
+      acme.cert-manager.io/dns01-solver: "true"
     prometheus:
       prometheusSpec:
         nodeSelector:
           node_group: static-workers
+      ingress:
+        labels: null
+    grafana:
+      ingress: 
+        labels: null
+      extraLabels: 
+        acme.cert-manager.io/dns01-solver: "true"
+    alertmanager:
+      ingress: 
+        labels: null
 
  EOF
   ]
