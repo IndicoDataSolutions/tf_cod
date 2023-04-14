@@ -438,7 +438,7 @@ crunchy-postgres:
       replicas: 1
       resources:
         requests:
-          cpu: 500m
+          cpu: 1000m
           memory: 3000Mi
       tolerations:
         - effect: NoSchedule
@@ -459,8 +459,8 @@ crunchy-postgres:
           endpoint: s3.${var.region}.amazonaws.com
           region: ${var.region}
         schedules:
-          full: 30 4 * * *
-          incremental: 0 */1 * * *
+          full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
+          diff: 0 0 * * * # Diff backup daily at midnight
     imagePullSecrets:
       - name: harbor-pull-secret
   postgres-metrics:
@@ -502,7 +502,7 @@ crunchy-postgres:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 30Gi
+            storage: 100Gi
       name: pgha1
       replicas: 2
       resources:
@@ -528,8 +528,8 @@ crunchy-postgres:
           endpoint: s3.${var.region}.amazonaws.com
           region: ${var.region}
         schedules:
-          full: 30 4 * * *
-          incremental: 0 */1 * * *
+          full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
+          diff: 0 0 * * * # Diff backup daily at midnight
     imagePullSecrets:
       - name: harbor-pull-secret
 aws-load-balancer-controller:
