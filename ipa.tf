@@ -461,6 +461,11 @@ crunchy-postgres:
         schedules:
           full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
           differential: 0 0 * * * # Diff backup daily at midnight
+      jobs:
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 3000Mi
     imagePullSecrets:
       - name: harbor-pull-secret
   postgres-metrics:
@@ -530,6 +535,11 @@ crunchy-postgres:
         schedules:
           full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
           differential: 0 0 * * * # Diff backup daily at midnight
+      jobs:
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 3000Mi
     imagePullSecrets:
       - name: harbor-pull-secret
 aws-load-balancer-controller:
