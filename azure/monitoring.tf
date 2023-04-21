@@ -97,6 +97,11 @@ resource "helm_release" "monitoring" {
   
     defaultBackend:
       nodeSelector.beta.kubernetes.io/os: linux
+
+    controller:
+      service:
+        annotations:
+          service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
   
   authentication:
     ingressUsername: monitoring
