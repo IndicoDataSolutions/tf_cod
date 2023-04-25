@@ -119,6 +119,17 @@ ingress-nginx:
     patch:
       nodeSelector.beta.kubernetes.io/os: linux
 
+
+    controller:
+      service:
+        annotations:
+          service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
+  
+  authentication:
+    ingressUsername: monitoring
+    ingressPassword: ${random_password.monitoring-password.result}
+
+
   defaultBackend:
     nodeSelector.beta.kubernetes.io/os: linux
 
