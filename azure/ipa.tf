@@ -185,7 +185,7 @@ resource "helm_release" "crunchy-postgres" {
       replicas: 1
       resources:
         requests:
-          cpu: 500m
+          cpu: 1000m
           memory: 3000Mi
       tolerations:
         - effect: NoSchedule
@@ -202,8 +202,8 @@ resource "helm_release" "crunchy-postgres" {
               requests:
                 storage: 200Gi
         schedules:
-          full: 30 4 * * *
-          incremental: 0 */1 * * *
+          full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
+          differential: 0 0 * * * # Diff backup daily at midnight
     imagePullSecrets:
       - name: harbor-pull-secret
   postgres-metrics:
