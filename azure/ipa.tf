@@ -192,6 +192,10 @@ resource "helm_release" "crunchy-postgres" {
           key: indico.io/crunchy
           operator: Exists
     pgBackRestConfig:
+      global:
+        archive-timeout: '10000'
+        repo1-path: /pgbackrest/postgres-data/repo1
+        repo1-retention-full: '5'
       repos:
       - name: repo1
         volume:
