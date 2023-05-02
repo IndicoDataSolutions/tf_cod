@@ -257,7 +257,7 @@ variable "snapshot_id" {
 
 variable "include_rox" {
   type        = bool
-  default     = true
+  default     = false
   description = "Create a read only FSx file system"
 }
 
@@ -469,7 +469,7 @@ variable "opentelemetry-collector_version" {
 
 variable "include_fsx" {
   type        = bool
-  default     = true
+  default     = false
   description = "Create a fsx file system(s)"
 }
 
@@ -481,7 +481,7 @@ variable "include_pgbackup" {
 
 variable "include_efs" {
   type        = bool
-  default     = false
+  default     = true
   description = "Create efs"
 }
 
