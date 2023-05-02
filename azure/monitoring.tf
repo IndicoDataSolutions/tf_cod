@@ -1,3 +1,27 @@
+locals {
+  alerting_configuration_values = var.alerting_enabled == "false" ? (<<EOT
+noExtraConfigs: true
+  EOT
+    ) : (<<EOT
+alerting:
+  email:
+    enabled: ${var.alerting_email_enabled}
+    smarthost: '${var.alerting_email_host}'
+    from: '${var.alerting_email_from}'
+    auth_username: '${var.alerting_email_username}'
+    auth_password: '${var.alerting_email_password}'
+    targetEmail: "${var.alerting_email_to}"
+  slack:
+    enabled: ${var.alerting_slack_enabled}
+    apiUrl: ${var.alerting_slack_token}
+    channel: ${var.alerting_slack_channel}
+  pagerDuty:
+    enabled: ${var.alerting_pagerduty_enabled}
+    integrationKey: ${var.alerting_pagerduty_integration_key}
+    integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
+EOT
+  )
+}
 resource "azurerm_dns_caa_record" "grafana-caa" {
   count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true ? 1 : 0
   name                = lower("grafana.${local.dns_prefix}")
@@ -79,24 +103,22 @@ resource "helm_release" "monitoring" {
   timeout          = "900" # 15 minutes
 
   values = [<<EOF
-  global:
-    host: "${local.dns_name}"
-  
-  prometheus-postgres-exporter:
-    enabled: ${local.kube_prometheus_stack_enabled}
+global:
+  host: "${var.dns_name}"
 
-  ingress-nginx:
-    enabled: ${local.kube_prometheus_stack_enabled}
+prometheus-postgres-exporter:
+  enabled: false
 
-    rbac:
-      create: true
+ingress-nginx:
+  enabled: ${var.enable_dns_infrastructure == true && var.enable_monitoring_infrastructure == true}
 
-    admissionWebhooks:
-      patch:
-        nodeSelector.beta.kubernetes.io/os: linux
-  
-    defaultBackend:
+  rbac:
+    create: true
+
+  admissionWebhooks:
+    patch:
       nodeSelector.beta.kubernetes.io/os: linux
+
 
     controller:
       service:
@@ -107,21 +129,35 @@ resource "helm_release" "monitoring" {
     ingressUsername: monitoring
     ingressPassword: ${random_password.monitoring-password.result}
 
-  kube-prometheus-stack:
-    enabled: ${local.kube_prometheus_stack_enabled}
-    prometheus:
-      prometheusSpec:
-        nodeSelector:
-          node_group: static-workers
-        storageSpec:
-          volumeClaimTemplate:
-            spec:
-              storageClassName: default
 
-  prometheus-adapter:
+  defaultBackend:
+    nodeSelector.beta.kubernetes.io/os: linux
+
+authentication:
+  ingressUsername: monitoring
+  ingressPassword: ${random_password.monitoring-password.result}
+
+${local.alerting_configuration_values}
+
+kube-prometheus-stack:
+  enabled: true
+  nodeExporter:
     enabled: false
- EOF
-  ]
+
+  prometheus:
+    enabled: true
+    prometheusSpec:
+      nodeSelector:
+        node_group: static-workers
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: default
+
+prometheus-adapter:
+  enabled: false
+EOF
+]
 }
 
 resource "helm_release" "keda-monitoring" {

@@ -567,3 +567,75 @@ variable "alternate_domain" {
   description = "Optional alternate domain to use with cluster."
 }
 
+variable "alerting_enabled" {
+  type        = bool
+  default     = false
+  description = "enable alerts"
+}
+
+variable "alerting_slack_enabled" {
+  type        = bool
+  default     = false
+  description = "enable alerts via slack"
+}
+
+variable "alerting_pagerduty_enabled" {
+  type        = bool
+  default     = false
+  description = "enable alerts via pagerduty"
+}
+
+variable "alerting_email_enabled" {
+  type        = bool
+  default     = false
+  description = "enable alerts via email"
+}
+
+variable "alerting_slack_token" {
+  type        = string
+  default     = "blank"
+  description = "Secret url with embedded token needed for slack webhook delivery."
+}
+
+variable "alerting_slack_channel" {
+  type        = string
+  default     = "blank"
+  description = "Slack channel for sending notifications from alertmanager."
+}
+
+variable "alerting_pagerduty_integration_key" {
+  type        = string
+  default     = "blank"
+  description = "Secret pagerduty_integration_key."
+}
+
+variable "alerting_email_from" {
+  type        = string
+  default     = "blank"
+  description = "alerting_email_from."
+}
+
+variable "alerting_email_to" {
+  type        = string
+  default     = "blank"
+  description = "alerting_email_to"
+}
+
+variable "alerting_email_host" {
+  type        = string
+  default     = "blank"
+  description = "alerting_email_host"
+}
+
+variable "alerting_email_username" {
+  type        = string
+  default     = "blank"
+  description = "alerting_email_username"
+}
+
+variable "alerting_email_password" {
+  type        = string
+  default     = "blank"
+  description = "alerting_email_password"
+}
+
