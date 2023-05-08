@@ -4,6 +4,7 @@ noExtraConfigs: true
   EOT
     ) : (<<EOT
 alerting:
+  enabled: true
   email:
     enabled: ${var.alerting_email_enabled}
     smarthost: '${var.alerting_email_host}'
