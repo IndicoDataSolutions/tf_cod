@@ -75,6 +75,15 @@ node_groups = {
     spot             = false
     desired_capacity = "1"
     taints           = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
+  },
+  readapi-azurite = {
+    min_size         = 0
+    max_size         = 1
+    instance_types   = ["m5.large"]
+    type             = "cpu"
+    spot             = false
+    desired_capacity = "1"
+    taints           = "--register-with-taints=indico.io/azurite=true:NoSchedule"
   }
 }
 # additional_tags = { # delete this if no additional tags needed
