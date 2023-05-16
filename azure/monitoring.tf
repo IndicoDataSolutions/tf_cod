@@ -1,9 +1,10 @@
 locals {
-  alerting_configuration_values = var.alerting_enabled == "false" ? (<<EOT
+  alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
 noExtraConfigs: true
   EOT
     ) : (<<EOT
 alerting:
+  enabled: true
   email:
     enabled: ${var.alerting_email_enabled}
     smarthost: '${var.alerting_email_host}'
