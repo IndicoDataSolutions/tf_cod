@@ -208,9 +208,5 @@ module "ipa-testing" {
   ipa_smoketest_repo             = var.ipa_smoketest_repo
   ipa_smoketest_version          = var.ipa_smoketest_version
   ipa_smoketest_values           = var.ipa_smoketest_values
-  ipa_smoketest_container_tag    = var.ipa_smoketest_container_tag
-  ipa_smoketest_cronjob_enabled  = var.ipa_smoketest_cronjob_enabled
-  ipa_smoketest_cronjob_schedule = var.ipa_smoketest_cronjob_schedule
-  ipa_smoketest_slack_channel    = var.ipa_smoketest_slack_channel
 }
 

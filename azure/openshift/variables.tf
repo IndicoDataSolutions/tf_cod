@@ -339,34 +339,14 @@ variable "ipa_smoketest_repo" {
   default = "https://harbor.devops.indico.io/chartrepo/indico-charts"
 }
 
-variable "ipa_smoketest_container_tag" {
-  type    = string
-  default = "IPA-6.1.0"
-}
-
 variable "ipa_smoketest_version" {
   type    = string
   default = "0.1.14-dop-1536-18805132"
 }
 
-variable "ipa_smoketest_slack_channel" {
-  type    = string
-  default = "cod-smoketest-results"
-}
-
 variable "ipa_smoketest_enabled" {
   type    = bool
   default = true
-}
-
-variable "ipa_smoketest_cronjob_enabled" {
-  type    = bool
-  default = false
-}
-
-variable "ipa_smoketest_cronjob_schedule" {
-  type    = string
-  default = "0 0 * * *" # every night at midnight
 }
 
 variable "admin_group_name" {

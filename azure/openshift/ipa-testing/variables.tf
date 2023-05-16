@@ -35,28 +35,12 @@ variable "ipa_smoketest_repo" {
   type = string
 }
 
-variable "ipa_smoketest_container_tag" {
-  type = string
-}
-
 variable "ipa_smoketest_version" {
-  type = string
-}
-
-variable "ipa_smoketest_slack_channel" {
   type = string
 }
 
 variable "ipa_smoketest_enabled" {
   type = bool
-}
-
-variable "ipa_smoketest_cronjob_enabled" {
-  type = bool
-}
-
-variable "ipa_smoketest_cronjob_schedule" {
-  type = string
 }
 
 variable "kubernetes_host" {
