@@ -105,7 +105,7 @@ resource "helm_release" "monitoring" {
 
   values = [<<EOF
 global:
-  host: "${var.dns_name}"
+  host: "${local.dns_name}"
 
 prometheus-postgres-exporter:
   enabled: false

@@ -405,6 +405,17 @@ variable "openshift_pull_secret" {
   default = ""
 }
 
+variable "enable_dns_infrastructure" {
+  type    = bool
+  default = true
+}
+
+variable "enable_monitoring_infrastructure" {
+  description = "Enables the deployment of the Indico Monitoring helm chart"
+  type        = bool
+  default     = true
+}
+
 variable "servicebus_pricing_tier" {
   type        = string
   default     = "Standard"
