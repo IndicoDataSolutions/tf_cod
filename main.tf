@@ -351,13 +351,17 @@ module "argo-registration" {
     argocd     = argocd
   }
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.0.46"
-  label                        = var.label
+  version                      = "1.1.11"
+  cluster_name                 = var.label
   region                       = var.region
   argo_password                = var.argo_password
   argo_username                = var.argo_username
-  aws_account                  = var.aws_account
+  account                      = var.aws_account
+  cloud_provider               = "aws"
   argo_github_team_admin_group = var.argo_github_team_owner
+  endpoint                     = module.cluster.kubernetes_host
+  ca_data                      = module.cluster.kubernetes_cluster_ca_certificate
+
 }
 
 locals {
