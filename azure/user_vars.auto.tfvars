@@ -10,6 +10,7 @@ database_subnet_cidr    = ["192.168.4.0/26"]
 storage_account_name    = "indicodatatest"
 cluster_manager_vm_size = "Standard_F2s"
 private_cluster_enabled = false
+k8s_version = "1.25.6"
 
 default_node_pool = {
   name                           = "defaultpool"
