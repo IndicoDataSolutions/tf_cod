@@ -126,6 +126,12 @@ variable "argo_password" {
   default   = ""
 }
 
+variable "argo_namespace" {
+  type    = string
+  default = "argo"
+}
+
+
 variable "argo_repo" {
   description = "Argo Github Repository containing the IPA Application"
   default     = ""

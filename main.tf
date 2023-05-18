@@ -386,6 +386,7 @@ module "argo-registration" {
   region                       = var.region
   argo_password                = var.argo_password
   argo_username                = var.argo_username
+  argo_namespace               = var.argo_namespace
   account                      = var.aws_account
   cloud_provider               = "aws"
   argo_github_team_admin_group = var.argo_github_team_owner

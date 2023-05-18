@@ -294,6 +294,11 @@ variable "argo_branch" {
   description = "Branch to use on argo_repo"
 }
 
+variable "argo_namespace" {
+  type = string
+  default = "argo"
+}
+
 variable "argo_path" {
   description = "Path within the argo_repo containing yaml"
   default     = "."
