@@ -685,7 +685,7 @@ resource "argocd_application" "ipa" {
 
   metadata {
     name      = lower("${var.aws_account}-${var.region}-${var.label}-deploy-ipa")
-    namespace = "argo"
+    namespace = var.argo_namespace
     labels = {
       test = "true"
     }
@@ -708,7 +708,7 @@ resource "argocd_application" "ipa" {
     }
 
     sync_policy {
-      automated = {
+      automated {
         prune       = true
         self_heal   = false
         allow_empty = false
@@ -718,7 +718,7 @@ resource "argocd_application" "ipa" {
     destination {
       #server    = "https://kubernetes.default.svc"
       name      = "in-cluster"
-      namespace = "argo"
+      namespace = var.argo_namespace
     }
   }
 

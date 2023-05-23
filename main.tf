@@ -14,7 +14,7 @@ terraform {
     }
     argocd = {
       source  = "oboukili/argocd"
-      version = "3.1.0"
+      version = "5.3.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
@@ -250,7 +250,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "7.2.2"
+  version                    = "7.8.0"
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
@@ -273,6 +273,7 @@ module "cluster" {
   cluster_version            = var.cluster_version
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
   access_security_group      = module.cluster-manager.cluster_manager_sg
+  aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
 }
 
 resource "aws_security_group" "indico_allow_access" {
@@ -351,13 +352,19 @@ module "argo-registration" {
     argocd     = argocd
   }
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.0.46"
-  label                        = var.label
+  version                      = "1.1.16"
+  cluster_name                 = var.label
   region                       = var.region
   argo_password                = var.argo_password
   argo_username                = var.argo_username
-  aws_account                  = var.aws_account
+  argo_namespace               = var.argo_namespace
+  argo_host                    = var.argo_host
+  account                      = var.aws_account
+  cloud_provider               = "aws"
   argo_github_team_admin_group = var.argo_github_team_owner
+  endpoint                     = module.cluster.kubernetes_host
+  ca_data                      = module.cluster.kubernetes_cluster_ca_certificate
+
 }
 
 locals {

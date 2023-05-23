@@ -294,6 +294,11 @@ variable "argo_branch" {
   description = "Branch to use on argo_repo"
 }
 
+variable "argo_namespace" {
+  type = string
+  default = "argo"
+}
+
 variable "argo_path" {
   description = "Path within the argo_repo containing yaml"
   default     = "."
@@ -509,3 +514,8 @@ variable "use_acm" {
   description = "create cluster that will use acm"
 }
 
+variable "aws_primary_dns_role_arn" {
+  type        = string
+  default     = ""
+  description = "The AWS arn for the role needed to manage route53 DNS in a different account."
+}
