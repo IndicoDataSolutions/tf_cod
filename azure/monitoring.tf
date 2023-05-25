@@ -105,13 +105,13 @@ resource "helm_release" "monitoring" {
 
   values = [<<EOF
 global:
-  host: "${var.dns_name}"
+  host: "${local.dns_name}"
 
 prometheus-postgres-exporter:
   enabled: false
 
 ingress-nginx:
-  enabled: ${var.enable_dns_infrastructure == true && var.enable_monitoring_infrastructure == true}
+  enabled: ${local.kube_prometheus_stack_enabled}
 
   rbac:
     create: true
