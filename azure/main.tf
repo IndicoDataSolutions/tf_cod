@@ -21,7 +21,7 @@ terraform {
     }
     argocd = {
       source  = "oboukili/argocd"
-      version = "3.1.0"
+      version = "5.3.0"
     }
     local = {
       source  = "hashicorp/local"
