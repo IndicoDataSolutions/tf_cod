@@ -437,7 +437,7 @@ resource "argocd_application" "ipa" {
     }
 
     sync_policy {
-      automated = {
+      automated {
         prune       = true
         self_heal   = false
         allow_empty = false
