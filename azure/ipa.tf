@@ -382,7 +382,7 @@ spec:
               nvidia-device-plugin:
                 podSecurityContext:
                   allowPrivilegeEscalation: true
-                compatWithCPUManager: "true"
+                compatWithCPUManager: true
 
 
         - name: HELM_VALUES
