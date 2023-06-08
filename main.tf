@@ -80,10 +80,10 @@ provider "aws" {
 
 provider "azurerm" {
   alias           = "indicoio"
-  subscription_id = var.indicoio_subscription_id
-  tenant_id       = var.indicoio_tenant_id
-  client_id       = var.indicoio_client_id
-  client_secret   = var.indicoio_client_secret
+  client_id       = var.azure_indico_io_client_id
+  client_secret   = var.azure_indico_io_client_secret
+  subscription_id = var.azure_indico_io_subscription_id
+  tenant_id       = var.azure_indico_io_tenant_id
 }
 
 data "vault_kv_secret_v2" "terraform-snowflake" {
@@ -308,10 +308,10 @@ module "readapi" {
   source          = "app.terraform.io/indico/indico-azure-readapi/mod"
   version         = "2.1.1"
   readapi_name    = lower("${var.account}-${var.label}")
-  client_id       = var.indicoio_client_id
-  client_secret   = var.indicoio_client_secret
-  subscription_id = var.indicoio_subscription_id
-  tenant_id       = var.indicoio_tenant_id
+  client_id       = var.azure_indico_io_client_id
+  client_secret   = var.azure_indico_io_client_secret
+  subscription_id = var.azure_indico_io_subscription_id
+  tenant_id       = var.azure_indico_io_tenant_id
 }
 
 resource "kubernetes_secret" "readapi" {
