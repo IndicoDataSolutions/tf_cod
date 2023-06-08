@@ -380,9 +380,9 @@ spec:
           value: |
             nvidia-device-plugin:
               nvidia-device-plugin:
-                compatWithCPUManager: true
+                compatWithCPUManager: "true"
                 podSecurityContext:
-                  allowPrivilegeEscalation: true
+                  allowPrivilegeEscalation: "true"
 
         - name: HELM_VALUES
           value: |
