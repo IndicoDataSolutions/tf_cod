@@ -305,9 +305,13 @@ module "readapi" {
   providers = {
     azurerm = azurerm.indicoio
   }
-  source       = "app.terraform.io/indico/indico-azure-readapi/mod"
-  version      = "2.1.1"
-  readapi_name = lower("${var.account}-${var.label}")
+  source          = "app.terraform.io/indico/indico-azure-readapi/mod"
+  version         = "2.1.1"
+  readapi_name    = lower("${var.account}-${var.label}")
+  client_id       = var.indicoio_client_id
+  client_secret   = var.indicoio_client_secret
+  subscription_id = var.indicoio_subscription_id
+  tenant_id       = var.indicoio_tenant_id
 }
 
 resource "kubernetes_secret" "readapi" {
