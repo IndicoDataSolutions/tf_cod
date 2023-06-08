@@ -158,13 +158,7 @@ variable "ipa_enabled" {
 
 variable "ipa_values" {
   type    = string
-  default = <<EOT
-nvidia-device-plugin:
-  nvidia-device-plugin:
-    compatWithCPUManager: true
-    podSecurityContext:
-      allowPrivilegeEscalation: true
-EOT
+  default = ""
 }
 
 variable "git_pat" {

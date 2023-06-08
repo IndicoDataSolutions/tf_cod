@@ -376,6 +376,14 @@ spec:
         - name: RELEASE_NAME
           value: ipa
 
+        - name: HELM_TF_COD_VALUES
+          value: |
+            nvidia-device-plugin:
+              nvidia-device-plugin:
+                compatWithCPUManager: true
+                podSecurityContext:
+                  allowPrivilegeEscalation: true
+
         - name: HELM_VALUES
           value: |
             ${base64decode(var.ipa_values)}    
