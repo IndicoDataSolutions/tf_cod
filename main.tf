@@ -316,7 +316,7 @@ module "readapi" {
 }
 
 resource "kubernetes_secret" "readapi" {
-  depends_on = [module.cluster]
+  depends_on = [module.cluster, module.readapi]
   metadata {
     name = "readapi-queue-auth"
   }
