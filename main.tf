@@ -78,6 +78,13 @@ provider "aws" {
   }
 }
 
+provider "azurerm" {
+  alias           = "indicoio"
+  subscription_id = var.indicoio_subscription_id
+  tenant_id       = var.indicoio_tenant_id
+  client_id       = var.indicoio_client_id
+  client_secret   = var.indicoio_client_secret
+}
 
 data "vault_kv_secret_v2" "terraform-snowflake" {
   mount = var.terraform_vault_mount_path
@@ -290,6 +297,34 @@ module "cluster" {
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
   access_security_group      = module.cluster-manager.cluster_manager_sg
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
+}
+
+
+module "readapi" {
+  count = var.enable_readapi ? 1 : 0
+  providers = {
+    azurerm = azurerm.indicoio
+  }
+  source       = "app.terraform.io/indico/indico-azure-readapi/mod"
+  version      = "2.1.1"
+  readapi_name = lower("${var.account}-${var.label}")
+}
+
+resource "kubernetes_secret" "readapi" {
+  depends_on = [module.cluster]
+  metadata {
+    name = "readapi-queue-auth"
+  }
+
+  data = {
+    endpoint                   = module.readapi.endpoint
+    access_key                 = module.readapi.access_key
+    storage_account_name       = module.readapi.storage_account_name
+    storage_account_id         = module.readapi.storage_account_id
+    storage_account_access_key = module.readapi.storage_account_access_key
+    storage_queue_name         = module.readapi.storage_queue_name
+    storage_connection_string  = module.readapi.storage_connection_string
+  }
 }
 
 module "snowflake" {
