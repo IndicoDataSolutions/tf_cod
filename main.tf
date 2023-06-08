@@ -79,6 +79,7 @@ provider "aws" {
 }
 
 provider "azurerm" {
+  features {}
   alias           = "indicoio"
   client_id       = var.azure_indico_io_client_id
   client_secret   = var.azure_indico_io_client_secret
