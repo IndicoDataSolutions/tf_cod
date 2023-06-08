@@ -47,7 +47,7 @@ provider "azurerm" {
 }
 
 provider "azurerm" {
-  alias           = "indicoio"
+  alias = "indicoio"
   features {}
   client_id       = var.azure_indico_io_client_id
   client_secret   = var.azure_indico_io_client_secret
@@ -251,19 +251,20 @@ module "readapi" {
 }
 
 resource "kubernetes_secret" "readapi" {
-  depends_on = [module.cluster]
+  count      = var.enable_readapi ? 1 : 0
+  depends_on = [module.cluster, module.readapi]
   metadata {
     name = "readapi-queue-auth"
   }
 
   data = {
-    endpoint                   = module.readapi.endpoint
-    access_key                 = module.readapi.access_key
-    storage_account_name       = module.readapi.storage_account_name
-    storage_account_id         = module.readapi.storage_account_id
-    storage_account_access_key = module.readapi.storage_account_access_key
-    storage_queue_name         = module.readapi.storage_queue_name
-    storage_connection_string  = module.readapi.storage_connection_string
+    endpoint                   = module.readapi[0].endpoint
+    access_key                 = module.readapi[0].access_key
+    storage_account_name       = module.readapi[0].storage_account_name
+    storage_account_id         = module.readapi[0].storage_account_id
+    storage_account_access_key = module.readapi[0].storage_account_access_key
+    storage_queue_name         = module.readapi[0].storage_queue_name
+    storage_connection_string  = module.readapi[0].storage_connection_string
   }
 }
 

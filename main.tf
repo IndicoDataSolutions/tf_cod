@@ -316,19 +316,20 @@ module "readapi" {
 }
 
 resource "kubernetes_secret" "readapi" {
+  count      = var.enable_readapi ? 1 : 0
   depends_on = [module.cluster, module.readapi]
   metadata {
     name = "readapi-queue-auth"
   }
 
   data = {
-    endpoint                   = module.readapi.endpoint
-    access_key                 = module.readapi.access_key
-    storage_account_name       = module.readapi.storage_account_name
-    storage_account_id         = module.readapi.storage_account_id
-    storage_account_access_key = module.readapi.storage_account_access_key
-    storage_queue_name         = module.readapi.storage_queue_name
-    storage_connection_string  = module.readapi.storage_connection_string
+    endpoint                   = module.readapi[0].endpoint
+    access_key                 = module.readapi[0].access_key
+    storage_account_name       = module.readapi[0].storage_account_name
+    storage_account_id         = module.readapi[0].storage_account_id
+    storage_account_access_key = module.readapi[0].storage_account_access_key
+    storage_queue_name         = module.readapi[0].storage_queue_name
+    storage_connection_string  = module.readapi[0].storage_connection_string
   }
 }
 
