@@ -367,6 +367,12 @@ spec:
     chart: ipa
     repoURL: ${var.ipa_repo}
     targetRevision: ${var.ipa_version}
+    helm:
+      parameters:
+      - name: "nvidia-device-plugin.compatWithCPUManager"
+        value: "true"
+      - name: "nvidia-device-plugin.podSecurityContext.allowPrivilegeEscalation"
+        value: "true"
     plugin:
       name: argocd-vault-plugin-helm-values-expand-no-build
       env:
