@@ -402,6 +402,24 @@ variable "enable_ad_group_mapping" {
   description = "Enable the Mapping of AD Group"
 }
 
+# ReadAPI stuff
+variable "enable_readapi" {
+  type    = bool
+  default = true
+}
+variable "azure_indico_io_client_id" {
+  type = string
+}
+variable "azure_indico_io_client_secret" {
+  type = string
+}
+variable "azure_indico_io_subscription_id" {
+  type = string
+}
+variable "azure_indico_io_tenant_id" {
+  type = string
+}
+
 #openshift & azure common variables
 
 # enable for openshift
