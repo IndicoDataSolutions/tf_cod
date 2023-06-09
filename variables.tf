@@ -414,6 +414,24 @@ variable "restore_snapshot_name" {
   description = "Name of snapshot in account's s3 bucket"
 }
 
+# ReadAPI stuff
+variable "enable_readapi" {
+  type    = bool
+  default = true
+}
+variable "azure_indico_io_client_id" {
+  type = string
+}
+variable "azure_indico_io_client_secret" {
+  type = string
+}
+variable "azure_indico_io_subscription_id" {
+  type = string
+}
+variable "azure_indico_io_tenant_id" {
+  type = string
+}
+
 ## OIDC Configuration
 variable "oidc_enabled" {
   type        = bool
