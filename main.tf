@@ -334,7 +334,8 @@ resource "kubernetes_secret" "readapi" {
 }
 
 module "snowflake" {
-  version               = "2.1.2"
+  count                 = var.enable_weather_station == true ? 1 : 0
+  version               = "2.2.0"
   source                = "app.terraform.io/indico/indico-aws-snowflake/mod"
   label                 = var.label
   additional_tags       = var.additional_tags
@@ -344,6 +345,8 @@ module "snowflake" {
   snowflake_private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
   snowflake_account     = var.snowflake_account
   snowflake_username    = var.snowflake_username
+  region                = var.region
+  aws_account_name      = var.aws_account
 }
 
 resource "aws_security_group" "indico_allow_access" {
