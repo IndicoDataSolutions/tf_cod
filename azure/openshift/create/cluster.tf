@@ -44,7 +44,7 @@ module "argo-registration" {
   count = var.argo_enabled == true ? 1 : 0
 
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.1.12"
+  version                      = "1.1.16"
   cluster_name                 = var.label
   region                       = var.region
   argo_password                = var.argo_password
