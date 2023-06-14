@@ -138,6 +138,7 @@ resource "helm_release" "monitoring" {
   chart            = "monitoring"
   version          = var.monitoring_version
   timeout          = "900" # 15 minutes
+  skip_crds        = true
 
   values = [<<EOF
 global:
@@ -188,7 +189,7 @@ kube-prometheus-stack:
 prometheus-adapter:
   enabled: false
 EOF
-]
+  ]
 }
 
 resource "null_resource" "restore-prometheus-operator" {
