@@ -287,14 +287,6 @@ cluster:
   domain: ${var.domain_suffix}
   account: ${var.account}
 
-rabbitmq:
-  enabled: true
-  rabbitmq:
-    metrics:
-      enabled: ${var.is_openshift}
-      serviceMonitor:
-        enabled: ${var.is_openshift}
-
 secrets:
   rabbitmq:
     create: true
