@@ -14,7 +14,7 @@ terraform {
     }
     argocd = {
       source  = "oboukili/argocd"
-      version = "5.3.0"
+      version = "5.4.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
@@ -78,6 +78,14 @@ provider "aws" {
   }
 }
 
+provider "azurerm" {
+  features {}
+  alias           = "indicoio"
+  client_id       = var.azure_indico_io_client_id
+  client_secret   = var.azure_indico_io_client_secret
+  subscription_id = var.azure_indico_io_subscription_id
+  tenant_id       = var.azure_indico_io_tenant_id
+}
 
 data "vault_kv_secret_v2" "terraform-snowflake" {
   mount = var.terraform_vault_mount_path
@@ -292,8 +300,42 @@ module "cluster" {
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
 }
 
+
+module "readapi" {
+  count = var.enable_readapi ? 1 : 0
+  providers = {
+    azurerm = azurerm.indicoio
+  }
+  source          = "app.terraform.io/indico/indico-azure-readapi/mod"
+  version         = "2.1.2"
+  readapi_name    = lower("${var.aws_account}-${var.label}")
+  client_id       = var.azure_indico_io_client_id
+  client_secret   = var.azure_indico_io_client_secret
+  subscription_id = var.azure_indico_io_subscription_id
+  tenant_id       = var.azure_indico_io_tenant_id
+}
+
+resource "kubernetes_secret" "readapi" {
+  count      = var.enable_readapi ? 1 : 0
+  depends_on = [module.cluster, module.readapi]
+  metadata {
+    name = "readapi-queue-auth"
+  }
+
+  data = {
+    endpoint                   = module.readapi[0].endpoint
+    access_key                 = module.readapi[0].access_key
+    storage_account_name       = module.readapi[0].storage_account_name
+    storage_account_id         = module.readapi[0].storage_account_id
+    storage_account_access_key = module.readapi[0].storage_account_access_key
+    storage_queue_name         = module.readapi[0].storage_queue_name
+    storage_connection_string  = module.readapi[0].storage_connection_string
+  }
+}
+
 module "snowflake" {
-  version               = "2.1.2"
+  count                 = var.enable_weather_station == true ? 1 : 0
+  version               = "2.2.0"
   source                = "app.terraform.io/indico/indico-aws-snowflake/mod"
   label                 = var.label
   additional_tags       = var.additional_tags
@@ -303,6 +345,8 @@ module "snowflake" {
   snowflake_private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
   snowflake_account     = var.snowflake_account
   snowflake_username    = var.snowflake_username
+  region                = var.region
+  aws_account_name      = var.aws_account
 }
 
 resource "aws_security_group" "indico_allow_access" {

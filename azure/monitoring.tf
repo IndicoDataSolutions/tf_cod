@@ -102,16 +102,17 @@ resource "helm_release" "monitoring" {
   version          = var.monitoring_version
   wait             = false
   timeout          = "900" # 15 minutes
+  skip_crds        = true
 
   values = [<<EOF
 global:
-  host: "${var.dns_name}"
+  host: "${local.dns_name}"
 
 prometheus-postgres-exporter:
   enabled: false
 
 ingress-nginx:
-  enabled: ${var.enable_dns_infrastructure == true && var.enable_monitoring_infrastructure == true}
+  enabled: ${local.kube_prometheus_stack_enabled}
 
   rbac:
     create: true
@@ -158,7 +159,7 @@ kube-prometheus-stack:
 prometheus-adapter:
   enabled: false
 EOF
-]
+  ]
 }
 
 resource "helm_release" "keda-monitoring" {

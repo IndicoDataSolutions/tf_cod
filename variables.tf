@@ -199,6 +199,23 @@ variable "kms_encrypt_secrets" {
   description = "Encrypt EKS secrets with KMS"
 }
 
+# ReadAPI stuff
+variable "enable_readapi" {
+  type = bool
+  default = true
+}
+variable "azure_indico_io_client_id" {
+  type = string
+}
+variable "azure_indico_io_client_secret" {
+  type = string
+}
+variable "azure_indico_io_subscription_id" {
+  type = string
+}
+variable "azure_indico_io_tenant_id" {
+  type = string
+}
 
 # IAM
 variable "cluster_manager_iam_role" {

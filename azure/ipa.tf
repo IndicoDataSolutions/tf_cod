@@ -294,9 +294,9 @@ rabbitmq:
   enabled: true
   rabbitmq:
     metrics:
-      enabled: ${var.is_openshift}
+      enabled: true
       serviceMonitor:
-        enabled: ${var.is_openshift}
+        enabled: true
 
 secrets:
   rabbitmq:
@@ -676,7 +676,7 @@ resource "argocd_application" "ipa" {
     }
 
     sync_policy {
-      automated = {
+      automated {
         prune       = true
         self_heal   = false
         allow_empty = false
