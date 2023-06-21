@@ -308,7 +308,7 @@ module "readapi" {
   }
   source          = "app.terraform.io/indico/indico-azure-readapi/mod"
   version         = "2.1.2"
-  readapi_name    = lower("${var.aws_account}-${var.label}-${var.region}")
+  readapi_name    = md5(lower("${var.aws_account}-${var.label}-${var.region}"))
   client_id       = var.azure_indico_io_client_id
   client_secret   = var.azure_indico_io_client_secret
   subscription_id = var.azure_indico_io_subscription_id
