@@ -384,7 +384,11 @@ external-dns:
   sources:
     - service
     - ingress
-
+aws-for-fluent-bit:
+  enabled: true
+  cloudWatchLogs:
+    region: ${var.region}
+    logGroupName: "/aws/eks/fluentbit-cloudwatch/${local.cluster_name}/logs"
 cluster-autoscaler:
   cluster-autoscaler:
     awsRegion: ${var.region}
