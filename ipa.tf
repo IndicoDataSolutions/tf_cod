@@ -389,6 +389,7 @@ aws-for-fluent-bit:
   cloudWatchLogs:
     region: ${var.region}
     logGroupName: "/aws/eks/fluentbit-cloudwatch/${local.cluster_name}/logs"
+    logGroupTemplate: "/aws/eks/fluentbit-cloudwatch/${local.cluster_name}/workload/$kubernetes['namespace_name']"
 cluster-autoscaler:
   cluster-autoscaler:
     awsRegion: ${var.region}
