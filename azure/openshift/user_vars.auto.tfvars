@@ -20,7 +20,7 @@ ipa_crds_namespace = "indico"
 svp_client_id     = "na"
 svp_client_secret = "na"
 
-# fill out this file with desired values and reference it 
+# fill out this file with desired values and reference it
 
 region                  = "eastus"
 vnet_cidr               = "192.168.0.0/20"
@@ -186,6 +186,28 @@ openshift_machine_sets = {
     cluster_auto_scaling           = true
     cluster_auto_scaling_min_count = 1
     cluster_auto_scaling_max_count = 4
+    storageAccountType             = "Premium_LRS"
+    image = {
+      offer      = "aro4"
+      publisher  = "azureopenshift"
+      resourceID = ""
+      sku        = "aro_410"
+      version    = "410.84.20220125"
+    }
+  },
+  azurite = {
+    node_count = 1
+    pool_name  = "azurite"
+    vm_size    = "Standard_D16s_v3"
+    node_os    = "Linux"
+    zones      = ["1"]
+    taints     = ["indico.io/azurite=true:NoSchedule"]
+    labels = {
+      "node_group" : "readapi-azurite"
+    }
+    cluster_auto_scaling           = true
+    cluster_auto_scaling_min_count = 0
+    cluster_auto_scaling_max_count = 1
     storageAccountType             = "Premium_LRS"
     image = {
       offer      = "aro4"
