@@ -216,20 +216,22 @@ module "cluster" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  source                  = "app.terraform.io/indico/indico-azure-cluster/mod"
-  version                 = "2.0.22"
-  label                   = var.label
-  public_key              = tls_private_key.pk.public_key_openssh
-  region                  = var.region
-  svp_client_id           = var.svp_client_id
-  svp_client_secret       = var.svp_client_secret
-  default_node_pool       = var.default_node_pool
-  additional_node_pools   = var.additional_node_pools
-  vnet_subnet_id          = module.networking.subnet_id
-  k8s_version             = var.k8s_version
-  private_cluster_enabled = var.private_cluster_enabled
-  resource_group_name     = local.resource_group_name
-  admin_group_name        = var.admin_group_name
+
+  source                     = "app.terraform.io/indico/indico-azure-cluster/mod"
+  insights_retention_in_days = var.monitor_retention_in_days
+  version                    = "2.0.28"
+  label                      = var.label
+  public_key                 = tls_private_key.pk.public_key_openssh
+  region                     = var.region
+  svp_client_id              = var.svp_client_id
+  svp_client_secret          = var.svp_client_secret
+  default_node_pool          = var.default_node_pool
+  additional_node_pools      = var.additional_node_pools
+  vnet_subnet_id             = module.networking.subnet_id
+  k8s_version                = var.k8s_version
+  private_cluster_enabled    = var.private_cluster_enabled
+  resource_group_name        = local.resource_group_name
+  admin_group_name           = var.admin_group_name
   # this feature can be checked using:
   # az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/EnableWorkloadIdentityPreview')].{Name:name,State:properties.state}"
   # az provider register --namespace Microsoft.ContainerService
