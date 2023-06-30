@@ -31,7 +31,7 @@ data "aws_vpc_endpoint_service" "guardduty" {
 }
 
 resource "aws_vpc_endpoint" "eks_vpc_guardduty" {
-  vpc_id            = module.vpc_eks.vpc_id
+  vpc_id            = local.network[0].indico_vpc_id
   service_name      = data.aws_vpc_endpoint_service.guardduty.service_name
   vpc_endpoint_type = "Interface"
   
@@ -55,16 +55,13 @@ resource "aws_security_group" "eks_vpc_endpoint_guardduty" {
   lifecycle {
     create_before_destroy = true
   }
-}
 
-resource "aws_vpc_security_group_ingress_rule" "eks_vpc_guardduty_ingress" {
-  security_group_id = aws_security_group.eks_vpc_endpoint_guardduty.id
-  description       = "Ingress for port 443."
-
-  cidr_ipv4   = "0.0.0.0/0"
-  from_port   = 443
-  ip_protocol = "tcp"
-  to_port     = 443
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 data "aws_iam_policy_document" "eks_vpc_guardduty" {
