@@ -274,7 +274,7 @@ variable "aws_account" {
 
 variable "argo_host" {
   type    = string
-  default = "argocd.devops.indico.io"
+  default = "argo.devops.indico.io"
 }
 
 variable "argo_username" {
