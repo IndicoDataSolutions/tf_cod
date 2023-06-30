@@ -21,3 +21,22 @@ module "k8s_dashboard" {
   keycloak_client_id     = module.keycloak.client_id
   keycloak_client_secret = module.keycloak.client_secret
 }
+
+resource "aws_eks_addon" "guardduty" {
+  depends_on = [
+    module.cluster
+  ]
+  count = var.eks_addon_version_guardduty != null ? 1 : 0
+  
+
+  cluster_name      = module.cluster.name
+  addon_name        = "aws-guardduty-agent"
+  addon_version     = "v1.2.0-eksbuild.1"
+  resolve_conflicts = "OVERWRITE"
+
+  preserve = true
+
+  tags = {
+    "eks_addon" = "guardduty"
+  }
+}
