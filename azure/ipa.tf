@@ -289,6 +289,12 @@ cluster:
   region: ${var.region}
   domain: ${var.domain_suffix}
   account: ${var.account}
+  argoRepo: ${var.argo_repo}
+  argoBranch: ${var.argo_branch}
+  argoPath: ${var.argo_path}
+  ipaVersion: ${var.ipa_version}
+  ipaPreReqsVersion: ${var.ipa_pre_reqs_version}
+  ipaCrdsVersion: ${var.ipa_crds_version}
 
 rabbitmq:
   enabled: true

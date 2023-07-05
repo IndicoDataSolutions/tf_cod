@@ -317,6 +317,12 @@ cluster:
   region: ${var.region}
   domain: indico.io
   account: ${var.aws_account}
+  argoRepo: ${var.argo_repo}
+  argoBranch: ${var.argo_branch}
+  argoPath: ${var.argo_path}
+  ipaVersion: ${var.ipa_version}
+  ipaPreReqsVersion: ${var.ipa_pre_reqs_version}
+  ipaCrdsVersion: ${var.ipa_crds_version}
 
 secrets:
   rabbitmq:
