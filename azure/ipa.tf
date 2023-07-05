@@ -176,8 +176,13 @@ secrets:
 clusterIssuer:
   additionalSolvers:
     - dns01:
-        route53:
-          region: ${var.region}
+        azureDNS:
+          environment: AzurePublicCloud
+          hostedZoneName: ${data.azurerm_dns_zone.domain.name}
+          managedIdentity:
+            clientID: ${module.cluster.kubelet_identity.client_id}
+          resourceGroupName: ${var.common_resource_group}
+          subscriptionID: ${split("/", data.azurerm_subscription.primary.id)[2]}
       selector:
         matchLabels:
           "acme.cert-manager.io/dns01-solver": "true"
