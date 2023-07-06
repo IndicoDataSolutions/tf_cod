@@ -77,6 +77,7 @@ resource "helm_release" "monitoring" {
   version          = var.monitoring_version
   wait             = false
   timeout          = "900" # 15 minutes
+  skip_crds        = true
 
   values = [<<EOF
   global:
