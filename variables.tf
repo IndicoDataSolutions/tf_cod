@@ -641,3 +641,8 @@ variable "alerting_email_password" {
   description = "alerting_email_password"
 }
 
+variable "eks_addon_version_guardduty" {
+  type        = bool
+  default     = true
+  description = "enable guardduty"
+}
