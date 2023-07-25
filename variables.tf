@@ -125,6 +125,12 @@ variable "storage_gateway_size" {
   description = "The size of the storage gateway VM"
 }
 
+variable "existing_kms_key" {
+  type = string
+  default = ""
+  description = "Name of kms key if it exists in the account"
+}
+
 ### database
 variable "bucket_versioning" {
   type        = bool
