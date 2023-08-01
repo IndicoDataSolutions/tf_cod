@@ -695,6 +695,11 @@ metadata:
     avp.kubernetes.io/path: tools/argo/data/ipa-deploy
     argocd.argoproj.io/sync-wave: "-2"
 spec:
+  ignoreDifferences:
+    - group: apps
+      jsonPointers:
+        - /spec/replicas
+      kind: Deployment
   destination:
     server: ${module.cluster.kubernetes_host}
     namespace: default

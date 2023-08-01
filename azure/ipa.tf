@@ -584,6 +584,11 @@ metadata:
   annotations:
     avp.kubernetes.io/path: tools/argo/data/ipa-deploy
 spec:
+  ignoreDifferences:
+    - group: apps
+      jsonPointers:
+        - /spec/replicas
+      kind: Deployment
   destination:
     server: ${module.cluster.kubernetes_host}
     namespace: default
