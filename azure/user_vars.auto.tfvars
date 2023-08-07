@@ -18,6 +18,9 @@ default_node_pool = {
   vm_size                        = "Standard_D16_v3"
   zones                          = ["1", "2"]
   taints                         = null
+  labels = {
+      "node_group" : "default-workers"
+    }
   cluster_auto_scaling           = false
   cluster_auto_scaling_min_count = null
   cluster_auto_scaling_max_count = null
