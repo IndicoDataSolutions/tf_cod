@@ -204,6 +204,7 @@ variable "default_node_pool" {
     name                           = string
     zones                          = list(string)
     taints                         = list(string)
+    labels                         = map(string)
     cluster_auto_scaling           = bool
     cluster_auto_scaling_min_count = number
     cluster_auto_scaling_max_count = number
