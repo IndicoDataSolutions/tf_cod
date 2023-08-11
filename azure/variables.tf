@@ -305,7 +305,7 @@ variable "monitoring_enabled" {
 
 variable "keda_version" {
   type        = string
-  default     = "2.8.1"
+  default     = "2.11.2"
   description = "Version of keda helm chart"
 }
 
