@@ -125,6 +125,12 @@ variable "storage_gateway_size" {
   description = "The size of the storage gateway VM"
 }
 
+variable "existing_kms_key" {
+  type        = string
+  default     = ""
+  description = "Name of kms key if it exists in the account (eg. 'alias/<name>')"
+}
+
 ### database
 variable "bucket_versioning" {
   type        = bool
@@ -201,7 +207,7 @@ variable "kms_encrypt_secrets" {
 
 # ReadAPI stuff
 variable "enable_readapi" {
-  type = bool
+  type    = bool
   default = true
 }
 variable "azure_indico_io_client_id" {
@@ -312,7 +318,7 @@ variable "argo_branch" {
 }
 
 variable "argo_namespace" {
-  type = string
+  type    = string
   default = "argo"
 }
 
