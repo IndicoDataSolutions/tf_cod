@@ -178,10 +178,11 @@ module "cluster-manager" {
 }
 
 module "kms_key" {
-  source          = "app.terraform.io/indico/indico-aws-kms/mod"
-  version         = "1.1.0"
-  label           = var.label
-  additional_tags = var.additional_tags
+  source           = "app.terraform.io/indico/indico-aws-kms/mod"
+  version          = "2.0.2"
+  label            = var.label
+  additional_tags  = var.additional_tags
+  existing_kms_key = var.existing_kms_key
 }
 
 module "security-group" {
