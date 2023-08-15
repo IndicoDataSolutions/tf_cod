@@ -33,7 +33,7 @@ node_groups = {
     taints           = "--register-with-taints=indico.io/celery=true:NoSchedule"
   },
   static-workers = {
-    min_size         = 1
+    min_size         = 0
     max_size         = 20
     instance_types   = ["m5.xlarge"]
     type             = "cpu"
@@ -46,7 +46,7 @@ node_groups = {
     instance_types   = ["m5.xlarge"]
     type             = "cpu"
     spot             = false
-    desired_capacity = "1"
+    desired_capacity = "0"
     taints           = "--register-with-taints=indico.io/pdfextraction=true:NoSchedule"
   },
   highmem-workers = {
@@ -68,12 +68,12 @@ node_groups = {
     taints           = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
   },
   pgo-workers = {
-    min_size         = 1
+    min_size         = 0
     max_size         = 4
     instance_types   = ["m5.large"]
     type             = "cpu"
     spot             = false
-    desired_capacity = "1"
+    desired_capacity = "0"
     taints           = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
   },
   readapi-azurite = {
@@ -82,7 +82,7 @@ node_groups = {
     instance_types   = ["m5.large"]
     type             = "cpu"
     spot             = false
-    desired_capacity = "1"
+    desired_capacity = "0"
     taints           = "--register-with-taints=indico.io/azurite=true:NoSchedule"
   }
 }
