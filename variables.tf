@@ -468,7 +468,7 @@ variable "hibernation_enabled" {
 }
 
 variable "keda_version" {
-  default = "2.8.1"
+  default = "2.11.2"
 }
 
 variable "opentelemetry-collector_version" {
