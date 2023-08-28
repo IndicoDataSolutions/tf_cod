@@ -10,38 +10,39 @@ terraform {
     }
     keycloak = {
       source  = "mrparkers/keycloak"
-      version = "4.0.1"
+      version = "4.3.1"
     }
     argocd = {
       source  = "oboukili/argocd"
-      version = "5.4.0"
+      version = "6.0.2"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.12.1"
+      version = ">= 2.23.0"
     }
     kubectl = {
-      source = "gavinbunney/kubectl"
+      source  = "gavinbunney/kubectl"
+      version = "1.14.0"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.6.0"
+      version = ">= 2.11.0"
     }
     random = {
       source  = "hashicorp/random"
-      version = "~>3.3.0"
+      version = "~>3.5.1"
     }
     github = {
       source  = "integrations/github"
-      version = "4.26.0"
+      version = "5.34.0"
     }
     vault = {
       source  = "hashicorp/vault"
-      version = "3.13.0"
+      version = "3.19.0"
     }
     snowflake = {
       source  = "Snowflake-Labs/snowflake"
-      version = "~> 0.35"
+      version = "~> 0.70"
     }
   }
 }
