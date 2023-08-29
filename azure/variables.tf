@@ -222,6 +222,7 @@ variable "default_node_pool" {
     cluster_auto_scaling           = bool
     cluster_auto_scaling_min_count = number
     cluster_auto_scaling_max_count = number
+    labels                         = map(string)
   })
 
   default = {
