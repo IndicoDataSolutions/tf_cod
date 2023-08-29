@@ -10,17 +10,17 @@ database_subnet_cidr    = ["192.168.4.0/26"]
 storage_account_name    = ""
 cluster_manager_vm_size = "Standard_F2s"
 private_cluster_enabled = false
-k8s_version = "1.24.10"
+k8s_version             = "1.27.3"
 
 default_node_pool = {
-  name                           = "defaultpool"
-  node_count                     = 3
-  vm_size                        = "Standard_D16_v3"
-  zones                          = ["1", "2"]
-  taints                         = null
+  name       = "defaultpool"
+  node_count = 3
+  vm_size    = "Standard_D16_v3"
+  zones      = ["1", "2"]
+  taints     = null
   labels = {
-      "node_group" : "default-workers"
-    }
+    "node_group" : "default-workers"
+  }
   cluster_auto_scaling           = false
   cluster_auto_scaling_min_count = null
   cluster_auto_scaling_max_count = null
