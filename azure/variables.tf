@@ -174,6 +174,14 @@ variable "git_pat" {
   default   = ""
 }
 
+variable "crds-values-yaml-b64" {
+  default = "Cg=="
+}
+
+variable "pre-reqs-values-yaml-b64" {
+  default = "Cg=="
+}
+
 ### cluster manager variables
 variable "cluster_manager_vm_size" {
   type        = string

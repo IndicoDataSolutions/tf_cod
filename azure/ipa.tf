@@ -67,11 +67,62 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
+resource "github_repository_file" "pre-reqs-values-yaml" {
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/helm/pre-reqs-values.values"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+  content = base64decode(var.pre-reqs-values-yaml-b64)
+}
+
+
+resource "github_repository_file" "crds-values-yaml" {
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/helm/crds-values.values"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+  content = base64decode(var.crds-values-yaml-b64)
+}
+
+data "github_repository_file" "data-crds-values" {
+  depends_on = [
+    github_repository_file.crds-values-yaml
+  ]
+  repository = data.github_repository.argo-github-repo.name
+  branch     = var.argo_branch
+  file       = var.argo_path == "." ? "helm/crds-values.values" : "${var.argo_path}/helm/crds-values.values"
+}
+
+
+data "github_repository_file" "data-pre-reqs-values" {
+  depends_on = [
+    github_repository_file.pre-reqs-values-yaml
+  ]
+  repository = data.github_repository.argo-github-repo.name
+  branch     = var.argo_branch
+  file       = var.argo_path == "." ? "helm/pre-reqs-values.values" : "${var.argo_path}/helm/pre-reqs-values.values"
+}
+
 resource "helm_release" "ipa-crds" {
   depends_on = [
     module.cluster,
     kubernetes_secret.harbor-pull-secret,
-    kubernetes_secret.issuer-secret
+    kubernetes_secret.issuer-secret,
+    data.github_repository_file.data-crds-values
   ]
 
   verify           = false
@@ -107,7 +158,11 @@ resource "helm_release" "ipa-crds" {
     installCRDs: true
   aws-ebs-csi-driver:
     enabled: false
- EOF
+EOF
+    ,
+    <<EOT
+${data.github_repository_file.data-crds-values.content}
+EOT
   ]
 }
 
@@ -268,7 +323,8 @@ resource "helm_release" "ipa-pre-requisites" {
     data.vault_kv_secret_v2.zerossl_data,
     kubernetes_secret.azure_storage_key,
     kubernetes_config_map.azure_dns_credentials,
-    kubernetes_service_account.workload_identity
+    kubernetes_service_account.workload_identity,
+    data.github_repository_file.data-pre-reqs-values
   ]
 
   verify           = false
@@ -463,6 +519,10 @@ aws-fsx-csi-driver:
 metrics-server:
   enabled: false
   EOF
+    ,
+    <<EOT
+${data.github_repository_file.data-pre-reqs-values.content}
+EOT
   ]
 }
 
