@@ -175,6 +175,7 @@ resource "helm_release" "keda-monitoring" {
   repository       = "https://kedacore.github.io/charts"
   chart            = "keda"
   version          = var.keda_version
+  wait             = true
 
 
   values = [<<EOF
