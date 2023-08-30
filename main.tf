@@ -161,23 +161,6 @@ module "sqs_sns" {
   label   = var.label
 }
 
-module "cluster-manager" {
-  source                   = "app.terraform.io/indico/indico-aws-cluster-manager/mod"
-  version                  = "1.1.1"
-  label                    = var.label
-  additional_tags          = var.additional_tags
-  vpc_id                   = local.network[0].indico_vpc_id
-  subnet_id                = var.direct_connect == true ? local.network[0].private_subnet_ids[0] : local.network[0].public_subnet_ids[0]
-  user_ip                  = var.user_ip
-  key_pair                 = aws_key_pair.kp.key_name
-  public_ip                = !var.direct_connect # if using direct connect setup, do not provision public ip
-  region                   = var.region
-  cluster_name             = var.cluster_name
-  cluster_manager_iam_role = var.cluster_manager_iam_role
-  kms_key_arn              = module.kms_key.key_arn
-  assumed_roles            = var.assumed_roles
-}
-
 module "kms_key" {
   source           = "app.terraform.io/indico/indico-aws-kms/mod"
   version          = "2.0.2"
@@ -275,7 +258,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "8.0.17"
+  version                    = "8.0.19"
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
@@ -296,7 +279,6 @@ module "cluster" {
   s3_buckets                 = [module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : ""]
   cluster_version            = var.cluster_version
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
-  access_security_group      = module.cluster-manager.cluster_manager_sg
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
 }
 
