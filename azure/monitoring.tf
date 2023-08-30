@@ -126,7 +126,6 @@ ingress-nginx:
     patch:
       nodeSelector.beta.kubernetes.io/os: linux
 
-
     controller:
       service:
         annotations:
