@@ -269,18 +269,16 @@ module "fsx-storage" {
   include_rox                 = var.include_rox
 }
 
-
 module "cluster" {
   cod_snapshots_enabled      = true
   allow_dns_management       = true
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "8.0.13"
+  version                    = "8.0.14"
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
-  map_roles                  = [{ rolearn = module.cluster-manager.cluster_manager_iam_role_arn, username = "admin", groups = ["system:masters"] }]
   map_users                  = values(local.eks_users)
   vpc_id                     = local.network[0].indico_vpc_id
   security_group_id          = module.security-group.all_subnets_sg_id
@@ -301,7 +299,6 @@ module "cluster" {
   access_security_group      = module.cluster-manager.cluster_manager_sg
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
 }
-
 
 module "readapi" {
   count = var.enable_readapi ? 1 : 0
