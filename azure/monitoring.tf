@@ -117,6 +117,11 @@ ingress-nginx:
   rbac:
     create: true
 
+  controller:
+    service:
+      annotations:
+        service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
+
   admissionWebhooks:
     patch:
       nodeSelector.beta.kubernetes.io/os: linux
