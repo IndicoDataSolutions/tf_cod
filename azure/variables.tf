@@ -52,12 +52,6 @@ variable "region" {
   description = "The Azure region in which to launch the indico stack"
 }
 
-variable "external_ip" {
-  type        = string
-  default     = "35.174.218.89"
-  description = "The external IP which is allowed to connect to the cluster through ssh (AWS SSO VPN)"
-}
-
 variable "vnet_cidr" {
   type        = string
   description = "The VNet CIDR for the entire indico stack"
@@ -180,13 +174,6 @@ variable "crds-values-yaml-b64" {
 
 variable "pre-reqs-values-yaml-b64" {
   default = "Cg=="
-}
-
-### cluster manager variables
-variable "cluster_manager_vm_size" {
-  type        = string
-  default     = "Standard_Fs_v2"
-  description = "The cluster manager instance size"
 }
 
 ### cluster variables
