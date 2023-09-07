@@ -147,6 +147,8 @@ locals {
 
   snapshot_storage_account_name = replace(lower("${var.account}snapshots"), "-", "")
   storage_account_name          = replace(lower(var.storage_account_name), "-", "")
+  file_storage_account_name     = replace(lower("${var.storage_account_name}f"), "-", "")
+
 
   argo_app_name           = lower("${var.account}.${var.region}.${var.label}-ipa")
   argo_cluster_name       = "${var.account}.${var.region}.${var.label}"
@@ -198,7 +200,7 @@ module "storage" {
   blob_storage_tier          = var.blob_storage_tier
   blob_storage_account_kind  = var.blob_storage_account_kind
   
-  file_storage_account_name  = "${local.storage_account_name}f"
+  file_storage_account_name  = local.file_storage_account_name
   file_storage_tier          = var.file_storage_tier
   file_storage_account_kind  = var.file_storage_account_kind
 }
