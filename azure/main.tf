@@ -134,7 +134,6 @@ module "argo-registration" {
   argo_username                = var.argo_username
   argo_namespace               = var.argo_namespace
   account                      = var.account
-  azure_storage_tier           = "Premium"
   cloud_provider               = "azure"
   argo_github_team_admin_group = var.argo_github_team_owner
   endpoint                     = module.cluster.kubernetes_host
@@ -206,11 +205,12 @@ module "storage" {
     azurerm_resource_group.cod-cluster
   ]
   source               = "app.terraform.io/indico/indico-azure-blob/mod"
-  version              = "0.1.14"
+  version              = "0.1.15"
   label                = var.label
   region               = var.region
   resource_group_name  = local.resource_group_name
   storage_account_name = local.storage_account_name
+  azure_storage_tier   = var.azure_storage_tier
 }
 
 module "cluster" {
