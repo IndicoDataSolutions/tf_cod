@@ -189,13 +189,14 @@ module "storage" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  source               = "app.terraform.io/indico/indico-azure-blob/mod"
-  version              = "0.1.15"
-  label                = var.label
-  region               = var.region
-  resource_group_name  = local.resource_group_name
-  storage_account_name = local.storage_account_name
-  azure_storage_tier   = var.azure_storage_tier
+  source                     = "app.terraform.io/indico/indico-azure-blob/mod"
+  version                    = "0.1.16"
+  label                      = var.label
+  region                     = var.region
+  resource_group_name        = local.resource_group_name
+  storage_account_name       = local.storage_account_name
+  azure_storage_tier         = var.azure_storage_tier
+  azure_storage_account_kind = var.azure_storage_account_kind
 }
 
 module "cluster" {

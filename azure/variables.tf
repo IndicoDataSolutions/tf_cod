@@ -531,3 +531,10 @@ variable "azure_storage_tier" {
   default     = "Standard"
   description = "Azure default storage tier"
 }
+
+variable "azure_storage_account_kind" {
+  type        = string
+  default     = "StorageV2"
+  description = "Storage account kind"
+}
+
