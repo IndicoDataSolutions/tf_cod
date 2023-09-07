@@ -134,6 +134,7 @@ module "argo-registration" {
   argo_username                = var.argo_username
   argo_namespace               = var.argo_namespace
   account                      = var.account
+  azure_storage_tier           = "Premium"
   cloud_provider               = "azure"
   argo_github_team_admin_group = var.argo_github_team_owner
   endpoint                     = module.cluster.kubernetes_host
