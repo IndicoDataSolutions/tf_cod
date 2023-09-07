@@ -541,7 +541,7 @@ variable "alerting_email_password" {
 
 variable "monitor_retention_in_days" {
   type        = number
-  default     = 14 # minimum value
+  default     = 30 # minimum value
   description = "Azure Monitor retention in days"
 }
 
