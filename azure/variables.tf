@@ -525,6 +525,7 @@ variable "monitor_retention_in_days" {
   description = "Azure Monitor retention in days"
 }
 
+
 variable "blob_storage_tier" {
   type        = string
   default     = "Premium"
