@@ -543,3 +543,10 @@ variable "monitor_retention_in_days" {
   default     = 14 # minimum value
   description = "Azure Monitor retention in days"
 }
+
+
+variable "azure_storage_tier" {
+  type        = string
+  default     = "Standard"
+  description = "Azure default storage tier"
+}
