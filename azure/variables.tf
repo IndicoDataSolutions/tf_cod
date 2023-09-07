@@ -52,12 +52,6 @@ variable "region" {
   description = "The Azure region in which to launch the indico stack"
 }
 
-variable "external_ip" {
-  type        = string
-  default     = "35.174.218.89"
-  description = "The external IP which is allowed to connect to the cluster through ssh (AWS SSO VPN)"
-}
-
 variable "vnet_cidr" {
   type        = string
   description = "The VNet CIDR for the entire indico stack"
@@ -174,11 +168,12 @@ variable "git_pat" {
   default   = ""
 }
 
-### cluster manager variables
-variable "cluster_manager_vm_size" {
-  type        = string
-  default     = "Standard_Fs_v2"
-  description = "The cluster manager instance size"
+variable "crds-values-yaml-b64" {
+  default = "Cg=="
+}
+
+variable "pre-reqs-values-yaml-b64" {
+  default = "Cg=="
 }
 
 ### cluster variables
@@ -200,7 +195,7 @@ variable "svp_client_secret" {
 
 variable "k8s_version" {
   type        = string
-  default     = "1.27"
+  default     = "1.27.3"
   description = "The version of the kubernetes cluster"
 }
 
@@ -326,11 +321,6 @@ variable "ipa_smoketest_repo" {
   default = "https://harbor.devops.indico.io/chartrepo/indico-charts"
 }
 
-variable "ipa_smoketest_container_tag" {
-  type    = string
-  default = "development-5cc16676"
-}
-
 variable "ipa_smoketest_version" {
   type    = string
   default = "0.2.1-add-openshift-crds-4a0b2155"
@@ -344,16 +334,6 @@ variable "ipa_smoketest_slack_channel" {
 variable "ipa_smoketest_enabled" {
   type    = bool
   default = true
-}
-
-variable "ipa_smoketest_cronjob_enabled" {
-  type    = bool
-  default = false
-}
-
-variable "ipa_smoketest_cronjob_schedule" {
-  type    = string
-  default = "0 0 * * *" # every night at midnight
 }
 
 variable "admin_group_name" {

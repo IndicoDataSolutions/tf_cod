@@ -185,21 +185,6 @@ module "networking" {
   region              = var.region
 }
 
-module "cluster-manager" {
-  depends_on = [
-    azurerm_resource_group.cod-cluster
-  ]
-  source              = "app.terraform.io/indico/indico-azure-cluster-manager/mod"
-  version             = "2.0.7"
-  label               = var.label
-  subnet_id           = module.networking.subnet_id
-  public_key          = tls_private_key.pk.public_key_openssh
-  region              = var.region
-  vm_size             = var.cluster_manager_vm_size
-  external_ip         = var.external_ip
-  resource_group_name = local.resource_group_name
-}
-
 module "storage" {
   depends_on = [
     azurerm_resource_group.cod-cluster
@@ -220,7 +205,7 @@ module "cluster" {
 
   source                     = "app.terraform.io/indico/indico-azure-cluster/mod"
   insights_retention_in_days = var.monitor_retention_in_days
-  version                    = "3.0.0"
+  version                    = "3.1.3"
   label                      = var.label
   public_key                 = tls_private_key.pk.public_key_openssh
   region                     = var.region
