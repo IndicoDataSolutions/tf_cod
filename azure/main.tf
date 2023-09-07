@@ -190,7 +190,7 @@ module "storage" {
     azurerm_resource_group.cod-cluster
   ]
   source                     = "app.terraform.io/indico/indico-azure-blob/mod"
-  version                    = "0.1.17"
+  version                    = "0.1.1"
   label                      = var.label
   region                     = var.region
   resource_group_name        = local.resource_group_name
@@ -201,7 +201,8 @@ module "storage" {
 
 module "cluster" {
   depends_on = [
-    azurerm_resource_group.cod-cluster
+    azurerm_resource_group.cod-cluster,
+    module.storage
   ]
 
   source                     = "app.terraform.io/indico/indico-azure-cluster/mod"
