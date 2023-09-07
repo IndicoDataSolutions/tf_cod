@@ -194,11 +194,13 @@ module "storage" {
   label                      = var.label
   region                     = var.region
   resource_group_name        = local.resource_group_name
-  storage_account_name       = local.storage_account_name
-  blob_storage_tier         = var.blob_storage_tier
-  blob_storage_account_kind = var.blob_storage_account_kind
-  file_storage_tier         = var.file_storage_tier
-  file_storage_account_kind = var.file_storage_account_kind
+  blob_storage_account_name  = local.storage_account_name
+  blob_storage_tier          = var.blob_storage_tier
+  blob_storage_account_kind  = var.blob_storage_account_kind
+  
+  file_storage_account_name  = "${local.storage_account_name}f"
+  file_storage_tier          = var.file_storage_tier
+  file_storage_account_kind  = var.file_storage_account_kind
 }
 
 module "cluster" {
