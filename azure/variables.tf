@@ -525,16 +525,29 @@ variable "monitor_retention_in_days" {
   description = "Azure Monitor retention in days"
 }
 
-
-variable "azure_storage_tier" {
+variable "blob_storage_tier" {
   type        = string
-  default     = "Standard"
-  description = "Azure default storage tier"
+  default     = "Premium"
+  description = "Azure blob default storage tier"
 }
 
-variable "azure_storage_account_kind" {
+variable "blob_storage_account_kind" {
   type        = string
-  default     = "StorageV2"
-  description = "Storage account kind"
+  default     = "BlockBlobStorage"
+  description = "Blob Storage account kind"
 }
+
+
+variable "file_storage_tier" {
+  type        = string
+  default     = "Premium"
+  description = "Azure file default storage tier"
+}
+
+variable "file_storage_account_kind" {
+  type        = string
+  default     = "FileStorage"
+  description = "File Storage account kind"
+}
+
 

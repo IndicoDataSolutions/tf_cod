@@ -298,6 +298,25 @@ resource "kubernetes_secret" "azure_storage_key" {
   }
 }
 
+
+resource "kubernetes_secret" "azure_file_storage_key" {
+  depends_on = [
+    module.cluster
+  ]
+  metadata {
+    name = "azure-file-storage-key"
+  }
+
+  data = {
+    azurestorageaccountname = module.storage.file_storage_account_name
+    azurestorageaccountkey  = module.storage.file_storage_account_primary_access_key
+    AZURE_ACCOUNT_NAME      = module.storage.file_storage_account_name
+    AZURE_ACCOUNT_KEY       = module.storage.file_storage_account_primary_access_key
+  }
+}
+
+
+
 resource "kubernetes_config_map" "azure_dns_credentials" {
   count = var.include_external_dns == true ? 1 : 0
 
@@ -431,7 +450,7 @@ storage:
   pvcSpec:
     azureFile:
       readOnly: false
-      secretName: "azure-storage-key"
+      secretName: "azure-file-storage-key"
       secretNamespace: null
       shareName: ${module.storage.fileshare_name}
     mountOptions:
