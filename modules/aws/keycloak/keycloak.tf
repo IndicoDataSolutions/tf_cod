@@ -2,11 +2,9 @@ terraform {
   required_providers {
     keycloak = {
       source  = "mrparkers/keycloak"
-      version = "4.0.1"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.6.0"
     }
   }
 }
