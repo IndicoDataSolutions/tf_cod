@@ -108,9 +108,6 @@ configs:
     blob:
       s3:
       azure:
-        account: #{vars['label']}#{vars['region']}
-        key: ''
-        container: blob
         prefix: ''
   extraIndicoConfigs:
     DEFAULT_OCR_ENGINE: omnipage
@@ -150,6 +147,11 @@ authSettings:
   manageAllData: 'True'
 readapi:
   enabled: false
+  secretRefs:
+    - indico-static-secrets
+    - indico-generated-secrets
+    - rabbitmq
+    - azure-storage-key
 cronjob:
   services:
     storage-cleanup:
