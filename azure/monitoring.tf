@@ -117,10 +117,14 @@ ingress-nginx:
   rbac:
     create: true
 
+  controller:
+    service:
+      annotations:
+        service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
+
   admissionWebhooks:
     patch:
       nodeSelector.beta.kubernetes.io/os: linux
-
 
     controller:
       service:
@@ -175,6 +179,7 @@ resource "helm_release" "keda-monitoring" {
   repository       = "https://kedacore.github.io/charts"
   chart            = "keda"
   version          = var.keda_version
+  wait             = true
 
 
   values = [<<EOF
