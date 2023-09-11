@@ -204,7 +204,7 @@ module "cluster" {
 
   source                     = "app.terraform.io/indico/indico-azure-cluster/mod"
   insights_retention_in_days = var.monitor_retention_in_days
-  version                    = "3.1.3"
+  version                    = "3.1.4"
   label                      = var.label
   public_key                 = tls_private_key.pk.public_key_openssh
   region                     = var.region
@@ -217,6 +217,7 @@ module "cluster" {
   private_cluster_enabled    = var.private_cluster_enabled
   resource_group_name        = local.resource_group_name
   admin_group_name           = var.admin_group_name
+  account                    = var.account
   # this feature can be checked using:
   # az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/EnableWorkloadIdentityPreview')].{Name:name,State:properties.state}"
   # az provider register --namespace Microsoft.ContainerService
