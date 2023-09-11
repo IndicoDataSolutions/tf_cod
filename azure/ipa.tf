@@ -672,11 +672,14 @@ spec:
               annotations:
                 "azure.workload.identity/inject-proxy-sidecar": "true"
                 reloader.stakater.com/auto: "true"
-              
               serviceAccountName: "workload-identity-storage-account"
               labels:
                 "azure.workload.identity/use": "true"
-                
+              secretRefs:
+                - indico-static-secrets
+                - indico-generated-secrets
+                - rabbitmq
+                - azure-storage-key
             aws-node-termination:
               enabled: false 
             global:
