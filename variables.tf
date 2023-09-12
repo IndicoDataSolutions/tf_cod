@@ -90,13 +90,6 @@ variable "public_ip" {
   description = "Should the cluster manager have a public IP assigned"
 }
 
-variable "user_ip" {
-  type        = string
-  default     = ""
-  description = "The IP address to allow SSH access for"
-}
-
-
 variable "vpc_name" {
   type        = string
   default     = "indico_vpc"
@@ -224,12 +217,6 @@ variable "azure_indico_io_tenant_id" {
 }
 
 # IAM
-variable "cluster_manager_iam_role" {
-  type        = string
-  default     = null
-  description = "Name of the IAM role to assign to the cluster manager EC2 instance; will be created if not supplied"
-}
-
 variable "eks_cluster_iam_role" {
   type        = string
   default     = null
@@ -282,12 +269,6 @@ variable "include_rox" {
   type        = bool
   default     = false
   description = "Create a read only FSx file system"
-}
-
-variable "assumed_roles" {
-  type        = list(string)
-  default     = null
-  description = "list of ARNs to be put in the trust relationship for the cluster manager role"
 }
 
 variable "aws_account" {

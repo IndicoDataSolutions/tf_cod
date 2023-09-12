@@ -95,7 +95,6 @@ default_tags = {
   "indico/cluster"     = "dop-832",    #This should match the label variable
   "indico/environment" = "dev"         # Choices are dev , stage , prod
 }
-user_ip           = "" # set this to the external IP address if deployment server has no outbound access; else, leave as empty string or remove
 submission_expiry = 30 # days
 uploads_expiry    = 30 # days
 #RDS Stuff
@@ -108,8 +107,3 @@ include_fsx                 = false
 include_efs                 = true
 #cluster
 node_group_multi_az = false
-assumed_roles = [
-  "arn:aws:iam::528987135818:role/aws-reserved/sso.amazonaws.com/us-east-2/AWSReservedSSO_SupportUser_e2021891b05267dd",
-  "arn:aws:iam::528987135818:role/aws-reserved/sso.amazonaws.com/us-east-2/AWSReservedSSO_PowerUserAccess_d162cafa6627ab76",
-  "arn:aws:iam::528987135818:role/aws-reserved/sso.amazonaws.com/us-east-2/AWSReservedSSO_AdministratorAccess_e837eb0d7af593bc"
-]
