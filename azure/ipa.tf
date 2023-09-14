@@ -387,6 +387,18 @@ clusterIssuer:
       selector:
         matchLabels:
           "acme.cert-manager.io/dns01-solver": "true"
+    # adding this additional solver with the same configurations pending planning to allow configuring DNS outside of azure in aws.
+    - dns01:
+        azureDNS:
+          environment: AzurePublicCloud
+          hostedZoneName: ${data.azurerm_dns_zone.domain.name}
+          managedIdentity:
+            clientID: ${module.cluster.kubelet_identity.client_id}
+          resourceGroupName: ${var.common_resource_group}
+          subscriptionID: ${split("/", data.azurerm_subscription.primary.id)[2]}
+      selector:
+        matchLabels:
+          "acme.cert-manager.io/dns02-solver": "true"
 
 apiModels:
   enabled: true
