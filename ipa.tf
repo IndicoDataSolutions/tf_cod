@@ -56,7 +56,7 @@ locals {
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
   acm_ipa_values = var.use_acm == true ? (<<EOT
 app-edge:
-  alternateDomain: ${local.dns_name}
+  alternateDomain: ""
   service:
     type: "NodePort"
     ports:
@@ -87,7 +87,7 @@ app-edge:
   EOT
     ) : (<<EOT
 app-edge:
-  alternateDomain: ${local.dns_name}
+  alternateDomain: ""
 EOT
   )
   dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT
