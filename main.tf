@@ -434,6 +434,7 @@ data "aws_route53_zone" "primary" {
 }
 
 resource "aws_route53_record" "ipa-app-caa" {
+  count = var.is_alternate_account_domain == "true" ? 0 : 1
   zone_id = data.aws_route53_zone.primary.zone_id
   name    = local.dns_name
   type    = "CAA"
