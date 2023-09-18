@@ -424,8 +424,8 @@ module "argo-registration" {
 locals {
   security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
   cluster_name      = var.label
-  dns_name          = lower("${var.label}.${var.region}.${var.aws_account}.indico.io")
-  dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
+  dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${var.aws_account}.indico.io") : var.domain_host
+  #dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
 }
 
 
@@ -434,6 +434,7 @@ data "aws_route53_zone" "primary" {
 }
 
 resource "aws_route53_record" "ipa-app-caa" {
+  count = var.is_alternate_account_domain == "true" ? 0 : 1
   zone_id = data.aws_route53_zone.primary.zone_id
   name    = local.dns_name
   type    = "CAA"

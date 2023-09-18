@@ -1,6 +1,6 @@
 locals {
   #need to get the root of alternate_domain
-  the_splits            = var.alternate_domain != "" ? split(".", var.alternate_domain) : split(".", "test.domain.com")
+  the_splits            = local.dns_name != "" ? split(".", local.dns_name) : split(".", "test.domain.com")
   the_length            = length(local.the_splits)
   the_tld               = local.the_splits[local.the_length - 1]
   the_domain            = local.the_splits[local.the_length - 2]
@@ -56,7 +56,7 @@ locals {
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
   acm_ipa_values = var.use_acm == true ? (<<EOT
 app-edge:
-  alternateDomain: ${var.alternate_domain}
+  alternateDomain: ""
   service:
     type: "NodePort"
     ports:
@@ -87,10 +87,10 @@ app-edge:
   EOT
     ) : (<<EOT
 app-edge:
-  alternateDomain: ${var.alternate_domain}
+  alternateDomain: ""
 EOT
   )
-  dns_configuration_values = var.alternate_domain == "" ? (<<EOT
+  dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT
 clusterIssuer:
   additionalSolvers:
     - dns01:
@@ -106,21 +106,17 @@ clusterIssuer:
     - dns01:
         route53:
           region: ${var.region}
-      selector:
-        matchLabels:
-          "acme.cert-manager.io/dns01-solver": "true"
-    - dns01:
-        route53:
-          region: ${var.region}
           role: ${var.aws_primary_dns_role_arn}
       selector:
         matchLabels:
-          "acme.cert-manager.io/dns02-solver": "true"
+          "acme.cert-manager.io/dns01-solver": "true"
+external-dns:
+  enabled: false
 alternate-external-dns:
   enabled: true
   logLevel: debug
   policy: sync
-  txtOwnerId: "${var.alternate_domain}-${var.label}-${var.region}"
+  txtOwnerId: "${local.dns_name}-${var.label}-${var.region}"
   domainFilters:
     - ${local.alternate_domain_root}
   extraArgs:
