@@ -294,8 +294,8 @@ rabbitmq:
       enabled: true
       serviceMonitor:
         enabled: true
-    hpa:
-      enabled: false
+  hpa:
+    enabled: false
 
 secrets:
   rabbitmq:
