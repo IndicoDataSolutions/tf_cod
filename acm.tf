@@ -4,7 +4,7 @@ output "acm_arn" {
 }
 
 resource "aws_acm_certificate" "alb" {
-  count    = var.use_acm == true ? 1 : 0
+  count    = var.use_acm == true && var.is_alternate_account_domain == "false" ? 1 : 0
   domain_name       = local.dns_name
   validation_method = "DNS"
   depends_on = [
