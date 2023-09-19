@@ -293,7 +293,7 @@ rabbitmq:
     metrics:
       enabled: true
       serviceMonitor:
-        enabled: true
+        enabled: false
   hpa:
     enabled: false
 
