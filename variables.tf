@@ -550,10 +550,16 @@ variable "aws_primary_dns_role_arn" {
   description = "The AWS arn for the role needed to manage route53 DNS in a different account."
 }
 
-variable "alternate_domain" {
+variable "is_alternate_account_domain" {
+  type        = string
+  default     = "false"
+  description = "domain name is controlled by a different aws account"
+}
+
+variable "domain_host" {
   type        = string
   default     = ""
-  description = "Optional alternate domain to use with cluster."
+  description = "domain host name."
 }
 
 variable "alerting_enabled" {
