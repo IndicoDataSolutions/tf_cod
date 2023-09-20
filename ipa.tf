@@ -116,7 +116,7 @@ alternate-external-dns:
   enabled: true
   logLevel: debug
   policy: sync
-  txtOwnerId: "${var.dns_name}-${var.label}-${var.region}"
+  txtOwnerId: "${local.dns_name}-${var.label}-${var.region}"
   domainFilters:
     - ${local.alternate_domain_root}
   extraArgs:
