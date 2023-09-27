@@ -143,12 +143,6 @@ variable "uploads_expiry" {
   default     = 30
 }
 
-variable "multi_az" {
-  type        = bool
-  default     = true
-  description = "Enable a multi-availability zone deployment"
-}
-
 ### cluster
 variable "name" {
   type        = string
