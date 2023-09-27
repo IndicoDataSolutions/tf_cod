@@ -106,4 +106,4 @@ include_rox                 = false
 include_fsx                 = false
 include_efs                 = true
 #cluster
-node_group_multi_az = false
+node_group_multi_az = true
