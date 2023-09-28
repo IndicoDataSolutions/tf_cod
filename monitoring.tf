@@ -184,7 +184,7 @@ authentication:
 ${local.alerting_configuration_values}
 
 kube-prometheus-stack:
-  ${local.kube_prometheus_stack_values}
+${local.kube_prometheus_stack_values}
   
 
 EOF
