@@ -133,6 +133,32 @@ alternate-external-dns:
     - ingress
 EOT
   )
+  runtime_scanner_ingress_values = var.use_static_ssl_certificates == true ? (<<EOT
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - foo'
+    nginx.ingress.kubernetes.io/auth-secret: runtime-scanner-auth
+  
+  useDefaultResolver: true
+  labels: {}
+
+  hosts:
+    - host: scan
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: 
+    - secretName: ${var.ssl_sub_level_secret_name}
+      hosts:
+        - scan
+  EOT
+    ) : (<<EOT
+extraConfigurations: "none"
+EOT
+  )
 }
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
@@ -725,6 +751,7 @@ spec:
               authentication:
                 ingressUser: monitoring
                 ingressPassword: ${random_password.monitoring-password.result}
+              ${indent(14, local.runtime_scanner_ingress_values)} 
             ${indent(12, local.acm_ipa_values)}         
 
         - name: HELM_VALUES

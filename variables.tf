@@ -639,3 +639,15 @@ variable "eks_addon_version_guardduty" {
   default     = true
   description = "enable guardduty"
 }
+
+variable "use_static_ssl_certificates" {
+  type        = bool
+  default     = false
+  description = "use static ssl certificates for clusters which cannot use certmanager and external dns."
+}
+
+variable "ssl_sub_level_secret_name" {
+  type        = string
+  default     = "indico-ssl-sublevel-static-cert"
+  description = "sub_level_secret_name for static ssl certificate"
+}

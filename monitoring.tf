@@ -22,6 +22,68 @@ alerting:
     integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
 EOT
   )
+  kube_prometheus_stack_values = var.use_static_ssl_certificates == true ? (<<EOT
+  alertmanager:
+    ingress:
+      annotations:
+        nginx.ingress.kubernetes.io/auth-type: basic
+        nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - foo'
+        nginx.ingress.kubernetes.io/auth-secret: alertmanager-auth
+      
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - alertmanager.${var.local_dns_name}
+      paths:
+        - /
+      tls:
+        - secretName: ${var.ssl_sub_level_secret_name}
+          hosts:
+            - alertmanager.${var.local_dns_name}
+  prometheus:
+    prometheusSpec:
+      nodeSelector:
+        node_group: static-workers
+    ingress:
+      annotations:
+        nginx.ingress.kubernetes.io/auth-type: basic
+        nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - foo'
+        nginx.ingress.kubernetes.io/auth-secret: prometheus-auth
+      
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - prometheus.${var.local_dns_name}
+      paths:
+        - /
+      tls:
+        - secretName: ${var.ssl_sub_level_secret_name}
+          hosts:
+            - prometheus.${var.local_dns_name}
+  grafana:
+    ingress:
+      annotations:
+        nginx.ingress.kubernetes.io/auth-type: basic
+        nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - foo'
+        nginx.ingress.kubernetes.io/auth-secret: grafana-auth
+      
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - grafana.${var.local_dns_name}
+      path: /
+      tls:
+        - secretName: ${var.ssl_sub_level_secret_name}
+          hosts:
+            - grafana.${var.local_dns_name}
+  EOT
+    ) : (<<EOT
+  prometheus:
+    prometheusSpec:
+      nodeSelector:
+        node_group: static-workers
+EOT
+  )
 }
 
 resource "aws_route53_record" "grafana-caa" {
@@ -101,6 +163,7 @@ resource "helm_release" "monitoring" {
 global:
   host: "${local.dns_name}"
 
+
 ingress-nginx:
   enabled: true
 
@@ -121,10 +184,8 @@ authentication:
 ${local.alerting_configuration_values}
 
 kube-prometheus-stack:
-  prometheus:
-    prometheusSpec:
-      nodeSelector:
-        node_group: static-workers
+  ${local.kube_prometheus_stack_values}
+  
 
 EOF
   ]

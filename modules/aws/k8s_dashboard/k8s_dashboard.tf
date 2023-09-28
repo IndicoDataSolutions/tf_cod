@@ -1,3 +1,31 @@
+locals {
+  ingress_values = var.use_static_ssl_certificates == false ? (<<EOT
+  ingress:
+    enabled: true
+    hosts:
+      - k8s.${var.local_dns_name}
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: zerossl
+    tls:
+      - hosts:
+          - k8s.${var.local_dns_name}
+        secretName: k8s-proxy-tls
+  EOT
+    ) : (<<EOT
+  ingress:
+    enabled: true
+    hosts:
+      - k8s.${var.local_dns_name}
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    tls:
+      - hosts:
+          - k8s.${var.local_dns_name}
+        secretName: ${var.ssl_sub_level_secret_name}
+EOT
+  )
+}
 resource "helm_release" "k8s-dashboard" {
   name             = "k8s"
   create_namespace = true
@@ -82,17 +110,7 @@ oauth2-proxy:
     annotations:
       external-dns.alpha.kubernetes.io/hostname: k8s.${var.local_dns_name}
 
-  ingress:
-    enabled: true
-    hosts:
-      - k8s.${var.local_dns_name}
-    annotations:
-      kubernetes.io/ingress.class: nginx
-      cert-manager.io/cluster-issuer: zerossl
-    tls:
-      - hosts:
-          - k8s.${var.local_dns_name}
-        secretName: k8s-proxy-tls
+  ${local.ingress_values}
 
    EOF
   ]
