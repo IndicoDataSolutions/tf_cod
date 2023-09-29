@@ -13,16 +13,16 @@ locals {
         secretName: k8s-proxy-tls
   EOT
     ) : (<<EOT
-  ingress:
-    enabled: true
-    hosts:
-      - k8s-${var.local_dns_name}
-    annotations:
-      kubernetes.io/ingress.class: nginx
-    tls:
-      - hosts:
-          - k8s-${var.local_dns_name}
-        secretName: ${var.ssl_static_secret_name}
+ingress:
+  enabled: true
+  hosts:
+    - k8s-${var.local_dns_name}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  tls:
+    - hosts:
+        - k8s-${var.local_dns_name}
+      secretName: ${var.ssl_static_secret_name}
 EOT
   )
 }
@@ -56,7 +56,7 @@ kubernetes-dashboard:
     disableAccessDeniedNotifications: false
 
 oauth2-proxy:
-  ${local.ingress_values}
+  
   extraArgs:
     insecure-oidc-allow-unverified-email: true
     email-domain: indico.io
@@ -110,6 +110,8 @@ oauth2-proxy:
   service:
     annotations:
       external-dns.alpha.kubernetes.io/hostname: k8s.${var.local_dns_name}
+
+  ${local.ingress_values}
 
   EOF
   ]
