@@ -5,7 +5,7 @@ locals {
   the_tld               = local.the_splits[local.the_length - 1]
   the_domain            = local.the_splits[local.the_length - 2]
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
-
+  enable_external_dns =  var.use_static_ssl_certificates == false ? true : false
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:
     enabled: false
@@ -113,7 +113,7 @@ clusterIssuer:
 external-dns:
   enabled: false
 alternate-external-dns:
-  enabled: true
+  enabled: ${local.enable_external_dns}
   logLevel: debug
   policy: sync
   txtOwnerId: "${local.dns_name}-${var.label}-${var.region}"
@@ -401,7 +401,7 @@ apiModels:
     node_group: static-workers
 
 external-dns:
-  enabled: true
+  enabled: ${local.enable_external_dns}
   logLevel: debug
   policy: sync
   txtOwnerId: "${var.label}-${var.region}"
