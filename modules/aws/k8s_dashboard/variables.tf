@@ -21,8 +21,8 @@ variable "use_static_ssl_certificates" {
   description = "use static ssl certificates for clusters which cannot use certmanager and external dns."
 }
 
-variable "ssl_sub_level_secret_name" {
+variable "ssl_static_secret_name" {
   type        = string
-  default     = "indico-ssl-sublevel-static-cert"
-  description = "sub_level_secret_name for static ssl certificate"
+  default     = "indico-ssl-static-cert"
+  description = "secret_name for static ssl certificate"
 }

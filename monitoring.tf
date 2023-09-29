@@ -28,13 +28,13 @@ EOT
       enabled: true
       ingressClassName: nginx
       hosts:
-        - alertmanager.${local.dns_name}
+        - alertmanager-${local.dns_name}
       paths:
         - /
       tls:
-        - secretName: ${var.ssl_sub_level_secret_name}
+        - secretName: ${var.ssl_static_secret_name}
           hosts:
-            - alertmanager.${local.dns_name}
+            - alertmanager-${local.dns_name}
   prometheus:
     prometheusSpec:
       nodeSelector:
@@ -43,24 +43,24 @@ EOT
       enabled: true
       ingressClassName: nginx
       hosts:
-        - prometheus.${local.dns_name}
+        - prometheus-${local.dns_name}
       paths:
         - /
       tls:
-        - secretName: ${var.ssl_sub_level_secret_name}
+        - secretName: ${var.ssl_static_secret_name}
           hosts:
-            - prometheus.${local.dns_name}
+            - prometheus-${local.dns_name}
   grafana:
     ingress:
       enabled: true
       ingressClassName: nginx
       hosts:
-        - grafana.${local.dns_name}
+        - grafana-${local.dns_name}
       path: /
       tls:
-        - secretName: ${var.ssl_sub_level_secret_name}
+        - secretName: ${var.ssl_static_secret_name}
           hosts:
-            - grafana.${local.dns_name}
+            - grafana-${local.dns_name}
   EOT
     ) : (<<EOT
   alertmanager:
