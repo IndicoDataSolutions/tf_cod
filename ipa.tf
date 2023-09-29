@@ -136,6 +136,7 @@ EOT
   runtime_scanner_ingress_values = var.use_static_ssl_certificates == true ? (<<EOT
 ingress:
   enabled: true
+  useStaticCertificate: true
   className: "nginx"
   annotations:
     nginx.ingress.kubernetes.io/auth-type: basic
@@ -156,7 +157,11 @@ ingress:
         - scan
   EOT
     ) : (<<EOT
-extraConfigurations: "none"
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: zerossl
 EOT
   )
 }
