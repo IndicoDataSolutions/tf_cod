@@ -151,7 +151,7 @@ ingress:
         - path: /
           pathType: ImplementationSpecific
   tls: 
-    - secretName: ${var.ssl_sub_level_secret_name}
+    - secretName: ${var.ssl_static_secret_name}
       hosts:
         - scan
   EOT
