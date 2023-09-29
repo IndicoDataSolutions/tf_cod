@@ -112,7 +112,7 @@ oauth2-proxy:
 
   ${local.ingress_values}
 
-   EOF
+  EOF
   ]
 }
 

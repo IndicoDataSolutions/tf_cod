@@ -25,11 +25,6 @@ EOT
   kube_prometheus_stack_values = var.use_static_ssl_certificates == true ? (<<EOT
   alertmanager:
     ingress:
-      annotations:
-        nginx.ingress.kubernetes.io/auth-type: basic
-        nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - foo'
-        nginx.ingress.kubernetes.io/auth-secret: alertmanager-auth
-      
       enabled: true
       ingressClassName: nginx
       hosts:
@@ -45,11 +40,6 @@ EOT
       nodeSelector:
         node_group: static-workers
     ingress:
-      annotations:
-        nginx.ingress.kubernetes.io/auth-type: basic
-        nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - foo'
-        nginx.ingress.kubernetes.io/auth-secret: prometheus-auth
-      
       enabled: true
       ingressClassName: nginx
       hosts:
@@ -62,11 +52,6 @@ EOT
             - prometheus.${local.dns_name}
   grafana:
     ingress:
-      annotations:
-        nginx.ingress.kubernetes.io/auth-type: basic
-        nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - foo'
-        nginx.ingress.kubernetes.io/auth-secret: grafana-auth
-      
       enabled: true
       ingressClassName: nginx
       hosts:
@@ -78,10 +63,21 @@ EOT
             - grafana.${local.dns_name}
   EOT
     ) : (<<EOT
+  alertmanager:
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
   prometheus:
     prometheusSpec:
       nodeSelector:
         node_group: static-workers
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+  grafana:
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
 EOT
   )
 }
