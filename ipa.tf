@@ -473,7 +473,7 @@ crunchy-postgres:
           requests:
             storage: 200Gi
       name: pgha1
-      replicas: 1
+      replicas: ${var.az_count}
       resources:
         requests:
           cpu: 1000m

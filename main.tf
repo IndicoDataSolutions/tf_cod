@@ -258,7 +258,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "8.0.20"
+  version                    = "8.1.6"
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
@@ -272,7 +272,7 @@ module "cluster" {
   eks_cluster_nodes_iam_role = "${var.label}-${var.region}-node-role"
   fsx_arns                   = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
   kms_key_arn                = module.kms_key.key_arn
-  multi_az                   = var.node_group_multi_az
+  az_count                   = var.az_count
   key_pair                   = aws_key_pair.kp.key_name
   snapshot_id                = var.snapshot_id
   default_tags               = var.default_tags
@@ -348,7 +348,6 @@ resource "aws_security_group" "indico_allow_access" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
 }
 
 # argo 
@@ -434,7 +433,7 @@ data "aws_route53_zone" "primary" {
 }
 
 resource "aws_route53_record" "ipa-app-caa" {
-  count = var.is_alternate_account_domain == "true" ? 0 : 1
+  count   = var.is_alternate_account_domain == "true" ? 0 : 1
   zone_id = data.aws_route53_zone.primary.zone_id
   name    = local.dns_name
   type    = "CAA"
