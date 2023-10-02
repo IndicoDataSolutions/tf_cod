@@ -447,6 +447,18 @@ variable "enable_servicebus" {
   default = false
 }
 
+variable "is_alternate_account_domain" {
+  type        = string
+  default     = "false"
+  description = "domain name is controlled by a different aws account"
+}
+
+variable "domain_host" {
+  type        = string
+  default     = ""
+  description = "domain host name."
+}
+
 variable "alerting_enabled" {
   type        = bool
   default     = false

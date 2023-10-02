@@ -8,6 +8,7 @@ data "azurerm_dns_zone" "domain" {
 }
 
 resource "azurerm_dns_caa_record" "fqdn" {
+  count = var.is_alternate_account_domain == "true" ? 0 : 1
   name                = local.dns_prefix
   zone_name           = data.azurerm_dns_zone.domain.name
   resource_group_name = var.common_resource_group
