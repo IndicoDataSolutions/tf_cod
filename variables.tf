@@ -143,12 +143,6 @@ variable "uploads_expiry" {
   default     = 30
 }
 
-variable "multi_az" {
-  type        = bool
-  default     = true
-  description = "Enable a multi-availability zone deployment"
-}
-
 ### cluster
 variable "name" {
   type        = string
@@ -253,10 +247,16 @@ variable "per_unit_storage_throughput" {
   default     = 100
   description = "Throughput for each 1 TiB or storage (max 200) for RWX FSx"
 }
-variable "node_group_multi_az" {
-  type        = bool
-  default     = true
-  description = "Enable a multi-availability zone deployment for nodes"
+
+variable "az_count" {
+  type        = number
+  default     = 2
+  description = "Number of availability zones for nodes"
+
+  validation {
+    condition     = var.az_count > 0 && var.az_count <= 3
+    error_message = "The az_count must be in the range 1-3"
+  }
 }
 
 variable "snapshot_id" {
