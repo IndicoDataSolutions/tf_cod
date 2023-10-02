@@ -2,8 +2,8 @@
 direct_connect = false # set to true to deploy the direct connect compatible stack
 #region               = "us-east-2" # only 2 az in us-west-1
 vpc_cidr             = "10.0.0.0/16"
-private_subnet_cidrs = ["10.0.0.0/19", "10.0.32.0/19"]
-public_subnet_cidrs  = ["10.0.96.0/27", "10.0.97.0/27"]
+private_subnet_cidrs = ["10.0.0.0/19", "10.0.32.0/19", "10.0.64.0/19"]
+public_subnet_cidrs  = ["10.0.96.0/27", "10.0.97.0/27", "10.0.98.0/27"]
 
 
 ipa_values = ""
@@ -106,4 +106,4 @@ include_rox                 = false
 include_fsx                 = false
 include_efs                 = true
 #cluster
-node_group_multi_az = true
+az_count = 2
