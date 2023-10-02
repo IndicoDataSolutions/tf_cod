@@ -670,7 +670,6 @@ spec:
           value: |
             readapi:
               annotations:
-                "azure.workload.identity/inject-proxy-sidecar": "true"
                 reloader.stakater.com/auto: "true"
               serviceAccountName: "workload-identity-storage-account"
               labels:
