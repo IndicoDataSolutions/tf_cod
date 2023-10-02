@@ -22,6 +22,64 @@ alerting:
     integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
 EOT
   )
+  kube_prometheus_stack_values = var.use_static_ssl_certificates == true ? (<<EOT
+  alertmanager:
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - alertmanager-${local.dns_name}
+      paths:
+        - /
+      tls:
+        - secretName: ${var.ssl_static_secret_name}
+          hosts:
+            - alertmanager-${local.dns_name}
+  prometheus:
+    prometheusSpec:
+      nodeSelector:
+        node_group: static-workers
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - prometheus-${local.dns_name}
+      paths:
+        - /
+      tls:
+        - secretName: ${var.ssl_static_secret_name}
+          hosts:
+            - prometheus-${local.dns_name}
+  grafana:
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - grafana-${local.dns_name}
+      path: /
+      tls:
+        - secretName: ${var.ssl_static_secret_name}
+          hosts:
+            - grafana-${local.dns_name}
+  EOT
+    ) : (<<EOT
+  alertmanager:
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+  prometheus:
+    prometheusSpec:
+      nodeSelector:
+        node_group: static-workers
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+  grafana:
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+EOT
+  )
 }
 
 resource "aws_route53_record" "grafana-caa" {
@@ -121,10 +179,7 @@ authentication:
 ${local.alerting_configuration_values}
 
 kube-prometheus-stack:
-  prometheus:
-    prometheusSpec:
-      nodeSelector:
-        node_group: static-workers
+${local.kube_prometheus_stack_values}
 
 EOF
   ]
