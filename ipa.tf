@@ -6,6 +6,7 @@ locals {
   the_domain            = local.the_splits[local.the_length - 2]
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
 
+  enable_external_dns =  var.use_static_ssl_certificates == false ? true : false
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:
     enabled: false
@@ -111,7 +112,7 @@ clusterIssuer:
         matchLabels:
           "acme.cert-manager.io/dns01-solver": "true"
 external-dns:
-  enabled: false
+  enabled: ${local.enable_external_dns}
 alternate-external-dns:
   enabled: true
   logLevel: debug
@@ -131,6 +132,36 @@ alternate-external-dns:
   policy: sync
   sources:
     - ingress
+EOT
+  )
+  runtime_scanner_ingress_values = var.use_static_ssl_certificates == true ? (<<EOT
+ingress:
+  enabled: true
+  useStaticCertificate: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - alternate'
+    nginx.ingress.kubernetes.io/auth-secret: runtime-scanner-auth
+  
+  useDefaultResolver: true
+  labels: {}
+  hosts:
+    - host: scan
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: 
+    - secretName: ${var.ssl_static_secret_name}
+      hosts:
+        - scan
+  EOT
+    ) : (<<EOT
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: zerossl
 EOT
   )
 }
@@ -370,7 +401,7 @@ apiModels:
     node_group: static-workers
 
 external-dns:
-  enabled: true
+  enabled: ${local.enable_external_dns}
   logLevel: debug
   policy: sync
   txtOwnerId: "${var.label}-${var.region}"
@@ -725,6 +756,7 @@ spec:
               authentication:
                 ingressUser: monitoring
                 ingressPassword: ${random_password.monitoring-password.result}
+                ${indent(14, local.runtime_scanner_ingress_values)} 
             ${indent(12, local.acm_ipa_values)}         
 
         - name: HELM_VALUES
