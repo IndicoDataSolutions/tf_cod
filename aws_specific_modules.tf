@@ -16,10 +16,12 @@ module "k8s_dashboard" {
 
   source = "./modules/aws/k8s_dashboard"
 
-  local_dns_name         = local.dns_name
-  ipa_repo               = var.ipa_repo
-  keycloak_client_id     = module.keycloak.client_id
-  keycloak_client_secret = module.keycloak.client_secret
+  local_dns_name              = local.dns_name
+  ipa_repo                    = var.ipa_repo
+  keycloak_client_id          = module.keycloak.client_id
+  keycloak_client_secret      = module.keycloak.client_secret
+  use_static_ssl_certificates = var.use_static_ssl_certificates
+  ssl_static_secret_name      = var.ssl_static_secret_name
 }
 
 data "aws_vpc_endpoint_service" "guardduty" {
