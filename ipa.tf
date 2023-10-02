@@ -140,7 +140,7 @@ ingress:
   className: "nginx"
   annotations:
     nginx.ingress.kubernetes.io/auth-type: basic
-    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - foo'
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - alternate'
     nginx.ingress.kubernetes.io/auth-secret: runtime-scanner-auth
   
   useDefaultResolver: true
