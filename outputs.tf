@@ -81,3 +81,7 @@ output "kube_token" {
   sensitive = true
   value     = module.cluster.kubernetes_token
 }
+
+output "node_groups" {
+  value = var.node_groups
+}
