@@ -39,7 +39,6 @@ node_groups = {
     type             = "cpu"
     spot             = false
     desired_capacity = "0"
-    taints           = ""
   },
   pdf-workers = {
     min_size         = 0
