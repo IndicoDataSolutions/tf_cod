@@ -162,7 +162,17 @@ variable "k8s_version" {
   description = "The EKS version to use"
 }
 
+
 variable "node_groups" {
+  type = map(object({
+    desired_capacity = string,
+    instance_types   = list(string),
+    max_size         = number,
+    min_size         = number,
+    spot             = bool,
+    taints           = string,
+    type             = string
+  }))
 }
 
 variable "node_bootstrap_arguments" {
