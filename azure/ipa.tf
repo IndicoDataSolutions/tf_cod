@@ -668,6 +668,9 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
+            nvidia-device-plugin:
+              nvidia-device-plugin:
+                compatWithCPUManager: True
             readapi:
               annotations:
                 reloader.stakater.com/auto: "true"
