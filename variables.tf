@@ -165,13 +165,14 @@ variable "k8s_version" {
 
 variable "node_groups" {
   type = map(object({
-    desired_capacity = string,
-    instance_types   = list(string),
-    max_size         = number,
-    min_size         = number,
-    spot             = bool,
-    taints           = string,
-    type             = string
+    desired_capacity       = string,
+    instance_types         = list(string),
+    max_size               = number,
+    min_size               = number,
+    spot                   = bool,
+    taints                 = optional(string),
+    type                   = string,
+    additional_node_labels = optional(string)
   }))
 }
 
