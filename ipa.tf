@@ -6,7 +6,7 @@ locals {
   the_domain            = local.the_splits[local.the_length - 2]
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
 
-  enable_external_dns =  var.use_static_ssl_certificates == false ? true : false
+  enable_external_dns = var.use_static_ssl_certificates == false ? true : false
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:
     enabled: false
@@ -817,7 +817,7 @@ resource "argocd_application" "ipa" {
       path            = var.argo_path
       target_revision = var.argo_branch
       directory {
-        recurse = false
+        recurse = "false"
       }
     }
 
