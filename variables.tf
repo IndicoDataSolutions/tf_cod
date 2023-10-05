@@ -162,18 +162,8 @@ variable "k8s_version" {
   description = "The EKS version to use"
 }
 
-
+# this is free-form since many options may be not passed which default 
 variable "node_groups" {
-  type = map(object({
-    desired_capacity       = string,
-    instance_types         = list(string),
-    max_size               = number,
-    min_size               = number,
-    spot                   = bool,
-    taints                 = optional(string),
-    type                   = string,
-    additional_node_labels = optional(string)
-  }))
 }
 
 variable "node_bootstrap_arguments" {
