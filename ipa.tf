@@ -810,21 +810,21 @@ resource "argocd_application" "ipa" {
     project = module.argo-registration.argo_project_name
 
     source {
-      plugin {
-        name = "argocd-vault-plugin"
-      }
+      #plugin {
+      #  name = "argocd-vault-plugin"
+      #}
       repo_url        = "https://github.com/IndicoDataSolutions/${var.argo_repo}.git"
       path            = var.argo_path
       target_revision = var.argo_branch
       directory {
-        recurse = "false"
+        recurse = false
       }
     }
 
     sync_policy {
       automated {
         prune       = true
-        self_heal   = true
+        self_heal   = false
         allow_empty = false
       }
     }
