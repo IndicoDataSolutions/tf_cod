@@ -707,6 +707,17 @@ output "zerossl" {
   value     = data.vault_kv_secret_v2.zerossl_data.data_json
 }
 
+
+resource "github_repository_file" "tfc-version-file" {
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/.tfc-version"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  content = var.terraform_cloud_version
+}
+
 resource "argocd_application" "ipa" {
   depends_on = [
     helm_release.ipa-pre-requisites,

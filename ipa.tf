@@ -604,6 +604,7 @@ data "github_repository" "argo-github-repo" {
   full_name = "IndicoDataSolutions/${var.argo_repo}"
 }
 
+
 resource "github_repository_file" "smoketest-application-yaml" {
   count = var.ipa_smoketest_enabled == true ? 1 : 0
 
@@ -688,6 +689,18 @@ resource "github_repository_file" "alb-values-yaml" {
 
   content = local.acm_ipa_values
 }
+
+
+resource "github_repository_file" "tfc-version-file" {
+  repository          = data.github_repository.argo-github-repo.name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/.tfc-version"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  content = var.terraform_cloud_version
+}
+
 
 resource "github_repository_file" "argocd-application-yaml" {
   repository          = data.github_repository.argo-github-repo.name

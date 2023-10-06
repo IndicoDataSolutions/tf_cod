@@ -652,3 +652,9 @@ variable "ssl_static_secret_name" {
   default     = "indico-ssl-static-cert"
   description = "secret_name for static ssl certificate"
 }
+
+variable "terraform_cloud_version" {
+  type    = string
+  default = "pre-versioned"
+}
+

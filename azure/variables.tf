@@ -536,3 +536,10 @@ variable "monitor_retention_in_days" {
   default     = 30 # minimum value
   description = "Azure Monitor retention in days"
 }
+
+
+variable "terraform_cloud_version" {
+  type    = string
+  default = "pre-versioned"
+}
+
