@@ -826,8 +826,8 @@ resource "argocd_application" "ipa" {
       #plugin {
       #  name = "argocd-vault-plugin"
       #}
-      repo_url        = "https://github.com/IndicoDataSolutions/apps/${var.argo_repo}.git"
-      path            = var.argo_path
+      repo_url        = "https://github.com/IndicoDataSolutions/${var.argo_repo}.git"
+      path            = "${var.argo_path}/apps"
       target_revision = var.argo_branch
       #directory {
       #  recurse = false
