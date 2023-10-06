@@ -655,6 +655,6 @@ variable "ssl_static_secret_name" {
 
 variable "terraform_cloud_version" {
   type    = string
-  default = "pre-versioned"
+  default = "0.0.0"
 }
 

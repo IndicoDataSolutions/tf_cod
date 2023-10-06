@@ -540,6 +540,6 @@ variable "monitor_retention_in_days" {
 
 variable "terraform_cloud_version" {
   type    = string
-  default = "pre-versioned"
+  default = "0.0.0"
 }
 
