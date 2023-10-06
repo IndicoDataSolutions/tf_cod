@@ -609,7 +609,7 @@ resource "github_repository_file" "smoketest-application-yaml" {
 
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
-  file                = "${var.argo_path}/ipa_smoketest.yaml"
+  file                = "${var.argo_path}/apps/ipa_smoketest.yaml"
   commit_message      = var.message
   overwrite_on_create = true
 
@@ -692,7 +692,7 @@ resource "github_repository_file" "alb-values-yaml" {
 resource "github_repository_file" "argocd-application-yaml" {
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
-  file                = "${var.argo_path}/ipa_application.yaml"
+  file                = "${var.argo_path}/apps/ipa_application.yaml"
   commit_message      = var.message
   overwrite_on_create = true
 
@@ -813,7 +813,7 @@ resource "argocd_application" "ipa" {
       #plugin {
       #  name = "argocd-vault-plugin"
       #}
-      repo_url        = "https://github.com/IndicoDataSolutions/${var.argo_repo}.git"
+      repo_url        = "https://github.com/IndicoDataSolutions/apps/${var.argo_repo}.git"
       path            = var.argo_path
       target_revision = var.argo_branch
       #directory {

@@ -4,7 +4,7 @@ resource "github_repository_file" "argocd-application-yaml" {
 
   repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
-  file                = "${var.argo_path}/ipa_application.yaml"
+  file                = "${var.argo_path}/apps/ipa_application.yaml"
   commit_message      = var.message
   overwrite_on_create = true
 
