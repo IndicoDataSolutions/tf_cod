@@ -705,7 +705,6 @@ resource "argocd_application" "ipa" {
     helm_release.ipa-pre-requisites,
     time_sleep.wait_1_minutes_after_pre_reqs,
     module.argo-registration,
-    kubernetes_job.snapshot-restore-job,
     github_repository_file.argocd-application-yaml,
     helm_release.monitoring
   ]
