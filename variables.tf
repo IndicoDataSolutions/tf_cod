@@ -341,7 +341,7 @@ variable "ipa_smoketest_version" {
 
 variable "ipa_smoketest_enabled" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "monitoring_version" {

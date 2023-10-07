@@ -25,6 +25,53 @@ locals {
             - ${local.dns_name}
       alb:
         publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
+        acmArn: ${aws_acm_certificate_validation.alb[0].certificate_arn}  
+ EOF
+  ] : []
+  fsx_values = var.include_fsx == true ? [<<EOF
+  aws-fsx-csi-driver:
+    enabled: true
+  aws-efs-csi-driver:
+    enabled: false
+  storage:
+    pvcSpec:
+      csi:
+        driver: fsx.csi.aws.com
+        volumeAttributes:
+          dnsname: ${module.fsx-storage[0].fsx-rwx.dns_name}
+          mountname: ${module.fsx-storage[0].fsx-rwx.mount_name}
+        volumeHandle: ${module.fsx-storage[0].fsx-rwx.id}
+    indicoStorageClass:
+      enabled: true
+      name: indico-sc
+      provisioner: fsx.csi.aws.com
+      parameters:
+        securityGroupIds: ${local.security_group_id}
+        subnetId: ${module.fsx-storage[0].fsx-rwx.subnet_ids[0]}
+ EOF
+  ] : []
+  storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
+  acm_ipa_values = var.use_acm == true ? (<<EOT
+app-edge:
+  alternateDomain: ""
+  service:
+    type: "NodePort"
+    ports:
+      http_port: 31755
+      http_api_port: 31270
+  aws-load-balancer-controller:
+    enabled: true
+    ingress:
+      enabled: true
+      annotations:
+        acme.cert-manager.io/http01-edit-in-place: "true"
+        cert-manager.io/cluster-issuer: zerossl      
+      tls:
+        - secretName: indico-ssl-cm-cert
+          hosts:
+            - ${local.dns_name}
+      alb:
+        publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
         acmArn: ${aws_acm_certificate_validation.alb[0].certificate_arn}
       service:
         name: app-edge
@@ -33,8 +80,8 @@ locals {
         - host: ${local.dns_name}
           paths:
             - path: /
-              pathType: Prefix  
- EOF
+              pathType: Prefix
+  EOT
     ) : (<<EOT
 app-edge:
   alternateDomain: ""
@@ -553,71 +600,6 @@ data "github_repository" "argo-github-repo" {
   full_name = "IndicoDataSolutions/${var.argo_repo}"
 }
 
-resource "github_repository_file" "smoketest-application-yaml" {
-  count = var.ipa_smoketest_enabled == true ? 1 : 0
-
-  repository          = data.github_repository.argo-github-repo.name
-  branch              = var.argo_branch
-  file                = "${var.argo_path}/ipa_smoketest.yaml"
-  commit_message      = var.message
-  overwrite_on_create = true
-
-  lifecycle {
-    ignore_changes = [
-      content
-    ]
-  }
-
-  content = <<EOT
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: ${local.argo_smoketest_app_name}
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-  labels:
-    app: cod
-    region: ${var.region}
-    account: ${var.aws_account}
-    name: ${var.label}
-  annotations:
-    avp.kubernetes.io/path: tools/argo/data/ipa-deploy
-    argocd.argoproj.io/sync-wave: "2"
-spec:
-  destination:
-    server: ${module.cluster.kubernetes_host}
-    namespace: default
-  project: ${module.argo-registration.argo_project_name}
-  syncPolicy:
-    automated:
-      prune: true
-    syncOptions:
-      - CreateNamespace=true
-
-  source:
-    chart: cod-smoketests
-    repoURL: ${var.ipa_smoketest_repo}
-    targetRevision: ${var.ipa_smoketest_version}
-    plugin:
-      name: argocd-vault-plugin-helm-values-expand-no-build
-      env:
-        - name: KUBE_VERSION
-          value: "${var.k8s_version}"
-
-        - name: RELEASE_NAME
-          value: run
-      
-        - name: HELM_VALUES
-          value: |
-            cluster:
-              name: ${var.label}
-              region: ${var.region}
-              account: ${var.aws_account}
-            host: ${local.dns_name}
-            ${indent(12, base64decode(var.ipa_smoketest_values))}    
-EOT
-}
-
 resource "github_repository_file" "alb-values-yaml" {
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
@@ -737,7 +719,9 @@ resource "argocd_application" "ipa" {
     helm_release.ipa-pre-requisites,
     time_sleep.wait_1_minutes_after_pre_reqs,
     module.argo-registration,
+    kubernetes_job.snapshot-restore-job,
     github_repository_file.argocd-application-yaml,
+    helm_release.monitoring
   ]
 
   count = var.ipa_enabled == true ? 1 : 0
