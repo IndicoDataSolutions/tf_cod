@@ -2,20 +2,6 @@
 # Include modules only installed on AWS here.
 #
 
-# Azure doesn't support arbitrary OIDC, so we can use keycloak on Azure.
-module "k8s_dashboard" {
-  count = var.enable_k8s_dashboard == true ? 1 : 0
-
-  source = "./modules/aws/k8s_dashboard"
-
-  local_dns_name              = local.dns_name
-  ipa_repo                    = var.ipa_repo
-  keycloak_client_id          = module.keycloak.client_id
-  keycloak_client_secret      = module.keycloak.client_secret
-  use_static_ssl_certificates = var.use_static_ssl_certificates
-  ssl_static_secret_name      = var.ssl_static_secret_name
-}
-
 data "aws_vpc_endpoint_service" "guardduty" {
   service_type = "Interface"
   filter {
