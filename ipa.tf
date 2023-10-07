@@ -380,10 +380,6 @@ monitoring:
   
     defaultBackend:
       nodeSelector.beta.kubernetes.io/os: linux
-  
-  authentication:
-    ingressUsername: monitoring
-    ingressPassword: ${random_password.monitoring-password.result}
 
   kube-prometheus-stack:
     prometheus:
