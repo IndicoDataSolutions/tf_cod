@@ -19,13 +19,6 @@ locals {
       annotations:
         acme.cert-manager.io/http01-edit-in-place: "true"
         cert-manager.io/cluster-issuer: zerossl      
-      tls:
-        - secretName: indico-ssl-cm-cert
-          hosts:
-            - ${local.dns_name}
-      alb:
-        publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
-        acmArn: ${aws_acm_certificate_validation.alb[0].certificate_arn}  
  EOF
   ] : []
   fsx_values = var.include_fsx == true ? [<<EOF
