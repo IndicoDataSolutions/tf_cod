@@ -15,6 +15,17 @@ resource "helm_release" "ipa-pre-requisites" {
   disable_webhooks = false
 
   values = [<<EOF
+  cert-manager:
+    nodeSelector:
+      kubernetes.io/os: linux
+    webhook:
+      nodeSelector:
+        kubernetes.io/os: linux
+    cainjector:
+      nodeSelector:
+        kubernetes.io/os: linux
+    enabled: true
+    installCRDs: true
   aws-efs-csi-driver:
     enabled: true
   aws-for-fluent-bit:
