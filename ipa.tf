@@ -15,8 +15,6 @@ resource "helm_release" "ipa-pre-requisites" {
   disable_webhooks = false
 
   values = [<<EOF
-  aws-fsx-csi-driver:
-    enabled: false
   aws-efs-csi-driver:
     enabled: true
   aws-load-balancer-controller:
