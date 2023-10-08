@@ -38,8 +38,8 @@ EOF
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
     module.cluster,
-    helm_release.ipa-crds,
-    time_sleep.wait_1_minutes_after_crds,
+    helm_release.ipa-crds
+    //time_sleep.wait_1_minutes_after_crds,
   ]
 
   verify           = false
