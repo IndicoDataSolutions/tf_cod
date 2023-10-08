@@ -17,10 +17,6 @@ resource "helm_release" "ipa-pre-requisites" {
   values = [<<EOF
   aws-efs-csi-driver:
     enabled: true
-  aws-load-balancer-controller:
-    enabled: true
-  ingress:
-    enabled: true
   aws-for-fluent-bit:
    enabled: true
    cloudWatchLogs:
