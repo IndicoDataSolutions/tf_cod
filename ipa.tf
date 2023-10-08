@@ -1,6 +1,51 @@
-resource "helm_release" "ipa-pre-requisites" {
+resource "helm_release" "ipa-crds" {
   depends_on = [
     module.cluster
+  ]
+
+  verify           = false
+  name             = "ipa-crds"
+  create_namespace = true
+  namespace        = "default"
+  repository       = var.ipa_repo
+  chart            = "ipa-crds"
+  version          = var.ipa_crds_version
+  wait             = true
+
+  values = [
+    <<EOF
+  crunchy-pgo:
+    enabled: false
+    updateCRDs: 
+      enabled: false
+
+  
+  cert-manager:
+    nodeSelector:
+      kubernetes.io/os: linux
+    webhook:
+      nodeSelector:
+        kubernetes.io/os: linux
+    cainjector:
+      nodeSelector:
+        kubernetes.io/os: linux
+    enabled: true
+    installCRDs: true
+EOF
+  ]
+}
+
+resource "time_sleep" "wait_1_minutes_after_crds" {
+  depends_on = [helm_release.ipa-crds]
+
+  create_duration = "1m"
+}
+
+resource "helm_release" "ipa-pre-requisites" {
+  depends_on = [
+    module.cluster,
+    helm_release.ipa-crds,
+    time_sleep.wait_1_minutes_after_crds,
   ]
 
   verify           = false
