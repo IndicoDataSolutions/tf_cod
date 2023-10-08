@@ -21,6 +21,25 @@ resource "helm_release" "ipa-pre-requisites" {
     enabled: true
   ingress:
     enabled: true
+  aws-for-fluent-bit:
+   enabled: true
+   cloudWatchLogs:
+    region: ${var.region}
+    logGroupName: "/aws/eks/fluentbit-cloudwatch/${local.cluster_name}/logs"
+    logGroupTemplate: "/aws/eks/fluentbit-cloudwatch/${local.cluster_name}/workload/$kubernetes['namespace_name']"
+  cluster-autoscaler:
+    cluster-autoscaler:
+      awsRegion: ${var.region}
+      image:
+        tag: "v1.27.0"
+      autoDiscovery:
+        clusterName: "${local.cluster_name}"
+  aws-load-balancer-controller:
+    enabled: ${var.use_acm}
+    aws-load-balancer-controller:
+      clusterName: ${var.label}
+      vpcId: ${local.network[0].indico_vpc_id}
+      region: ${var.region}    
       
  EOF
   ]
