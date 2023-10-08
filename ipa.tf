@@ -14,12 +14,6 @@ resource "helm_release" "ipa-crds" {
 
   values = [
     <<EOF
-  crunchy-pgo:
-    enabled: false
-    updateCRDs: 
-      enabled: false
-
-  
   cert-manager:
     nodeSelector:
       kubernetes.io/os: linux
@@ -35,11 +29,11 @@ EOF
   ]
 }
 
-resource "time_sleep" "wait_1_minutes_after_crds" {
-  depends_on = [helm_release.ipa-crds]
+# resource "time_sleep" "wait_1_minutes_after_crds" {
+#   depends_on = [helm_release.ipa-crds]
 
-  create_duration = "1m"
-}
+#   create_duration = "1m"
+# }
 
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
@@ -60,17 +54,6 @@ resource "helm_release" "ipa-pre-requisites" {
   disable_webhooks = false
 
   values = [<<EOF
-  cert-manager:
-    nodeSelector:
-      kubernetes.io/os: linux
-    webhook:
-      nodeSelector:
-        kubernetes.io/os: linux
-    cainjector:
-      nodeSelector:
-        kubernetes.io/os: linux
-    enabled: true
-    installCRDs: true
   aws-efs-csi-driver:
     enabled: true
   aws-for-fluent-bit:
