@@ -330,26 +330,6 @@ module "snowflake" {
   aws_account_name      = var.aws_account
 }
 
-resource "aws_security_group" "indico_allow_access" {
-  name        = "${var.label}-allow-access"
-  description = "Promethues, Grafana"
-  vpc_id      = local.network[0].indico_vpc_id
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["35.174.218.89/32"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 # argo 
 provider "argocd" {
   server_addr = var.argo_host

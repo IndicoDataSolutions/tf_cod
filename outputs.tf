@@ -29,11 +29,6 @@ output "fsx-rox" {
   value       = var.include_rox ? module.fsx-storage[0].fsx-rox : ""
 }
 
-output "indico_allow_access" {
-  value       = aws_security_group.indico_allow_access.id
-  description = "The ID of the indico indico_allow_access security group used for configuring HAproxy."
-}
-
 output "key_pem" {
   value       = tls_private_key.pk.private_key_pem
   description = "Generated private key for key pair"
