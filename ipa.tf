@@ -832,6 +832,8 @@ resource "argocd_application" "ipa" {
       directory {
         exclude = "cod.yaml"
         recurse = false
+        jsonnet {
+        }
       }
     }
 
