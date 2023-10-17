@@ -810,7 +810,7 @@ resource "argocd_application" "ipa" {
 
     source {
       repo_url        = "https://github.com/IndicoDataSolutions/${var.argo_repo}.git"
-      path            = "${var.argo_path}/apps"
+      path            = var.argo_path
       target_revision = var.argo_branch
       directory {
         exclude = "cod.yaml"
