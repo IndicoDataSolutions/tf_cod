@@ -6,7 +6,7 @@ locals {
   the_domain            = local.the_splits[local.the_length - 2]
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
 
-  enable_external_dns =  var.use_static_ssl_certificates == false ? true : false
+  enable_external_dns = var.use_static_ssl_certificates == false ? true : false
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:
     enabled: false
@@ -806,21 +806,19 @@ resource "argocd_application" "ipa" {
   }
 
   spec {
-
     project = module.argo-registration.argo_project_name
 
     source {
-      plugin {
-        name = "argocd-vault-plugin"
-      }
       repo_url        = "https://github.com/IndicoDataSolutions/${var.argo_repo}.git"
       path            = var.argo_path
       target_revision = var.argo_branch
       directory {
+        exclude = "cod.yaml"
         recurse = false
+        jsonnet {
+        }
       }
     }
-
     sync_policy {
       automated {
         prune       = true
