@@ -27,8 +27,7 @@ spec:
         - name: {{ .Chart.Name }}-init
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: [
-            ['sh', '-c', 'pytest -s -v --cloudProvider {{ .Values.cluster.cloudProvider | quote }} --account {{ .Values.cluster.account | quote }} --region {{ .Values.cluster.region | quote }} --name {{ .Values.cluster.name | quote }}']
+          command: ['sh', '-c', 'pytest -s -v --cloudProvider {{ .Values.cluster.cloudProvider | quote }} --account {{ .Values.cluster.account | quote }} --region {{ .Values.cluster.region | quote }} --name {{ .Values.cluster.name | quote }}']
           env:
             - name: PYTHONUNBUFFERED
               value: '1'
