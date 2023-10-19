@@ -652,7 +652,3 @@ variable "ssl_static_secret_name" {
   description = "secret_name for static ssl certificate"
 }
 
-variable "eric" {
-  type    = string
-  default = "was here"
-}
