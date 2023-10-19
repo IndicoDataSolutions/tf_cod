@@ -652,8 +652,3 @@ variable "ssl_static_secret_name" {
   description = "secret_name for static ssl certificate"
 }
 
-variable "tf_cod_git_hash" {
-  type    = string
-  default = "uuuuuuuu"
-}
-
