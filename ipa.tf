@@ -618,6 +618,17 @@ output "git_branch" {
   value = data.external.git_information.result.branch
 }
 
+resource "kubernetes_config_map" "terraform-variables" {
+  metadata {
+    name = "terraform-variables"
+  }
+
+  data = {
+    node_groups = "${var.node_groups}"
+  }
+}
+
+
 resource "helm_release" "terraform-smoketests" {
   depends_on = [
     time_sleep.wait_1_minutes_after_crds,

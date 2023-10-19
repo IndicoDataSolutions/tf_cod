@@ -1,0 +1,8 @@
+- id: terraform-variables
+  args: []
+  description: Generate terraform configmap from the variables
+  entry: smoketests/generate-terraform-variables
+#  files: (README\.md\.gotmpl|(Chart|requirements|values)\.yaml)$
+  language: script
+  name: Terraform Variables
+  require_serial: true
