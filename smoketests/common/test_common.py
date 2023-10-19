@@ -21,5 +21,5 @@ class TestCommon:
 
   @pytest.fixture(autouse=True)
   def teardown_method(self, cloudProvider, account, region, name):
-     print(f"\Teardown method called using {cloudProvider} {account}/{region}/{name}\n")
+     print(f"\nTeardown method called using {cloudProvider} {account}/{region}/{name}\n")
 
