@@ -5,6 +5,11 @@
 replicaCount: 1
 #Declare variables to be passed into your templates.
 
+cluster:
+  account: "account-name"
+  region: "region-name"
+  name: "cluster-name"
+
 image:
   repository: harbor.devops.indico.io/indico/terraform-smoketests
   pullPolicy: Always
