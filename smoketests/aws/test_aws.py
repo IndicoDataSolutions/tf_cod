@@ -51,6 +51,7 @@ class TestAWS:
         stdout=subprocess.PIPE,
         )
     if result.returncode == 0 and len(result.stdout) > 0:
+      print(f"success getting vpcs! {result.stdout}")
       vpcs = json.loads(result.stdout)["Vpcs"]
       if len(vpcs) > 0:
         return vpcs[0]["VpcId"]
