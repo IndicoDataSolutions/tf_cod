@@ -35,3 +35,75 @@ steps:
       event:
         - push
         - tag
+
+
+---
+kind: secret
+name: harbor_pull_secret
+get:
+  path: tools/drone/devops_harbor_pull_secret
+  name: DOCKER_CONFIG_JSON
+
+---
+kind: secret
+name: harbor_username
+get:
+  path: tools/drone/harbor-push-token
+  name: username
+
+---
+kind: secret
+name: harbor_password
+get:
+  path: tools/drone/harbor-push-token
+  name: password
+
+---
+kind: secret
+name: chartmuseum_username
+get:
+  path: tools/drone/cm
+  name: username
+
+---
+kind: secret
+name: chartmuseum_password
+get:
+  path: tools/drone/cm
+  name: password
+
+---
+kind: secret
+name: github_token
+get:
+  path: tools/drone/github
+  name: token
+
+---
+kind: secret
+name: github_pr_check_token
+get:
+  path: tools/drone/jenkins-github-token
+  name: github-token
+
+---
+kind: secret
+name: jira_api_token
+get:
+  path: tools/drone/indicomachineuser-atlassian
+  name: token
+
+---
+kind: secret
+name: jira_user_email
+get: 
+  path: tools/drone/indicomachineuser-atlassian
+  name: email
+
+---
+kind: secret
+name: harbor_api_token
+get:
+  path: tools/drone/harbor-api
+  name: bearer_token
+
