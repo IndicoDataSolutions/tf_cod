@@ -340,6 +340,7 @@ resource "helm_release" "ipa-pre-requisites" {
   values = concat(local.storage_spec, [<<EOF
 
 cluster:
+  cloudProvider: aws
   name: ${var.label}
   region: ${var.region}
   domain: indico.io
@@ -593,6 +594,37 @@ ${data.github_repository_file.data-pre-reqs-values.content}
 EOT
   ])
 }
+
+data "template_file" "startup_script" {
+  template = file("${path.module}/startup.sh")
+}
+
+output "template_vars" {
+  value = data.template_file.startup_script.rendered
+}
+
+# resource "helm_release" "terraform-smoketests" {
+#   depends_on = [
+#     time_sleep.wait_1_minutes_after_crds,
+#     module.cluster,
+#     module.fsx-storage,
+#     helm_release.ipa-crds,
+#     helm_release.ipa-pre-requisites,
+#     data.vault_kv_secret_v2.zerossl_data,
+#     data.github_repository_file.data-pre-reqs-values
+#   ]
+
+#   verify           = false
+#   name             = "terraform-smoketests"
+#   namespace        = "default"
+#   repository       = var.ipa_repo
+#   chart            = "terraform-smoketests"
+#   version          = var.ipa_pre_reqs_version
+#   wait             = false
+#   timeout          = "1800" # 30 minutes
+#   disable_webhooks = false
+
+# }
 
 resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
   depends_on = [helm_release.ipa-pre-requisites]

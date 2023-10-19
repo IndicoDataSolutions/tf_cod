@@ -651,3 +651,9 @@ variable "ssl_static_secret_name" {
   default     = "indico-ssl-static-cert"
   description = "secret_name for static ssl certificate"
 }
+
+variable "tf_cod_git_hash" {
+  type    = string
+  default = "uuuuuuuu"
+}
+
