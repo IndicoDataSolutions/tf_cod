@@ -1,4 +1,5 @@
 resource "kubernetes_config_map" "terraform-variables" {
+  depends_on = [null_resource.sleep-5-minutes]
   metadata {
     name = "terraform-variables"
   }
