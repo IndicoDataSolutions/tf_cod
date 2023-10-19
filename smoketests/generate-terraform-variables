@@ -1,9 +1,7 @@
 #!/bin/bash
 echo "Version 1"
 
-hcl2tojson variables.tf > tf_vars.json
-
-echo "terraform-variables" > tf.vars_generated
+hcl2tojson variables.tf > .tf_vars.json
 
 terraform_configmap_file="tf-smoketest-variables.tf"
 
@@ -16,7 +14,7 @@ echo '  data = {' >> ${terraform_configmap_file}
 
 
 
-cat tf_vars.json|jq -r '.variable[] | keys[]' | while read name ; do
+cat .tf_vars.json|jq -r '.variable[] | keys[]' | while read name ; do
     echo "    $name = \"\${var.$name}\"" >> ${terraform_configmap_file}
 done
 

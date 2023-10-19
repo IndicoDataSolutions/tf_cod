@@ -7,3 +7,4 @@ module.kubeconfig
 azure/overrides.tfvars
 .debug
 .env
+.tf_vars.json
