@@ -630,7 +630,7 @@ resource "helm_release" "terraform-smoketests" {
     data.github_repository_file.data-pre-reqs-values
   ]
   verify           = false
-  name             = "terraform-smoketests"
+  name             = "terraform-smoketests-${substr(data.external.git_information.result.sha, 0, 8)}"
   namespace        = "default"
   repository       = var.ipa_repo
   chart            = "terraform-smoketests"
