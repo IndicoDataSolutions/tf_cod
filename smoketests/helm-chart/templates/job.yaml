@@ -15,6 +15,7 @@ spec:
       labels:
         {{- include "terraform-smoketests.selectorLabels" . | nindent 8 }}
     spec:
+      restartPolicy: Never
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
