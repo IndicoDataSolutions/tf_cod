@@ -34,6 +34,9 @@ spec:
             '--region {{.Values.cluster.region}}',
             '--name {{ .Values.cluster.name }}'
             ]
+          env:
+            - name: PYTHONUNBUFFERED
+              value: '1'
           envFrom:
             - configMapRef:
                 name: ipa-cluster-configuration  
