@@ -619,17 +619,33 @@ output "git_branch" {
 }
 
 
+resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
+  depends_on = [helm_release.ipa-pre-requisites]
+
+  create_duration = "1m"
+}
+
+resource "null_resource" "sleep-5-minutes" {
+  depends_on = [
+    time_sleep.wait_1_minutes_after_pre_reqs
+  ]
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    command = "sleep 300"
+  }
+}
+
+
 resource "helm_release" "terraform-smoketests" {
   depends_on = [
-    time_sleep.wait_1_minutes_after_crds,
-    module.cluster,
-    module.fsx-storage,
-    helm_release.ipa-crds,
-    helm_release.ipa-pre-requisites,
-    data.vault_kv_secret_v2.zerossl_data,
-    data.external.git_information,
-    data.github_repository_file.data-pre-reqs-values
+    null_resource.sleep-5-minutes,
+    kubernetes_config_map.terraform-variables
   ]
+
   verify           = false
   name             = "terraform-smoketests-${substr(data.external.git_information.result.sha, 0, 8)}"
   namespace        = "default"

@@ -6,6 +6,16 @@ hcl2tojson variables.tf > .tf_vars.json
 terraform_configmap_file="tf-smoketest-variables.tf"
 
 echo 'resource "kubernetes_config_map" "terraform-variables" {' > ${terraform_configmap_file}
+echo '  depends_on = [
+    time_sleep.wait_1_minutes_after_crds,
+    module.cluster,
+    module.fsx-storage,
+    helm_release.ipa-crds,
+    helm_release.ipa-pre-requisites,
+    data.vault_kv_secret_v2.zerossl_data,
+    data.external.git_information,
+    data.github_repository_file.data-pre-reqs-values
+  ]
 echo '  metadata {' >> ${terraform_configmap_file}
 echo '    name = "terraform-variables"' >> ${terraform_configmap_file}
 echo '  }' >> ${terraform_configmap_file}
