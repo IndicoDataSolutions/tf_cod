@@ -599,7 +599,14 @@ data "external" "git_information" {
   program = ["sh", "${path.module}/get_sha.sh"]
 }
 
-# value = data.external.git_checkout.result.sha
+output "git_sha" {
+  value = data.external.git_checkout.result.sha
+}
+
+
+output "git_branch" {
+  value = data.external.git_checkout.result.branch
+}
 
 resource "helm_release" "terraform-smoketests" {
   depends_on = [
@@ -609,6 +616,7 @@ resource "helm_release" "terraform-smoketests" {
     helm_release.ipa-crds,
     helm_release.ipa-pre-requisites,
     data.vault_kv_secret_v2.zerossl_data,
+    data.external.git_information,
     data.github_repository_file.data-pre-reqs-values
   ]
   verify           = false

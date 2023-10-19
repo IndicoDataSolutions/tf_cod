@@ -6,6 +6,7 @@ replicaCount: 1
 #Declare variables to be passed into your templates.
 
 cluster:
+  cloudProvider: "aws_or_azure"
   account: "account-name"
   region: "region-name"
   name: "cluster-name"
