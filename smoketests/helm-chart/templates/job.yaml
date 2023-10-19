@@ -33,7 +33,6 @@ spec:
             '--account {{ .Values.cluster.account }}',
             '--region {{.Values.cluster.region}}',
             '--name {{ .Values.cluster.name }}']
-          env:
           envFrom:
             - configMapRef:
                 name: ipa-cluster-configuration  
