@@ -2,7 +2,6 @@ import pytest
 import hcl2
 import os
 import json
-import logging
 import subprocess
 
 from lib.helpers.utilities import Process
@@ -19,8 +18,7 @@ class TestAWS:
     self.region = region
     self.name = name
     self.foo = "hell yeah"
-    self.logger = logging.getLogger(__name__)
-    self.logger.setLevel(logging.DEBUG)
+    self.cluster_filter = f"Name=tag:indico/cluster,Values={self.name}"
 
     print(f"\nSetup method called using {account}/{region}/{name}\n")
 
@@ -30,8 +28,8 @@ class TestAWS:
 
 
   def test_azs(self, cloudProvider, account, region, name):
-    p = Process(self.logger, account, region, name)
-    filters = f"Name=tag:indico/cluster,Values={self.name}"
+    p = Process(account, region, name)
+    
     result = p.run(
         [
             "aws",
@@ -44,7 +42,7 @@ class TestAWS:
             "--max-items",
             "2048",
             "--filters",
-            filters,
+            self.cluster_filter,
             "--output",
             "json",
         ],

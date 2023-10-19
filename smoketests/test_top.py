@@ -2,7 +2,6 @@ import pytest
 import os
 import subprocess
 
-
 # pytest -s -v --name ericfoo
 
 # @pytest.fixture(scope="session")
@@ -18,7 +17,6 @@ import subprocess
 #     return pytestconfig.getoption("name")
 
 subprocess.Popen("env|sort", shell=True)
-
 
 def test_print_name(cloudProvider, account, region, name):
     print(f"\nCloudProvider: {cloudProvider}, Account {account}, Region: {region}, Name: {name}")
