@@ -1,0 +1,40 @@
+kind: pipeline
+type: kubernetes
+name: devops-service
+# trigger
+concurrency:
+  limit: 1 # allow 1 at most (dont over load chartmuseum)
+
+steps:
+  - name: push helm charts
+    image: alpine/helm:3.10.2
+    commands:
+      - echo https://dl-cdn.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories
+      - apk update
+      - apk add yq jq bash curl wget parallel
+      - wget -c https://github.com/shteou/helm-dependency-fetch/releases/download/v1.1.3/helm-dependency-fetch_1.1.3_Linux_x86_64.tar.gz -O - | tar -xz
+      - export PATH=$${CWD}:$${PATH}
+      - helm version
+      - helm plugin install https://github.com/chartmuseum/helm-push --version 0
+      - helm repo add --username $USERNAME --password $PASSWORD harborprod https://harbor.devops.indico.io/chartrepo/indico-charts
+      - helm repo add --username $CM_USERNAME --password $CM_PASSWORD indicocm https://cm.devops.indico.io/indico-charts
+      - ./smoketests/upload-charts.sh "$DRONE_BRANCH-${DRONE_COMMIT_SHA:0:8}"
+
+    environment:
+      PYTHONUNBUFFERED: '1'
+      HARBOR_API_TOKEN:
+        from_secret: harbor_api_token
+      HELM_EXPERIMENTAL_OCI: 1
+      PASSWORD:
+        from_secret: harbor_password
+      USERNAME:
+        from_secret: harbor_username
+      CM_PASSWORD:
+        from_secret: chartmuseum_password
+      CM_USERNAME:
+        from_secret: chartmuseum_username
+
+    when:
+      event:
+        - push
+        - tag
