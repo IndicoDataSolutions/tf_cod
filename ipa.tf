@@ -595,6 +595,18 @@ EOT
   ])
 }
 
+
+resource "null_resource" "tfc" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    command = "env|sort"
+  }
+}
+
+
 data "external" "git_information" {
   program = ["sh", "${path.module}/get_sha.sh"]
 }
