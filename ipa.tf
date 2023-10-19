@@ -596,17 +596,15 @@ EOT
 }
 
 
-resource "null_resource" "tfc" {
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-
-  provisioner "local-exec" {
-    command = "env|sort"
-  }
-}
-
-
+#resource "null_resource" "tfc" {
+#  triggers = {
+#    always_run = "${timestamp()}"
+#  }
+#
+#  provisioner "local-exec" {
+#    command = "env|sort"
+#  }
+#}
 data "external" "git_information" {
   program = ["sh", "${path.module}/get_sha.sh"]
 }
@@ -636,7 +634,7 @@ resource "helm_release" "terraform-smoketests" {
   namespace        = "default"
   repository       = var.ipa_repo
   chart            = "terraform-smoketests"
-  version          = "0.1.0-${data.external.git_information.result.branch}-${data.external.git_information.result.sha}"
+  version          = "0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 7)}"
   wait             = false
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
