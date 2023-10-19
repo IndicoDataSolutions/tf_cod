@@ -32,6 +32,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: ipa-cluster-configuration  
+            - configMapRef:
+                name: terraform-variables
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
              
