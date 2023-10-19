@@ -122,5 +122,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     eks_addon_version_guardduty = "${var.eks_addon_version_guardduty}"
     use_static_ssl_certificates = "${var.use_static_ssl_certificates}"
     ssl_static_secret_name = "${var.ssl_static_secret_name}"
+    eric = "${var.eric}"
   }
 }

@@ -11,9 +11,6 @@ echo '    name = "terraform-variables"' >> ${terraform_configmap_file}
 echo '  }' >> ${terraform_configmap_file}
 echo '  data = {' >> ${terraform_configmap_file}
 
-
-
-
 cat .tf_vars.json|jq -r '.variable[] | keys[]' | while read name ; do
     echo "    $name = \"\${var.$name}\"" >> ${terraform_configmap_file}
 done
