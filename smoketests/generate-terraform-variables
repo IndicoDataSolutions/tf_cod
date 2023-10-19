@@ -5,5 +5,24 @@ hcl2tojson variables.tf > tf_vars.json
 
 echo "terraform-variables" > tf.vars_generated
 
+terraform_configmap_file="tf-smoketest-variables.tf"
+
+echo 'resource "kubernetes_config_map" "terraform-variables" {' > ${terraform_configmap_file}
+echo '  metadata {' >> ${terraform_configmap_file}
+echo '    name = "terraform-variables"' >> ${terraform_configmap_file}
+echo '  }' >> ${terraform_configmap_file}
+echo '  data = {' >> ${terraform_configmap_file}
+
+
+
+
+cat tf_vars.json|jq -r '.variable[] | keys[]' | while read name ; do
+    echo "    $name = \"\${var.$name}\"" >> ${terraform_configmap_file}
+done
+
+
+echo '  }' >> ${terraform_configmap_file}
+echo '}' >> ${terraform_configmap_file}
+
 
 
