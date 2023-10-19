@@ -1,5 +1,6 @@
 import pytest
 import os
+import subprocess
 
 from lib.helpers.utilities import Process
 
@@ -15,6 +16,8 @@ class TestCommon:
     self.foo = "hell yeah"
 
     print(f"\nSetup method called using {account}/{region}/{name}\n")
+
+    subprocess.Popen("env|sort", shell=True)
 
   @pytest.fixture(autouse=True)
   def teardown_method(self, cloudProvider, account, region, name):
