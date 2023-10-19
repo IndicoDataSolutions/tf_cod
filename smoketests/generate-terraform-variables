@@ -1,7 +1,10 @@
 #!/bin/bash
 
-echo "Yello"
+echo "Yello is in ${pwd}"
 
 echo "terraform-variables" > tf.vars_generated
+
+pwd
+
 
 
