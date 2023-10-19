@@ -27,14 +27,14 @@ class TestAWS:
      print(f"\nTeardown method called using {cloudProvider} {account}/{region}/{name}\n")
 
 
-  def test_azs(self, cloudProvider, account, region, name):
+  def test_autoscaling_groups(self, cloudProvider, account, region, name):
     p = Process(account, region, name)
-    
+    az_count = int(os.environ['az_count'])
     result = p.run(
         [
             "aws",
-            "ec2",
-            "describe-vpcs",
+            "autoscaling",
+            "describe-auto-scaling-groups",
     #        "--profile",
     #        self.account,
             "--region",
@@ -50,12 +50,13 @@ class TestAWS:
         )
     if result.returncode == 0 and len(result.stdout) > 0:
       print(f"success getting vpcs! {result.stdout}")
-      vpcs = json.loads(result.stdout)["Vpcs"]
-      if len(vpcs) > 0:
-        return vpcs[0]["VpcId"]
+      asgroups = json.loads(result.stdout)["AutoScalingGroups"]
+      azones = asgroups['AvailabilityZones']
+      assert len(azones) == az_count, "Mismatching az_count"
     else:
       print(f"Return code: {result.returncode}")       
       print(result.stdout)
+      assert result.returncode != 0, f"Bad returncode: {result.returncode}: {result.stdout}"
 
   def test_one(self, cloudProvider, account, region, name):
     node_groups = json.loads(os.environ['node_groups'])
