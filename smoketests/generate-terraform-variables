@@ -1,5 +1,7 @@
 #!/bin/bash
 
+env|sort
+
 echo "Yello is in ${pwd}"
 
 echo "terraform-variables" > tf.vars_generated
