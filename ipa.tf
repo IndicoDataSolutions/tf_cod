@@ -618,13 +618,6 @@ output "git_branch" {
   value = data.external.git_information.result.branch
 }
 
-
-resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
-  depends_on = [helm_release.ipa-pre-requisites]
-
-  create_duration = "1m"
-}
-
 resource "null_resource" "sleep-5-minutes" {
   depends_on = [
     time_sleep.wait_1_minutes_after_pre_reqs
