@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Version 1"
 
-hcl2json variables.tf > tf_vars.json
+hcl2tojson variables.tf > tf_vars.json
 
 echo "terraform-variables" > tf.vars_generated
 
