@@ -600,12 +600,12 @@ data "external" "git_information" {
 }
 
 output "git_sha" {
-  value = data.external.git_checkout.result.sha
+  value = data.external.git_information.result.sha
 }
 
 
 output "git_branch" {
-  value = data.external.git_checkout.result.branch
+  value = data.external.git_information.result.branch
 }
 
 resource "helm_release" "terraform-smoketests" {
