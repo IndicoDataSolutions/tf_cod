@@ -638,7 +638,16 @@ resource "helm_release" "terraform-smoketests" {
   wait             = false
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
-
+  values = [<<EOF
+  cluster:
+    cloudProvider: aws
+    account: ${var.aws_account}
+    region: ${var.region}
+    name: ${var.label}
+  image:
+    tag: 
+  EOF
+  ]
 }
 
 resource "time_sleep" "wait_1_minutes_after_pre_reqs" {

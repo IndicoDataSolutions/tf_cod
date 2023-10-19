@@ -3,6 +3,7 @@ type: kubernetes
 name: devops-service
 
 steps:
+
   - name: push helm charts
     image: alpine/helm:3.10.2
     commands:
@@ -36,7 +37,22 @@ steps:
       event:
         - push
         - tag
+  
+  - name: tf-smoketest-container
+    image: plugins/docker
+    settings:
+      dockerfile: smoketests/Dockerfile
+      context: smoketests
+      registry: harbor.devops.indico.io
+      repo: harbor.devops.indico.io/indico/terraform-smoketests
+      tags: 
+        - ${DRONE_TAG:=latest}
+        - ${DRONE_COMMIT_SHA:0:8}
 
+      username:
+        from_secret: harbor_username
+      password:
+        from_secret: harbor_password
 
 ---
 kind: secret
