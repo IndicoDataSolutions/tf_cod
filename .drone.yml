@@ -1,9 +1,6 @@
 kind: pipeline
 type: kubernetes
 name: devops-service
-# trigger
-concurrency:
-  limit: 1 # allow 1 at most (dont over load chartmuseum)
 
 steps:
   - name: push helm charts
