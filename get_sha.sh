@@ -1,5 +1,9 @@
 #!/bin/bash
 set -e
 
-echo '{ "branch":  "'"$(git rev-parse --abbrev-ref HEAD)"'",    "sha": "'"$(git rev-parse --short HEAD)"'"}'
+#TFC_CONFIGURATION_VERSION_GIT_BRANCH=dop-1942
+#TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA=1e487626389c9d82c5f18ad80ab6fa106959b95b
+
+echo '{ "branch": "'"${TFC_CONFIGURATION_VERSION_GIT_BRANCH}"'", "sha": "'"${TFC_CONFIGURATION_VERSION_GIT_COMMIT_SHA}"'" }'
+
 
