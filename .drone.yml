@@ -15,7 +15,8 @@ steps:
       - helm plugin install https://github.com/chartmuseum/helm-push --version 0
       - helm repo add --username $USERNAME --password $PASSWORD harborprod https://harbor.devops.indico.io/chartrepo/indico-charts
       - helm repo add --username $CM_USERNAME --password $CM_PASSWORD indicocm https://cm.devops.indico.io/indico-charts
-      - ./smoketests/upload-charts.sh "$DRONE_BRANCH-${DRONE_COMMIT_SHA:0:8}"
+      - cd smoketests
+      - ./upload-charts.sh "$DRONE_BRANCH-${DRONE_COMMIT_SHA:0:8}"
 
     environment:
       PYTHONUNBUFFERED: '1'
