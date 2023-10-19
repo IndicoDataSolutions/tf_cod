@@ -634,7 +634,7 @@ resource "helm_release" "terraform-smoketests" {
   namespace        = "default"
   repository       = var.ipa_repo
   chart            = "terraform-smoketests"
-  version          = "0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 7)}"
+  version          = "0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
   wait             = false
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
