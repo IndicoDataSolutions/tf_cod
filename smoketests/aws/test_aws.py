@@ -1,8 +1,14 @@
 import pytest
 import hcl2
+import os
+import json
+import logging
+import subprocess
 
 from lib.helpers.utilities import Process
 
+
+@pytest.mark.skipif(os.environ.get('CLOUD_PROVIDER') != "aws", reason="Skip if not on aws")
 class TestAWS:
   """A common class with common parameters, account, region, name"""
 
@@ -13,13 +19,45 @@ class TestAWS:
     self.region = region
     self.name = name
     self.foo = "hell yeah"
+    self.logger = logging.getLogger(__name__)
+    self.logger.setLevel(logging.DEBUG)
 
     print(f"\nSetup method called using {account}/{region}/{name}\n")
 
   @pytest.fixture(autouse=True)
   def teardown_method(self, cloudProvider, account, region, name):
-     print(f"\Teardown method called using {cloudProvider} {account}/{region}/{name}\n")
+     print(f"\nTeardown method called using {cloudProvider} {account}/{region}/{name}\n")
 
+
+  def test_azs(self, cloudProvider, account, region, name):
+    p = Process(self.logger, account, region, name)
+    filters = f"Name=tag:indico/cluster,Values={self.name}"
+    result = p.run(
+        [
+            "aws",
+            "ec2",
+            "describe-vpcs",
+    #        "--profile",
+    #        self.account,
+            "--region",
+            self.region,
+            "--max-items",
+            "2048",
+            "--filters",
+            filters,
+            "--output",
+            "json",
+        ],
+        stdout=subprocess.PIPE,
+        )
+    if result.returncode == 0 and len(result.stdout) > 0:
+      vpcs = json.loads(result.stdout)["Vpcs"]
+      if len(vpcs) > 0:
+        return vpcs[0]["VpcId"]
+    else:
+      print(f"Return code: {result.returncode}")       
+      print(result.stdout)
 
   def test_one(self, cloudProvider, account, region, name):
-    pass
+    node_groups = json.loads(os.environ['node_groups'])
+    print(node_groups)

@@ -31,6 +31,8 @@ spec:
           env:
             - name: PYTHONUNBUFFERED
               value: '1'
+            - name: CLOUD_PROVIDER
+              value: {{ .Values.cluster.cloudProvider | quote }}
           envFrom:
             - configMapRef:
                 name: ipa-cluster-configuration  
