@@ -4,7 +4,7 @@ FROM ubuntu:22.04
 WORKDIR /app
 ADD . /app
 
-RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+#RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
 
 # Installing prerequisite packages
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends tzdata && \
@@ -21,12 +21,5 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-ins
 
 RUN pip install -r requirements.txt
 
-WORKDIR /tests
-
-ADD conftest.py /tests
-ADD ./lib /tests/lib
-ADD ./aws /tests/aws
-ADD ./azure /tests/azure
-ADD ./common /tests/common
 
 
