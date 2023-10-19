@@ -595,36 +595,33 @@ EOT
   ])
 }
 
-data "template_file" "startup_script" {
-  template = file("${path.module}/startup.sh")
+data "external" "git_information" {
+  program = ["sh", "${path.module}/get_sha.sh"]
 }
 
-output "template_vars" {
-  value = data.template_file.startup_script.rendered
+# value = data.external.git_checkout.result.sha
+
+resource "helm_release" "terraform-smoketests" {
+  depends_on = [
+    time_sleep.wait_1_minutes_after_crds,
+    module.cluster,
+    module.fsx-storage,
+    helm_release.ipa-crds,
+    helm_release.ipa-pre-requisites,
+    data.vault_kv_secret_v2.zerossl_data,
+    data.github_repository_file.data-pre-reqs-values
+  ]
+  verify           = false
+  name             = "terraform-smoketests"
+  namespace        = "default"
+  repository       = var.ipa_repo
+  chart            = "terraform-smoketests"
+  version          = "0.1.0-${data.external.git_information.result.branch}-${data.external.git_information.result.sha}"
+  wait             = false
+  timeout          = "1800" # 30 minutes
+  disable_webhooks = false
+
 }
-
-# resource "helm_release" "terraform-smoketests" {
-#   depends_on = [
-#     time_sleep.wait_1_minutes_after_crds,
-#     module.cluster,
-#     module.fsx-storage,
-#     helm_release.ipa-crds,
-#     helm_release.ipa-pre-requisites,
-#     data.vault_kv_secret_v2.zerossl_data,
-#     data.github_repository_file.data-pre-reqs-values
-#   ]
-
-#   verify           = false
-#   name             = "terraform-smoketests"
-#   namespace        = "default"
-#   repository       = var.ipa_repo
-#   chart            = "terraform-smoketests"
-#   version          = var.ipa_pre_reqs_version
-#   wait             = false
-#   timeout          = "1800" # 30 minutes
-#   disable_webhooks = false
-
-# }
 
 resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
   depends_on = [helm_release.ipa-pre-requisites]
