@@ -23,6 +23,7 @@ with open('variables.tf', 'r') as file:
        var_rows += f"    {updated_name} = \"${{jsonencode(var.{var_name})}}\"\n"
 
 config_map = f"""resource "kubernetes_config_map" "terraform-variables" {{
+# this file is generated via pre-commit, DO NOT EDIT !
   depends_on = [null_resource.sleep-5-minutes]
   metadata {{
     name = "terraform-variables"
