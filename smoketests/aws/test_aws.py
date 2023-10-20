@@ -46,24 +46,29 @@ class TestAWS:
   def test_spot_instance_configuration(self, cloudProvider, account, region, name):
     node_groups = json.loads(os.environ['node_groups'])
     assert len(node_groups) > 0
-    
-    #for k,v in node_groups.items():
-    #  print(f"Key {k}, Value: {v}")
-    
-    p = Process(account, region, name)
-    with open("asgroups.json") as f:
-      for ag in json.load(f)['AutoScalingGroups']:
-        tags = ag['Tags']
-        group_resource_id = p.getTag(tags, "Name", keyName="Key", keyValue="ResourceId")
-        group_name = p.getTag(tags, "Name", keyName="Key")
-        simple_group_name = p.getTag(tags, "k8s.io/cluster-autoscaler/node-template/label/node_group", keyName="Key")
-        assert node_groups[simple_group_name], f"Unable to locate node group {simple_group_name}"
-        tf_group = node_groups[simple_group_name]
-        #print(f"Group Name: {simple_group_name} is {group_name} {group_resource_id} {tf_group}")
-        assert tf_group['min_size'] == ag['MinSize']
-        assert tf_group['max_size'] == ag['MaxSize']
-        print(f"Ag: {ag}")
-        print(f"TfGroup: {tf_group}")
 
+    p = Process(account, region, name)
+    output = p.run(
+        ["aws", "autoscaling", "describe-auto-scaling-groups", "--region", self.region, "--max-items", "2048", "--filters", self.cluster_filter, "--output", "json",], stdout=subprocess.PIPE)
+    autoscaling_groups = p.parseResult(output, 'AutoScalingGroups')
+    for ag in autoscaling_groups:
+      tags = ag['Tags']
+      group_resource_id = p.getTag(tags, "Name", keyName="Key", keyValue="ResourceId")
+      group_name = p.getTag(tags, "Name", keyName="Key")
+      simple_group_name = p.getTag(tags, "k8s.io/cluster-autoscaler/node-template/label/node_group", keyName="Key")
+      assert node_groups[simple_group_name], f"Unable to locate node group {simple_group_name}"
+      tf_group = node_groups[simple_group_name]
+      assert tf_group['min_size'] == ag['MinSize']
+      assert tf_group['max_size'] == ag['MaxSize']
+      if tf_group['spot']:
+        lt = ag['LaunchTemplate']
+        assert ag.get('LaunchTemplate'), f"Missing Spot Policy on {simple_group_name}"
+        launch_template_id = lt['LaunchTemplateId']
+        output = p.run(
+          ["aws", "ec2", "describe-launch-template-versions", "--launch-template-id", launch_template_id, "--region", self.region, "--max-items", "2048", "--output", "json",], stdout=subprocess.PIPE)
+        launch_template_version = p.parseResult(output, 'LaunchTemplateVersions')[0]
+        launch_template_data = launch_template_version['LaunchTemplateData']
+        instance_market_options = launch_template_data['InstanceMarketOptions']
+        assert instance_market_options['MarketType'] == 'spot'
 
    
