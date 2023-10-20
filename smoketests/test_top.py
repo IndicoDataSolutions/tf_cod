@@ -2,24 +2,15 @@ import pytest
 import os
 import subprocess
 
-# pytest -s -v --name ericfoo
+#subprocess.Popen("env|sort", shell=True)
 
-# @pytest.fixture(scope="session")
-# def account(pytestconfig):
-#     return pytestconfig.getoption("account")
-
-# @pytest.fixture(scope="session")
-# def region(pytestconfig):
-#     return pytestconfig.getoption("region")
-
-# @pytest.fixture(scope="session")
-# def name(pytestconfig):
-#     return pytestconfig.getoption("name")
-
-subprocess.Popen("env|sort", shell=True)
-
-def test_print_name(cloudProvider, account, region, name):
+def test_validate_fixture_parameters(cloudProvider, account, region, name):
     print(f"\nCloudProvider: {cloudProvider}, Account {account}, Region: {region}, Name: {name}")
+    assert cloudProvider != "aws_or_azure"
+    assert account != "default account"
+    assert region != "default region"
+    assert name != "default name"
+    
 
-def test_print_name_2(pytestconfig):
-    print(f"test_print_name_2(name): {pytestconfig.getoption('name')}")
+#def test_print_name_2(pytestconfig):
+#    print(f"test_print_name_2(name): {pytestconfig.getoption('name')}")

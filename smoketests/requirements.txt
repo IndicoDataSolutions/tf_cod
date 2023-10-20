@@ -1,5 +1,5 @@
-boto3==1.24.34
-botocore==1.27.34
+boto3==1.28.57
+botocore==1.31.67
 pytest>=7.2.2
 configparser==5.3.0
 snowflake-connector-python>=3.0.3
