@@ -27,10 +27,6 @@ class TestAWS:
     #print(f"\nTeardown method called using {cloudProvider} {account}/{region}/{name}\n")
     pass
 
-  def test_spot_instances(self, cloudProvider, account, region, name):
-    node_groups = json.loads(os.environ['node_groups'])
-
-
   def test_autoscaling_groups(self, cloudProvider, account, region, name):
     p = Process(account, region, name)
     az_count = int(os.environ['az_count'])
@@ -53,8 +49,6 @@ class TestAWS:
     autoscaling_groups = p.parseResult(output, 'AutoScalingGroups')
     for ag in autoscaling_groups:
       tags = ag['Tags']
-      group_resource_id = p.getTag(tags, "Name", keyName="Key", keyValue="ResourceId")
-      group_name = p.getTag(tags, "Name", keyName="Key")
       simple_group_name = p.getTag(tags, "k8s.io/cluster-autoscaler/node-template/label/node_group", keyName="Key")
       assert node_groups[simple_group_name], f"Unable to locate node group {simple_group_name}"
       tf_group = node_groups[simple_group_name]
