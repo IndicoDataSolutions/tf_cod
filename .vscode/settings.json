@@ -1,0 +1,21 @@
+{
+  "python.testing.pytestArgs": [
+    "-v",
+    "-s",
+    ".",
+    "-p",
+    "*test*.py",
+    "--cloudProvider",
+    "aws"
+  ],
+  "python.testing.unittestArgs": [
+    "-v",
+    "-s",
+    ".",
+    "-p",
+    "*test*.py"
+  ],
+  "python.testing.cwd": "${workspaceRoot}/smoketests",
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
+}
