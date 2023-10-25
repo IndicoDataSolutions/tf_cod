@@ -630,13 +630,19 @@ cert-manager:
   enabled: false
 
 docker-registry:
+  service:
+    annotations: 
+      external-dns.alpha.kubernetes.io/hostname: "local-registry.${local.dns_name}"
   extraEnvVars:
   - name: GOGC
     value: "50"
   ingress:
+    enabled: true
     annotations:
       cert-manager.io/cluster-issuer: zerossl
       kubernetes.io/ingress.class: nginx
+    labels: 
+      acme.cert-manager.io/dns01-solver: "true"
     hosts:
     - local-registry.${local.dns_name}
     tls:
