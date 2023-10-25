@@ -620,7 +620,7 @@ resource "helm_release" "local-registry" {
   namespace        = "local-registry"
   repository       = var.ipa_repo
   chart            = "local-registry"
-  version          = var.ipa_pre_reqs_version
+  version          = var.local_registry_version
   wait             = false
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
