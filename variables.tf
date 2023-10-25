@@ -656,7 +656,7 @@ variable "local_registry_version" {
   type = string
 }
 
-variable "local_registry_chart_enabled" {
+variable "local_registry_enabled" {
   type    = bool
   default = false
 }
