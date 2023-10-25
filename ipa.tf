@@ -602,7 +602,7 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
 
 
 data "vault_kv_secret_v2" "account-robot-credentials" {
-  mount = var.aws_account
+  mount = "customer-${var.aws_account}"
   name  = "harbor-registry"
 }
 
