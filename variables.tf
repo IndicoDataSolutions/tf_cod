@@ -651,3 +651,13 @@ variable "ssl_static_secret_name" {
   default     = "indico-ssl-static-cert"
   description = "secret_name for static ssl certificate"
 }
+
+variable "local_registry_version" {
+  type = string
+}
+
+variable "local_registry_chart_enabled" {
+  type    = bool
+  default = false
+}
+

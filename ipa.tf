@@ -600,6 +600,27 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
   create_duration = "1m"
 }
 
+resource "helm_release" "local-registry" {
+  depends_on = [
+    time_sleep.wait_1_minutes_after_pre_reqs,
+    module.cluster
+  ]
+
+  verify           = false
+  name             = "local-registry"
+  create_namespace = true
+  namespace        = "local-registry"
+  repository       = var.ipa_repo
+  chart            = "local-registry"
+  version          = var.ipa_pre_reqs_version
+  wait             = false
+  timeout          = "1800" # 30 minutes
+  disable_webhooks = false
+
+}
+
+
+
 data "github_repository" "argo-github-repo" {
   full_name = "IndicoDataSolutions/${var.argo_repo}"
 }
