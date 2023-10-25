@@ -532,6 +532,86 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
   create_duration = "1m"
 }
 
+
+resource "helm_release" "local-registry" {
+  depends_on = [
+    time_sleep.wait_1_minutes_after_pre_reqs,
+    module.cluster
+  ]
+
+  count = var.local_registry_enabled == true ? 1 : 0
+
+  verify           = false
+  name             = "local-registry"
+  create_namespace = true
+  namespace        = "local-registry"
+  repository       = var.ipa_repo
+  chart            = "local-registry"
+  version          = var.local_registry_version
+  wait             = false
+  timeout          = "1800" # 30 minutes
+  disable_webhooks = false
+
+  values = [<<EOF
+cert-manager:
+  enabled: false
+
+docker-registry:
+  service:
+    annotations: 
+      external-dns.alpha.kubernetes.io/hostname: "local-registry.${local.dns_name}"
+  extraEnvVars:
+  - name: GOGC
+    value: "50"
+  ingress:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: zerossl
+      kubernetes.io/ingress.class: nginx
+    labels: 
+      acme.cert-manager.io/dns01-solver: "true"
+    hosts:
+    - local-registry.${local.dns_name}
+    tls:
+    - hosts:
+      - local-registry.${local.dns_name}
+      secretName: registry-tls
+  persistence:
+    deleteEnabled: true
+    enabled: true
+    size: 20Gi
+  proxy:
+    enabled: true
+    remoteurl: https://harbor.devops.indico.io
+    secretRef: remote-access
+  replicaCount: 3
+  secrets:
+    htpasswd: local-user:$2y$05$dl9xvvYCbYHkM/ox3UhY3erWZAeERxsFJiW04vZouM9geoqDusaAe
+
+localPullSecret:
+  password: $2y$05$dl9xvvYCbYHkM/ox3UhY3erWZAeERxsFJiW04vZouM9geoqDusaAe
+  secretName: local-pull-secret
+  username: local-user
+
+metrics-server:
+  apiService:
+    create: true
+  enabled: false
+
+proxyRegistryAccess:
+  proxyPassword: ${jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)["harbor_password"]}
+  proxyPullSecretName: remote-access
+  proxyUrl: https://harbor.devops.indico.io
+  proxyUsername: ${jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)["harbor_username"]}
+registryUrl: https://harbor.devops.indico.io
+restartCronjob:
+  cronSchedule: 0 0 */3 * *
+  disabled: false
+  image: bitnami/kubectl:1.20.13
+  EOF
+  ]
+}
+
 data "github_repository" "argo-github-repo" {
   count     = var.argo_enabled == true ? 1 : 0
   full_name = "${var.github_organization}/${var.argo_repo}"
