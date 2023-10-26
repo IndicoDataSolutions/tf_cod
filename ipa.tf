@@ -820,10 +820,10 @@ docker-registry:
     secretRef: remote-access
   replicaCount: 3
   secrets:
-    htpasswd: local-user:${htpasswd_password.hash.sha512}
+    htpasswd: local-user:$2y$05$iIazyhgN8h.Bfkbo.Z18AOBsl.yhF9uHStDN8AcmH3p8KLdsSmjRW
 
 localPullSecret:
-  password: ${htpasswd_password.hash.sha512}
+  password: local-user:$2y$05$iIazyhgN8h.Bfkbo.Z18AOBsl.yhF9uHStDN8AcmH3p8KLdsSmjRW
   secretName: local-pull-secret
   username: local-user
 
