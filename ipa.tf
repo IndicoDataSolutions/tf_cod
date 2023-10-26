@@ -606,6 +606,12 @@ data "vault_kv_secret_v2" "account-robot-credentials" {
   name  = "harbor-registry"
 }
 
+resource "kubernetes_namespace" "local-registry" {
+  metadata {
+    name = "local-registry"
+  }
+}
+
 resource "kubernetes_storage_class_v1" "local-registry" {
   count = var.local_registry_enabled == true ? 1 : 0
 
@@ -635,10 +641,13 @@ resource "kubernetes_storage_class_v1" "local-registry" {
 }
 
 resource "kubernetes_persistent_volume_claim" "local-registry" {
-  count = var.local_registry_enabled == true ? 1 : 0
+
+  depends_on = [kubernetes_namespace.local-registry]
+  count      = var.local_registry_enabled == true ? 1 : 0
 
   metadata {
-    name = "local-registry"
+    name      = "local-registry"
+    namespace = "local-registry"
   }
   spec {
     access_modes       = ["ReadWriteMany"]
@@ -679,6 +688,7 @@ resource "kubernetes_persistent_volume" "local-registry" {
 
 resource "helm_release" "local-registry" {
   depends_on = [
+    kubernetes_namespace.local-registry,
     time_sleep.wait_1_minutes_after_pre_reqs,
     module.cluster,
     kubernetes_persistent_volume_claim.local-registry
@@ -688,7 +698,7 @@ resource "helm_release" "local-registry" {
 
   verify           = false
   name             = "local-registry"
-  create_namespace = true
+  create_namespace = false
   namespace        = "local-registry"
   repository       = var.ipa_repo
   chart            = "local-registry"
