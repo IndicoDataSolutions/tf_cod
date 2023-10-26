@@ -869,11 +869,12 @@ docker-registry:
     remoteurl: https://harbor.devops.indico.io
     secretRef: remote-access
   replicaCount: 3
+  
   secrets:
-    htpasswd: local-user:$2y$05$dl9xvvYCbYHkM/ox3UhY3erWZAeERxsFJiW04vZouM9geoqDusaAe
+    htpasswd: local-user:$2y$05$S9YpXoZIauUJ4bZ8Iww4v.LGZSg23OvZ09LqfZ9KjJR5uOMpVzvdG
 
 localPullSecret:
-  password: mnGB*WHI&wKY@@Y*M1FqD4*a3aOFFuDmZWFzpEwG
+  password: "mnGB*WHI&wKY@@Y*M1FqD4*a3aOFFuDmZWFzpEwG"
   secretName: local-pull-secret
   username: local-user
 

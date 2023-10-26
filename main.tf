@@ -45,7 +45,7 @@ terraform {
       version = "0.73.0"
     }
     htpasswd = {
-      source = "loafoe/htpasswd"
+      source  = "loafoe/htpasswd"
       version = "1.0.4"
     }
   }
@@ -54,7 +54,6 @@ terraform {
 provider "time" {}
 
 provider "keycloak" {
-  # these values are provided by the keycloak varset from terraform cloud
 }
 
 provider "vault" {
@@ -243,7 +242,7 @@ module "efs-storage" {
 
 
 module "efs-storage-local-registry" {
-  count              = var.local_registry_enabled  == true ? 1 : 0
+  count              = var.local_registry_enabled == true ? 1 : 0
   source             = "app.terraform.io/indico/indico-aws-efs/mod"
   version            = "0.0.1"
   label              = "${var.label}-local-registry"
