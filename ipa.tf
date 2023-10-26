@@ -837,7 +837,7 @@ proxyRegistryAccess:
   proxyPullSecretName: remote-access
   proxyUrl: https://harbor.devops.indico.io
   proxyUsername: ${jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)["harbor_username"]}
-registryUrl: https://harbor.devops.indico.io
+registryUrl: local-registry.${local.dns_name}
 restartCronjob:
   cronSchedule: 0 0 */3 * *
   disabled: false
