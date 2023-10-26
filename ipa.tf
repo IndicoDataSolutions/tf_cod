@@ -652,7 +652,9 @@ docker-registry:
   persistence:
     deleteEnabled: true
     enabled: true
-    size: 20Gi
+    size: 100Gi
+    storageClass: indico-sc
+
   proxy:
     enabled: true
     remoteurl: https://harbor.devops.indico.io
