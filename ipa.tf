@@ -775,6 +775,8 @@ ingress-nginx:
         cpu: 1
         memory: 2Gi
     service:
+      external:
+        enabled: false
       internal:
         annotations:
           service.beta.kubernetes.io/aws-load-balancer-internal: "true"
