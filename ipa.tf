@@ -761,6 +761,7 @@ ingress-nginx:
   controller:
     ingressClass: nginx-internal
     ingressClassResource:
+      controllerValue: "k8s.io/ingress-nginx-internal"
       name: nginx-internal
     admissionWebhooks:
       enabled: false
