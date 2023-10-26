@@ -640,6 +640,20 @@ resource "kubernetes_storage_class_v1" "local-registry" {
   #mount_options = ["file_mode=0700", "dir_mode=0777", "mfsymlinks", "uid=1000", "gid=1000", "nobrl", "cache=none"]
 }
 
+
+resource "aws_efs_access_point" "local-registry" {
+  count = var.local_registry_enabled == true ? 1 : 0
+
+  depends_on = [module.efs-storage-local-registry[0]]
+
+  posix_user {
+    gid = 1000
+    uid = 1000
+  }
+  file_system_id = module.efs-storage-local-registry[0].efs_filesystem_id
+}
+
+
 resource "kubernetes_persistent_volume_claim" "local-registry" {
 
   depends_on = [
@@ -687,7 +701,7 @@ resource "kubernetes_persistent_volume" "local-registry" {
     persistent_volume_source {
       csi {
         driver        = "efs.csi.aws.com"
-        volume_handle = module.efs-storage-local-registry[0].efs_filesystem_id
+        volume_handle = "${module.efs-storage-local-registry[0].efs_filesystem_id}::${aws_efs_access_point.local-registry[0].id}"
       }
     }
   }
@@ -740,6 +754,7 @@ docker-registry:
   - name: GOGC
     value: "50"
   ingress:
+    className: nginx-internal
     enabled: true
     annotations:
       cert-manager.io/cluster-issuer: zerossl
@@ -792,6 +807,13 @@ restartCronjob:
   ]
 }
 
+output "local_registry_password" {
+  value = htpasswd_password.hash.sha512
+}
+
+output "local_registry_username" {
+  value = "local-user"
+}
 
 
 data "github_repository" "argo-github-repo" {
