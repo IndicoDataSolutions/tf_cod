@@ -648,7 +648,7 @@ resource "kubernetes_persistent_volume_claim" "local-registry" {
         storage = "100Gi"
       }
     }
-    volume_name = kubernetes_persistent_volume.local-registry-volume.metadata.0.name
+    volume_name = "local-registry"
   }
 }
 
