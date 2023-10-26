@@ -39,6 +39,10 @@ terraform {
       source  = "hashicorp/vault"
       version = "3.13.0"
     }
+    htpasswd = {
+      source = "loafoe/htpasswd"
+      version = "1.0.4"
+    }
   }
 }
 
@@ -139,6 +143,8 @@ module "argo-registration" {
   endpoint                     = module.cluster.kubernetes_host
   ca_data                      = module.cluster.kubernetes_cluster_ca_certificate
 }
+
+provider "htpasswd" {}
 
 provider "local" {}
 

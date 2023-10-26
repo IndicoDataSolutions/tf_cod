@@ -532,6 +532,23 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
   create_duration = "1m"
 }
 
+data "vault_kv_secret_v2" "account-robot-credentials" {
+  mount = "customer-${var.aws_account}"
+  name  = "harbor-registry"
+}
+
+resource "random_password" "password" {
+  length = 30
+}
+
+resource "random_password" "salt" {
+  length = 8
+}
+
+resource "htpasswd_password" "hash" {
+  password = random_password.password.result
+  salt     = random_password.salt.result
+}
 
 resource "helm_release" "local-registry" {
   depends_on = [
@@ -586,10 +603,10 @@ docker-registry:
     secretRef: remote-access
   replicaCount: 3
   secrets:
-    htpasswd: local-user:$2y$05$dl9xvvYCbYHkM/ox3UhY3erWZAeERxsFJiW04vZouM9geoqDusaAe
+    htpasswd: local-user:${htpasswd_password.hash.sha512}
 
 localPullSecret:
-  password: $2y$05$dl9xvvYCbYHkM/ox3UhY3erWZAeERxsFJiW04vZouM9geoqDusaAe
+  password: ${htpasswd_password.hash.sha512}
   secretName: local-pull-secret
   username: local-user
 
