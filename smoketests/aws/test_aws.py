@@ -17,7 +17,6 @@ class TestAWS:
     self.account = account
     self.region = region
     self.name = name
-    self.foo = "hell yeah"
     self.cluster_filter = f"Name=tag:indico/cluster,Values={self.name}"
     pass
     #print(f"\nSetup method called using {account}/{region}/{name}\n")
