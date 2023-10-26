@@ -43,14 +43,14 @@ then
     testname=$(basename "$testfile")
     echo "Running test with $testfile"
   
-    echo helm template ./$dir --dependency-update --name-template $testname --namespace default --kube-version 1.25 --values $testfile --include-crds --debug > /dev/null
-    helm template ./$dir --dependency-update --name-template $testname --namespace default --kube-version 1.25 --values $testfile --include-crds --debug > /dev/null
+    echo helm template ./$dir --dependency-update --name-template $testname --namespace default --kube-version 1.27 --values $testfile --include-crds --debug > /dev/null
+    helm template ./$dir --dependency-update --name-template $testname --namespace default --kube-version 1.27 --values $testfile --include-crds --debug > /dev/null
     
     echo "Linting chart"
     helm lint ./$dir --values $testfile
 
     echo "Images referenced"
-    helm template ./$dir --dependency-update --name-template $testname --namespace default --kube-version 1.25 --values $testfile --include-crds | yq '..|.image? | select(.)' | sort -u
+    helm template ./$dir --dependency-update --name-template $testname --namespace default --kube-version 1.27 --values $testfile --include-crds | yq '..|.image? | select(.)' | sort -u
   done
 fi
 
