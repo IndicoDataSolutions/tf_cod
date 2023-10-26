@@ -642,8 +642,11 @@ resource "kubernetes_storage_class_v1" "local-registry" {
 
 resource "kubernetes_persistent_volume_claim" "local-registry" {
 
-  depends_on = [kubernetes_namespace.local-registry]
-  count      = var.local_registry_enabled == true ? 1 : 0
+  depends_on = [
+    kubernetes_namespace.local-registry,
+    kubernetes_persistent_volume.local-registry
+  ]
+  count = var.local_registry_enabled == true ? 1 : 0
 
   metadata {
     name      = "local-registry"
@@ -662,6 +665,11 @@ resource "kubernetes_persistent_volume_claim" "local-registry" {
 }
 
 resource "kubernetes_persistent_volume" "local-registry" {
+
+  depends_on = [
+    module.efs-storage-local-registry[0]
+  ]
+
   count = var.local_registry_enabled == true ? 1 : 0
 
   metadata {
