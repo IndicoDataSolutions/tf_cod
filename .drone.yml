@@ -1,0 +1,125 @@
+kind: pipeline
+type: kubernetes
+name: devops-service
+
+steps:
+
+  - name: push helm charts
+    image: alpine/helm:3.10.2
+    commands:
+      - echo https://dl-cdn.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories
+      - apk update
+      - apk add yq jq bash curl wget parallel git
+      - wget -c https://github.com/shteou/helm-dependency-fetch/releases/download/v1.1.3/helm-dependency-fetch_1.1.3_Linux_x86_64.tar.gz -O - | tar -xz
+      - export PATH=$${CWD}:$${PATH}
+      - helm version
+      - helm plugin install https://github.com/chartmuseum/helm-push --version 0
+      - helm repo add --username $USERNAME --password $PASSWORD harborprod https://harbor.devops.indico.io/chartrepo/indico-charts
+      - cd smoketests
+      - ./upload-charts.sh "$DRONE_BRANCH-${DRONE_COMMIT_SHA:0:8}"
+
+    environment:
+      PYTHONUNBUFFERED: '1'
+      HARBOR_API_TOKEN:
+        from_secret: harbor_api_token
+      HELM_EXPERIMENTAL_OCI: 1
+      PASSWORD:
+        from_secret: harbor_password
+      USERNAME:
+        from_secret: harbor_username
+      CM_PASSWORD:
+        from_secret: chartmuseum_password
+      CM_USERNAME:
+        from_secret: chartmuseum_username
+
+    when:
+      event:
+        - push
+        - tag
+  
+  - name: tf-smoketest-container
+    image: plugins/docker
+    settings:
+      dockerfile: smoketests/Dockerfile
+      context: smoketests
+      registry: harbor.devops.indico.io
+      repo: harbor.devops.indico.io/indico/terraform-smoketests
+      tags: 
+        - ${DRONE_TAG:=latest}
+        - ${DRONE_COMMIT_SHA:0:8}
+
+      username:
+        from_secret: harbor_username
+      password:
+        from_secret: harbor_password
+
+---
+kind: secret
+name: harbor_pull_secret
+get:
+  path: tools/drone/devops_harbor_pull_secret
+  name: DOCKER_CONFIG_JSON
+
+---
+kind: secret
+name: harbor_username
+get:
+  path: tools/drone/harbor-push-token
+  name: username
+
+---
+kind: secret
+name: harbor_password
+get:
+  path: tools/drone/harbor-push-token
+  name: password
+
+---
+kind: secret
+name: chartmuseum_username
+get:
+  path: tools/drone/cm
+  name: username
+
+---
+kind: secret
+name: chartmuseum_password
+get:
+  path: tools/drone/cm
+  name: password
+
+---
+kind: secret
+name: github_token
+get:
+  path: tools/drone/github
+  name: token
+
+---
+kind: secret
+name: github_pr_check_token
+get:
+  path: tools/drone/jenkins-github-token
+  name: github-token
+
+---
+kind: secret
+name: jira_api_token
+get:
+  path: tools/drone/indicomachineuser-atlassian
+  name: token
+
+---
+kind: secret
+name: jira_user_email
+get: 
+  path: tools/drone/indicomachineuser-atlassian
+  name: email
+
+---
+kind: secret
+name: harbor_api_token
+get:
+  path: tools/drone/harbor-api
+  name: bearer_token
+
