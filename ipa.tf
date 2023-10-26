@@ -647,7 +647,7 @@ resource "aws_efs_access_point" "local-registry" {
   depends_on = [module.efs-storage-local-registry[0]]
 
   root_directory {
-    path = "/"
+    path = "/registry"
     creation_info {
       owner_gid   = 1000
       owner_uid   = 1000
