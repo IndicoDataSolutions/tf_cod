@@ -793,7 +793,7 @@ docker-registry:
     annotations:
       cert-manager.io/cluster-issuer: zerossl
       kubernetes.io/ingress.class: nginx-internal
-      service.beta.kubernetes.io/aws-load-balancer-internal: true
+      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
 
     labels: 
       acme.cert-manager.io/dns01-solver: "true"
