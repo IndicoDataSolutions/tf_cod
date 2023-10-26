@@ -648,7 +648,7 @@ resource "kubernetes_persistent_volume_claim" "local-registry" {
         storage = "100Gi"
       }
     }
-    volume_name = "local-registry"
+    volume_name = kubernetes_persistent_volume.local-registry.metadata.0.name
   }
 }
 
@@ -712,7 +712,7 @@ docker-registry:
     enabled: true
     annotations:
       cert-manager.io/cluster-issuer: zerossl
-      kubernetes.io/ingress.class: nginx
+      kubernetes.io/ingress.class: nginx-internal
     labels: 
       acme.cert-manager.io/dns01-solver: "true"
     hosts:
