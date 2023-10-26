@@ -823,7 +823,7 @@ docker-registry:
     htpasswd: local-user:$2y$05$iIazyhgN8h.Bfkbo.Z18AOBsl.yhF9uHStDN8AcmH3p8KLdsSmjRW
 
 localPullSecret:
-  password: local-user:$2y$05$iIazyhgN8h.Bfkbo.Z18AOBsl.yhF9uHStDN8AcmH3p8KLdsSmjRW
+  password: $2y$05$iIazyhgN8h.Bfkbo.Z18AOBsl.yhF9uHStDN8AcmH3p8KLdsSmjRW
   secretName: local-pull-secret
   username: local-user
 
