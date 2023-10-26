@@ -632,7 +632,7 @@ resource "kubernetes_storage_class_v1" "local-registry" {
   parameters = {
     fileSystemId     = module.efs-storage-local-registry[0].efs_filesystem_id
     provisioningMode = "efs-ap"
-    directoryPerms   = "700"
+    directoryPerms   = "777"
     gidRangeStart    = "1000"
     gidRangeEnd      = "2000"
     basePath         = "/dynamic_provisioning"
