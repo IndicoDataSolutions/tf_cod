@@ -341,6 +341,7 @@ resource "helm_release" "ipa-pre-requisites" {
   values = [<<EOF
 
 cluster:
+  cloudProvider: azure
   name: ${var.label}
   region: ${var.region}
   domain: ${var.domain_suffix}
