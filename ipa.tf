@@ -755,6 +755,31 @@ resource "helm_release" "local-registry" {
 cert-manager:
   enabled: false
 
+ingress-nginx:
+  enabled: true
+  
+  controller:
+    ingressClass: nginx-internal
+#    ingressClassResource:
+#      name: nginx-internal
+    admissionWebhooks:
+      enabled: false
+    autoscaling:
+      enabled: true
+      maxReplicas: 12
+      minReplicas: 6
+      targetCPUUtilizationPercentage: 50
+      targetMemoryUtilizationPercentage: 50
+    resources:
+      requests:
+        cpu: 1
+        memory: 2Gi
+    service:
+      internal:
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+        enabled: true
+
 docker-registry:
   service:
     annotations: 
