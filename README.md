@@ -1,6 +1,16 @@
 # tf_cod
 Terraform repo used for Clusters On Demand (COD)
 
+## pre-commit setup
+
+1. Make sure you install the python requirements for this repo.
+
+   `pip install -r smoketests/requirements.txt`
+
+2. Install/Setup pre-commit
+
+   `pre-commit install`
+
 ## Smoketests
 
 Whenever `tf_cod` has a commit to it, a Dockerfile located in [smoketests/Dockerfile](smoketests/Dockefile) gets built via a [drone job](https://drone.devops.indico.io/IndicoDataSolutions/tf_cod)
