@@ -613,10 +613,10 @@ resource "kubernetes_storage_class_v1" "local-registry" {
     name = "local-registry"
   }
 
- # enabled: true
- #     parameters:
- #       provisioningMode: efs-ap
- ##       fileSystemId: ${module.efs-storage[0].efs_filesystem_id}
+  # enabled: true
+  #     parameters:
+  #       provisioningMode: efs-ap
+  ##       fileSystemId: ${module.efs-storage[0].efs_filesystem_id}
   #      directoryPerms: "700"
   #      gidRangeStart: "1000" # optional
   #      gidRangeEnd: "2000" # optional
@@ -624,12 +624,12 @@ resource "kubernetes_storage_class_v1" "local-registry" {
   storage_provisioner = "efs.csi.aws.com"
   reclaim_policy      = "Retain"
   parameters = {
-    fileSystemId = ${module.efs-storage-local-registry[0].efs_filesystem_id}
+    fileSystemId     = module.efs-storage-local-registry[0].efs_filesystem_id
     provisioningMode = "efs-ap"
-    directoryPerms = "700"
-    gidRangeStart = "1000"
-    gidRangeEnd = "2000"
-    basePath = "/dynamic_provisioning"
+    directoryPerms   = "700"
+    gidRangeStart    = "1000"
+    gidRangeEnd      = "2000"
+    basePath         = "/dynamic_provisioning"
   }
   #mount_options = ["file_mode=0700", "dir_mode=0777", "mfsymlinks", "uid=1000", "gid=1000", "nobrl", "cache=none"]
 }
@@ -641,7 +641,7 @@ resource "kubernetes_persistent_volume_claim" "local-registry" {
     name = "local-registry"
   }
   spec {
-    access_modes = ["ReadWriteMany"]
+    access_modes       = ["ReadWriteMany"]
     storage_class_name = "local-registry"
     resources {
       requests = {
@@ -663,13 +663,13 @@ resource "kubernetes_persistent_volume" "local-registry" {
     capacity = {
       storage = "100Gi"
     }
-    
-    access_modes = ["ReadWriteMany"]
+
+    access_modes       = ["ReadWriteMany"]
     storage_class_name = "local-registry"
 
     persistent_volume_source {
       csi {
-        driver = "efs.csi.aws.com"
+        driver        = "efs.csi.aws.com"
         volume_handle = module.efs-storage-local-registry[0].efs_filesystem_id
       }
     }
