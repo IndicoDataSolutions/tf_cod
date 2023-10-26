@@ -629,14 +629,14 @@ resource "kubernetes_storage_class_v1" "local-registry" {
   #      basePath: "/dynamic_provisioning" # optional
   storage_provisioner = "efs.csi.aws.com"
   reclaim_policy      = "Retain"
-  parameters = {
-    fileSystemId     = module.efs-storage-local-registry[0].efs_filesystem_id
-    provisioningMode = "efs-ap"
-    directoryPerms   = "777"
-    gidRangeStart    = "1000"
-    gidRangeEnd      = "2000"
-    basePath         = "/dynamic_provisioning"
-  }
+  #parameters = {
+  #  fileSystemId     = module.efs-storage-local-registry[0].efs_filesystem_id
+  #  provisioningMode = "efs-ap"
+  #  directoryPerms   = "777"
+  #  gidRangeStart    = "1000"
+  #  gidRangeEnd      = "2000"
+  #  basePath         = "/dynamic_provisioning"
+  #}
   #mount_options = ["file_mode=0700", "dir_mode=0777", "mfsymlinks", "uid=1000", "gid=1000", "nobrl", "cache=none"]
 }
 
