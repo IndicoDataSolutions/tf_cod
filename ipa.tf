@@ -652,7 +652,7 @@ docker-registry:
   persistence:
     deleteEnabled: true
     enabled: true
-    size: 100Gi
+    size: 800Gi
     storageClass: indico-sc
 
   proxy:
