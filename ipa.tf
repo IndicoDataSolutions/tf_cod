@@ -718,7 +718,7 @@ resource "kubernetes_persistent_volume" "local-registry" {
 
 
 resource "random_password" "password" {
-  length = 30
+  length = 12
 }
 
 resource "random_password" "salt" {
