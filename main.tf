@@ -44,6 +44,10 @@ terraform {
       source  = "Snowflake-Labs/snowflake"
       version = "0.73.0"
     }
+    htpasswd = {
+      source = "loafoe/htpasswd"
+      version = "1.0.4"
+    }
   }
 }
 
@@ -100,6 +104,8 @@ provider "snowflake" {
   region      = var.snowflake_region
   private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
 }
+
+provider "htpasswd" {}
 
 data "aws_caller_identity" "current" {}
 
