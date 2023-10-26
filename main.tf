@@ -235,6 +235,18 @@ module "efs-storage" {
 
 }
 
+
+module "efs-storage-local-registry" {
+  count              = var.local_registry_enabled  == true ? 1 : 0
+  source             = "app.terraform.io/indico/indico-aws-efs/mod"
+  version            = "0.0.1"
+  label              = "${var.label}-local-registry"
+  additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage-local-registry" })
+  security_groups    = [module.security-group.all_subnets_sg_id]
+  private_subnet_ids = flatten([local.network[0].private_subnet_ids])
+  kms_key_arn        = module.kms_key.key_arn
+}
+
 module "fsx-storage" {
   count                       = var.include_fsx == true ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-fsx/mod"

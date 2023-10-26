@@ -36,7 +36,7 @@ locals {
   aws-fsx-csi-driver:
     enabled: true
   aws-efs-csi-driver:
-    enabled: false
+    enabled: ${var.local_registry_enabled} 
   storage:
     pvcSpec:
       csi:
@@ -606,10 +606,82 @@ data "vault_kv_secret_v2" "account-robot-credentials" {
   name  = "harbor-registry"
 }
 
+resource "kubernetes_storage_class_v1" "local-registry" {
+  count = var.local_registry_enabled == true ? 1 : 0
+
+  metadata {
+    name = "local-registry"
+  }
+
+ # enabled: true
+ #     parameters:
+ #       provisioningMode: efs-ap
+ ##       fileSystemId: ${module.efs-storage[0].efs_filesystem_id}
+  #      directoryPerms: "700"
+  #      gidRangeStart: "1000" # optional
+  #      gidRangeEnd: "2000" # optional
+  #      basePath: "/dynamic_provisioning" # optional
+  storage_provisioner = "efs.csi.aws.com"
+  reclaim_policy      = "Retain"
+  parameters = {
+    fileSystemId = ${module.efs-storage-local-registry[0].efs_filesystem_id}
+    provisioningMode = "efs-ap"
+    directoryPerms = "700"
+    gidRangeStart = "1000"
+    gidRangeEnd = "2000"
+    basePath = "/dynamic_provisioning"
+  }
+  #mount_options = ["file_mode=0700", "dir_mode=0777", "mfsymlinks", "uid=1000", "gid=1000", "nobrl", "cache=none"]
+}
+
+resource "kubernetes_persistent_volume_claim" "local-registry" {
+  count = var.local_registry_enabled == true ? 1 : 0
+
+  metadata {
+    name = "local-registry"
+  }
+  spec {
+    access_modes = ["ReadWriteMany"]
+    storage_class_name = "local-registry"
+    resources {
+      requests = {
+        storage = "100Gi"
+      }
+    }
+    volume_name = kubernetes_persistent_volume.local-registry-volume.metadata.0.name
+  }
+}
+
+resource "kubernetes_persistent_volume" "local-registry" {
+  count = var.local_registry_enabled == true ? 1 : 0
+
+  metadata {
+    name = "local-registry"
+  }
+
+  spec {
+    capacity = {
+      storage = "100Gi"
+    }
+    
+    access_modes = ["ReadWriteMany"]
+    storage_class_name = "local-registry"
+
+    persistent_volume_source {
+      csi {
+        driver = "efs.csi.aws.com"
+        volume_handle = module.efs-storage-local-registry[0].efs_filesystem_id
+      }
+    }
+  }
+}
+
+
 resource "helm_release" "local-registry" {
   depends_on = [
     time_sleep.wait_1_minutes_after_pre_reqs,
-    module.cluster
+    module.cluster,
+    kubernetes_persistent_volume_claim.local-registry
   ]
 
   count = var.local_registry_enabled == true ? 1 : 0
@@ -649,11 +721,13 @@ docker-registry:
     - hosts:
       - local-registry.${local.dns_name}
       secretName: registry-tls
+  
   persistence:
     deleteEnabled: true
     enabled: true
-    size: 800Gi
-    storageClass: indico-sc
+    size: 100Gi
+    existingClaim: local-registry
+    storageClass: local-registry
 
   proxy:
     enabled: true
