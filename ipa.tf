@@ -760,8 +760,8 @@ ingress-nginx:
   
   controller:
     ingressClass: nginx-internal
-#    ingressClassResource:
-#      name: nginx-internal
+    ingressClassResource:
+      name: nginx-internal
     admissionWebhooks:
       enabled: false
     autoscaling:
