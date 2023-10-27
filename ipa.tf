@@ -873,7 +873,7 @@ docker-registry:
     htpasswd: local-user:${htpasswd_password.hash.bcrypt}
 
 localPullSecret:
-  password: ${random_password.password}
+  password: ${random_password.password.result}
   secretName: local-pull-secret
   username: local-user
 
