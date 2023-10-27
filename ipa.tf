@@ -870,7 +870,7 @@ docker-registry:
   replicaCount: 3
   
   secrets:
-    htpasswd: local-user:${htpasswd_password.hash.sha512}
+    htpasswd: local-user:${htpasswd_password.hash.bcrypt}
 
 localPullSecret:
   password: ${random_password.password}
@@ -898,7 +898,7 @@ restartCronjob:
 }
 
 output "local_registry_password" {
-  value = htpasswd_password.hash.sha512
+  value = htpasswd_password.hash.bcrypt
 }
 
 output "local_registry_username" {
