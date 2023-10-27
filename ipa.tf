@@ -667,10 +667,9 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
   create_duration = "1m"
 }
 
-
 data "vault_kv_secret_v2" "account-robot-credentials" {
-  mount = "customer-${var.aws_account}"
-  name  = "harbor-registry"
+  mount = "harbor-robot-accounts"
+  name  = lower(var.aws_account)
 }
 
 resource "kubernetes_namespace" "local-registry" {
@@ -884,13 +883,13 @@ metrics-server:
   enabled: false
 
 proxyRegistryAccess:
-  #proxyPassword: ${jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)["harbor_password"]}
+  proxyPassword: ${jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)[var.local_registry_harbor_robot_account_name]}
   proxyPullSecretName: remote-access
   proxyUrl: https://harbor.devops.indico.io
-  #proxyUsername: ${jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)["harbor_username"]}
+  proxyUsername: ${var.local_registry_harbor_robot_account_name}
   
-  proxyPassword: 7QmGA8N9i5zg0ifDpM50b6BvpdkYCDTJ
-  proxyUsername: robot$indico-dev-v1
+  #proxyPassword: 7QmGA8N9i5zg0ifDpM50b6BvpdkYCDTJ
+  #proxyUsername: robot$indico-dev-v1
 
 registryUrl: local-registry.${local.dns_name}
 restartCronjob:

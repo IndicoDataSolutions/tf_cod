@@ -661,3 +661,7 @@ variable "local_registry_enabled" {
   default = false
 }
 
+variable "local_registry_harbor_robot_account_name" {
+  type    = string
+  default = "unused"
+}
