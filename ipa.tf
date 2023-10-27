@@ -1058,6 +1058,11 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
+            global:
+              image:
+                registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "harbor.devops.indico.io"}/indico
+              imagePullSecrets: ${var.local_registry_enabled ? "local-pull-secret" : "harbor-pull-secret"}
+
             runtime-scanner:
               enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
               authentication:
