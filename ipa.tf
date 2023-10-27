@@ -605,6 +605,7 @@ EOT
 #    command = "env|sort"
 #  }
 #}
+
 data "external" "git_information" {
   program = ["sh", "${path.module}/get_sha.sh"]
 }
