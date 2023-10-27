@@ -870,10 +870,10 @@ docker-registry:
   replicaCount: 3
   
   secrets:
-    htpasswd: local-user:$2y$05$/LkcPVjV/eLrHHGj6RUnF.RHxvPFuGXms8nhfb0Os.FihJGyWcMuK
+    htpasswd: local-user:${htpasswd_password.hash.sha512}
 
 localPullSecret:
-  password: playgolf
+  password: ${random_password.password}
   secretName: local-pull-secret
   username: local-user
 
@@ -886,11 +886,8 @@ proxyRegistryAccess:
   proxyPassword: ${jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)[var.local_registry_harbor_robot_account_name]}
   proxyPullSecretName: remote-access
   proxyUrl: https://harbor.devops.indico.io
-  proxyUsername: ${var.local_registry_harbor_robot_account_name}
+  proxyUsername: "robot$"${var.local_registry_harbor_robot_account_name}
   
-  #proxyPassword: 7QmGA8N9i5zg0ifDpM50b6BvpdkYCDTJ
-  #proxyUsername: robot$indico-dev-v1
-
 registryUrl: local-registry.${local.dns_name}
 restartCronjob:
   cronSchedule: 0 0 */3 * *
