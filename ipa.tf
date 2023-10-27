@@ -871,10 +871,10 @@ docker-registry:
   replicaCount: 3
   
   secrets:
-    htpasswd: local-user:$2y$05$S9YpXoZIauUJ4bZ8Iww4v.LGZSg23OvZ09LqfZ9KjJR5uOMpVzvdG
+    htpasswd: local-user:$2y$05$/LkcPVjV/eLrHHGj6RUnF.RHxvPFuGXms8nhfb0Os.FihJGyWcMuK
 
 localPullSecret:
-  password: "mnGB*WHI&wKY@@Y*M1FqD4*a3aOFFuDmZWFzpEwG"
+  password: playgolf
   secretName: local-pull-secret
   username: local-user
 
