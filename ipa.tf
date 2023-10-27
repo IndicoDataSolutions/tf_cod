@@ -134,6 +134,27 @@ alternate-external-dns:
     - ingress
 EOT
   )
+  local_registry_tf_cod_values = var.local_registry_enabled == true ? (<<EOT
+celery-flower:
+  imagePullSecrets: local-pull-secret
+
+worker:
+  imagePullSecrets: local-pull-secret
+  
+readapi:
+  imagePullSecret: local-pull-secret
+
+server:
+  imagePullSecrets: local-pull-secret
+
+cronjob:
+  imagePullSecrets: local-pull-secret  
+  EOT
+    ) : (<<EOT
+# not using local_registry
+  EOT
+  )
+
   runtime_scanner_ingress_values = var.use_static_ssl_certificates == true ? (<<EOT
 ingress:
   enabled: true
@@ -1061,8 +1082,7 @@ spec:
             global:
               image:
                 registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "harbor.devops.indico.io"}/indico
-              imagePullSecrets: ${var.local_registry_enabled ? "local-pull-secret" : "harbor-pull-secret"}
-
+            ${indent(12, local.local_registry_tf_cod_values)}
             runtime-scanner:
               enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
               authentication:
