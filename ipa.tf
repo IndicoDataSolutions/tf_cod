@@ -884,10 +884,14 @@ metrics-server:
   enabled: false
 
 proxyRegistryAccess:
-  proxyPassword: ${jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)["harbor_password"]}
+  #proxyPassword: ${jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)["harbor_password"]}
   proxyPullSecretName: remote-access
   proxyUrl: https://harbor.devops.indico.io
-  proxyUsername: ${jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)["harbor_username"]}
+  #proxyUsername: ${jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)["harbor_username"]}
+  
+  proxyPassword: 7QmGA8N9i5zg0ifDpM50b6BvpdkYCDTJ
+  proxyUsername: robot$indico-dev-v1
+
 registryUrl: local-registry.${local.dns_name}
 restartCronjob:
   cronSchedule: 0 0 */3 * *
