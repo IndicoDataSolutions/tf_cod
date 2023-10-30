@@ -135,31 +135,12 @@ alternate-external-dns:
 EOT
   )
   local_registry_tf_cod_values = var.local_registry_enabled == true ? (<<EOT
-celery-flower:
-  imagePullSecrets: local-pull-secret
+global:
+  imagePullSecrets: 
+    - name: local-pull-secret
+    - name: harbor-pull-secret
   image:
     registry: local-registry.${local.dns_name}/indico
-
-worker:
-  imagePullSecrets: local-pull-secret
-  image:
-    registry: local-registry.${local.dns_name}/indico
-  
-readapi:
-  imagePullSecret: local-pull-secret
-  image:
-    registry: local-registry.${local.dns_name}/indico
-
-server:
-  imagePullSecrets: local-pull-secret
-  image:
-    registry: local-registry.${local.dns_name}/indico
-
-cronjob:
-  imagePullSecrets: local-pull-secret  
-  image:
-    registry: local-registry.${local.dns_name}/indico
-
   EOT
     ) : (<<EOT
 # not using local_registry
