@@ -137,18 +137,29 @@ EOT
   local_registry_tf_cod_values = var.local_registry_enabled == true ? (<<EOT
 celery-flower:
   imagePullSecrets: local-pull-secret
+  image:
+    registry: local-registry.${local.dns_name}/indico
 
 worker:
   imagePullSecrets: local-pull-secret
+  image:
+    registry: local-registry.${local.dns_name}/indico
   
 readapi:
   imagePullSecret: local-pull-secret
+  image:
+    registry: local-registry.${local.dns_name}/indico
 
 server:
   imagePullSecrets: local-pull-secret
+  image:
+    registry: local-registry.${local.dns_name}/indico
 
 cronjob:
   imagePullSecrets: local-pull-secret  
+  image:
+    registry: local-registry.${local.dns_name}/indico
+
   EOT
     ) : (<<EOT
 # not using local_registry
@@ -905,7 +916,7 @@ metrics-server:
   enabled: false
 
 proxyRegistryAccess:
-  proxyPassword: ${replace(jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)[var.local_registry_harbor_robot_account_name], "'", "")}
+  proxyPassword: ${jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)[var.local_registry_harbor_robot_account_name]}
   proxyPullSecretName: remote-access
   proxyUrl: https://harbor.devops.indico.io
   proxyUsername: "robot${"$"}${var.local_registry_harbor_robot_account_name}"
