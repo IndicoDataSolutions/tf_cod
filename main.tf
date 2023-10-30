@@ -81,11 +81,11 @@ provider "aws" {
 
 provider "azurerm" {
   features {}
-  alias           = "readapi"
-  client_id       = var.azure_readapi_client_id
-  client_secret   = var.azure_readapi_client_secret
-  subscription_id = var.azure_readapi_subscription_id
-  tenant_id       = var.azure_readapi_tenant_id
+  alias           = "indicoio"
+  client_id       = var.azure_indico_io_client_id
+  client_secret   = var.azure_indico_io_client_secret
+  subscription_id = var.azure_indico_io_subscription_id
+  tenant_id       = var.azure_indico_io_tenant_id
 }
 
 data "vault_kv_secret_v2" "terraform-snowflake" {
@@ -282,42 +282,35 @@ module "cluster" {
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
 }
 
-module "readapi_queue" {
+module "readapi" {
   count = var.enable_readapi ? 1 : 0
   providers = {
-    azurerm = azurerm.readapi
+    azurerm = azurerm.indicoio
   }
-  source          = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
-  version         = "1.0.0"
+  source          = "app.terraform.io/indico/indico-azure-readapi/mod"
+  version         = "2.1.2"
   readapi_name    = lower("${var.aws_account}-${var.label}")
-}
-
-locals {
-  readapi_secret_path = var.environment == "production" ? "prod-readapi" : "dev-readapi"
-}
-
-data "vault_kv_secret_v2" "readapi_secret" {
-  mount = "customer-${var.aws_account}"
-  name  = local.readapi_secret_path
+  client_id       = var.azure_indico_io_client_id
+  client_secret   = var.azure_indico_io_client_secret
+  subscription_id = var.azure_indico_io_subscription_id
+  tenant_id       = var.azure_indico_io_tenant_id
 }
 
 resource "kubernetes_secret" "readapi" {
   count      = var.enable_readapi ? 1 : 0
-  depends_on = [module.cluster]
+  depends_on = [module.cluster, module.readapi]
   metadata {
-    name = "readapi-secret"
+    name = "readapi-queue-auth"
   }
 
   data = {
-    READAPI_COMPUTER_VISION_URL     = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
-    READAPI_COMPUTER_VISION_APIKEY  = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_url"]
-    READAPI_FORM_RECOGNITION_URL    = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_key"]
-    READAPI_FORM_RECOGNITION_APIKEY = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_url"]
-    storage_account_name            = module.readapi_queue[0].storage_account_name
-    storage_account_id              = module.readapi_queue[0].storage_account_id
-    storage_account_access_key      = module.readapi_queue[0].storage_account_access_key
-    storage_queue_name              = module.readapi_queue[0].storage_queue_name
-    storage_connection_string       = module.readapi_queue[0].storage_connection_string
+    endpoint                   = module.readapi[0].endpoint
+    access_key                 = module.readapi[0].access_key
+    storage_account_name       = module.readapi[0].storage_account_name
+    storage_account_id         = module.readapi[0].storage_account_id
+    storage_account_access_key = module.readapi[0].storage_account_access_key
+    storage_queue_name         = module.readapi[0].storage_queue_name
+    storage_connection_string  = module.readapi[0].storage_connection_string
   }
 }
 

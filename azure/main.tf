@@ -225,12 +225,12 @@ module "cluster" {
   enable_oidc_issuer       = true
 }
 
-module "readapi_queue" {
-  count = var.enable_readapi_queue ? 1 : 0
+module "readapi" {
+  count = var.enable_readapi ? 1 : 0
   providers = {
     azurerm = azurerm.indicoio
   }
-  source          = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
+  source          = "app.terraform.io/indico/indico-azure-readapi/mod"
   version         = "2.1.2"
   readapi_name    = lower("${var.account}-${var.label}")
   client_id       = var.azure_indico_io_client_id
@@ -241,19 +241,19 @@ module "readapi_queue" {
 
 resource "kubernetes_secret" "readapi" {
   count      = var.enable_readapi ? 1 : 0
-  depends_on = [module.cluster, module.readapi_queue]
+  depends_on = [module.cluster, module.readapi]
   metadata {
     name = "readapi-queue-auth"
   }
 
   data = {
-    endpoint                   = "foo"
-    access_key                 = "foo"
-    storage_account_name       = module.readapi_queue[0].storage_account_name
-    storage_account_id         = module.readapi_queue[0].storage_account_id
-    storage_account_access_key = module.readapi_queue[0].storage_account_access_key
-    storage_queue_name         = module.readapi_queue[0].storage_queue_name
-    storage_connection_string  = module.readapi_queue[0].storage_connection_string
+    endpoint                   = module.readapi[0].endpoint
+    access_key                 = module.readapi[0].access_key
+    storage_account_name       = module.readapi[0].storage_account_name
+    storage_account_id         = module.readapi[0].storage_account_id
+    storage_account_access_key = module.readapi[0].storage_account_access_key
+    storage_queue_name         = module.readapi[0].storage_queue_name
+    storage_connection_string  = module.readapi[0].storage_connection_string
   }
 }
 
