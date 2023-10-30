@@ -89,6 +89,8 @@ app-edge:
     ) : (<<EOT
 app-edge:
   alternateDomain: ""
+  image:
+    registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "harbor.devops.indico.io"}/indico
 EOT
   )
   dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT
@@ -139,6 +141,10 @@ global:
   imagePullSecrets: 
     - name: local-pull-secret
     - name: harbor-pull-secret
+  image:
+    registry: local-registry.${local.dns_name}/indico
+
+app-edge:
   image:
     registry: local-registry.${local.dns_name}/indico
   EOT
