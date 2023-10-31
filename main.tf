@@ -287,9 +287,9 @@ module "readapi_queue" {
   providers = {
     azurerm = azurerm.readapi
   }
-  source          = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
-  version         = "1.0.0"
-  readapi_name    = lower("${var.aws_account}-${var.label}")
+  source       = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
+  version      = "1.0.0"
+  readapi_name = lower("${var.aws_account}-${var.label}")
 }
 
 locals {
@@ -309,15 +309,15 @@ resource "kubernetes_secret" "readapi" {
   }
 
   data = {
-    READAPI_COMPUTER_VISION_URL     = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
-    READAPI_COMPUTER_VISION_APIKEY  = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_url"]
-    READAPI_FORM_RECOGNITION_URL    = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_key"]
-    READAPI_FORM_RECOGNITION_APIKEY = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_url"]
-    storage_account_name            = module.readapi_queue[0].storage_account_name
-    storage_account_id              = module.readapi_queue[0].storage_account_id
-    storage_account_access_key      = module.readapi_queue[0].storage_account_access_key
-    storage_queue_name              = module.readapi_queue[0].storage_queue_name
-    storage_connection_string       = module.readapi_queue[0].storage_connection_string
+    READAPI_COMPUTER_VISION_HOST  = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
+    READAPI_COMPUTER_VISION_KEY   = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_url"]
+    READAPI_FORM_RECOGNITION_HOST = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_key"]
+    READAPI_FORM_RECOGNITION_KEY  = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_url"]
+    storage_account_name          = module.readapi_queue[0].storage_account_name
+    storage_account_id            = module.readapi_queue[0].storage_account_id
+    storage_account_access_key    = module.readapi_queue[0].storage_account_access_key
+    storage_queue_name            = module.readapi_queue[0].storage_queue_name
+    storage_connection_string     = module.readapi_queue[0].storage_connection_string
   }
 }
 
