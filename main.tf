@@ -319,7 +319,7 @@ resource "kubernetes_secret" "readapi" {
     storage_account_id            = module.readapi_queue[0].storage_account_id
     storage_account_access_key    = module.readapi_queue[0].storage_account_access_key
     storage_queue_name            = module.readapi_queue[0].storage_queue_name
-    storage_connection_string     = module.readapi_queue[0].storage_connection_string
+    QUEUE_CONNECTION_STRING       = module.readapi_queue[0].storage_connection_string
   }
 }
 
