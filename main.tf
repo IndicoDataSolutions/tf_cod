@@ -10,7 +10,7 @@ terraform {
     }
     keycloak = {
       source  = "mrparkers/keycloak"
-      version = "4.3.1"
+      version = "4.0.1"
     }
     argocd = {
       source  = "oboukili/argocd"
@@ -44,13 +44,18 @@ terraform {
       source  = "Snowflake-Labs/snowflake"
       version = "0.73.0"
     }
+    htpasswd = {
+      source  = "loafoe/htpasswd"
+      version = "1.0.4"
+    }
   }
 }
 
 provider "time" {}
 
 provider "keycloak" {
-  # these values are provided by the keycloak varset from terraform cloud
+  client_id = "terraform-master"
+  url       = "https://keycloak.devops.indico.io"
 }
 
 provider "vault" {
@@ -100,6 +105,8 @@ provider "snowflake" {
   region      = var.snowflake_region
   private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
 }
+
+provider "htpasswd" {}
 
 data "aws_caller_identity" "current" {}
 
@@ -233,6 +240,18 @@ module "efs-storage" {
   private_subnet_ids = flatten([local.network[0].private_subnet_ids])
   kms_key_arn        = module.kms_key.key_arn
 
+}
+
+
+module "efs-storage-local-registry" {
+  count              = var.local_registry_enabled == true ? 1 : 0
+  source             = "app.terraform.io/indico/indico-aws-efs/mod"
+  version            = "0.0.1"
+  label              = "${var.label}-local-registry"
+  additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage-local-registry" })
+  security_groups    = [module.security-group.all_subnets_sg_id]
+  private_subnet_ids = flatten([local.network[0].private_subnet_ids])
+  kms_key_arn        = module.kms_key.key_arn
 }
 
 module "fsx-storage" {

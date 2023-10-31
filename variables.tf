@@ -652,3 +652,16 @@ variable "ssl_static_secret_name" {
   description = "secret_name for static ssl certificate"
 }
 
+variable "local_registry_version" {
+  type = string
+}
+
+variable "local_registry_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "local_registry_harbor_robot_account_name" {
+  type    = string
+  default = "unused"
+}

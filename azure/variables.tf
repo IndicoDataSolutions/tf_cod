@@ -536,3 +536,14 @@ variable "monitor_retention_in_days" {
   default     = 30 # minimum value
   description = "Azure Monitor retention in days"
 }
+
+
+variable "local_registry_version" {
+  type = string
+}
+
+variable "local_registry_enabled" {
+  type    = bool
+  default = false
+}
+

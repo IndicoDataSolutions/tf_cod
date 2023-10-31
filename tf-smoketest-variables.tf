@@ -116,6 +116,9 @@ resource "kubernetes_config_map" "terraform-variables" {
     eks_addon_version_guardduty = "${jsonencode(var.eks_addon_version_guardduty)}"
     use_static_ssl_certificates = "${jsonencode(var.use_static_ssl_certificates)}"
     ssl_static_secret_name = "${jsonencode(var.ssl_static_secret_name)}"
+    local_registry_version = "${jsonencode(var.local_registry_version)}"
+    local_registry_enabled = "${jsonencode(var.local_registry_enabled)}"
+    local_registry_harbor_robot_account_name = "${jsonencode(var.local_registry_harbor_robot_account_name)}"
 
   }
 }

@@ -36,7 +36,7 @@ locals {
   aws-fsx-csi-driver:
     enabled: true
   aws-efs-csi-driver:
-    enabled: false
+    enabled: ${var.local_registry_enabled} 
   storage:
     pvcSpec:
       csi:
@@ -89,6 +89,8 @@ app-edge:
     ) : (<<EOT
 app-edge:
   alternateDomain: ""
+  image:
+    registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "harbor.devops.indico.io"}/indico
 EOT
   )
   dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT
@@ -134,6 +136,23 @@ alternate-external-dns:
     - ingress
 EOT
   )
+  local_registry_tf_cod_values = var.local_registry_enabled == true ? (<<EOT
+global:
+  imagePullSecrets: 
+    - name: local-pull-secret
+    - name: harbor-pull-secret
+  image:
+    registry: local-registry.${local.dns_name}/indico
+
+app-edge:
+  image:
+    registry: local-registry.${local.dns_name}/indico
+  EOT
+    ) : (<<EOT
+# not using local_registry
+  EOT
+  )
+
   runtime_scanner_ingress_values = var.use_static_ssl_certificates == true ? (<<EOT
 ingress:
   enabled: true
@@ -605,6 +624,7 @@ EOT
 #    command = "env|sort"
 #  }
 #}
+
 data "external" "git_information" {
   program = ["sh", "${path.module}/get_sha.sh"]
 }
@@ -666,6 +686,245 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
 
   create_duration = "1m"
 }
+
+data "vault_kv_secret_v2" "account-robot-credentials" {
+  mount = "harbor-robot-accounts"
+  name  = lower(var.aws_account)
+}
+
+resource "kubernetes_namespace" "local-registry" {
+  metadata {
+    name = "local-registry"
+  }
+}
+
+resource "kubernetes_storage_class_v1" "local-registry" {
+  count = var.local_registry_enabled == true ? 1 : 0
+
+  metadata {
+    name = "local-registry"
+  }
+
+  storage_provisioner = "efs.csi.aws.com"
+  reclaim_policy      = "Retain"
+}
+
+
+resource "aws_efs_access_point" "local-registry" {
+  count = var.local_registry_enabled == true ? 1 : 0
+
+  depends_on = [module.efs-storage-local-registry[0]]
+
+  root_directory {
+    path = "/registry"
+    creation_info {
+      owner_gid   = 1000
+      owner_uid   = 1000
+      permissions = "0777"
+    }
+  }
+
+  posix_user {
+    gid = 1000
+    uid = 1000
+  }
+  file_system_id = module.efs-storage-local-registry[0].efs_filesystem_id
+}
+
+
+resource "kubernetes_persistent_volume_claim" "local-registry" {
+
+  depends_on = [
+    kubernetes_namespace.local-registry,
+    kubernetes_persistent_volume.local-registry
+  ]
+  count = var.local_registry_enabled == true ? 1 : 0
+
+  metadata {
+    name      = "local-registry"
+    namespace = "local-registry"
+  }
+  spec {
+    access_modes       = ["ReadWriteMany"]
+    storage_class_name = "local-registry"
+    resources {
+      requests = {
+        storage = "100Gi"
+      }
+    }
+    volume_name = "local-registry"
+  }
+}
+
+resource "kubernetes_persistent_volume" "local-registry" {
+
+  depends_on = [
+    module.efs-storage-local-registry[0]
+  ]
+
+  count = var.local_registry_enabled == true ? 1 : 0
+
+  metadata {
+    name = "local-registry"
+  }
+
+  spec {
+    capacity = {
+      storage = "100Gi"
+    }
+
+    access_modes       = ["ReadWriteMany"]
+    storage_class_name = "local-registry"
+
+    persistent_volume_source {
+      csi {
+        driver        = "efs.csi.aws.com"
+        volume_handle = "${module.efs-storage-local-registry[0].efs_filesystem_id}::${aws_efs_access_point.local-registry[0].id}"
+      }
+    }
+  }
+}
+
+
+resource "random_password" "password" {
+  length = 12
+}
+
+resource "random_password" "salt" {
+  length = 8
+}
+
+resource "htpasswd_password" "hash" {
+  password = random_password.password.result
+  salt     = random_password.salt.result
+}
+
+resource "helm_release" "local-registry" {
+  depends_on = [
+    kubernetes_namespace.local-registry,
+    time_sleep.wait_1_minutes_after_pre_reqs,
+    module.cluster,
+    kubernetes_persistent_volume_claim.local-registry
+  ]
+
+  count = var.local_registry_enabled == true ? 1 : 0
+
+  verify           = false
+  name             = "local-registry"
+  create_namespace = false
+  namespace        = "local-registry"
+  repository       = var.ipa_repo
+  chart            = "local-registry"
+  version          = var.local_registry_version
+  wait             = false
+  timeout          = "1800" # 30 minutes
+  disable_webhooks = false
+
+  values = [<<EOF
+cert-manager:
+  enabled: false
+
+ingress-nginx:
+  enabled: true
+  
+  controller:
+    ingressClass: nginx-internal
+    ingressClassResource:
+      controllerValue: "k8s.io/ingress-nginx-internal"
+      name: nginx-internal
+    admissionWebhooks:
+      enabled: false
+    autoscaling:
+      enabled: true
+      maxReplicas: 12
+      minReplicas: 6
+      targetCPUUtilizationPercentage: 50
+      targetMemoryUtilizationPercentage: 50
+    resources:
+      requests:
+        cpu: 1
+        memory: 2Gi
+    service:
+      external:
+        enabled: false
+      internal:
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+        enabled: true
+
+docker-registry:
+  service:
+    annotations: 
+      external-dns.alpha.kubernetes.io/hostname: "local-registry.${local.dns_name}"
+  extraEnvVars:
+  - name: GOGC
+    value: "50"
+  ingress:
+    className: nginx-internal
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: zerossl
+      kubernetes.io/ingress.class: nginx-internal
+      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+
+    labels: 
+      acme.cert-manager.io/dns01-solver: "true"
+    hosts:
+    - local-registry.${local.dns_name}
+    tls:
+    - hosts:
+      - local-registry.${local.dns_name}
+      secretName: registry-tls
+  
+  persistence:
+    deleteEnabled: true
+    enabled: true
+    size: 100Gi
+    existingClaim: local-registry
+    storageClass: local-registry
+
+  proxy:
+    enabled: true
+    remoteurl: https://harbor.devops.indico.io
+    secretRef: remote-access
+  replicaCount: 3
+  
+  secrets:
+    htpasswd: local-user:${htpasswd_password.hash.bcrypt}
+
+localPullSecret:
+  password: ${random_password.password.result}
+  secretName: local-pull-secret
+  username: local-user
+
+metrics-server:
+  apiService:
+    create: true
+  enabled: false
+
+proxyRegistryAccess:
+  proxyPassword: ${jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)[var.local_registry_harbor_robot_account_name]}
+  proxyPullSecretName: remote-access
+  proxyUrl: https://harbor.devops.indico.io
+  proxyUsername: "robot${"$"}${var.local_registry_harbor_robot_account_name}"
+  
+registryUrl: local-registry.${local.dns_name}
+restartCronjob:
+  cronSchedule: 0 0 */3 * *
+  disabled: false
+  image: bitnami/kubectl:1.20.13
+  EOF
+  ]
+}
+
+output "local_registry_password" {
+  value = htpasswd_password.hash.bcrypt
+}
+
+output "local_registry_username" {
+  value = "local-user"
+}
+
 
 data "github_repository" "argo-github-repo" {
   full_name = "IndicoDataSolutions/${var.argo_repo}"
@@ -818,6 +1077,10 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
+            global:
+              image:
+                registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "harbor.devops.indico.io"}/indico
+            ${indent(12, local.local_registry_tf_cod_values)}
             runtime-scanner:
               enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
               authentication:
