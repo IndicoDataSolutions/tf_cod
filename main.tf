@@ -309,10 +309,12 @@ resource "kubernetes_secret" "readapi" {
   }
 
   data = {
-    READAPI_COMPUTER_VISION_HOST  = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
-    READAPI_COMPUTER_VISION_KEY   = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_url"]
-    READAPI_FORM_RECOGNITION_HOST = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_key"]
-    READAPI_FORM_RECOGNITION_KEY  = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_url"]
+    billing                       = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_url"]
+    apikey                        = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
+    READAPI_COMPUTER_VISION_HOST  = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_url"]
+    READAPI_COMPUTER_VISION_KEY   = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
+    READAPI_FORM_RECOGNITION_HOST = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_url"]
+    READAPI_FORM_RECOGNITION_KEY  = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_key"]
     storage_account_name          = module.readapi_queue[0].storage_account_name
     storage_account_id            = module.readapi_queue[0].storage_account_id
     storage_account_access_key    = module.readapi_queue[0].storage_account_access_key
