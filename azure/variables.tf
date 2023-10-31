@@ -15,6 +15,12 @@ variable "is_aws" {
   default = false
 }
 
+variable "environment" {
+  type        = string
+  default     = "development"
+  description = "The environment of the cluster, determines which account readapi to use, options production/development"
+}
+
 # top level variable declarations
 variable "common_resource_group" {
   type        = string
@@ -394,16 +400,17 @@ variable "enable_readapi" {
   type    = bool
   default = true
 }
-variable "azure_indico_io_client_id" {
+variable "azure_readapi_client_id" {
   type = string
 }
-variable "azure_indico_io_client_secret" {
+variable "azure_readapi_client_secret" {
+  type      = string
+  sensitive = true
+}
+variable "azure_readapi_subscription_id" {
   type = string
 }
-variable "azure_indico_io_subscription_id" {
-  type = string
-}
-variable "azure_indico_io_tenant_id" {
+variable "azure_readapi_tenant_id" {
   type = string
 }
 
