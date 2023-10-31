@@ -653,7 +653,8 @@ variable "ssl_static_secret_name" {
 }
 
 variable "local_registry_version" {
-  type = string
+  type    = string
+  default = "unused"
 }
 
 variable "local_registry_enabled" {

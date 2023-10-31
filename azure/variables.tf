@@ -539,7 +539,8 @@ variable "monitor_retention_in_days" {
 
 
 variable "local_registry_version" {
-  type = string
+  type    = string
+  default = "unused"
 }
 
 variable "local_registry_enabled" {
