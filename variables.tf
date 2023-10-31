@@ -502,6 +502,12 @@ variable "use_acm" {
   description = "create cluster that will use acm"
 }
 
+variable "enable_waf" {
+  type        = bool
+  default     = false
+  description = "enables aws alb controller for app-edge, also creates waf rules."
+}
+
 
 variable "terraform_vault_mount_path" {
   type    = string

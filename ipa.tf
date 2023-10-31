@@ -55,7 +55,7 @@ locals {
  EOF
   ] : []
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
-  acm_ipa_values = var.use_acm == true ? (<<EOT
+  alb_ipa_values = var.enable_waf == true ? (<<EOT
 app-edge:
   alternateDomain: ""
   service:
@@ -63,23 +63,25 @@ app-edge:
     ports:
       http_port: 31755
       http_api_port: 31270
+  nginx:
+    httpPort: 8080
   aws-load-balancer-controller:
     enabled: true
     ingress:
       enabled: true
-      annotations:
-        acme.cert-manager.io/http01-edit-in-place: "true"
-        cert-manager.io/cluster-issuer: zerossl      
+      useStaticCertificate: ${var.use_static_ssl_certificates}
+      labels:
+        indico.io/cluster: ${var.label}
       tls:
-        - secretName: indico-ssl-cm-cert
+        - secretName: ${var.ssl_static_secret_name}
           hosts:
             - ${local.dns_name}
       alb:
         publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
-        acmArn: ${aws_acm_certificate_validation.alb[0].certificate_arn}
+        wafArn: ${wafv2_arn}
       service:
         name: app-edge
-        port: 80
+        port: 8080
       hosts:
         - host: ${local.dns_name}
           paths:
