@@ -78,7 +78,7 @@ app-edge:
             - ${local.dns_name}
       alb:
         publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
-        wafArn: ${wafv2_arn.value}
+        wafArn: ${wafv2_arn}
       service:
         name: app-edge
         port: 8080
