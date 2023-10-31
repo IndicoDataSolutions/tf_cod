@@ -755,7 +755,7 @@ resource "github_repository_file" "alb-values-yaml" {
     aws_acm_certificate_validation.alb[0]
   ]
 
-  content = local.acm_ipa_values
+  content = local.alb_ipa_values
 }
 
 resource "github_repository_file" "argocd-application-yaml" {
@@ -772,7 +772,7 @@ resource "github_repository_file" "argocd-application-yaml" {
   }
   depends_on = [
     module.cluster,
-    aws_acm_certificate_validation.alb[0]
+    aws_wafv2_web_acl.wafv2-acl[0].arn
   ]
 
   content = <<EOT
@@ -826,7 +826,7 @@ spec:
                 ingressUser: monitoring
                 ingressPassword: ${random_password.monitoring-password.result}
                 ${indent(14, local.runtime_scanner_ingress_values)} 
-            ${indent(12, local.acm_ipa_values)}         
+            ${indent(12, local.alb_ipa_values)}         
 
         - name: HELM_VALUES
           value: |
