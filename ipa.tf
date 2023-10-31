@@ -772,7 +772,7 @@ resource "github_repository_file" "argocd-application-yaml" {
   }
   depends_on = [
     module.cluster,
-    aws_wafv2_web_acl.wafv2-acl[0].arn
+    aws_wafv2_web_acl.wafv2-acl[0]
   ]
 
   content = <<EOT
