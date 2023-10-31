@@ -55,6 +55,15 @@ provider "azurerm" {
   tenant_id       = var.azure_readapi_tenant_id
 }
 
+provider "azurerm" {
+  features {}
+  alias           = "indicoio"
+  client_id       = var.azure_indico_io_client_id
+  client_secret   = var.azure_indico_io_client_secret
+  subscription_id = var.azure_indico_io_subscription_id
+  tenant_id       = var.azure_indico_io_tenant_id
+}
+
 provider "azuread" {
 }
 

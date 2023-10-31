@@ -88,6 +88,15 @@ provider "azurerm" {
   tenant_id       = var.azure_readapi_tenant_id
 }
 
+provider "azurerm" {
+  features {}
+  alias           = "indicoio"
+  client_id       = var.azure_indico_io_client_id
+  client_secret   = var.azure_indico_io_client_secret
+  subscription_id = var.azure_indico_io_subscription_id
+  tenant_id       = var.azure_indico_io_tenant_id
+}
+
 data "vault_kv_secret_v2" "terraform-snowflake" {
   mount = var.terraform_vault_mount_path
   name  = "snowflake"
