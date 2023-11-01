@@ -12,6 +12,10 @@ resource "aws_wafv2_web_acl" "wafv2-acl" {
     name     = "AWS-AWSManagedRulesUnixRuleSet"
     priority = 0
 
+    override_action {
+      none {}
+    }
+
     statement {
       managed_rule_group_statement {
         name        = "AWSManagedRulesUnixRuleSet"
@@ -30,6 +34,10 @@ resource "aws_wafv2_web_acl" "wafv2-acl" {
     name     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
     priority = 1
 
+    override_action {
+      none {}
+    }
+
     statement {
       managed_rule_group_statement {
         name        = "AWSManagedRulesKnownBadInputsRuleSet"
@@ -47,6 +55,10 @@ resource "aws_wafv2_web_acl" "wafv2-acl" {
   rule {
     name     = "AWS-AWSManagedRulesAmazonIpReputationList"
     priority = 2
+
+    override_action {
+      none {}
+    }
 
     statement {
       managed_rule_group_statement {
@@ -68,6 +80,7 @@ resource "aws_wafv2_web_acl" "wafv2-acl" {
     sampled_requests_enabled   = true
   }
 }
+
 
 output "wafv2_arn" {
     description = "arn of the wafv2 acl"
