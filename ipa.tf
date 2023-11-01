@@ -67,6 +67,8 @@ app-edge:
     httpPort: 8080
   aws-load-balancer-controller:
     enabled: true
+    aws-load-balancer-controller:
+      enabled: true
     ingress:
       enabled: true
       useStaticCertificate: ${var.use_static_ssl_certificates}
