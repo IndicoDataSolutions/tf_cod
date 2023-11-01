@@ -10,7 +10,7 @@ terraform {
     }
     keycloak = {
       source  = "mrparkers/keycloak"
-      version = "4.3.1"
+      version = "4.0.1"
     }
     argocd = {
       source  = "oboukili/argocd"
@@ -50,7 +50,6 @@ terraform {
 provider "time" {}
 
 provider "keycloak" {
-  # these values are provided by the keycloak varset from terraform cloud
   client_id = "terraform-master"
   url       = "https://keycloak.devops.indico.io"
 }
