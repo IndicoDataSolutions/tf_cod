@@ -51,6 +51,8 @@ provider "time" {}
 
 provider "keycloak" {
   # these values are provided by the keycloak varset from terraform cloud
+  client_id = "terraform-master"
+  url       = "https://keycloak.devops.indico.io"
 }
 
 provider "vault" {
