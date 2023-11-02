@@ -69,6 +69,7 @@ app-edge:
     enabled: true
     aws-load-balancer-controller:
       enabled: true
+      clusterName: ${var.label}
     ingress:
       enabled: true
       useStaticCertificate: ${var.use_static_ssl_certificates}
