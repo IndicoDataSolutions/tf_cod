@@ -12,6 +12,7 @@ resource "kubernetes_service_account_v1" "vault-auth" {
   }
 }
 
+# The CRB is needed so vault can auth back to this cluster, see:
 resource "kubernetes_cluster_role_binding" "vault-auth" {
   metadata {
     name = "role-tokenreview-binding"
@@ -58,17 +59,17 @@ resource "vault_policy" "vault-auth-policy" {
   name = local.account_region_name
 
   policy = <<EOT
-
 path "indico-common/*" {
   capabilities = ["read", "list"]
 }
-
+path "sa-credentials/Indico-Devops/thanos-s3-sa" {
+  capabilities = ["read", "list"]
+}
 path "customer-${var.account}/*" {
   capabilities = ["read", "list"]
 }
 EOT
 }
-
 
 resource "vault_kubernetes_auth_backend_role" "vault-auth-role" {
   backend                          = vault_auth_backend.kubernetes.path
