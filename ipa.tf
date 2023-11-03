@@ -665,7 +665,7 @@ output "git_branch" {
   value = data.external.git_information.result.branch
 }
 
-resource "null_resource" "sleep-5-minutes" {
+resource "null_resource" "sleep-5-minutes-wait-for-charts-smoketest-build" {
   depends_on = [
     time_sleep.wait_1_minutes_after_pre_reqs
   ]
@@ -682,7 +682,7 @@ resource "null_resource" "sleep-5-minutes" {
 
 resource "helm_release" "terraform-smoketests" {
   depends_on = [
-    null_resource.sleep-5-minutes,
+    null_resource.sleep-5-minutes-wait-for-charts-smoketest-build,
     kubernetes_config_map.terraform-variables
   ]
 
