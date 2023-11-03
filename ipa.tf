@@ -277,7 +277,6 @@ data "github_repository_file" "data-crds-values" {
   file       = var.argo_path == "." ? "helm/crds-values.values" : "${var.argo_path}/helm/crds-values.values"
 }
 
-
 data "github_repository_file" "data-pre-reqs-values" {
   depends_on = [
     github_repository_file.pre-reqs-values-yaml
@@ -285,6 +284,14 @@ data "github_repository_file" "data-pre-reqs-values" {
   repository = data.github_repository.argo-github-repo.name
   branch     = var.argo_branch
   file       = var.argo_path == "." ? "helm/pre-reqs-values.values" : "${var.argo_path}/helm/pre-reqs-values.values"
+}
+
+module "secrets-operator-setup" {
+  source        = "./modules/common/vault-secrets-operator-setup"
+  vault_address = var.vault_address
+  account = var.aws_account
+  region = var.region
+  name = var.label
 }
 
 resource "helm_release" "ipa-crds" {
