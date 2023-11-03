@@ -19,7 +19,7 @@ resource "kubernetes_cluster_role_binding" "vault-auth" {
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = "cluster-admin"
+    name      = "system:auth-delegator"
   }
   subject {
     kind      = "ServiceAccount"
