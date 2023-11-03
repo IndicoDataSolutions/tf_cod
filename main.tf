@@ -82,8 +82,11 @@ provider "aws" {
 provider "aws" {
   access_key = var.indico_aws_access_key_id
   secret_key = var.indico_aws_secret_access_key
-  alias      = "indico-main"
-  region     = "us-east-2"
+  alias      = "alternate"
+  region     = var.region
+  default_tags {
+    tags = var.default_tags
+  }
 }
 
 provider "azurerm" {
@@ -416,13 +419,19 @@ locals {
 
 
 data "aws_route53_zone" "primary" {
-  name = is_alternate_account_domain == false ? lower("${var.aws_account}.indico.io") : local.alternate_domain_root
-  provider = is_alternate_account_domain == false ? aws : aws.indico-main
+  count = is_alternate_account_domain == false ? 1 : 0 
+  name  = lower("${var.aws_account}.indico.io")
+}
+
+data "aws_route53_zone" "alternate" {
+  count    = is_alternate_account_domain == true ? 1 : 0 
+  name     = lower(local.alternate_domain_root)
+  provider = aws.alternate
 }
 
 resource "aws_route53_record" "ipa-app-caa" {
   count   = var.is_alternate_account_domain == "true" ? 0 : 1
-  zone_id = data.aws_route53_zone.primary.zone_id
+  zone_id = data.aws_route53_zone.primary[0].zone_id
   name    = local.dns_name
   type    = "CAA"
   ttl     = 300
@@ -433,7 +442,22 @@ resource "aws_route53_record" "ipa-app-caa" {
     "0 issue \"amazonaws.com\"",
     "0 issue \"awstrust.com\""
   ]
-  provider = is_alternate_account_domain == false ? aws : aws.indico-main
+}
+
+resource "aws_route53_record" "ipa-alternate-app-caa" {
+  count   = var.is_alternate_account_domain == "true" ? 1 : 0
+  zone_id = data.aws_route53_zone.alternate[0].zone_id
+  name    = local.dns_name
+  type    = "CAA"
+  ttl     = 300
+  records = [
+    "0 issue \"sectigo.com\"",
+    "0 issue \"amazontrust.com\"",
+    "0 issue \"amazon.com\"",
+    "0 issue \"amazonaws.com\"",
+    "0 issue \"awstrust.com\""
+  ]
+  provider = aws.alternate
 }
 
 
