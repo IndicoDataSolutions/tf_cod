@@ -36,7 +36,7 @@ resource "aws_vpc_endpoint" "eks_vpc_guardduty" {
   vpc_id            = local.network[0].indico_vpc_id
   service_name      = data.aws_vpc_endpoint_service.guardduty.service_name
   vpc_endpoint_type = "Interface"
-  
+
   policy = data.aws_iam_policy_document.eks_vpc_guardduty.json
 
   security_group_ids  = [aws_security_group.eks_vpc_endpoint_guardduty.id]
@@ -105,7 +105,7 @@ resource "aws_eks_addon" "guardduty" {
     module.cluster
   ]
   count = var.eks_addon_version_guardduty != null ? 1 : 0
-  
+
 
   cluster_name      = local.cluster_name
   addon_name        = "aws-guardduty-agent"

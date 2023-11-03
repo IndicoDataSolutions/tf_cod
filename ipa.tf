@@ -338,9 +338,14 @@ resource "helm_release" "ipa-crds" {
     enabled: true
 
     defaultAuthMethod:
-      jwt:
-        serviceAccount: "vault-auth"
-      
+      enabled: true
+      namespace: default
+      method: kubernetes
+      mount: ${module.secrets-operator-setup.vault_mount_path}
+      kubernetes:
+        role: ${module.secrets-operator-setup.vault_auth_role_name}
+        tokenAudiences: ${module.secrets-operator-setup.vault_auth_audiences}
+        serviceAccount: ${module.secrets-operator-setup.vault_auth_service_account_name}
 
     defaultVaultConnection:
       enabled: true

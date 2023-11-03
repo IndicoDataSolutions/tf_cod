@@ -65,9 +65,9 @@ EOT
 resource "vault_kubernetes_auth_backend_role" "vault-auth-role" {
   backend                          = vault_auth_backend.kubernetes.path
   role_name                        = "vault-auth-role"
-  bound_service_account_names      = ["vault-auth"]
+  bound_service_account_names      = [kubernetes_service_account_v1.vault-auth.metadata.0.name]
   bound_service_account_namespaces = ["default"]
   token_ttl                        = 3600
   token_policies                   = [vault_policy.vault-auth-policy.name]
-  audience                         = "vault"
+  audience                         = var.audience
 }
