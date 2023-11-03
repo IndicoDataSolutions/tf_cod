@@ -30,21 +30,11 @@ resource "vault_auth_backend" "kubernetes" {
 
 
 resource "vault_kubernetes_auth_backend_config" "vault-auth" {
-  backend                = vault_auth_backend.kubernetes.path
-  kubernetes_host        = var.kubernetes_host
-  disable_iss_validation = "true"
-  #  issuer="https://kubernetes.default.svc.cluster.local"
+  backend            = vault_auth_backend.kubernetes.path
+  kubernetes_host    = var.kubernetes_host
   token_reviewer_jwt = kubernetes_secret_v1.vault-auth.data["token"]
-  kubernetes_ca_cert = kubernetes_secret_v1.vault-auth.data["ca.crt"]
+  kubernetes_ca_cert = base64decode(kubernetes_secret_v1.vault-auth.data["ca.crt"])
 }
-/*
-vault write auth/demo-auth-mount/role/role1 \
-   bound_service_account_names=default \
-   bound_service_account_namespaces=app \
-   policies=dev \
-   audience=vault \
-   ttl=24h
-*/
 
 resource "vault_policy" "vault-auth-policy" {
   name = local.account_region_name
