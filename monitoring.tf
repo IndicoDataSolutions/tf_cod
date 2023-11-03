@@ -83,77 +83,43 @@ EOT
 }
 
 resource "aws_route53_record" "grafana-caa" {
-  count   = var.monitoring_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
-  zone_id =  data.aws_route53_zone.primary[0].zone_id
+  count   = var.monitoring_enabled == true ? 1 : 0
+  zone_id =  data.aws_route53_zone.primary.zone_id
   name    = lower("grafana.${local.dns_name}")
   type    = "CAA"
   ttl     = 300
   records = [
     "0 issue \"sectigo.com\""
   ]
+  provider = is_alternate_account_domain == false ? aws.default : aws.alternate
 }
 
 
 resource "aws_route53_record" "prometheus-caa" {
-  count   = var.monitoring_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
-  zone_id = data.aws_route53_zone.primary[0].zone_id
+  count   = var.monitoring_enabled == true ? 1 : 0
+  zone_id = data.aws_route53_zone.primary.zone_id
   name    = lower("prometheus.${local.dns_name}")
   type    = "CAA"
   ttl     = 300
   records = [
     "0 issue \"sectigo.com\""
   ]
+  provider = is_alternate_account_domain == false ? aws.default : aws.alternate
 }
 
 
 resource "aws_route53_record" "alertmanager-caa" {
-  count   = var.monitoring_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
-  zone_id = data.aws_route53_zone.primary[0].zone_id
+  count   = var.monitoring_enabled == true ? 1 : 0
+  zone_id = data.aws_route53_zone.primary.zone_id
   name    = lower("alertmanager.${local.dns_name}")
   type    = "CAA"
   ttl     = 300
   records = [
     "0 issue \"sectigo.com\""
   ]
+  provider = is_alternate_account_domain == false ? aws.default : aws.alternate
 }
 
-resource "aws_route53_record" "grafana-caa-alternate" {
-  count   = var.monitoring_enabled == true && var.is_alternate_account_domain == "true" ? 1 : 0
-  zone_id =  data.aws_route53_zone.alternate[0].zone_id
-  name    = lower("grafana.${local.dns_name}")
-  type    = "CAA"
-  ttl     = 300
-  records = [
-    "0 issue \"sectigo.com\""
-  ]
-  provider = aws.alternate
-}
-
-
-resource "aws_route53_record" "prometheus-caa-alternate" {
-  count   = var.monitoring_enabled == true && var.is_alternate_account_domain == "true" ? 1 : 0
-  zone_id = data.aws_route53_zone.alternate[0].zone_id
-  name    = lower("prometheus.${local.dns_name}")
-  type    = "CAA"
-  ttl     = 300
-  records = [
-    "0 issue \"sectigo.com\""
-  ]
-  provider = aws.alternate
-}
-
-
-resource "aws_route53_record" "alertmanager-caa-alternate" {
-  count   = var.monitoring_enabled == true && var.is_alternate_account_domain == "true" ? 1 : 0
-  zone_id = data.aws_route53_zone.alternate[0].zone_id
-  name    = lower("alertmanager.${local.dns_name}")
-  type    = "CAA"
-  ttl     = 300
-  records = [
-    "0 issue \"sectigo.com\""
-  ]
-  provider = aws.alternate
-}
 
 resource "random_password" "monitoring-password" {
   length  = 16
@@ -178,9 +144,6 @@ resource "helm_release" "monitoring" {
     aws_route53_record.alertmanager-caa,
     aws_route53_record.grafana-caa,
     aws_route53_record.prometheus-caa,
-    aws_route53_record.alertmanager-caa-alternate,
-    aws_route53_record.grafana-caa-alternate,
-    aws_route53_record.prometheus-caa-alternate,
     time_sleep.wait_1_minutes_after_pre_reqs
   ]
 
