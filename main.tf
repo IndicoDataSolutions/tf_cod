@@ -80,8 +80,8 @@ provider "aws" {
 }
 
 locals {
-  aws_access_id = is_alternate_account_domain == true ? var.indico_aws_access_key_id : var.aws_access_key
-  aws_access_key = is_alternate_account_domain == true ? var.indico_aws_secret_access_key : var.aws_secret_key
+  aws_access_id = var.is_alternate_account_domain == true ? var.indico_aws_access_key_id : var.aws_access_key
+  aws_access_key = var.is_alternate_account_domain == true ? var.indico_aws_secret_access_key : var.aws_secret_key
 }
 
 provider "aws" {
