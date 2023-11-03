@@ -287,11 +287,12 @@ data "github_repository_file" "data-pre-reqs-values" {
 }
 
 module "secrets-operator-setup" {
-  source        = "./modules/common/vault-secrets-operator-setup"
-  vault_address = var.vault_address
-  account       = var.aws_account
-  region        = var.region
-  name          = var.label
+  source          = "./modules/common/vault-secrets-operator-setup"
+  vault_address   = var.vault_address
+  account         = var.aws_account
+  region          = var.region
+  name            = var.label
+  kubernetes_host = module.cluster.kubernetes_host
 }
 
 resource "helm_release" "ipa-crds" {
