@@ -79,14 +79,10 @@ provider "aws" {
   }
 }
 
-locals {
-  aws_access_id = var.is_alternate_account_domain == true ? var.indico_aws_access_key_id : var.aws_access_key
-  aws_access_key = var.is_alternate_account_domain == true ? var.indico_aws_secret_access_key : var.aws_secret_key
-}
 
 provider "aws" {
-  access_key = var.is_alternate_account_domain == true ? var.indico_aws_access_key_id : var.aws_access_key
-  secret_key = var.is_alternate_account_domain == true ? var.indico_aws_secret_access_key : var.aws_secret_key
+  access_key = var.is_alternate_account_domain == "true" ? var.indico_aws_access_key_id : var.aws_access_key
+  secret_key = var.is_alternate_account_domain == "true" ? var.indico_aws_secret_access_key : var.aws_secret_key
   region     = var.region
   alias      = "dns-control"
   default_tags {
@@ -426,7 +422,7 @@ locals {
 
 
 data "aws_route53_zone" "primary" {
-  name  = var.is_alternate_account_domain == false ? lower("${var.aws_account}.indico.io") : lower(local.alternate_domain_root)
+  name  = var.is_alternate_account_domain == "false" ? lower("${var.aws_account}.indico.io") : lower(local.alternate_domain_root)
   provider = aws.dns-control
 }
 
