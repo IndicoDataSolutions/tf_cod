@@ -426,7 +426,7 @@ locals {
 
 
 data "aws_route53_zone" "primary" {
-  name  = is_alternate_account_domain == false ? lower("${var.aws_account}.indico.io") : lower(local.alternate_domain_root)
+  name  = var.is_alternate_account_domain == false ? lower("${var.aws_account}.indico.io") : lower(local.alternate_domain_root)
   provider = aws.dns-control
 }
 
