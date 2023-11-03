@@ -321,6 +321,21 @@ resource "helm_release" "ipa-crds" {
         kubernetes.io/os: linux
     enabled: true
     installCRDs: true
+
+  vault-secrets-operator:
+    enabled: true
+
+    defaultVaultConnection:
+      enabled: true
+      address: ${var.vault_address}
+      skipTLSVerify: false
+      spec:
+      template:
+        spec:
+          containers:
+          - name: manager
+            args:
+            - "--client-cache-persistence-model=direct-encrypted"
 EOF
     ,
     <<EOT
