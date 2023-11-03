@@ -1,5 +1,21 @@
 
 
+resource "kubernetes_service_account_v1" "example" {
+  metadata {
+    name = "terraform-example"
+  }
+  secret {
+    name = kubernetes_secret_v1.example.metadata.0.name
+  }
+}
+
+resource "kubernetes_secret_v1" "example" {
+  metadata {
+    name = "terraform-example"
+  }
+}
+
+
 resource "kubernetes_service_account_v1" "vault-auth" {
   metadata {
     name = "vault-auth"
