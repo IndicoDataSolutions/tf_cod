@@ -85,8 +85,8 @@ locals {
 }
 
 provider "aws" {
-  access_key = local.aws_access_id
-  secret_key = local.aws_access_key
+  access_key = var.is_alternate_account_domain == true ? var.indico_aws_access_key_id : var.aws_access_key
+  secret_key = var.is_alternate_account_domain == true ? var.indico_aws_secret_access_key : var.aws_secret_key
   region     = var.region
   alias      = "dns-control"
   default_tags {
