@@ -80,10 +80,20 @@ provider "aws" {
 }
 
 provider "aws" {
-  access_key = is_alternate_account_domain == true ? var.indico_aws_access_key_id : var.aws_access_key
-  secret_key = is_alternate_account_domain == true ? var.indico_aws_secret_access_key : var.aws_secret_key
+  access_key = var.aws_access_key
+  secret_key = ivar.aws_secret_key
   region     = var.region
-  alias      = "dns-control"
+  alias      = is_alternate_account_domain == false ? "dns-control" : "not-used"
+  default_tags {
+    tags = var.default_tags
+  }
+}
+
+provider "aws" {
+  access_key = var.indico_aws_access_key_id
+  secret_key = var.indico_aws_secret_access_key
+  region     = var.region
+  alias      = is_alternate_account_domain == true ? "dns-control" : "not-used"
   default_tags {
     tags = var.default_tags
   }
