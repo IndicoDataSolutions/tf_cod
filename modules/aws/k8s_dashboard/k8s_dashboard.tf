@@ -171,4 +171,3 @@ ${local.ingress_values}
    EOF
   ]
 }
-
