@@ -38,7 +38,7 @@ terraform {
     }
     vault = {
       source  = "hashicorp/vault"
-      version = "3.19.0"
+      version = "3.22.0"
     }
     snowflake = {
       source  = "Snowflake-Labs/snowflake"
