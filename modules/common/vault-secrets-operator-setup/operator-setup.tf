@@ -1,27 +1,27 @@
 
-
-resource "kubernetes_service_account_v1" "example" {
-  metadata {
-    name = "terraform-example"
-  }
-  secret {
-    name = kubernetes_secret_v1.example.metadata.0.name
-  }
-}
-
-resource "kubernetes_secret_v1" "example" {
-  metadata {
-    name = "terraform-example"
-  }
-}
-
-
 resource "kubernetes_service_account_v1" "vault-auth" {
   metadata {
-    name = "vault-auth"
+    name      = "vault-auth"
+    namespace = "default"
+  }
+
+  automount_service_account_token = true
+
+  image_pull_secret {
+    name = "harbor-pull-secret"
   }
 }
 
+resource "kubernetes_secret_v1" "vault-auth" {
+  metadata {
+    name      = "vault-auth"
+    namespace = "default"
+    annotations = {
+      "kubernetes.io/service-account.name" = kubernetes_service_account_v1.vault-auth.metadata.0.name
+    }
+  }
+  type = "kubernetes.io/service-account-token"
+}
 
 resource "vault_auth_backend" "kubernetes" {
   type = "kubernetes"
