@@ -289,9 +289,9 @@ data "github_repository_file" "data-pre-reqs-values" {
 module "secrets-operator-setup" {
   source        = "./modules/common/vault-secrets-operator-setup"
   vault_address = var.vault_address
-  account = var.aws_account
-  region = var.region
-  name = var.label
+  account       = var.aws_account
+  region        = var.region
+  name          = var.label
 }
 
 resource "helm_release" "ipa-crds" {
@@ -331,6 +331,11 @@ resource "helm_release" "ipa-crds" {
 
   vault-secrets-operator:
     enabled: true
+
+    defaultAuthMethod:
+      jwt:
+        serviceAccount: "vault-auth"
+      
 
     defaultVaultConnection:
       enabled: true
