@@ -34,5 +34,5 @@ resource "vault_kubernetes_auth_backend_config" "vault-auth" {
   disable_iss_validation = "true"
   #  issuer="https://kubernetes.default.svc.cluster.local"
   token_reviewer_jwt = kubernetes_secret_v1.vault-auth.data["token"]
-  kubernetes_ca_cert = vkubernetes_secret_v1.vault-auth.data["ca.crt"]
+  kubernetes_ca_cert = kubernetes_secret_v1.vault-auth.data["ca.crt"]
 }
