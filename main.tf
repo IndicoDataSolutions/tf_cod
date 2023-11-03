@@ -78,31 +78,22 @@ provider "aws" {
     tags = var.default_tags
   }
 }
+
 locals {
-  dns_account_alias = is_alternate_account_domain == false ? "dns-control" : "not-used"
-  dns_account_alternate_alias = is_alternate_account_domain == true ? "dns-control" : "not-used"
+  aws_access_id = is_alternate_account_domain == true ? var.indico_aws_access_key_id : var.aws_access_key
+  aws_access_key = is_alternate_account_domain == true ? var.indico_aws_secret_access_key : var.aws_secret_key
 }
 
 provider "aws" {
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
+  access_key = local.aws_access_id
+  secret_key = local.aws_access_key
   region     = var.region
-  alias      = local.dns_account_alias
+  alias      = "dns-control"
   default_tags {
     tags = var.default_tags
   }
 }
 
-
-provider "aws" {
-  access_key = var.indico_aws_access_key_id
-  secret_key = var.indico_aws_secret_access_key
-  region     = var.region
-  alias      = local.dns_account_alternate_alias
-  default_tags {
-    tags = var.default_tags
-  }
-}
 
 
 provider "azurerm" {
