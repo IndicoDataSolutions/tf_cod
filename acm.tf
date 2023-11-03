@@ -28,7 +28,7 @@ resource "aws_route53_record" "alb" {
   ttl             = 60
   type            = each.value.type
   zone_id         = data.aws_route53_zone.primary.zone_id
-  provider = is_alternate_account_domain == false ? aws.default : aws.alternate
+  provider = aws.dns-control
 }
 
 

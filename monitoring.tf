@@ -91,7 +91,7 @@ resource "aws_route53_record" "grafana-caa" {
   records = [
     "0 issue \"sectigo.com\""
   ]
-  provider = is_alternate_account_domain == false ? aws.default : aws.alternate
+  provider = aws.dns-control
 }
 
 
@@ -104,7 +104,7 @@ resource "aws_route53_record" "prometheus-caa" {
   records = [
     "0 issue \"sectigo.com\""
   ]
-  provider = is_alternate_account_domain == false ? aws.default : aws.alternate
+  provider = aws.dns-control
 }
 
 
@@ -117,7 +117,7 @@ resource "aws_route53_record" "alertmanager-caa" {
   records = [
     "0 issue \"sectigo.com\""
   ]
-  provider = is_alternate_account_domain == false ? aws.default : aws.alternate
+  provider = aws.dns-control
 }
 
 

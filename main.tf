@@ -80,24 +80,15 @@ provider "aws" {
 }
 
 provider "aws" {
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
+  access_key = is_alternate_account_domain == true ? var.indico_aws_access_key_id : var.aws_access_key
+  secret_key = is_alternate_account_domain == true ? var.indico_aws_secret_access_key : var.aws_secret_key
   region     = var.region
-  alias      = "default"
+  alias      = "dns-control"
   default_tags {
     tags = var.default_tags
   }
 }
 
-provider "aws" {
-  access_key = var.indico_aws_access_key_id
-  secret_key = var.indico_aws_secret_access_key
-  region     = var.region
-  alias      = "alternate"
-  default_tags {
-    tags = var.default_tags
-  }
-}
 
 provider "azurerm" {
   features {}
@@ -430,7 +421,7 @@ locals {
 
 data "aws_route53_zone" "primary" {
   name  = is_alternate_account_domain == false ? lower("${var.aws_account}.indico.io") : lower(local.alternate_domain_root)
-  provider = is_alternate_account_domain == false ? aws.default : aws.alternate
+  provider = aws.dns-control
 }
 
 
@@ -447,7 +438,8 @@ resource "aws_route53_record" "ipa-app-caa" {
     "0 issue \"amazonaws.com\"",
     "0 issue \"awstrust.com\""
   ]
+  provider = aws.dns-control
 }
-provider = is_alternate_account_domain == false ? aws.default : aws.alternate
+
 
 
