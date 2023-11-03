@@ -82,6 +82,7 @@ app-edge:
       alb:
         publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
         wafArn: ${aws_wafv2_web_acl.wafv2-acl[0].arn}
+        acmArn: ${aws_acm_certificate_validation.alb[0].certificate_arn}
       service:
         name: app-edge
         port: 8080

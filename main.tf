@@ -79,6 +79,13 @@ provider "aws" {
   }
 }
 
+provider "aws" {
+  access_key = var.indico_aws_access_key_id
+  secret_key = var.indico_aws_secret_access_key
+  alias      = "indico-main"
+  region     = "us-east-2"
+}
+
 provider "azurerm" {
   features {}
   alias           = "indicoio"
@@ -409,7 +416,8 @@ locals {
 
 
 data "aws_route53_zone" "primary" {
-  name = lower("${var.aws_account}.indico.io")
+  name = is_alternate_account_domain == false ? lower("${var.aws_account}.indico.io") : local.alternate_domain_root
+  provider = is_alternate_account_domain == false ? aws : aws.indico-main
 }
 
 resource "aws_route53_record" "ipa-app-caa" {
@@ -425,6 +433,7 @@ resource "aws_route53_record" "ipa-app-caa" {
     "0 issue \"amazonaws.com\"",
     "0 issue \"awstrust.com\""
   ]
+  provider = is_alternate_account_domain == false ? aws : aws.indico-main
 }
 
 

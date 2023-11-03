@@ -60,6 +60,18 @@ variable "aws_secret_key" {
   sensitive   = true
 }
 
+variable "indico_aws_access_key_id" {
+  type        = string
+  description = "The AWS access key for controlling dns in an alternate account"
+  sensitive   = true
+}
+
+variable "indico_aws_secret_access_key" {
+  type        = string
+  description = "The AWS secret key for controlling dns in an alternate account"
+  sensitive   = true
+}
+
 variable "direct_connect" {
   type        = bool
   default     = false
