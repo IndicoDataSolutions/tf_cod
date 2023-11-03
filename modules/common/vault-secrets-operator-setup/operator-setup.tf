@@ -29,14 +29,10 @@ resource "vault_auth_backend" "kubernetes" {
 }
 
 
-/*
-
-resource "vault_kubernetes_auth_backend_config" "cluster-auth" {
+resource "vault_kubernetes_auth_backend_config" "vault-auth" {
   kubernetes_host        = var.kubernetes_host
   disable_iss_validation = "true"
   #  issuer="https://kubernetes.default.svc.cluster.local"
-  token_reviewer_jwt = data.local_file.vault-token.content
-  kubernetes_ca_cert = var.kubernetes_cluster_ca_certificate
+  token_reviewer_jwt = kubernetes_secret_v1.vault-auth.data["token"]
+  kubernetes_ca_cert = vkubernetes_secret_v1.vault-auth.data["ca.crt"]
 }
-
-*/
