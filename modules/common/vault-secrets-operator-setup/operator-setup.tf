@@ -46,7 +46,8 @@ resource "vault_auth_backend" "kubernetes" {
 
 # vault read auth/indico-dev-us-east-2-dop-999/config
 resource "vault_kubernetes_auth_backend_config" "vault-auth" {
-  disable_iss_validation = true
+  disable_iss_validation = false
+  disable_local_ca_jwt   = true
   backend                = vault_auth_backend.kubernetes.path
   kubernetes_host        = var.kubernetes_host
   token_reviewer_jwt     = kubernetes_secret_v1.vault-auth.data["token"]
