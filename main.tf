@@ -78,22 +78,27 @@ provider "aws" {
     tags = var.default_tags
   }
 }
+locals {
+  dns_account_alias = is_alternate_account_domain == false ? "dns-control" : "not-used"
+  dns_account_alternate_alias = is_alternate_account_domain == true ? "dns-control" : "not-used"
+}
 
 provider "aws" {
   access_key = var.aws_access_key
-  secret_key = ivar.aws_secret_key
+  secret_key = var.aws_secret_key
   region     = var.region
-  alias      = is_alternate_account_domain == false ? "dns-control" : "not-used"
+  alias      = local.dns_account_alias
   default_tags {
     tags = var.default_tags
   }
 }
 
+
 provider "aws" {
   access_key = var.indico_aws_access_key_id
   secret_key = var.indico_aws_secret_access_key
   region     = var.region
-  alias      = is_alternate_account_domain == true ? "dns-control" : "not-used"
+  alias      = local.dns_account_alternate_alias
   default_tags {
     tags = var.default_tags
   }
