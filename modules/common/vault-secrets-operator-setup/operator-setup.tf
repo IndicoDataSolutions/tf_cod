@@ -12,6 +12,22 @@ resource "kubernetes_service_account_v1" "vault-auth" {
   }
 }
 
+resource "kubernetes_cluster_role_binding" "vault-auth" {
+  metadata {
+    name = "role-tokenreview-binding"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "cluster-admin"
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account_v1.vault-auth.metadata.0.name
+    namespace = "default"
+  }
+}
+
 resource "kubernetes_secret_v1" "vault-auth" {
   metadata {
     name      = "vault-auth"
@@ -28,7 +44,7 @@ resource "vault_auth_backend" "kubernetes" {
   path = local.account_region_name
 }
 
-
+# vault read auth/indico-dev-us-east-2-dop-999/config
 resource "vault_kubernetes_auth_backend_config" "vault-auth" {
   disable_iss_validation = true
   backend                = vault_auth_backend.kubernetes.path
