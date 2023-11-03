@@ -49,8 +49,8 @@ resource "vault_kubernetes_auth_backend_config" "vault-auth" {
   disable_iss_validation = true
   backend                = vault_auth_backend.kubernetes.path
   kubernetes_host        = var.kubernetes_host
-  #token_reviewer_jwt     = kubernetes_secret_v1.vault-auth.data["token"]
-  kubernetes_ca_cert = kubernetes_secret_v1.vault-auth.data["ca.crt"]
+  token_reviewer_jwt     = kubernetes_secret_v1.vault-auth.data["token"]
+  kubernetes_ca_cert     = kubernetes_secret_v1.vault-auth.data["ca.crt"]
 }
 
 resource "vault_policy" "vault-auth-policy" {
