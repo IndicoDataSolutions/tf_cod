@@ -287,6 +287,9 @@ data "github_repository_file" "data-pre-reqs-values" {
 }
 
 module "secrets-operator-setup" {
+  depends_on = [
+    module.cluster
+  ]
   source          = "./modules/common/vault-secrets-operator-setup"
   vault_address   = var.vault_address
   account         = var.aws_account
@@ -298,7 +301,8 @@ module "secrets-operator-setup" {
 resource "helm_release" "ipa-crds" {
   depends_on = [
     module.cluster,
-    data.github_repository_file.data-crds-values
+    data.github_repository_file.data-crds-values,
+    module.secrets-operator-setup
   ]
 
   verify           = false
