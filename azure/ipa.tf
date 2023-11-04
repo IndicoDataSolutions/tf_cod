@@ -215,6 +215,67 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
 
 
 
+
+data "external" "git_information" {
+  program = ["sh", "${path.module}/get_sha.sh"]
+}
+
+output "git_sha" {
+  value = data.external.git_information.result.sha
+}
+
+
+output "git_branch" {
+  value = data.external.git_information.result.branch
+}
+
+
+resource "null_resource" "sleep-5-minutes-wait-for-charts-smoketest-build" {
+  depends_on = [
+    time_sleep.wait_1_minutes_after_pre_reqs
+  ]
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    command = "sleep 300"
+  }
+}
+
+
+resource "helm_release" "terraform-smoketests" {
+  depends_on = [
+    null_resource.sleep-5-minutes-wait-for-charts-smoketest-build,
+    kubernetes_config_map.terraform-variables
+  ]
+
+  verify           = false
+  name             = "terraform-smoketests-${substr(data.external.git_information.result.sha, 0, 8)}"
+  namespace        = "default"
+  repository       = var.ipa_repo
+  chart            = "terraform-smoketests"
+  version          = "0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+  wait             = true
+  wait_for_jobs    = true
+  timeout          = "1800" # 30 minutes
+  disable_webhooks = false
+  values = [<<EOF
+  cluster:
+    cloudProvider: azure
+    account: ${var.account}
+    region: ${var.region}
+    name: ${var.label}
+  image:
+    tag: ${substr(data.external.git_information.result.sha, 0, 8)}
+  EOF
+  ]
+}
+
+
+
+
 # Install the Machinesets now
 resource "helm_release" "crunchy-postgres" {
   count = var.is_openshift == true ? 1 : 0
