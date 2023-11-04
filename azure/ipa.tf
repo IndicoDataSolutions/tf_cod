@@ -117,12 +117,25 @@ data "github_repository_file" "data-pre-reqs-values" {
   file       = var.argo_path == "." ? "helm/pre-reqs-values.values" : "${var.argo_path}/helm/pre-reqs-values.values"
 }
 
+module "secrets-operator-setup" {
+  depends_on = [
+    module.cluster
+  ]
+  source          = "./modules/common/vault-secrets-operator-setup"
+  vault_address   = var.vault_address
+  account         = var.account
+  region          = var.region
+  name            = var.label
+  kubernetes_host = module.cluster.kubernetes_host
+}
+
 resource "helm_release" "ipa-crds" {
   depends_on = [
     module.cluster,
     kubernetes_secret.harbor-pull-secret,
     kubernetes_secret.issuer-secret,
-    data.github_repository_file.data-crds-values
+    data.github_repository_file.data-crds-values,
+    module.secrets-operator-setup
   ]
 
   verify           = false
@@ -158,6 +171,31 @@ resource "helm_release" "ipa-crds" {
     installCRDs: true
   aws-ebs-csi-driver:
     enabled: false
+
+  vault-secrets-operator:
+    enabled: true
+
+    defaultAuthMethod:
+      enabled: true
+      namespace: default
+      method: kubernetes
+      mount: ${module.secrets-operator-setup.vault_mount_path}
+      kubernetes:
+        role: ${module.secrets-operator-setup.vault_auth_role_name}
+        tokenAudiences: [${module.secrets-operator-setup.vault_auth_audience}]
+        serviceAccount: ${module.secrets-operator-setup.vault_auth_service_account_name}
+
+    defaultVaultConnection:
+      enabled: true
+      address: ${var.vault_address}
+      skipTLSVerify: false
+      spec:
+      template:
+        spec:
+          containers:
+          - name: manager
+            args:
+            - "--client-cache-persistence-model=direct-encrypted"
 EOF
     ,
     <<EOT
