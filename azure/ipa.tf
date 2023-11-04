@@ -121,7 +121,7 @@ module "secrets-operator-setup" {
   depends_on = [
     module.cluster
   ]
-  source          = "./modules/common/vault-secrets-operator-setup"
+  source          = "../modules/common/vault-secrets-operator-setup"
   vault_address   = var.vault_address
   account         = var.account
   region          = var.region
