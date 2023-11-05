@@ -4,10 +4,10 @@ import os
 import hcl2
 import json
 
-vars = {}
-var_rows = ""
 
 def generate_variables(working_dir='.'):
+  vars = {}
+  var_rows = ""
   with open(f"{working_dir}/variables.tf", 'r') as file: 
       for var in hcl2.load(file)['variable']:
         for var_name in var:
