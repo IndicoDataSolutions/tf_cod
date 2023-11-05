@@ -204,17 +204,11 @@ EOT
   ]
 }
 
-
-
-
 resource "time_sleep" "wait_1_minutes_after_crds" {
   depends_on = [helm_release.ipa-crds]
 
   create_duration = "1m"
 }
-
-
-
 
 data "external" "git_information" {
   program = ["sh", "${path.module}/get_sha.sh"]
