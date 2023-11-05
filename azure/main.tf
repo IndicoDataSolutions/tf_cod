@@ -43,12 +43,20 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    cognitive_account {
+      purge_soft_delete_on_destroy = true
+    }
+  }
 }
 
 provider "azurerm" {
   alias = "indicoio"
-  features {}
+  features {
+    cognitive_account {
+      purge_soft_delete_on_destroy = true
+    }
+  }
   client_id       = var.azure_indico_io_client_id
   client_secret   = var.azure_indico_io_client_secret
   subscription_id = var.azure_indico_io_subscription_id
