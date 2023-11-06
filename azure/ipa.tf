@@ -182,7 +182,7 @@ resource "helm_release" "ipa-crds" {
       mount: ${module.secrets-operator-setup.vault_mount_path}
       kubernetes:
         role: ${module.secrets-operator-setup.vault_auth_role_name}
-        tokenAudiences: #[${module.secrets-operator-setup.vault_auth_audience}]
+        tokenAudiences: [${module.secrets-operator-setup.vault_auth_audience}]
         serviceAccount: ${module.secrets-operator-setup.vault_auth_service_account_name}
 
     defaultVaultConnection:
