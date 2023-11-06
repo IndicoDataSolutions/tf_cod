@@ -17,7 +17,7 @@ vault write auth/${auth_name}/config   token_reviewer_jwt="$TOKEN_REVIEW_JWT"   
 vault read auth/${auth_name}/config
 
 vault policy write $policy_name - <<EOF
-path "secret/data/$olicy_name/config" {
+path "secret/data/$policy_name/config" {
   capabilities = ["read"]
 }
 EOF
@@ -28,7 +28,10 @@ vault write auth/${auth_name}/role/devweb-app \
   policies=$policy_name \
   ttl=24h
 
-curl \
+
+echo jwt is ${TOKEN_REVIEW_JWT}
+
+curl -v \
      --request POST \
      --data '{"jwt": "'$TOKEN_REVIEW_JWT'", "role": "devweb-app"}' \
      https://vault.devops.indico.io/v1/auth/${auth_name}/login
