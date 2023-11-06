@@ -68,6 +68,7 @@ path "sa-credentials/Indico-Devops/thanos-s3-sa" {
 path "customer-${var.account}/*" {
   capabilities = ["read", "list"]
 }
+
 EOT
 }
 

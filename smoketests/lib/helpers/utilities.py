@@ -18,7 +18,7 @@ class Process:
         if not hideLogs:
             print(" ".join(args))
         self.command = args
-        return subprocess.run(args, stdout=stdout, shell=shell)
+        return subprocess.run(args, stdout=stdout, stderr=subprocess.PIPE, shell=shell)
 
     def parseResult(self, output, field_name):
       if output.returncode == 0 and len(output.stdout) > 0:
