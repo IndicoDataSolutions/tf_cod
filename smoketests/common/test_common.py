@@ -64,4 +64,5 @@ spec:
     assert output.stdout != '<no value>', "Unable to obtain mac"    
     output = p.run(["kubectl", "get", "secret", f"{secret_name}", "--output", "json"], stdout=subprocess.PIPE)
     assert output.returncode == 0, f"Unable to get secret {secret_name}, error: {output.stderr}"
+    p.run(["kubectl", "delete", "-f", secrets_file_path], stdout=subprocess.PIPE)
 
