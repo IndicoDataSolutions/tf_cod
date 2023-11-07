@@ -1,5 +1,5 @@
 
-resource "kubernetes_service_account_v1" "vault-auth" {
+resource "kubernetes_service_account_v1" "vault-auth-default" {
   metadata {
     name      = "vault-auth"
     namespace = "default"
@@ -11,6 +11,22 @@ resource "kubernetes_service_account_v1" "vault-auth" {
     name = "harbor-pull-secret"
   }
 }
+
+
+resource "kubernetes_service_account_v1" "vault-auth-monitoring" {
+  metadata {
+    name      = "vault-auth"
+    namespace = "monitoring"
+  }
+
+  automount_service_account_token = true
+
+  image_pull_secret {
+    name = "harbor-pull-secret"
+  }
+}
+
+
 
 # The CRB is needed so vault can auth back to this cluster, see:
 resource "kubernetes_cluster_role_binding" "vault-auth" {
@@ -24,17 +40,22 @@ resource "kubernetes_cluster_role_binding" "vault-auth" {
   }
   subject {
     kind      = "ServiceAccount"
-    name      = kubernetes_service_account_v1.vault-auth.metadata.0.name
-    namespace = "default"
+    name      = kubernetes_service_account_v1.vault-auth-default.metadata.0.name
+    namespace = kubernetes_service_account_v1.vault-auth-default.metadata.0.namespace
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account_v1.vault-auth-monitoring.metadata.0.name
+    namespace = kubernetes_service_account_v1.vault-auth-monitoring.metadata.0.namespace
   }
 }
 
-resource "kubernetes_secret_v1" "vault-auth" {
+resource "kubernetes_secret_v1" "vault-auth-default" {
   metadata {
     name      = "vault-auth"
     namespace = "default"
     annotations = {
-      "kubernetes.io/service-account.name" = kubernetes_service_account_v1.vault-auth.metadata.0.name
+      "kubernetes.io/service-account.name" = kubernetes_service_account_v1.vault-auth-default.metadata.0.name
     }
   }
   type = "kubernetes.io/service-account-token"
@@ -75,8 +96,8 @@ EOT
 resource "vault_kubernetes_auth_backend_role" "vault-auth-role" {
   backend                          = vault_auth_backend.kubernetes.path
   role_name                        = "vault-auth-role"
-  bound_service_account_names      = [kubernetes_service_account_v1.vault-auth.metadata.0.name]
-  bound_service_account_namespaces = ["default"]
+  bound_service_account_names      = [kubernetes_service_account_v1.vault-auth-default.metadata.0.name, kubernetes_service_account_v1.vault-auth-monitoring.metadata.0.name]
+  bound_service_account_namespaces = ["default", "monitoring"]
   token_ttl                        = 3600
   token_policies                   = [vault_policy.vault-auth-policy.name]
   audience                         = var.audience
