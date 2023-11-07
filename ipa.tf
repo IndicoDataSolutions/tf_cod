@@ -423,65 +423,6 @@ secrets:
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
 
 ${local.dns_configuration_values}
-
-monitoring:
-  enabled: true
-  global:
-      host: "${local.dns_name}"
-    
-  ingress-nginx:
-    enabled: true
-
-    rbac:
-      create: true
-
-    admissionWebhooks:
-      patch:
-        nodeSelector.beta.kubernetes.io/os: linux
-  
-    defaultBackend:
-      nodeSelector.beta.kubernetes.io/os: linux
-  
-  authentication:
-    ingressUsername: monitoring
-    ingressPassword: ${random_password.monitoring-password.result}
-
-  kube-prometheus-stack:
-    prometheus:
-      thanos: 
-        objectStorageConfig:
-          existingSecret:
-            name: thanos-storage
-            key: thanos_storage.yaml
-              
-        ## ObjectStorageConfig configures object storage in Thanos.
-        # objectStorageConfig:
-        #   # use existing secret, if configured, objectStorageConfig.secret will not be used
-        #   existingSecret: {}
-        #     # name: ""
-        #     # key: ""
-        #   # will render objectStorageConfig secret data and configure it to be used by Thanos custom resource,
-        #   # ignored when prometheusspec.thanos.objectStorageConfig.existingSecret is set
-        #   # https://thanos.io/tip/thanos/storage.md/#s3
-        #   secret: {}
-        #     # type: S3
-        #     # config:
-        #     #   bucket: ""
-        #     #   endpoint: ""
-        #     #   region: ""
-        #     #   access_key: ""
-        #     #   secret_key: ""
-      thanosService:
-        enabled: true
-      prometheusSpec:
-        nodeSelector:
-          node_group: static-workers
-
-apiModels:
-  enabled: true
-  nodeSelector:
-    node_group: static-workers
-
 external-dns:
   enabled: ${local.enable_external_dns}
   logLevel: debug
