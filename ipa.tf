@@ -372,6 +372,21 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
   create_duration = "1m"
 }
 
+
+
+resource "kubectl_manifest" "thanos-storage-secret" {
+  depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
+  yaml_body  = <<YAML
+    apiVersion: "secrets.hashicorp.com/v1beta1"
+    kind: "VaultStaticSecret"
+    metadata:
+      name:  vault-thanos-storage
+      namespace: default
+    spec:
+      targetNamespaces: [${var.nvidia_operator_namespace}]
+  YAML
+}
+
 resource "kubernetes_manifest" "thanos-storage-secret" {
   depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
 
