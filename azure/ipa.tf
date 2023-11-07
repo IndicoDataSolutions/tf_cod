@@ -253,7 +253,7 @@ resource "helm_release" "terraform-smoketests" {
   version          = "0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
   wait             = true
   wait_for_jobs    = true
-  timeout          = "1800" # 30 minutes
+  timeout          = "300" # 5 minutes
   disable_webhooks = false
   values = [<<EOF
   cluster:

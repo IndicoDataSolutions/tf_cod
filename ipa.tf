@@ -372,6 +372,29 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
   create_duration = "1m"
 }
 
+
+resource "kubernetes_manifest" "thanos-storage-secret" {
+  manifest = {
+    apiVersion = "secrets.hashicorp.com/v1beta1"
+    kind       = "VaultStaticSecret"
+    metadata = {
+      name      = "vault-thanos-storage"
+      namespace = "default"
+    }
+    spec = {
+      namespace = "default"
+      mount     = "customer-Indico-Devops"
+      path      = "thanos-s3-sa/thanos_storage.yaml"
+      destination = {
+        create : true
+        name : "thanos-storage"
+      }
+      vaultAuthRef = "default"
+    }
+  }
+}
+
+
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
     time_sleep.wait_1_minutes_after_crds,
@@ -670,7 +693,7 @@ resource "helm_release" "terraform-smoketests" {
   version          = "0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
   wait             = true
   wait_for_jobs    = true
-  timeout          = "1800" # 30 minutes
+  timeout          = "300" # 5 minutes
   disable_webhooks = false
   values = [<<EOF
   cluster:
