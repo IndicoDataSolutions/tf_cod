@@ -304,6 +304,7 @@ data "helm_template" "vault-secrets-operator" {
   repository   = "https://helm.releases.hashicorp.com"
   chart        = "vault-secrets-operator"
   version      = "0.3.4"
+  kube_version = "1.25"
   include_crds = true
 }
 
