@@ -303,6 +303,7 @@ data "helm_template" "vault-secrets-operator" {
   namespace    = "default"
   repository   = "https://helm.releases.hashicorp.com"
   chart        = "vault-secrets-operator"
+  version      = "0.3.4"
   include_crds = true
 }
 
