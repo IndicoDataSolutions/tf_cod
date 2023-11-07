@@ -298,12 +298,11 @@ module "secrets-operator-setup" {
   kubernetes_host = module.cluster.kubernetes_host
 }
 
-data "helm_template" "ipa-crds-crds" {
-  name         = "ipa-crds"
+data "helm_template" "vault-secrets-operator" {
+  name         = "vault-secrets-operator"
   namespace    = "default"
-  repository   = var.ipa_repo
-  chart        = "ipa-crds"
-  version      = var.ipa_crds_version
+  repository   = "https://helm.releases.hashicorp.com"
+  chart        = "vault-secrets-operator"
   include_crds = true
 }
 
@@ -311,6 +310,9 @@ resource "kubectl_manifest" "ipa-crds-crds" {
   for_each  = toset(data.helm_template.ipa-crds-crds.crds)
   yaml_body = each.value
 }
+
+
+
 
 resource "helm_release" "ipa-crds" {
   depends_on = [
