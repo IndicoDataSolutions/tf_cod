@@ -448,6 +448,36 @@ monitoring:
 
   kube-prometheus-stack:
     prometheus:
+      thanos: 
+        objectStorageConfig:
+          secret:
+            type: S3
+            config:
+              bucket: thanos-indico-storage
+              region: us-east-2
+              endpoint: s3.us-east-2.amazonaws.com
+              access_key: AKIAWRWJX2UPXC32A25W
+              secret_key: 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
+              
+        ## ObjectStorageConfig configures object storage in Thanos.
+        # objectStorageConfig:
+        #   # use existing secret, if configured, objectStorageConfig.secret will not be used
+        #   existingSecret: {}
+        #     # name: ""
+        #     # key: ""
+        #   # will render objectStorageConfig secret data and configure it to be used by Thanos custom resource,
+        #   # ignored when prometheusspec.thanos.objectStorageConfig.existingSecret is set
+        #   # https://thanos.io/tip/thanos/storage.md/#s3
+        #   secret: {}
+        #     # type: S3
+        #     # config:
+        #     #   bucket: ""
+        #     #   endpoint: ""
+        #     #   region: ""
+        #     #   access_key: ""
+        #     #   secret_key: ""
+      thanosService:
+        enabled: true
       prometheusSpec:
         nodeSelector:
           node_group: static-workers
