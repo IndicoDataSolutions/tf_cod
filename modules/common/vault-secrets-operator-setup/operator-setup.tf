@@ -62,6 +62,7 @@ resource "vault_policy" "vault-auth-policy" {
 path "indico-common/*" {
   capabilities = ["read", "list"]
 }
+
 path "customer/Indico-Devops/thanos-s3-sa" {
   capabilities = ["read", "list"]
 }
