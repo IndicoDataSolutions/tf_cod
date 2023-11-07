@@ -456,9 +456,7 @@ monitoring:
               bucket: thanos-indico-storage
               region: us-east-2
               endpoint: s3.us-east-2.amazonaws.com
-              access_key: AKIAWRWJX2UPXC32A25W
-              secret_key: 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
-              
+
         ## ObjectStorageConfig configures object storage in Thanos.
         # objectStorageConfig:
         #   # use existing secret, if configured, objectStorageConfig.secret will not be used
