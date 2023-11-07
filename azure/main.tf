@@ -43,11 +43,19 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    cognitive_account {
+      purge_soft_delete_on_destroy = true
+    }
+  }
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    cognitive_account {
+      purge_soft_delete_on_destroy = true
+    }
+  }
   alias           = "readapi"
   client_id       = var.azure_readapi_client_id
   client_secret   = var.azure_readapi_client_secret
@@ -56,7 +64,11 @@ provider "azurerm" {
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    cognitive_account {
+      purge_soft_delete_on_destroy = true
+    }
+  }
   alias           = "indicoio"
   client_id       = var.azure_indico_io_client_id
   client_secret   = var.azure_indico_io_client_secret
@@ -213,7 +225,7 @@ module "cluster" {
 
   source                     = "app.terraform.io/indico/indico-azure-cluster/mod"
   insights_retention_in_days = var.monitor_retention_in_days
-  version                    = "3.1.4"
+  version                    = "3.1.5"
   label                      = var.label
   public_key                 = tls_private_key.pk.public_key_openssh
   region                     = var.region
