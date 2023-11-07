@@ -379,7 +379,7 @@ resource "kubectl_manifest" "thanos-storage-secret" {
     kind: "VaultStaticSecret"
     metadata:
       name:  vault-thanos-storage
-      namespace: monitoring
+      namespace: default
     spec:
       type: "kv-v2"
       namespace: default
