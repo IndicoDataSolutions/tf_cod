@@ -60,8 +60,8 @@ spec:
 
         p.run(["kubectl", "delete", "-f", secrets_file_path],
               stdout=subprocess.PIPE)
-        output = p.run(["kubectl", "apply", "-f", secrets_file_path,
-                       "--output", "json"], stdout=subprocess.PIPE)
+        p.run(["kubectl", "apply", "-f", secrets_file_path,
+               "--output", "json"], stdout=subprocess.PIPE)
         time.sleep(5)
         output = p.run(["kubectl", "get", "vaultstaticsecret", "smoketest-secret",
                        "--template", "{{ .status.secretMAC }}"], stdout=subprocess.PIPE)

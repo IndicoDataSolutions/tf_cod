@@ -12,26 +12,6 @@ resource "kubernetes_service_account_v1" "vault-auth-default" {
   }
 }
 
-resource "kubernetes_namespace" "monitoring" {
-  metadata {
-    name = "monitoring"
-  }
-}
-
-resource "kubernetes_service_account_v1" "vault-auth-monitoring" {
-  depends_on = [kubernetes_namespace.monitoring]
-  metadata {
-    name      = "vault-auth"
-    namespace = "monitoring"
-  }
-
-  automount_service_account_token = true
-
-  image_pull_secret {
-    name = "harbor-pull-secret"
-  }
-}
-
 # The CRB is needed so vault can auth back to this cluster, see:
 resource "kubernetes_cluster_role_binding" "vault-auth" {
   metadata {
@@ -47,11 +27,6 @@ resource "kubernetes_cluster_role_binding" "vault-auth" {
     name      = kubernetes_service_account_v1.vault-auth-default.metadata.0.name
     namespace = kubernetes_service_account_v1.vault-auth-default.metadata.0.namespace
   }
-  subject {
-    kind      = "ServiceAccount"
-    name      = kubernetes_service_account_v1.vault-auth-monitoring.metadata.0.name
-    namespace = kubernetes_service_account_v1.vault-auth-monitoring.metadata.0.namespace
-  }
 }
 
 resource "kubernetes_secret_v1" "vault-auth-default" {
@@ -64,6 +39,7 @@ resource "kubernetes_secret_v1" "vault-auth-default" {
   }
   type = "kubernetes.io/service-account-token"
 }
+
 
 resource "vault_auth_backend" "kubernetes" {
   type = "kubernetes"
@@ -100,8 +76,8 @@ EOT
 resource "vault_kubernetes_auth_backend_role" "vault-auth-role" {
   backend                          = vault_auth_backend.kubernetes.path
   role_name                        = "vault-auth-role"
-  bound_service_account_names      = [kubernetes_service_account_v1.vault-auth-default.metadata.0.name, kubernetes_service_account_v1.vault-auth-monitoring.metadata.0.name]
-  bound_service_account_namespaces = ["default", "monitoring"]
+  bound_service_account_names      = [kubernetes_service_account_v1.vault-auth-default.metadata.0.name]
+  bound_service_account_namespaces = ["default"]
   token_ttl                        = 3600
   token_policies                   = [vault_policy.vault-auth-policy.name]
   audience                         = var.audience
