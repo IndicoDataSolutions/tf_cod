@@ -374,7 +374,7 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
 
 
 resource "kubernetes_manifest" "thanos-storage-secret" {
-  depends_on = [helm_release.ipa-crds]
+  depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
 
   manifest = {
     apiVersion = "secrets.hashicorp.com/v1beta1"
