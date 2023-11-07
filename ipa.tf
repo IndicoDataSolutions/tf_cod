@@ -372,8 +372,6 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
   create_duration = "1m"
 }
 
-
-
 resource "kubectl_manifest" "thanos-storage-secret" {
   depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
   yaml_body  = <<YAML
@@ -383,32 +381,15 @@ resource "kubectl_manifest" "thanos-storage-secret" {
       name:  vault-thanos-storage
       namespace: default
     spec:
-      targetNamespaces: [${var.nvidia_operator_namespace}]
+      type: "kv-v2"
+      namespace: default
+      mount: customer-Indico-Devops
+      path: "thanos-s3-sa/thanos_storage.yaml"
+      destination:
+        create: true
+        name: thanos-storage
+      vaultAuthRef: default
   YAML
-}
-
-resource "kubernetes_manifest" "thanos-storage-secret" {
-  depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
-
-  manifest = {
-    apiVersion = "secrets.hashicorp.com/v1beta1"
-    kind       = "VaultStaticSecret"
-    metadata = {
-      name      = "vault-thanos-storage"
-      namespace = "default"
-    }
-    spec = {
-      type      = "kv-v2"
-      namespace = "default"
-      mount     = "customer-Indico-Devops"
-      path      = "thanos-s3-sa/thanos_storage.yaml"
-      destination = {
-        create : true
-        name : "thanos-storage"
-      }
-      vaultAuthRef = "default"
-    }
-  }
 }
 
 resource "helm_release" "ipa-pre-requisites" {
