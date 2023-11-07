@@ -372,7 +372,7 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
   create_duration = "1m"
 }
 
-
+/*
 resource "kubernetes_manifest" "thanos-storage-secret" {
   depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
 
@@ -395,7 +395,7 @@ resource "kubernetes_manifest" "thanos-storage-secret" {
     }
   }
 }
-
+*/
 
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
