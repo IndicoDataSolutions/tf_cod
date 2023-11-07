@@ -307,17 +307,10 @@ data "helm_template" "ipa-crds-crds" {
   include_crds = true
 }
 
-resource "local_file" "ipa-crds-crds" {
-  for_each = data.helm_template.ipa-crds-crds.crds
-  filename = "./${each.key}"
-  content  = each.value
+resource "kubectl_manifest" "crds" {
+  for_each  = data.helm_template.ipa-crds-crds.crds
+  yaml_body = each.value
 }
-
-resource "kubectl_manifest" "ipa-crds-crds" {
-  for_each  = local_file.ipa-crds-crds
-  yaml_body = each.value.content
-}
-
 
 resource "helm_release" "ipa-crds" {
   depends_on = [
