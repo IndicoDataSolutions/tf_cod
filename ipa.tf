@@ -307,17 +307,14 @@ data "helm_template" "vault-secrets-operator" {
   include_crds = true
 }
 
-resource "kubectl_manifest" "ipa-crds-crds" {
-  for_each  = toset(data.helm_template.ipa-crds-crds.crds)
+resource "kubectl_manifest" "vault-secrets-operator-crds" {
+  for_each  = toset(data.helm_template.vault-secrets-operator.crds)
   yaml_body = each.value
 }
 
-
-
-
 resource "helm_release" "ipa-crds" {
   depends_on = [
-    kubectl_manifest.ipa-crds-crds,
+    kubectl_manifest.vault-secrets-operator-crds,
     module.cluster,
     data.github_repository_file.data-crds-values,
     module.secrets-operator-setup
