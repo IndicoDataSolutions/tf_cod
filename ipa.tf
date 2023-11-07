@@ -308,7 +308,7 @@ data "helm_template" "ipa-crds-crds" {
 }
 
 resource "kubectl_manifest" "ipa-crds-crds" {
-  for_each  = data.helm_template.ipa-crds-crds.crds
+  for_each  = set(data.helm_template.ipa-crds-crds.crds)
   yaml_body = each.value
 }
 
