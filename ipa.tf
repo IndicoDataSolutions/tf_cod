@@ -450,13 +450,10 @@ monitoring:
     prometheus:
       thanos: 
         objectStorageConfig:
-          secret:
-            type: S3
-            config:
-              bucket: thanos-indico-storage
-              region: us-east-2
-              endpoint: s3.us-east-2.amazonaws.com
-
+          existingSecret:
+            name: thanos-storage
+            key: thanos_storage.yaml
+              
         ## ObjectStorageConfig configures object storage in Thanos.
         # objectStorageConfig:
         #   # use existing secret, if configured, objectStorageConfig.secret will not be used
