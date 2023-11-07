@@ -383,8 +383,8 @@ resource "kubectl_manifest" "thanos-storage-secret" {
     spec:
       type: "kv-v2"
       namespace: default
-      mount: customer-Indico-Devops
-      path: "thanos-s3-sa/thanos_storage.yaml"
+      mount: sa-credentials
+      path: "Indico-Devops/thanos-s3-sa/thanos_storage.yaml"
       destination:
         create: true
         name: thanos-storage
