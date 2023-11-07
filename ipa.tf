@@ -298,8 +298,30 @@ module "secrets-operator-setup" {
   kubernetes_host = module.cluster.kubernetes_host
 }
 
+data "helm_template" "ipa-crds-crds" {
+  name         = "ipa-crds"
+  namespace    = "default"
+  repository   = var.ipa_repo
+  chart        = "ipa-crds"
+  version      = var.ipa_crds_version
+  include_crds = true
+}
+
+resource "local_file" "ipa-crds-crds" {
+  for_each = data.helm_template.ipa-crds-crds.crds
+  filename = "./${each.key}"
+  content  = each.value
+}
+
+resource "kubectl_manifest" "ipa-crds-crds" {
+  for_each  = local_file.ipa-crds-crds
+  yaml_body = each.value.content
+}
+
+
 resource "helm_release" "ipa-crds" {
   depends_on = [
+    kubectl_manifest.ipa-crds-crds,
     module.cluster,
     data.github_repository_file.data-crds-values,
     module.secrets-operator-setup
