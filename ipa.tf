@@ -307,7 +307,7 @@ data "helm_template" "ipa-crds-crds" {
   include_crds = true
 }
 
-resource "kubectl_manifest" "crds" {
+resource "kubectl_manifest" "ipa-crds-crds" {
   for_each  = data.helm_template.ipa-crds-crds.crds
   yaml_body = each.value
 }
