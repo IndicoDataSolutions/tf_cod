@@ -5,29 +5,30 @@ import time
 
 from lib.helpers.utilities import Process
 
+
 class TestCommon:
-  """A common class with common parameters, account, region, name"""
+    """A common class with common parameters, account, region, name"""
 
-  @pytest.fixture(autouse=True)
-  def setup_method(self, cloudProvider, account, region, name):
-    self.cloudProvider = cloudProvider
-    self.account = account
-    self.region = region
-    self.name = name
+    @pytest.fixture(autouse=True)
+    def setup_method(self, cloudProvider, account, region, name):
+        self.cloudProvider = cloudProvider
+        self.account = account
+        self.region = region
+        self.name = name
 
-    print(f"\nSetup method called using {account}/{region}/{name}\n")
+        print(f"\nSetup method called using {account}/{region}/{name}\n")
 
-   
-  @pytest.fixture(autouse=True)
-  def teardown_method(self, cloudProvider, account, region, name):
-     print(f"\nTeardown method called using {cloudProvider} {account}/{region}/{name}\n")
+    @pytest.fixture(autouse=True)
+    def teardown_method(self, cloudProvider, account, region, name):
+        print(
+            f"\nTeardown method called using {cloudProvider} {account}/{region}/{name}\n")
 
+    # validate that the vault-secrets-operator is able to make secrets
 
-  # validate that the vault-secrets-operator is able to make secrets
-  def test_vault_secrets_operator(self, cloudProvider, account, region, name):
-    p = Process(account, region, name)
-    secret_name = "smoketest-secret-from-vault"
-    vault_static_secret = f"""
+    def test_vault_secrets_operator(self, cloudProvider, account, region, name):
+        p = Process(account, region, name)
+        secret_name = "smoketest-secret-from-vault"
+        vault_static_secret = f"""
 apiVersion: secrets.hashicorp.com/v1beta1
 kind: VaultStaticSecret
 metadata:
@@ -53,16 +54,21 @@ spec:
   # Name of the CRD to authenticate to Vault
   vaultAuthRef: default
 """
-    secrets_file_path = os.path.join('/tmp', 'vault-static-secret.yaml')
-    with open(secrets_file_path, 'w') as yf:
-      yf.write(vault_static_secret)
+        secrets_file_path = os.path.join('/tmp', 'vault-static-secret.yaml')
+        with open(secrets_file_path, 'w') as yf:
+            yf.write(vault_static_secret)
 
-    output = p.run(["kubectl", "apply", "-f", secrets_file_path, "--output", "json"], stdout=subprocess.PIPE)
-    time.sleep(5)
-    output = p.run(["kubectl", "get", "vaultstaticsecret", "smoketest-secret", "--template", "{{ .status.secretMAC }}"], stdout=subprocess.PIPE)
-    assert output.returncode == 0, f"Unable to get vaultstaticsecret : {output.stderr}"
-    assert output.stdout != '<no value>', "Unable to obtain mac"    
-    output = p.run(["kubectl", "get", "secret", f"{secret_name}", "--output", "json"], stdout=subprocess.PIPE)
-    assert output.returncode == 0, f"Unable to get secret {secret_name}, error: {output.stderr}"
-    p.run(["kubectl", "delete", "-f", secrets_file_path], stdout=subprocess.PIPE)
-
+        p.run(["kubectl", "delete", "-f", secrets_file_path],
+              stdout=subprocess.PIPE)
+        output = p.run(["kubectl", "apply", "-f", secrets_file_path,
+                       "--output", "json"], stdout=subprocess.PIPE)
+        time.sleep(5)
+        output = p.run(["kubectl", "get", "vaultstaticsecret", "smoketest-secret",
+                       "--template", "{{ .status.secretMAC }}"], stdout=subprocess.PIPE)
+        assert output.returncode == 0, f"Unable to get vaultstaticsecret : {output.stderr}"
+        assert output.stdout != '<no value>', "Unable to obtain mac"
+        output = p.run(["kubectl", "get", "secret",
+                       f"{secret_name}", "--output", "json"], stdout=subprocess.PIPE)
+        assert output.returncode == 0, f"Unable to get secret {secret_name}, error: {output.stderr}"
+        p.run(["kubectl", "delete", "-f", secrets_file_path],
+              stdout=subprocess.PIPE)
