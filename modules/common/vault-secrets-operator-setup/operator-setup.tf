@@ -13,7 +13,15 @@ resource "kubernetes_service_account_v1" "vault-auth-default" {
 }
 
 
+
+resource "kubernetes_namespace" "monitoring" {
+  metadata {
+    name = "monitoring"
+  }
+}
+
 resource "kubernetes_service_account_v1" "vault-auth-monitoring" {
+  depends_on = [kubernetes_namespace.monitoring]
   metadata {
     name      = "vault-auth"
     namespace = "monitoring"
