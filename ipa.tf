@@ -298,24 +298,8 @@ module "secrets-operator-setup" {
   kubernetes_host = module.cluster.kubernetes_host
 }
 
-data "helm_template" "vault-secrets-operator" {
-  name         = "vault-secrets-operator"
-  namespace    = "default"
-  repository   = "https://helm.releases.hashicorp.com"
-  chart        = "vault-secrets-operator"
-  version      = "0.3.4"
-  kube_version = "1.25"
-  include_crds = true
-}
-
-resource "kubectl_manifest" "vault-secrets-operator-crds" {
-  for_each  = toset(data.helm_template.vault-secrets-operator.crds)
-  yaml_body = each.value
-}
-
 resource "helm_release" "ipa-crds" {
   depends_on = [
-    kubectl_manifest.vault-secrets-operator-crds,
     module.cluster,
     data.github_repository_file.data-crds-values,
     module.secrets-operator-setup
