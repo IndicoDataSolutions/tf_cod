@@ -383,6 +383,7 @@ resource "kubernetes_manifest" "thanos-storage-secret" {
       namespace = "default"
     }
     spec = {
+      type      = "kv-v2"
       namespace = "default"
       mount     = "customer-Indico-Devops"
       path      = "thanos-s3-sa/thanos_storage.yaml"
