@@ -158,6 +158,8 @@ kube-prometheus-stack:
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.account}-${var.region}-${var.name}")}
+      thanosServiceExternal:
+        enabled: true
       thanosServiceMonitor:
         enabled: true
       thanosService:

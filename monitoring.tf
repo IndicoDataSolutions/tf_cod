@@ -46,6 +46,8 @@ EOT
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
+      thanosServiceExternal:
+        enabled: true
       thanosServiceMonitor:
         enabled: true
       thanosService:
@@ -104,6 +106,8 @@ EOT
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
+      thanosServiceExternal:
+        enabled: true
       thanosServiceMonitor:
         enabled: true
       thanosService:
