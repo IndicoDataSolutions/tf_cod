@@ -43,7 +43,7 @@ EOT
     thanosServiceMonitor:
       enabled: true
     thanosIngress:
-      enabled: false
+      enabled: true
       ingressClassName: nginx
       labels:
         acme.cert-manager.io/dns01-solver: "true"
@@ -54,11 +54,11 @@ EOT
       paths:
         - /
       hosts:
-        - "sidecar.${local.dns_name}"
+        - "thanos.${local.dns_name}"
       tls:
         - secretName: thanos-gateway-tls
           hosts:
-            - "sidecar.${local.dns_name}"
+            - "thanos.${local.dns_name}"
     thanosServiceExternal:
       enabled: true
       annotations:
@@ -66,7 +66,7 @@ EOT
 
     thanosService:
       #annotations:
-      #  external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
+      #  external-dns.alpha.kubernetes.io/hostname: thanos.${local.dns_name}
       enabled: true
 
     prometheusSpec:
@@ -121,7 +121,7 @@ EOT
         cert-manager.io/cluster-issuer: zerossl
       labels:
         acme.cert-manager.io/dns01-solver: "true"
-        
+
   prometheus:
     thanosServiceMonitor:
       enabled: true
@@ -132,7 +132,7 @@ EOT
       enabled: true
       
     thanosIngress:
-      enabled: false
+      enabled: true
       ingressClassName: nginx
       labels:
         acme.cert-manager.io/dns01-solver: "true"
@@ -142,14 +142,14 @@ EOT
       paths:
         - /
       hosts:
-        - "sidecar.${local.dns_name}"
+        - "thanos.${local.dns_name}"
       tls:
         - secretName: thanos-gateway-tls
           hosts:
-            - "sidecar.${local.dns_name}"
+            - "thanos.${local.dns_name}"
     thanosService:
       #annotations:
-      #  external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
+      #  external-dns.alpha.kubernetes.io/hostname: thanos.${local.dns_name}
       enabled: true
     
     prometheusSpec:
