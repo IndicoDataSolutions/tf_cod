@@ -396,6 +396,9 @@ resource "kubectl_manifest" "thanos-storage-secret" {
       mount: customer-Indico-Devops
       path: thanos-storage
       refreshAfter: 60s
+      rolloutRestartTargets:
+        - name: prometheus-monitoring-kube-prometheus-prometheus
+          kind: StatefulSet
       destination:
         annotations:
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
