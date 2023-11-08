@@ -86,7 +86,7 @@ EOT
         account: ${var.aws_account}
         region: ${var.region}
         name: ${var.label}
-        full-name: ${lower("${var.aws_account}-${var.egion}-${var.name}")}
+        full-name: ${lower("${var.aws_account}-${var.region}-${var.name}")}
       thanosService:
         enabled: true
       thanos: 
