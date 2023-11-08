@@ -54,7 +54,6 @@ EOT
         - secretName: thanos-gateway-tls
           hosts:
             - sidecar.${local_dns_name}
-
     thanosService:
       annotations:
         external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
@@ -128,7 +127,6 @@ EOT
         - secretName: thanos-gateway-tls
           hosts:
             - sidecar.${local_dns_name}
-
     thanosService:
       annotations:
         external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
