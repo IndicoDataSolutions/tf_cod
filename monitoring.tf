@@ -49,7 +49,7 @@ EOT
       annotations:
         cert-manager.io/cluster-issuer: zerossl
       enabled: true
-      pathType: Prefix
+      pathType: ImplementationSpecific
       paths:
         - /
       hosts:
@@ -61,8 +61,8 @@ EOT
     thanosServiceExternal:
       enabled: true
     thanosService:
-      annotations:
-        external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
+      #annotations:
+      #  external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
       enabled: true
 
     prometheusSpec:
@@ -130,7 +130,7 @@ EOT
       annotations:
         cert-manager.io/cluster-issuer: zerossl
       enabled: true
-      pathType: Prefix
+      pathType: ImplementationSpecific
       paths:
         - /
       hosts:
@@ -140,8 +140,8 @@ EOT
           hosts:
             - "sidecar.${local.dns_name}"
     thanosService:
-      annotations:
-        external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
+      #annotations:
+      #  external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
       enabled: true
     
     prometheusSpec:
