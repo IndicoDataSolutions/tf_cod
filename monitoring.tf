@@ -40,8 +40,6 @@ EOT
           hosts:
             - alertmanager-${local.dns_name}
   prometheus:
-    thanosServiceExternal:
-      enabled: true
     thanosServiceMonitor:
       enabled: true
     thanosIngress:
@@ -116,8 +114,6 @@ EOT
         acme.cert-manager.io/dns01-solver: "true"
 
   prometheus:
-    thanosServiceExternal:
-      enabled: true
     thanosServiceMonitor:
       enabled: true
     thanosIngress:
