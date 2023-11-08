@@ -92,6 +92,7 @@ EOT
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
+        eric: washere
       labels:
         acme.cert-manager.io/dns01-solver: "true"
 
