@@ -37,12 +37,11 @@ EOT
             - alertmanager-${local.dns_name}
   prometheus:
     prometheusSpec:
-      prometheusExternalLabelName: full-name
       externalLabels:
         account: ${var.aws_account}
         region: ${var.region}
         name: ${var.label}
-        full-name: ${lower("${var.aws_account}-${var-region}-${var.name}")}
+        full-name: ${lower("${var.aws_account}-${var.region}-${var.name}")}
       thanosService:
         enabled: true
       thanos: 
@@ -83,12 +82,11 @@ EOT
         cert-manager.io/cluster-issuer: zerossl
   prometheus:
     prometheusSpec:
-      prometheusExternalLabelName: full-name
       externalLabels:
         account: ${var.aws_account}
         region: ${var.region}
         name: ${var.label}
-        full-name: ${lower("${var.aws_account}-${var-region}-${var.name}")}
+        full-name: ${lower("${var.aws_account}-${var.egion}-${var.name}")}
       thanosService:
         enabled: true
       thanos: 
