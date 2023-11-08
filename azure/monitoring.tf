@@ -144,7 +144,6 @@ authentication:
   ingressPassword: ${random_password.monitoring-password.result}
 
 ${local.alerting_configuration_values}
-
 kube-prometheus-stack:
   enabled: true
   nodeExporter:
@@ -169,7 +168,6 @@ kube-prometheus-stack:
           existingSecret:
             name: thanos-storage
             key: thanos_storage.yaml
-
       nodeSelector:
         node_group: static-workers
       storageSpec:
