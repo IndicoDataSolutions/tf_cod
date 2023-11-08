@@ -75,14 +75,14 @@ EOT
       annotations:
         cert-manager.io/cluster-issuer: zerossl
   prometheus:
-    thanosService:
-      enabled: true
-    thanos: 
-      objectStorageConfig:
-        existingSecret:
-          name: thanos-storage
-          key: thanos_storage.yaml
     prometheusSpec:
+      thanosService:
+        enabled: true
+      thanos: 
+        objectStorageConfig:
+          existingSecret:
+            name: thanos-storage
+            key: thanos_storage.yaml
       nodeSelector:
         node_group: static-workers
     ingress:
