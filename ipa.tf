@@ -689,9 +689,28 @@ resource "null_resource" "sleep-5-minutes-wait-for-charts-smoketest-build" {
 }
 
 
+resource "null_resource" "wait-for-tf-cod-chart-build" {
+  depends_on = [
+    time_sleep.wait_1_minutes_after_pre_reqs
+  ]
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    environment = {
+      HARBOR_API_TOKEN = jsondecode(data.vault_kv_secret_v2.harbor-api-token)["bearer_token"]
+    }
+    command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+  }
+}
+
+
 resource "helm_release" "terraform-smoketests" {
   depends_on = [
-    null_resource.sleep-5-minutes-wait-for-charts-smoketest-build,
+    null_resource.wait-for-tf-cod-chart-build,
+    #null_resource.sleep-5-minutes-wait-for-charts-smoketest-build,
     kubernetes_config_map.terraform-variables
   ]
 
@@ -726,6 +745,12 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
 data "vault_kv_secret_v2" "account-robot-credentials" {
   mount = "harbor-robot-accounts"
   name  = lower(var.aws_account)
+}
+
+
+data "vault_kv_secret_v2" "harbor-api-token" {
+  mount = "tools/argo"
+  name  = "harbor-api"
 }
 
 resource "kubernetes_namespace" "local-registry" {
