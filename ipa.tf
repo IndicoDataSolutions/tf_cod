@@ -397,7 +397,8 @@ resource "kubectl_manifest" "thanos-storage-secret" {
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
         reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
       mount: customer-Indico-Devops
-      path: "thanos-s3-sa/thanos_storage.yaml"
+      path: "thanos-storage"
+      refreshAfter: 60s
       destination:
         create: true
         name: thanos-storage
