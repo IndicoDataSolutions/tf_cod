@@ -157,7 +157,7 @@ kube-prometheus-stack:
         account: ${var.account}
         region: ${var.region}
         name: ${var.label}
-        full-name: ${lower("${var.account}-${var.region}-${var.name}")}
+        fullname: ${lower("${var.account}-${var.region}-${var.name}")}
       thanosService:
         enabled: true
       thanos: 
