@@ -92,6 +92,9 @@ EOT
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+
   prometheus:
     prometheusSpec:
       externalLabels:
@@ -111,10 +114,14 @@ EOT
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
   grafana:
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
 EOT
   )
 }
