@@ -65,8 +65,8 @@ EOT
         external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
 
     thanosService:
-      annotations:
-        external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
+      #annotations:
+      #  external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
       enabled: true
 
     prometheusSpec:
@@ -148,8 +148,8 @@ EOT
           hosts:
             - "sidecar.${local.dns_name}"
     thanosService:
-      annotations:
-        external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
+      #annotations:
+      #  external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
       enabled: true
     
     prometheusSpec:
