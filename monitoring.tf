@@ -43,6 +43,7 @@ EOT
     thanosServiceMonitor:
       enabled: true
     thanosIngress:
+      ingressClassName: nginx
       labels:
         acme.cert-manager.io/dns01-solver: "true"
       annotations:
@@ -57,6 +58,8 @@ EOT
         - secretName: thanos-gateway-tls
           hosts:
             - "sidecar.${local.dns_name}"
+    thanosServiceExternal:
+      enabled: true
     thanosService:
       annotations:
         external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
@@ -118,7 +121,10 @@ EOT
   prometheus:
     thanosServiceMonitor:
       enabled: true
+    thanosServiceExternal:
+      enabled: true
     thanosIngress:
+      ingressClassName: nginx
       labels:
         acme.cert-manager.io/dns01-solver: "true"
       annotations:
