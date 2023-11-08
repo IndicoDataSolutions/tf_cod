@@ -49,11 +49,11 @@ EOT
         cert-manager.io/cluster-issuer: zerossl
       enabled: true
       hosts:
-        - sidecar.${local.dns_name}
+        - "sidecar.${local.dns_name}"
       tls:
         - secretName: thanos-gateway-tls
           hosts:
-            - sidecar.${local_dns_name}
+            - "sidecar.${local.dns_name}"
     thanosService:
       annotations:
         external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
@@ -122,11 +122,11 @@ EOT
         cert-manager.io/cluster-issuer: zerossl
       enabled: true
       hosts:
-        - sidecar.${local.dns_name}
+        - "sidecar.${local.dns_name}"
       tls:
         - secretName: thanos-gateway-tls
           hosts:
-            - sidecar.${local_dns_name}
+            - "sidecar.${local.dns_name}"
     thanosService:
       annotations:
         external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
