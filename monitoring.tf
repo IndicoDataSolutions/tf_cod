@@ -48,6 +48,7 @@ EOT
       annotations:
         cert-manager.io/cluster-issuer: zerossl
       enabled: true
+      pathType: Prefix
       paths:
         - /
       hosts:
@@ -123,6 +124,7 @@ EOT
       annotations:
         cert-manager.io/cluster-issuer: zerossl
       enabled: true
+      pathType: Prefix
       paths:
         - /
       hosts:
