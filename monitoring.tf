@@ -40,18 +40,19 @@ EOT
           hosts:
             - alertmanager-${local.dns_name}
   prometheus:
+    thanosServiceExternal:
+      enabled: true
+    thanosServiceMonitor:
+      enabled: true
+    thanosService:
+      enabled: true
+
     prometheusSpec:
       externalLabels:
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
-      thanosServiceExternal:
-        enabled: true
-      thanosServiceMonitor:
-        enabled: true
-      thanosService:
-        enabled: true
       thanos: 
         objectStorageConfig:
           existingSecret:
@@ -100,18 +101,18 @@ EOT
         acme.cert-manager.io/dns01-solver: "true"
 
   prometheus:
+    thanosServiceExternal:
+      enabled: true
+    thanosServiceMonitor:
+      enabled: true
+    thanosService:
+      enabled: true
     prometheusSpec:
       externalLabels:
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
-      thanosServiceExternal:
-        enabled: true
-      thanosServiceMonitor:
-        enabled: true
-      thanosService:
-        enabled: true
       thanos: 
         objectStorageConfig:
           existingSecret:

@@ -151,18 +151,20 @@ kube-prometheus-stack:
 
   prometheus:
     enabled: true
+    thanosServiceExternal:
+      enabled: true
+    thanosServiceMonitor:
+      enabled: true
+    thanosService:
+      enabled: true
+
     prometheusSpec:
       externalLabels:
         clusterAccount: ${var.account}
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.account}-${var.region}-${var.name}")}
-      thanosServiceExternal:
-        enabled: true
-      thanosServiceMonitor:
-        enabled: true
-      thanosService:
-        enabled: true
+  
       thanos: 
         objectStorageConfig:
           existingSecret:
