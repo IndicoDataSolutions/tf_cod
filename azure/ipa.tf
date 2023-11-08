@@ -223,8 +223,7 @@ output "git_branch" {
   value = data.external.git_information.result.branch
 }
 
-
-resource "null_resource" "sleep-5-minutes-wait-for-charts-smoketest-build" {
+resource "null_resource" "wait-for-tf-cod-chart-build" {
   depends_on = [
     time_sleep.wait_1_minutes_after_pre_reqs
   ]
@@ -234,14 +233,18 @@ resource "null_resource" "sleep-5-minutes-wait-for-charts-smoketest-build" {
   }
 
   provisioner "local-exec" {
-    command = "sleep 300"
+    environment = {
+      HARBOR_API_TOKEN = jsondecode(data.vault_kv_secret_v2.harbor-api-token.data_json)["bearer_token"]
+    }
+    command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
   }
 }
 
 
+
 resource "helm_release" "terraform-smoketests" {
   depends_on = [
-    null_resource.sleep-5-minutes-wait-for-charts-smoketest-build,
+    null_resource.wait-for-tf-cod-chart-build,
     kubernetes_config_map.terraform-variables
   ]
 
@@ -405,6 +408,34 @@ resource "kubernetes_config_map" "azure_dns_credentials" {
   data = {
     "azure.json" = var.is_openshift ? local.openshift_dns_credentials : local.azure_dns_credentials
   }
+}
+
+
+resource "kubectl_manifest" "thanos-storage-secret" {
+  depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
+  yaml_body  = <<YAML
+    apiVersion: "secrets.hashicorp.com/v1beta1"
+    kind: "VaultStaticSecret"
+    metadata:
+      name:  vault-thanos-storage
+      namespace: default
+    spec:
+      type: "kv-v2"
+      namespace: default
+      mount: customer-Indico-Devops
+      path: thanos-storage
+      refreshAfter: 60s
+      rolloutRestartTargets:
+        - name: prometheus-monitoring-kube-prometheus-prometheus
+          kind: StatefulSet
+      destination:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+        create: true
+        name: thanos-storage
+      vaultAuthRef: default
+  YAML
 }
 
 resource "helm_release" "ipa-pre-requisites" {

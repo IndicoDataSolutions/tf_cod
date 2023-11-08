@@ -153,6 +153,19 @@ kube-prometheus-stack:
   prometheus:
     enabled: true
     prometheusSpec:
+      prometheusExternalLabelName: ${lower("${var.account}-${var-region}-${var.name}")}
+      externalLabels:
+        account: ${var.account}
+        region: ${var.region}
+        name: ${var.label}
+      thanosService:
+        enabled: true
+      thanos: 
+        objectStorageConfig:
+          existingSecret:
+            name: thanos-storage
+            key: thanos_storage.yaml
+
       nodeSelector:
         node_group: static-workers
       storageSpec:
