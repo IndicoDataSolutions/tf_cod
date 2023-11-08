@@ -153,11 +153,12 @@ kube-prometheus-stack:
   prometheus:
     enabled: true
     prometheusSpec:
-      prometheusExternalLabelName: ${lower("${var.account}_${var-region}_${var.name}")}
+      prometheusExternalLabelName: full-name
       externalLabels:
         account: ${var.account}
         region: ${var.region}
         name: ${var.label}
+        full-name: ${lower("${var.account}-${var-region}-${var.name}")}
       thanosService:
         enabled: true
       thanos: 
