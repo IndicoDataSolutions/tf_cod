@@ -59,7 +59,8 @@ EOT
           hosts:
             - "sidecar.${local.dns_name}"
     thanosServiceExternal:
-      enabled: true
+      enabled: false
+      type: ClusterIP
     thanosService:
       #annotations:
       #  external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
@@ -122,7 +123,8 @@ EOT
     thanosServiceMonitor:
       enabled: true
     thanosServiceExternal:
-      enabled: true
+      enabled: false
+      type: ClusterIP
     thanosIngress:
       ingressClassName: nginx
       labels:
