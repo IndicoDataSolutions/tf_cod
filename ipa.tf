@@ -674,6 +674,7 @@ output "git_branch" {
   value = data.external.git_information.result.branch
 }
 
+/*
 resource "null_resource" "sleep-5-minutes-wait-for-charts-smoketest-build" {
   depends_on = [
     time_sleep.wait_1_minutes_after_pre_reqs
@@ -687,7 +688,7 @@ resource "null_resource" "sleep-5-minutes-wait-for-charts-smoketest-build" {
     command = "sleep 300"
   }
 }
-
+*/
 
 resource "null_resource" "wait-for-tf-cod-chart-build" {
   depends_on = [
