@@ -153,7 +153,7 @@ kube-prometheus-stack:
   prometheus:
     enabled: true
     prometheusSpec:
-      prometheusExternalLabelName: ${lower("${var.account}-${var-region}-${var.name}")}
+      prometheusExternalLabelName: ${lower("${var.account}_${var-region}_${var.name}")}
       externalLabels:
         account: ${var.account}
         region: ${var.region}

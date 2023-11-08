@@ -37,7 +37,7 @@ EOT
             - alertmanager-${local.dns_name}
   prometheus:
     prometheusSpec:
-      prometheusExternalLabelName: ${lower("${var.aws_account}-${var-region}-${var.name}")}
+      prometheusExternalLabelName: ${lower("${var.aws_account}_${var-region}_${var.name}")}
       externalLabels:
         account: ${var.aws_account}
         region: ${var.region}
