@@ -707,7 +707,6 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
   }
 }
 
-
 resource "helm_release" "terraform-smoketests" {
   depends_on = [
     null_resource.wait-for-tf-cod-chart-build,
