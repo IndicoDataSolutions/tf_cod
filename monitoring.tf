@@ -42,10 +42,10 @@ EOT
   prometheus:
     prometheusSpec:
       externalLabels:
-        account: ${var.aws_account}
-        region: ${var.region}
-        name: ${var.label}
-        fullname: ${lower("${var.aws_account}-${var.region}-${var.name}")}
+        clusterAccount: ${var.aws_account}
+        clusterRegion: ${var.region}
+        clusterName: ${var.label}
+        clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
       thanosService:
         enabled: true
       thanos: 
@@ -98,10 +98,10 @@ EOT
   prometheus:
     prometheusSpec:
       externalLabels:
-        account: ${var.aws_account}
-        region: ${var.region}
-        name: ${var.label}
-        fullname: ${lower("${var.aws_account}-${var.region}-${var.name}")}
+        clusterAccount: ${var.aws_account}
+        clusterRegion: ${var.region}
+        clusterName: ${var.label}
+        clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
       thanosService:
         enabled: true
       thanos: 
