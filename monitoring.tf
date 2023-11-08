@@ -36,14 +36,19 @@ EOT
           hosts:
             - alertmanager-${local.dns_name}
   prometheus:
-    thanosService:
-      enabled: true
-    thanos: 
-      objectStorageConfig:
-        existingSecret:
-          name: thanos-storage
-          key: thanos_storage.yaml
     prometheusSpec:
+      externalLabels:
+        account: ${var.aws_account}
+        region: ${var.region}
+        name: ${var.label}
+      thanosService:
+        enabled: true
+      thanos: 
+        objectStorageConfig:
+          existingSecret:
+            name: thanos-storage
+            key: thanos_storage.yaml
+
       nodeSelector:
         node_group: static-workers
     ingress:
@@ -76,6 +81,10 @@ EOT
         cert-manager.io/cluster-issuer: zerossl
   prometheus:
     prometheusSpec:
+      externalLabels:
+        account: ${var.aws_account}
+        region: ${var.region}
+        name: ${var.label}
       thanosService:
         enabled: true
       thanos: 
