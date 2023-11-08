@@ -25,6 +25,10 @@ EOT
   kube_prometheus_stack_values = var.use_static_ssl_certificates == true ? (<<EOT
   alertmanager:
     ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
       enabled: true
       ingressClassName: nginx
       hosts:
@@ -54,6 +58,10 @@ EOT
         node_group: static-workers
     ingress:
       enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
       ingressClassName: nginx
       hosts:
         - prometheus-${local.dns_name}
@@ -65,6 +73,10 @@ EOT
             - prometheus-${local.dns_name}
   grafana:
     ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
       enabled: true
       ingressClassName: nginx
       hosts:
