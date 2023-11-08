@@ -183,6 +183,16 @@ resource "aws_route53_record" "prometheus-caa" {
   ]
 }
 
+resource "aws_route53_record" "prometheus-sidecar-caa" {
+  count   = var.monitoring_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
+  zone_id = data.aws_route53_zone.primary.zone_id
+  name    = lower("sidecar.${local.dns_name}")
+  type    = "CAA"
+  ttl     = 300
+  records = [
+    "0 issue \"sectigo.com\""
+  ]
+}
 
 resource "aws_route53_record" "alertmanager-caa" {
   count   = var.monitoring_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
@@ -216,6 +226,7 @@ resource "helm_release" "monitoring" {
   depends_on = [
     module.cluster,
     helm_release.ipa-pre-requisites,
+    aws_route53_record.prometheus-sidecar-caa,
     aws_route53_record.alertmanager-caa,
     aws_route53_record.grafana-caa,
     aws_route53_record.prometheus-caa,
