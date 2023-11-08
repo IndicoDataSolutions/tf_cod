@@ -48,6 +48,8 @@ EOT
       annotations:
         cert-manager.io/cluster-issuer: zerossl
       enabled: true
+      paths:
+        - /
       hosts:
         - "sidecar.${local.dns_name}"
       tls:
@@ -121,6 +123,8 @@ EOT
       annotations:
         cert-manager.io/cluster-issuer: zerossl
       enabled: true
+      paths:
+        - /
       hosts:
         - "sidecar.${local.dns_name}"
       tls:
