@@ -61,6 +61,8 @@ EOT
             - "sidecar.${local.dns_name}"
     thanosServiceExternal:
       enabled: true
+      annotations:
+        external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
 
     thanosService:
       annotations:
@@ -123,7 +125,10 @@ EOT
   prometheus:
     thanosServiceMonitor:
       enabled: true
+
     thanosServiceExternal:
+      annotations:
+        external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
       enabled: true
       
     thanosIngress:
