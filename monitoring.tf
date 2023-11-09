@@ -42,59 +42,19 @@ EOT
   prometheus:
     thanosServiceMonitor:
       enabled: true
-    thanosIngress:
-      enabled: true
-      ingressClassName: nginx
-      labels:
-        acme.cert-manager.io/dns01-solver: "true"
-      annotations:
-        cert-manager.io/cluster-issuer: zerossl
-        nginx.ingress.kubernetes.io/backend-protocol: GRPC
-        nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
-        nginx.ingress.kubernetes.io/grpc-backend: 'true'
-        nginx.ingress.kubernetes.io/protocol: h2c
-        nginx.ingress.kubernetes.io/proxy-read-timeout: '160'
-      
-      pathType: ImplementationSpecific
-      paths:
-        - /
-      hosts:
-        - "thanos.${local.dns_name}"
-      tls:
-        - secretName: thanos-gateway-tls
-          hosts:
-            - "thanos.${local.dns_name}"
-    thanosServiceExternal:
-      enabled: true
-      annotations:
-        external-dns.alpha.kubernetes.io/hostname: sidecar.${local.dns_name}
 
     thanosService:
-      #annotations:
-      #  external-dns.alpha.kubernetes.io/hostname: thanos.${local.dns_name}
       enabled: true
 
     prometheusSpec:
+      disableCompaction: true
       externalLabels:
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
-      volumes:
-        - secret:
-            secretName: thanos-gateway-tls
-          name: thanos-gateway-tls
       thanos: 
-        volumeMounts:
-          - mountPath: /etc/tls/grpc
-            name: thanos-gateway-tls
-        grpcServerTlsConfig:
-          certFile: "/etc/tls/grpc/tls.crt"
-          keyFile: "/etc/tls/grpc/tls.key"
-        additionalArgs:
-          - --grpc-client-tls-secure
-          - --grpc-client-tls-skip-verify
-          - --endpoint=thanos.${local.dns_name}:443
+        blockSize: 5m
         objectStorageConfig:
           existingSecret:
             name: thanos-storage
