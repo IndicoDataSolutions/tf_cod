@@ -242,7 +242,6 @@ EOF
   ]
 }
 
-
 resource "kubectl_manifest" "thanos-datasource" {
   depends_on = [helm_release.monitoring]
   provider   = kubectl.devops-tools
