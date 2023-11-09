@@ -80,14 +80,19 @@ EOT
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
+      containers:
+        - name: thanos-sidecar
+          volumes:
+            - secret:
+                secretName: thanos-sidecar-tls
+              name: thanos-sidecar-tls
       thanos: 
-        volumes:
-          - name: thanos-gateway-cert
-            secret:
-              secretName: thanos-gateway-tls
         volumeMounts:
-          - mountPath: /certs
-            name: thanos-gateway-cert
+          - mountPath: /etc/tls/grpc
+            name: thanos-sidecar-tls
+        grpcServerTlsConfig:
+          certFile: "/etc/tls/grpc/tls.crt"
+          keyFile: "/etc/tls/grpc/tls.key"
         additionalArgs:
           - --grpc-client-tls-secure
           - --grpc-client-tls-skip-verify
@@ -179,14 +184,19 @@ EOT
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
+      containers:
+        - name: thanos-sidecar
+          volumes:
+            - secret:
+                secretName: thanos-sidecar-tls
+              name: thanos-sidecar-tls
       thanos: 
-        volumes:
-          - name: thanos-gateway-cert
-            secret:
-              secretName: thanos-gateway-tls
         volumeMounts:
-          - mountPath: /certs
-            name: thanos-gateway-cert
+          - mountPath: /etc/tls/grpc
+            name: thanos-sidecar-tls
+        grpcServerTlsConfig:
+          certFile: "/etc/tls/grpc/tls.crt"
+          keyFile: "/etc/tls/grpc/tls.key"
         objectStorageConfig:
           additionalArgs:
             - --grpc-client-tls-secure
