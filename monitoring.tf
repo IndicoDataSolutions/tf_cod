@@ -252,7 +252,19 @@ metadata:
   name: ${replace(local.dns_name, ".", "-")}
   namespace: default
 spec:
+  valuesFrom:
+    - targetPath: "secureJsonData.username"
+      valueFrom:
+        secretKeyRef:
+          name: grafana
+          key: admin-user
+    - targetPath: "secureJsonData.password"
+      valueFrom:
+        secretKeyRef:
+          name: grafana
+          key: admin-password
   datasource:
+    editable: true
     access: proxy
     editable: true
     jsonData:
@@ -260,8 +272,8 @@ spec:
       tlsSkipVerify: true
     name: prom1
     secureJsonData:
-      password: ${var.thanos_grafana_admin_password}
-      username: ${var.thanos_grafana_admin_username}
+      password: $${admin-password}
+      username: $${admin-user}
     type: prometheus
     url: https://prometheus.${local.dns_name}prometheus
   instanceSelector:
