@@ -49,6 +49,11 @@ EOT
         acme.cert-manager.io/dns01-solver: "true"
       annotations:
         cert-manager.io/cluster-issuer: zerossl
+        nginx.ingress.kubernetes.io/backend-protocol: GRPC
+        nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+        nginx.ingress.kubernetes.io/grpc-backend: 'true'
+        nginx.ingress.kubernetes.io/protocol: h2c
+        nginx.ingress.kubernetes.io/proxy-read-timeout: '160'
       
       pathType: ImplementationSpecific
       paths:
@@ -76,6 +81,17 @@ EOT
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
       thanos: 
+        volumes:
+          - name: thanos-gateway-cert
+            secret:
+              secretName: thanos-gateway-tls
+        volumeMounts:
+          - mountPath: /certs
+            name: thanos-gateway-cert
+        additionalArgs:
+          - --grpc-client-tls-secure
+          - --grpc-client-tls-skip-verify
+          - --endpoint=thanos.${local.dns_name}:443
         objectStorageConfig:
           existingSecret:
             name: thanos-storage
@@ -138,6 +154,11 @@ EOT
         acme.cert-manager.io/dns01-solver: "true"
       annotations:
         cert-manager.io/cluster-issuer: zerossl
+        nginx.ingress.kubernetes.io/backend-protocol: GRPC
+        nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+        nginx.ingress.kubernetes.io/grpc-backend: 'true'
+        nginx.ingress.kubernetes.io/protocol: h2c
+        nginx.ingress.kubernetes.io/proxy-read-timeout: '160'
       pathType: ImplementationSpecific
       paths:
         - /
@@ -159,7 +180,20 @@ EOT
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
       thanos: 
+        volumes:
+          - name: thanos-gateway-cert
+            secret:
+              secretName: thanos-gateway-tls
+        volumeMounts:
+          - mountPath: /certs
+            name: thanos-gateway-cert
         objectStorageConfig:
+          additionalArgs:
+            - --grpc-client-tls-secure
+            - --grpc-client-tls-skip-verify
+            - --grpc-server-tls-cert=/certs/tls.crt
+            - --grpc-server-tls-key=/certs/tls.key
+            - --endpoint=thanos.${local.dns_name}:443
           existingSecret:
             name: thanos-storage
             key: thanos_storage.yaml
