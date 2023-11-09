@@ -244,7 +244,7 @@ EOF
 
 resource "kubectl_manifest" "thanos-datasource" {
   depends_on = [helm_release.monitoring]
-  provider   = kubectl.devops-tools
+  provider   = kubectl.thanos-clusters
   yaml_body  = <<YAML
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
@@ -269,7 +269,6 @@ spec:
       dashboards: external-grafana
   YAML
 }
-
 
 resource "helm_release" "keda-monitoring" {
   count = var.monitoring_enabled == true ? 1 : 0

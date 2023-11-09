@@ -394,7 +394,7 @@ provider "kubectl" {
 }
 
 provider "kubectl" {
-  alias                  = "thanos-clusters"
+  alias                  = "thanos-cluster"
   host                   = var.thanos_cluster_host
   cluster_ca_certificate = var.thanos_cluster_ca_certificate
   #token                  = module.cluster.kubernetes_token
