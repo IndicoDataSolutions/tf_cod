@@ -177,29 +177,16 @@ EOT
       enabled: true
     
     prometheusSpec:
+      additionalArgs:
+        - "--tsdb.min-block-duration=5m"
+        - "--tsdb.max-block-duration=5m"
       externalLabels:
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
-#      volumes:
-#        - secret:
-#            secretName: thanos-gateway-tls
-#          name: thanos-gateway-tls
       thanos: # this is the one being used
-#        volumeMounts:
-#          - mountPath: /etc/tls/grpc
-#            name: thanos-gateway-tls
-#        grpcServerTlsConfig:
-#          certFile: "/etc/tls/grpc/tls.crt"
-#          keyFile: "/etc/tls/grpc/tls.key"
         objectStorageConfig:
-          additionalArgs:
-#            - --grpc-client-tls-secure
-#            - --grpc-client-tls-skip-verify
-#            - --grpc-server-tls-cert=/certs/tls.crt
-#            - --grpc-server-tls-key=/certs/tls.key
-#            - --endpoint=thanos.${local.dns_name}:443
           existingSecret:
             name: thanos-storage
             key: thanos_storage.yaml
