@@ -270,7 +270,7 @@ spec:
     jsonData:
       timeInterval: 5s
       tlsSkipVerify: true
-    name: prom1
+    name: ${local.dns_name}
     secureJsonData:
       password: $${admin-password}
       username: $${admin-user}
