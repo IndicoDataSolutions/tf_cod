@@ -570,3 +570,14 @@ variable "thanos_grafana_admin_password" {
   default   = "provided from the varset thanos"
 }
 
+variable "thanos_cluster_ca_certificate" {
+  type      = string
+  sensitive = true
+  default   = "provided from the varset thanos"
+}
+
+variable "thanos_cluster_host" {
+  type    = string
+  default = "provided from the varset thanos"
+}
+
