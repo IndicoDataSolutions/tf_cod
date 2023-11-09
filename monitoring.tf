@@ -275,7 +275,7 @@ spec:
       password: $${admin-password}
       username: $${admin-user}
     type: prometheus
-    url: https://prometheus.${local.dns_name}prometheus
+    url: https://prometheus.${local.dns_name}/prometheus
   instanceSelector:
     matchLabels:
       dashboards: external-grafana
