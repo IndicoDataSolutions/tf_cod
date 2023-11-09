@@ -388,36 +388,21 @@ provider "kubectl" {
   }
 }
 
-
-provider "kubectl" {
-  alias                  = "devops-tools"
-  host                   = var.devops_tools_cluster_host
-  cluster_ca_certificate = var.devops_tools_cluster_ca_certificate
-  #token                  = module.cluster.kubernetes_token
-  load_config_file = false
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--cluster-name", var.label]
-    command     = "aws"
-  }
+data "aws_eks_cluster" "thanos" {
+  name     = "thanos"
+  provider = aws.aws-indico-devops
 }
 
-
-data "aws_eks_cluster" "devops" {
-  name     = "devops"
-  provider = aws.indico-devops
-}
-
-data "aws_eks_cluster_auth" "devops" {
-  name     = "devops"
-  provider = aws.indico-devops
+data "aws_eks_cluster_auth" "thanos" {
+  name     = "thanos"
+  provider = aws.aws-indico-devops
 }
 
 provider "kubectl" {
   alias                  = "thanos-kubectl"
   host                   = var.thanos_cluster_host
   cluster_ca_certificate = var.thanos_cluster_ca_certificate
-  token                  = data.aws_eks_cluster_auth.devops.token
+  token                  = data.aws_eks_cluster_auth.thanos.token
 }
 
 provider "helm" {
