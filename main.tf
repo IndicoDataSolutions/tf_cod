@@ -75,6 +75,15 @@ provider "github" {
 
 provider "random" {}
 
+
+provider "aws" {
+  access_key = var.indico_devops_aws_access_key_id
+  secret_key = var.indico_devops_aws_secret_access_key
+  region     = var.indico_devops_aws_region
+  alias      = "aws-indico-devops"
+}
+
+
 provider "aws" {
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
@@ -392,6 +401,25 @@ provider "kubectl" {
     command     = "aws"
   }
 }
+
+
+data "aws_eks_cluster" "devops" {
+  name     = "devops"
+  provider = aws.indico-devops
+}
+
+data "aws_eks_cluster_auth" "devops" {
+  name     = "devops"
+  provider = aws.indico-devops
+}
+
+provider "kubectl" {
+  alias                  = "thanos-kubectl"
+  host                   = var.thanos_cluster_host
+  cluster_ca_certificate = var.thanos_cluster_ca_certificate
+  token                  = data.aws_eks_cluster_auth.devops.token
+}
+
 
 provider "kubectl" {
   alias                  = "thanos-cluster"

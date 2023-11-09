@@ -581,3 +581,22 @@ variable "thanos_cluster_host" {
   default = "provided from the varset thanos"
 }
 
+variable "indico_devops_aws_access_key_id" {
+  type        = string
+  description = "The Indico-Devops account access key"
+  sensitive   = true
+}
+
+variable "indico_devops_aws_secret_access_key" {
+  type        = string
+  description = "The Indico-Devops account secret"
+  sensitive   = true
+}
+
+variable "indico_devops_aws_region" {
+  type        = string
+  description = "The Indico-Devops devops cluster region"
+}
+
+
+

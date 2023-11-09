@@ -244,7 +244,7 @@ EOF
 
 resource "kubectl_manifest" "thanos-datasource" {
   depends_on = [helm_release.monitoring]
-  provider   = kubectl.thanos-clusters
+  provider   = kubectl.thanos-kubectl
   yaml_body  = <<YAML
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
