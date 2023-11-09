@@ -559,4 +559,14 @@ variable "devops_tools_cluster_ca_certificate" {
   default   = "provided from the varset devops-tools-cluster"
 }
 
+variable "thanos_grafana_admin_username" {
+  type    = string
+  default = "provided from the varset devops-tools-cluster"
+}
+
+variable "thanos_grafana_admin_password" {
+  type      = string
+  sensitive = true
+  default   = "provided from the varset thanos"
+}
 

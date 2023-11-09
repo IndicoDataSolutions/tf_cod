@@ -138,6 +138,8 @@ EOT
   )
 }
 
+
+
 resource "aws_route53_record" "grafana-caa" {
   count   = var.monitoring_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
   zone_id = data.aws_route53_zone.primary.zone_id
@@ -238,6 +240,33 @@ ${local.kube_prometheus_stack_values}
 
 EOF
   ]
+}
+
+resource "kubectl_manifest" "thanos-datasource" {
+  depends_on = [helm_release.monitoring]
+  yaml_body  = <<YAML
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: ${replace(local.dns_name, ".", "-")}
+  namespace: default
+spec:
+  datasource:
+    access: proxy
+    editable: true
+    jsonData:
+      timeInterval: 5s
+      tlsSkipVerify: true
+    name: prom1
+    secureJsonData:
+      password: ${var.thanos_grafana_admin_password}
+      username: ${var.thanos_grafana_admin_username}
+    type: prometheus
+    url: https://prometheus.${local.dns_name}prometheus
+  instanceSelector:
+    matchLabels:
+      dashboards: external-grafana
+  YAML
 }
 
 resource "helm_release" "keda-monitoring" {

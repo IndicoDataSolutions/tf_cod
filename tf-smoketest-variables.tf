@@ -121,6 +121,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     local_registry_enabled = "${jsonencode(var.local_registry_enabled)}"
     local_registry_harbor_robot_account_name = "${jsonencode(var.local_registry_harbor_robot_account_name)}"
     devops_tools_cluster_host = "${jsonencode(var.devops_tools_cluster_host)}"
+    thanos_grafana_admin_username = "${jsonencode(var.thanos_grafana_admin_username)}"
 
     }
   }
