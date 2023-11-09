@@ -269,7 +269,7 @@ metadata:
   namespace: default
 spec:
   valuesFrom:
-    - targetPath: "secureJsonData.password"
+    - targetPath: "secureJsonData.basicAuthPassword"
       valueFrom:
         secretKeyRef:
           name: ${replace(local.dns_name, ".", "-")}
@@ -277,7 +277,7 @@ spec:
   datasource:
     basicAuth: true
     basicAuthUser: monitoring
-    editable: true
+    editable: false
     access: proxy
     editable: true
     jsonData:
