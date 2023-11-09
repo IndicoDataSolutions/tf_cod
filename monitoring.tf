@@ -151,7 +151,7 @@ EOT
       enabled: true
       
     thanosIngress:
-      enabled: true
+      enabled: false
       ingressClassName: nginx
       labels:
         acme.cert-manager.io/dns01-solver: "true"
