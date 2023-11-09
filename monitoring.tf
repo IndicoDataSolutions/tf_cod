@@ -82,12 +82,12 @@ EOT
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
       volumes:
         - secret:
-            secretName: thanos-sidecar-tls
-          name: thanos-sidecar-tls
+            secretName: thanos-gateway-tls
+          name: thanos-gateway-tls
       thanos: 
         volumeMounts:
           - mountPath: /etc/tls/grpc
-            name: thanos-sidecar-tls
+            name: thanos-gateway-tls
         grpcServerTlsConfig:
           certFile: "/etc/tls/grpc/tls.crt"
           keyFile: "/etc/tls/grpc/tls.key"
@@ -184,12 +184,12 @@ EOT
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
       volumes:
         - secret:
-            secretName: thanos-sidecar-tls
-          name: thanos-sidecar-tls
+            secretName: thanos-gateway-tls
+          name: thanos-gateway-tls
       thanos: # this is the one being used
         volumeMounts:
           - mountPath: /etc/tls/grpc
-            name: thanos-sidecar-tls
+            name: thanos-gateway-tls
         grpcServerTlsConfig:
           certFile: "/etc/tls/grpc/tls.crt"
           keyFile: "/etc/tls/grpc/tls.key"
