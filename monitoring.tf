@@ -150,8 +150,8 @@ EOT
     
     prometheusSpec:
       additionalArgs:
-        - --storage.tsdb.min-block-duration=5m
-        - --storage.tsdb.max-block-duration=5m 
+        - "--storage.tsdb.min-block-duration=5m"
+        - "--storage.tsdb.max-block-duration=5m"
       externalLabels:
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
