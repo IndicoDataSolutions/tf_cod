@@ -120,6 +120,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     local_registry_version = "${jsonencode(var.local_registry_version)}"
     local_registry_enabled = "${jsonencode(var.local_registry_enabled)}"
     local_registry_harbor_robot_account_name = "${jsonencode(var.local_registry_harbor_robot_account_name)}"
+    devops_tools_cluster_host = "${jsonencode(var.devops_tools_cluster_host)}"
 
     }
   }

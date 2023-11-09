@@ -149,6 +149,7 @@ EOT
       enabled: true
     
     prometheusSpec:
+      disableCompaction: true
       additionalArgs:
         - "--storage.tsdb.min-block-duration=5m"
         - "--storage.tsdb.max-block-duration=5m"
