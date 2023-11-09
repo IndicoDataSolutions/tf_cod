@@ -80,12 +80,10 @@ EOT
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
-      containers:
-        - name: thanos-sidecar
-          volumes:
-            - secret:
-                secretName: thanos-sidecar-tls
-              name: thanos-sidecar-tls
+      volumes:
+        - secret:
+            secretName: thanos-sidecar-tls
+          name: thanos-sidecar-tls
       thanos: 
         volumeMounts:
           - mountPath: /etc/tls/grpc
@@ -184,13 +182,11 @@ EOT
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
-      containers:
-        - name: thanos-sidecar
-          volumes:
-            - secret:
-                secretName: thanos-sidecar-tls
-              name: thanos-sidecar-tls
-      thanos: 
+      volumes:
+        - secret:
+            secretName: thanos-sidecar-tls
+          name: thanos-sidecar-tls
+      thanos: # this is the one being used
         volumeMounts:
           - mountPath: /etc/tls/grpc
             name: thanos-sidecar-tls
