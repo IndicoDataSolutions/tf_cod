@@ -381,7 +381,7 @@ provider "kubectl" {
 
 
 provider "kubectl" {
-  alias                  = devops-tools
+  alias                  = "devops-tools"
   host                   = var.devops_tools_cluster_host
   cluster_ca_certificate = var.devops_tools_cluster_ca_certificate
   #token                  = module.cluster.kubernetes_token
