@@ -195,8 +195,8 @@ EOT
 #          keyFile: "/etc/tls/grpc/tls.key"
         objectStorageConfig:
           additionalArgs:
-            - --grpc-client-tls-secure
-            - --grpc-client-tls-skip-verify
+#            - --grpc-client-tls-secure
+#            - --grpc-client-tls-skip-verify
 #            - --grpc-server-tls-cert=/certs/tls.crt
 #            - --grpc-server-tls-key=/certs/tls.key
 #            - --endpoint=thanos.${local.dns_name}:443
