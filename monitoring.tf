@@ -150,15 +150,14 @@ EOT
     
     prometheusSpec:
       disableCompaction: true
-      additionalArgs:
-        - "--storage.tsdb.min-block-duration=5m"
-        - "--storage.tsdb.max-block-duration=5m"
       externalLabels:
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
       thanos: # this is the one being used
+        blockSize:
+          default: 5m
         objectStorageConfig:
           existingSecret:
             name: thanos-storage
