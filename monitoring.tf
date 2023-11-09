@@ -242,8 +242,24 @@ EOF
   ]
 }
 
-resource "kubectl_manifest" "thanos-datasource" {
+
+resource "kubectl_manifest" "thanos-datasource-credentials" {
   depends_on = [helm_release.monitoring]
+  provider   = kubectl.thanos-kubectl
+  yaml_body  = <<YAML
+apiVersion: v1
+stringData:
+  admin-password: ${random_password.monitoring-password.result}
+kind: Secret
+metadata:
+  name: ${replace(local.dns_name, ".", "-")}
+  namespace: default
+type: Opaque
+  YAML
+}
+
+resource "kubectl_manifest" "thanos-datasource" {
+  depends_on = [helm_release.monitoring, kubectl_manifest.thanos-datasource-credentials]
   provider   = kubectl.thanos-kubectl
   yaml_body  = <<YAML
 apiVersion: grafana.integreatly.org/v1beta1
@@ -253,17 +269,14 @@ metadata:
   namespace: default
 spec:
   valuesFrom:
-    - targetPath: "secureJsonData.username"
-      valueFrom:
-        secretKeyRef:
-          name: grafana
-          key: admin-user
     - targetPath: "secureJsonData.password"
       valueFrom:
         secretKeyRef:
-          name: grafana
+          name: ${replace(local.dns_name, ".", "-")}
           key: admin-password
   datasource:
+    basicAuth: true
+    basicAuthUser: monitoring
     editable: true
     access: proxy
     editable: true
@@ -272,8 +285,7 @@ spec:
       tlsSkipVerify: true
     name: ${local.dns_name}
     secureJsonData:
-      password: $${admin-password}
-      username: $${admin-user}
+      basicAuthPassword: $${admin-password}
     type: prometheus
     url: https://prometheus.${local.dns_name}/prometheus
   instanceSelector:
