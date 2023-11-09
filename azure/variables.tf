@@ -548,3 +548,15 @@ variable "local_registry_enabled" {
   default = false
 }
 
+variable "devops_tools_cluster_host" {
+  type    = string
+  default = "provided from the varset devops-tools-cluster"
+}
+
+variable "devops_tools_cluster_ca_certificate" {
+  type      = string
+  sensitive = true
+  default   = "provided from the varset devops-tools-cluster"
+}
+
+
