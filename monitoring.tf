@@ -156,8 +156,7 @@ EOT
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
       thanos: # this is the one being used
-        blockSize:
-          default: 5m
+        blockSize: 5m
         objectStorageConfig:
           existingSecret:
             name: thanos-storage
