@@ -183,9 +183,8 @@ EOF
 }
 
 resource "kubectl_manifest" "thanos-datasource-credentials" {
-  depends_on = [helm_release.monitoring]
-  provider   = kubectl.thanos-kubectl
-  yaml_body  = <<YAML
+  provider  = kubectl.thanos-kubectl
+  yaml_body = <<YAML
 apiVersion: v1
 stringData:
   admin-password: ${random_password.monitoring-password.result}
@@ -198,7 +197,7 @@ type: Opaque
 }
 
 resource "kubectl_manifest" "thanos-datasource" {
-  depends_on = [helm_release.monitoring, kubectl_manifest.thanos-datasource-credentials]
+  depends_on = [kubectl_manifest.thanos-datasource-credentials]
   provider   = kubectl.thanos-kubectl
   yaml_body  = <<YAML
 apiVersion: grafana.integreatly.org/v1beta1
