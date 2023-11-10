@@ -228,6 +228,10 @@ output "git_branch" {
   value = data.external.git_information.result.branch
 }
 
+output "wait_command" {
+  value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+}
+
 resource "null_resource" "wait-for-tf-cod-chart-build" {
   depends_on = [
     time_sleep.wait_1_minutes_after_pre_reqs
