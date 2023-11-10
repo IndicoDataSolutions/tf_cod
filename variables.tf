@@ -700,6 +700,12 @@ variable "thanos_cluster_host" {
   default = "provided from the varset thanos"
 }
 
+
+variable "thanos_cluster_name" {
+  type    = string
+  default = "thanos"
+}
+
 variable "indico_devops_aws_access_key_id" {
   type        = string
   description = "The Indico-Devops account access key"

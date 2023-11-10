@@ -388,12 +388,12 @@ provider "aws" {
 }
 
 data "aws_eks_cluster" "thanos" {
-  name     = "thanos"
+  name     = var.thanos_cluster_name
   provider = aws.aws-indico-devops
 }
 
 data "aws_eks_cluster_auth" "thanos" {
-  name     = "thanos"
+  name     = var.thanos_cluster_name
   provider = aws.aws-indico-devops
 }
 

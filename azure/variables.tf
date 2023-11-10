@@ -598,5 +598,8 @@ variable "indico_devops_aws_region" {
   description = "The Indico-Devops devops cluster region"
 }
 
-
+variable "thanos_cluster_name" {
+  type    = string
+  default = "thanos"
+}
 

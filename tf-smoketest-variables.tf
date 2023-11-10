@@ -123,6 +123,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     devops_tools_cluster_host = "${jsonencode(var.devops_tools_cluster_host)}"
     thanos_grafana_admin_username = "${jsonencode(var.thanos_grafana_admin_username)}"
     thanos_cluster_host = "${jsonencode(var.thanos_cluster_host)}"
+    thanos_cluster_name = "${jsonencode(var.thanos_cluster_name)}"
     indico_devops_aws_region = "${jsonencode(var.indico_devops_aws_region)}"
 
     }
