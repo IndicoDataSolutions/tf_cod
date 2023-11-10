@@ -67,6 +67,11 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
+data "vault_kv_secret_v2" "harbor-api-token" {
+  mount = "tools/argo"
+  name  = "harbor-api"
+}
+
 resource "github_repository_file" "pre-reqs-values-yaml" {
   repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
