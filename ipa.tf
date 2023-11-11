@@ -336,6 +336,16 @@ resource "helm_release" "ipa-crds" {
 
   vault-secrets-operator:
     enabled: true
+    
+    controller: 
+      manager:
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
 
     controller: 
       manager:
