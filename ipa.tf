@@ -674,7 +674,7 @@ aws-load-balancer-controller:
 EOF
     ,
     <<EOT
-${data.github_repository_file.data-pre-reqs-values.content}
+${data.github_repository_file.data-pre-reqs-values[0].content}
 EOT
   ])
 }
