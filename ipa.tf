@@ -993,7 +993,7 @@ metrics-server:
   enabled: false
 
 proxyRegistryAccess:
-  proxyPassword: ${jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)[var.local_registry_harbor_robot_account_name]}
+  proxyPassword: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)[var.local_registry_harbor_robot_account_name] : ""}
   proxyPullSecretName: remote-access
   proxyUrl: https://harbor.devops.indico.io
   proxyUsername: "robot${"$"}${var.local_registry_harbor_robot_account_name}"
