@@ -244,7 +244,8 @@ output "ns" {
 
 
 resource "github_repository_file" "pre-reqs-values-yaml" {
-  repository          = data.github_repository.argo-github-repo.name
+  count               = var.argo_enabled == true ? 1 : 0
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/pre-reqs-values.values"
   commit_message      = var.message
@@ -260,7 +261,8 @@ resource "github_repository_file" "pre-reqs-values-yaml" {
 
 
 resource "github_repository_file" "crds-values-yaml" {
-  repository          = data.github_repository.argo-github-repo.name
+  count               = var.argo_enabled == true ? 1 : 0
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/crds-values.values"
   commit_message      = var.message
@@ -275,19 +277,22 @@ resource "github_repository_file" "crds-values-yaml" {
 }
 
 data "github_repository_file" "data-crds-values" {
+  count = var.argo_enabled == true ? 1 : 0
   depends_on = [
     github_repository_file.crds-values-yaml
   ]
-  repository = data.github_repository.argo-github-repo.name
+  repository = data.github_repository.argo-github-repo[0].name
   branch     = var.argo_branch
   file       = var.argo_path == "." ? "helm/crds-values.values" : "${var.argo_path}/helm/crds-values.values"
 }
 
 data "github_repository_file" "data-pre-reqs-values" {
+  count = var.argo_enabled == true ? 1 : 0
+
   depends_on = [
     github_repository_file.pre-reqs-values-yaml
   ]
-  repository = data.github_repository.argo-github-repo.name
+  repository = data.github_repository.argo-github-repo[0].name
   branch     = var.argo_branch
   file       = var.argo_path == "." ? "helm/pre-reqs-values.values" : "${var.argo_path}/helm/pre-reqs-values.values"
 }
@@ -305,6 +310,8 @@ module "secrets-operator-setup" {
 }
 
 resource "helm_release" "ipa-crds" {
+  count = var.argo_enabled == true ? 1 : 0
+
   depends_on = [
     module.cluster,
     data.github_repository_file.data-crds-values,
@@ -1009,13 +1016,14 @@ output "local_registry_username" {
 
 
 data "github_repository" "argo-github-repo" {
+  count     = var.argo_enabled == true ? 1 : 0
   full_name = "IndicoDataSolutions/${var.argo_repo}"
 }
 
 resource "github_repository_file" "smoketest-application-yaml" {
-  count = var.ipa_smoketest_enabled == true ? 1 : 0
+  count = var.ipa_smoketest_enabled == true && var.argo_enabled == true ? 1 : 0
 
-  repository          = data.github_repository.argo-github-repo.name
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/ipa_smoketest.yaml"
   commit_message      = var.message
@@ -1078,7 +1086,8 @@ EOT
 }
 
 resource "github_repository_file" "alb-values-yaml" {
-  repository          = data.github_repository.argo-github-repo.name
+  count               = var.argo_enabled == true ? 1 : 0
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/alb.values"
   commit_message      = var.message
@@ -1098,7 +1107,8 @@ resource "github_repository_file" "alb-values-yaml" {
 }
 
 resource "github_repository_file" "argocd-application-yaml" {
-  repository          = data.github_repository.argo-github-repo.name
+  count               = var.argo_enabled == true ? 1 : 0
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/ipa_application.yaml"
   commit_message      = var.message
@@ -1257,10 +1267,11 @@ resource "argocd_application" "ipa" {
 
 
 resource "github_repository_file" "custom-application-yaml" {
+  count = var.argo_enabled == true ? 1 : 0
 
   for_each = var.applications
 
-  repository          = data.github_repository.argo-github-repo.name
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/${each.value.name}_application.yaml"
   commit_message      = var.message

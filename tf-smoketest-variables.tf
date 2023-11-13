@@ -49,6 +49,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     snapshot_id = "${jsonencode(var.snapshot_id)}"
     include_rox = "${jsonencode(var.include_rox)}"
     aws_account = "${jsonencode(var.aws_account)}"
+    argo_enabled = "${jsonencode(var.argo_enabled)}"
     argo_host = "${jsonencode(var.argo_host)}"
     argo_repo = "${jsonencode(var.argo_repo)}"
     argo_branch = "${jsonencode(var.argo_branch)}"
