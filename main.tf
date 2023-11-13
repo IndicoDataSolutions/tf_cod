@@ -460,13 +460,13 @@ module "argo-registration" {
 locals {
   security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
   cluster_name      = var.label
-  dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${var.aws_account}.indico.io") : var.domain_host
+  dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${var.aws_account}.${var.domain_suffix}") : var.domain_host
   #dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
 }
 
 
 data "aws_route53_zone" "primary" {
-  name  = var.is_alternate_account_domain == "false" ? lower("${var.aws_account}.indico.io") : lower(local.alternate_domain_root)
+  name     = var.is_alternate_account_domain == "false" ? lower("${var.aws_account}.${var.domain_suffix}") : lower(local.alternate_domain_root)
   provider = aws.dns-control
 }
 

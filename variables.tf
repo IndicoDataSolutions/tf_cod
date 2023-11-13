@@ -579,6 +579,12 @@ variable "is_alternate_account_domain" {
   description = "domain name is controlled by a different aws account"
 }
 
+variable "domain_suffix" {
+  type        = string
+  default     = "indico.io"
+  description = "Domain suffix"
+}
+
 variable "domain_host" {
   type        = string
   default     = ""
