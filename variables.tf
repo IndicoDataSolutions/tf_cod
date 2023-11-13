@@ -310,6 +310,7 @@ variable "argo_password" {
 
 variable "argo_repo" {
   description = "Argo Github Repository containing the IPA Application"
+  default     = ""
 }
 
 variable "argo_branch" {
