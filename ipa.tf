@@ -301,6 +301,7 @@ module "secrets-operator-setup" {
   depends_on = [
     module.cluster
   ]
+  count = var.argo_enabled == true ? 1: 0
   source          = "./modules/common/vault-secrets-operator-setup"
   vault_address   = var.vault_address
   account         = var.aws_account
