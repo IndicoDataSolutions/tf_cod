@@ -117,12 +117,25 @@ data "github_repository_file" "data-pre-reqs-values" {
   file       = var.argo_path == "." ? "helm/pre-reqs-values.values" : "${var.argo_path}/helm/pre-reqs-values.values"
 }
 
+module "secrets-operator-setup" {
+  depends_on = [
+    module.cluster
+  ]
+  source          = "../modules/common/vault-secrets-operator-setup"
+  vault_address   = var.vault_address
+  account         = var.account
+  region          = var.region
+  name            = var.label
+  kubernetes_host = module.cluster.kubernetes_host
+}
+
 resource "helm_release" "ipa-crds" {
   depends_on = [
     module.cluster,
     kubernetes_secret.harbor-pull-secret,
     kubernetes_secret.issuer-secret,
-    data.github_repository_file.data-crds-values
+    data.github_repository_file.data-crds-values,
+    module.secrets-operator-setup
   ]
 
   verify           = false
@@ -158,6 +171,31 @@ resource "helm_release" "ipa-crds" {
     installCRDs: true
   aws-ebs-csi-driver:
     enabled: false
+
+  vault-secrets-operator:
+    enabled: true
+
+    defaultAuthMethod:
+      enabled: true
+      namespace: default
+      method: kubernetes
+      mount: ${module.secrets-operator-setup.vault_mount_path}
+      kubernetes:
+        role: ${module.secrets-operator-setup.vault_auth_role_name}
+        tokenAudiences: [${module.secrets-operator-setup.vault_auth_audience}]
+        serviceAccount: ${module.secrets-operator-setup.vault_auth_service_account_name}
+
+    defaultVaultConnection:
+      enabled: true
+      address: ${var.vault_address}
+      skipTLSVerify: false
+      spec:
+      template:
+        spec:
+          containers:
+          - name: manager
+            args:
+            - "--client-cache-persistence-model=direct-encrypted"
 EOF
     ,
     <<EOT
@@ -166,14 +204,69 @@ EOT
   ]
 }
 
-
-
-
 resource "time_sleep" "wait_1_minutes_after_crds" {
   depends_on = [helm_release.ipa-crds]
 
   create_duration = "1m"
 }
+
+data "external" "git_information" {
+  program = ["sh", "${path.module}/get_sha.sh"]
+}
+
+output "git_sha" {
+  value = data.external.git_information.result.sha
+}
+
+
+output "git_branch" {
+  value = data.external.git_information.result.branch
+}
+
+
+resource "null_resource" "sleep-5-minutes-wait-for-charts-smoketest-build" {
+  depends_on = [
+    time_sleep.wait_1_minutes_after_pre_reqs
+  ]
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    command = "sleep 300"
+  }
+}
+
+
+resource "helm_release" "terraform-smoketests" {
+  depends_on = [
+    null_resource.sleep-5-minutes-wait-for-charts-smoketest-build,
+    kubernetes_config_map.terraform-variables
+  ]
+
+  verify           = false
+  name             = "terraform-smoketests-${substr(data.external.git_information.result.sha, 0, 8)}"
+  namespace        = "default"
+  repository       = var.ipa_repo
+  chart            = "terraform-smoketests"
+  version          = "0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+  wait             = true
+  wait_for_jobs    = true
+  timeout          = "1800" # 30 minutes
+  disable_webhooks = false
+  values = [<<EOF
+  cluster:
+    cloudProvider: azure
+    account: ${var.account}
+    region: ${var.region}
+    name: ${var.label}
+  image:
+    tag: ${substr(data.external.git_information.result.sha, 0, 8)}
+  EOF
+  ]
+}
+
 
 
 
