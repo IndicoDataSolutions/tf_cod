@@ -55,7 +55,7 @@ locals {
  EOF
   ] : []
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
-  acm_ipa_values = var.use_acm == true ? (<<EOT
+  alb_ipa_values = var.enable_waf == true ? (<<EOT
 app-edge:
   alternateDomain: ""
   service:
@@ -63,23 +63,29 @@ app-edge:
     ports:
       http_port: 31755
       http_api_port: 31270
+  nginx:
+    httpPort: 8080
   aws-load-balancer-controller:
     enabled: true
+    aws-load-balancer-controller:
+      enabled: true
+      clusterName: ${var.label}
     ingress:
       enabled: true
-      annotations:
-        acme.cert-manager.io/http01-edit-in-place: "true"
-        cert-manager.io/cluster-issuer: zerossl      
+      useStaticCertificate: ${var.use_static_ssl_certificates}
+      labels:
+        indico.io/cluster: ${var.label}
       tls:
-        - secretName: indico-ssl-cm-cert
+        - secretName: ${var.ssl_static_secret_name}
           hosts:
             - ${local.dns_name}
       alb:
         publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
+        wafArn: ${aws_wafv2_web_acl.wafv2-acl[0].arn}
         acmArn: ${aws_acm_certificate_validation.alb[0].certificate_arn}
       service:
         name: app-edge
-        port: 80
+        port: 8080
       hosts:
         - host: ${local.dns_name}
           paths:
@@ -1088,7 +1094,7 @@ resource "github_repository_file" "alb-values-yaml" {
     aws_acm_certificate_validation.alb[0]
   ]
 
-  content = local.acm_ipa_values
+  content = local.alb_ipa_values
 }
 
 resource "github_repository_file" "argocd-application-yaml" {
@@ -1105,7 +1111,7 @@ resource "github_repository_file" "argocd-application-yaml" {
   }
   depends_on = [
     module.cluster,
-    aws_acm_certificate_validation.alb[0]
+    aws_wafv2_web_acl.wafv2-acl[0]
   ]
 
   content = <<EOT
@@ -1163,7 +1169,7 @@ spec:
                 ingressUser: monitoring
                 ingressPassword: ${random_password.monitoring-password.result}
                 ${indent(14, local.runtime_scanner_ingress_values)} 
-            ${indent(12, local.acm_ipa_values)}         
+            ${indent(12, local.alb_ipa_values)}         
 
         - name: HELM_VALUES
           value: |
