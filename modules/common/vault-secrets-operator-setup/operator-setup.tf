@@ -30,6 +30,7 @@ resource "kubernetes_cluster_role_binding" "vault-auth" {
 }
 
 resource "kubernetes_secret_v1" "vault-auth" {
+  depends_on = [kubernetes_service_account_v1.vault-auth]
   metadata {
     name      = "vault-auth"
     namespace = "default"

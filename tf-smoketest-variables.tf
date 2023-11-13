@@ -1,11 +1,11 @@
 resource "kubernetes_config_map" "terraform-variables" {
-# this file is generated via pre-commit, DO NOT EDIT !
-  depends_on = [null_resource.sleep-5-minutes-wait-for-charts-smoketest-build]
-  metadata {
-    name = "terraform-variables"
-  }
-  data = {
-    is_azure = "${jsonencode(var.is_azure)}"
+  # this file is generated via pre-commit, DO NOT EDIT !
+    depends_on = [null_resource.sleep-5-minutes-wait-for-charts-smoketest-build]
+    metadata {
+      name = "terraform-variables"
+    }
+    data = {
+      is_azure = "${jsonencode(var.is_azure)}"
     is_aws = "${jsonencode(var.is_aws)}"
     label = "${jsonencode(var.label)}"
     message = "${jsonencode(var.message)}"
@@ -121,5 +121,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     local_registry_enabled = "${jsonencode(var.local_registry_enabled)}"
     local_registry_harbor_robot_account_name = "${jsonencode(var.local_registry_harbor_robot_account_name)}"
 
+    }
   }
-}
+  
