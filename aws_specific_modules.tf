@@ -13,7 +13,7 @@ module "keycloak" {
 
 # Azure doesn't support arbitrary OIDC, so we can use keycloak on Azure.
 module "k8s_dashboard" {
-  count = var.enable_k8s_dashboard == true ? 1 : 0
+  count = var.enable_k8s_dashboard == true && var.keycloak_enabled ? 1 : 0
 
   source = "./modules/aws/k8s_dashboard"
 
