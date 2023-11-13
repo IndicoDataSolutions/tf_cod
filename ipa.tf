@@ -375,11 +375,11 @@ resource "helm_release" "ipa-crds" {
       enabled: true
       namespace: default
       method: kubernetes
-      mount: ${module.secrets-operator-setup.vault_mount_path}
+      mount: ${module.secrets-operator-setup[0].vault_mount_path}
       kubernetes:
-        role: ${module.secrets-operator-setup.vault_auth_role_name}
-        tokenAudiences: [${module.secrets-operator-setup.vault_auth_audience}]
-        serviceAccount: ${module.secrets-operator-setup.vault_auth_service_account_name}
+        role: ${module.secrets-operator-setup[0].vault_auth_role_name}
+        tokenAudiences: [${module.secrets-operator-setup[0].vault_auth_audience}]
+        serviceAccount: ${module.secrets-operator-setup[0].vault_auth_service_account_name}
 
     defaultVaultConnection:
       enabled: true
