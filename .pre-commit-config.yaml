@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/IndicoDataSolutions/tf_cod
-    rev: dop-999
+    rev: dop-1968
     hooks:
       - id: terraform-variables
         args:

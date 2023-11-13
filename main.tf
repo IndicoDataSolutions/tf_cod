@@ -75,6 +75,7 @@ provider "github" {
 
 provider "random" {}
 
+
 provider "aws" {
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
@@ -392,6 +393,30 @@ provider "kubectl" {
   }
 }
 
+provider "aws" {
+  access_key = var.indico_devops_aws_access_key_id
+  secret_key = var.indico_devops_aws_secret_access_key
+  region     = var.indico_devops_aws_region
+  alias      = "aws-indico-devops"
+}
+
+data "aws_eks_cluster" "thanos" {
+  name     = var.thanos_cluster_name
+  provider = aws.aws-indico-devops
+}
+
+data "aws_eks_cluster_auth" "thanos" {
+  name     = var.thanos_cluster_name
+  provider = aws.aws-indico-devops
+}
+
+provider "kubectl" {
+  alias                  = "thanos-kubectl"
+  host                   = data.aws_eks_cluster.thanos.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.thanos.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.thanos.token
+  load_config_file       = false
+}
 
 provider "helm" {
   debug = true

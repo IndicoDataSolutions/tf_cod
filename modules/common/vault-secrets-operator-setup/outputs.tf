@@ -8,7 +8,7 @@ output "vault_auth_role_name" {
 }
 
 output "vault_auth_service_account_name" {
-  value = kubernetes_service_account_v1.vault-auth.metadata.0.name
+  value = kubernetes_service_account_v1.vault-auth-default.metadata.0.name
 }
 
 output "vault_auth_audience" {

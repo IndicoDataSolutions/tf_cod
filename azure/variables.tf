@@ -548,3 +548,63 @@ variable "local_registry_enabled" {
   default = false
 }
 
+variable "devops_tools_cluster_host" {
+  type    = string
+  default = "provided from the varset devops-tools-cluster"
+}
+
+variable "devops_tools_cluster_ca_certificate" {
+  type      = string
+  sensitive = true
+  default   = "provided from the varset devops-tools-cluster"
+}
+
+variable "thanos_grafana_admin_username" {
+  type    = string
+  default = "provided from the varset devops-tools-cluster"
+}
+
+variable "thanos_grafana_admin_password" {
+  type      = string
+  sensitive = true
+  default   = "provided from the varset thanos"
+}
+
+variable "thanos_cluster_ca_certificate" {
+  type      = string
+  sensitive = true
+  default   = "provided from the varset thanos"
+}
+
+variable "thanos_cluster_host" {
+  type    = string
+  default = "provided from the varset thanos"
+}
+
+variable "indico_devops_aws_access_key_id" {
+  type        = string
+  description = "The Indico-Devops account access key"
+  sensitive   = true
+}
+
+variable "indico_devops_aws_secret_access_key" {
+  type        = string
+  description = "The Indico-Devops account secret"
+  sensitive   = true
+}
+
+variable "indico_devops_aws_region" {
+  type        = string
+  description = "The Indico-Devops devops cluster region"
+}
+
+variable "thanos_cluster_name" {
+  type    = string
+  default = "thanos"
+}
+
+variable "thanos_enabled" {
+  type    = bool
+  default = true
+}
+
