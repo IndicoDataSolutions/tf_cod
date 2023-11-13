@@ -108,7 +108,7 @@ provider "azurerm" {
 }
 
 data "vault_kv_secret_v2" "terraform-snowflake" {
-  count = var.snowflake_enabled == true ? 1 : 0
+  count = var.enable_weather_station == true ? 1 : 0
   mount = var.terraform_vault_mount_path
   name  = "snowflake"
 }

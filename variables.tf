@@ -544,6 +544,7 @@ variable "snowflake_enabled" {
   type = bool
   default = true
 }
+
 variable "snowflake_region" {
   default     = "us-east-2.aws"
   type        = string
