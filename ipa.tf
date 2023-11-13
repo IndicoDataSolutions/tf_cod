@@ -1267,9 +1267,7 @@ resource "argocd_application" "ipa" {
 
 
 resource "github_repository_file" "custom-application-yaml" {
-  count = var.argo_enabled == true ? 1 : 0
-
-  for_each = var.applications
+  for_each = var.argo_enabled == true ? var.applications : {}
 
   repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
