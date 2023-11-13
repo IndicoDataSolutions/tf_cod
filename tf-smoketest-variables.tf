@@ -95,6 +95,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     use_acm = "${jsonencode(var.use_acm)}"
     enable_waf = "${jsonencode(var.enable_waf)}"
     terraform_vault_mount_path = "${jsonencode(var.terraform_vault_mount_path)}"
+    snowflake_enabled = "${jsonencode(var.snowflake_enabled)}"
     snowflake_region = "${jsonencode(var.snowflake_region)}"
     snowflake_username = "${jsonencode(var.snowflake_username)}"
     snowflake_account = "${jsonencode(var.snowflake_account)}"

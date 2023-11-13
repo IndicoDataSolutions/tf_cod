@@ -108,6 +108,7 @@ provider "azurerm" {
 }
 
 data "vault_kv_secret_v2" "terraform-snowflake" {
+  count = var.snowflake_enabled == true ? 1 : 0
   mount = var.terraform_vault_mount_path
   name  = "snowflake"
 }
@@ -117,7 +118,7 @@ provider "snowflake" {
   username    = var.snowflake_username
   account     = var.snowflake_account
   region      = var.snowflake_region
-  private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
+  private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake[0].data_json)["snowflake_private_key"]
 }
 
 provider "htpasswd" {}
