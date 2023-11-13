@@ -416,9 +416,9 @@ data "aws_eks_cluster_auth" "thanos" {
 
 provider "kubectl" {
   alias                  = "thanos-kubectl"
-  host                   = data.aws_eks_cluster.thanos[0].endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.thanos[0].certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.thanos[0].token
+  host                   = var.thanos_enabled == true ? data.aws_eks_cluster.thanos[0].endpoint : ""
+  cluster_ca_certificate = var.thanos_enabled == true ? base64decode(data.aws_eks_cluster.thanos[0].certificate_authority[0].data) : ""
+  token                  = var.thanos_enabled == true ? data.aws_eks_cluster_auth.thanos[0].token : ""
   load_config_file       = false
 }
 
