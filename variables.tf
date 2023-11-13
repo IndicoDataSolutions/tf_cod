@@ -742,17 +742,20 @@ variable "indico_devops_aws_access_key_id" {
   type        = string
   description = "The Indico-Devops account access key"
   sensitive   = true
+  default     = ""
 }
 
 variable "indico_devops_aws_secret_access_key" {
   type        = string
   description = "The Indico-Devops account secret"
   sensitive   = true
+  default     = ""
 }
 
 variable "indico_devops_aws_region" {
   type        = string
   description = "The Indico-Devops devops cluster region"
+  default     = ""
 }
 
 variable "thanos_enabled" {
