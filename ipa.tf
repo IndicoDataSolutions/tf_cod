@@ -301,7 +301,7 @@ module "secrets-operator-setup" {
   depends_on = [
     module.cluster
   ]
-  count = var.argo_enabled == true ? 1: 0
+  count           = var.argo_enabled == true ? 1 : 0
   source          = "./modules/common/vault-secrets-operator-setup"
   vault_address   = var.vault_address
   account         = var.aws_account
@@ -395,7 +395,7 @@ resource "helm_release" "ipa-crds" {
 EOF
     ,
     <<EOT
-${data.github_repository_file.data-crds-values.content}
+${data.github_repository_file.data-crds-values[0].content}
 EOT
   ]
 }
