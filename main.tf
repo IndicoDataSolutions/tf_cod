@@ -402,11 +402,13 @@ provider "aws" {
 }
 
 data "aws_eks_cluster" "thanos" {
+  count = var.thanos_enabled == true ? 1 : 0
   name     = var.thanos_cluster_name
   provider = aws.aws-indico-devops
 }
 
 data "aws_eks_cluster_auth" "thanos" {
+   count = var.thanos_enabled == true ? 1 : 0
   name     = var.thanos_cluster_name
   provider = aws.aws-indico-devops
 }
@@ -414,8 +416,8 @@ data "aws_eks_cluster_auth" "thanos" {
 provider "kubectl" {
   alias                  = "thanos-kubectl"
   host                   = data.aws_eks_cluster.thanos.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.thanos.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.thanos.token
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.thanos[0].certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.thanos[0].token
   load_config_file       = false
 }
 
