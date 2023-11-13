@@ -2,6 +2,7 @@
 # Include modules only installed on AWS here.
 #
 module "keycloak" {
+  count = var.keycloak_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
     helm_release.ipa-pre-requisites

@@ -778,3 +778,9 @@ variable "thanos_enabled" {
   default = true
 }
 
+variable "keycloak_enabled" {
+  type = bool
+
+  default = true
+}
+

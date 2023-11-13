@@ -131,6 +131,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     thanos_cluster_name = "${jsonencode(var.thanos_cluster_name)}"
     indico_devops_aws_region = "${jsonencode(var.indico_devops_aws_region)}"
     thanos_enabled = "${jsonencode(var.thanos_enabled)}"
+    keycloak_enabled = "${jsonencode(var.keycloak_enabled)}"
 
     }
   }
