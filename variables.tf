@@ -210,16 +210,20 @@ variable "enable_readapi" {
   default = true
 }
 variable "azure_indico_io_client_id" {
-  type = string
+  type    = string
+  default = ""
 }
 variable "azure_indico_io_client_secret" {
-  type = string
+  type    = string
+  default = ""
 }
 variable "azure_indico_io_subscription_id" {
-  type = string
+  type    = string
+  default = ""
 }
 variable "azure_indico_io_tenant_id" {
-  type = string
+  type    = string
+  default = ""
 }
 
 # IAM
