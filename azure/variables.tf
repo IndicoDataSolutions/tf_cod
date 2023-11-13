@@ -603,3 +603,8 @@ variable "thanos_cluster_name" {
   default = "thanos"
 }
 
+variable "thanos_enabled" {
+  type    = bool
+  default = true
+}
+

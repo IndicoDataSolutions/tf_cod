@@ -151,10 +151,10 @@ kube-prometheus-stack:
 
   prometheus:
     thanosServiceMonitor:
-      enabled: true
+      enabled: ${var.thanos_enabled}
 
     thanosService:
-      enabled: true
+      enabled: ${var.thanos_enabled}
     
     prometheusSpec:
       disableCompaction: true
@@ -183,6 +183,7 @@ EOF
 }
 
 resource "kubectl_manifest" "thanos-datasource-credentials" {
+  count     = var.thanos_enabled ? 1 : 0
   provider  = kubectl.thanos-kubectl
   yaml_body = <<YAML
 apiVersion: v1
@@ -197,6 +198,7 @@ type: Opaque
 }
 
 resource "kubectl_manifest" "thanos-datasource" {
+  count      = var.thanos_enabled ? 1 : 0
   depends_on = [kubectl_manifest.thanos-datasource-credentials]
   provider   = kubectl.thanos-kubectl
   yaml_body  = <<YAML

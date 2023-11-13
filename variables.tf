@@ -723,4 +723,8 @@ variable "indico_devops_aws_region" {
   description = "The Indico-Devops devops cluster region"
 }
 
+variable "thanos_enabled" {
+  type = bool
+  default = true
+}
 
