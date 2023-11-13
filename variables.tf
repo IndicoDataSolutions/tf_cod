@@ -64,12 +64,14 @@ variable "indico_aws_access_key_id" {
   type        = string
   description = "The AWS access key for controlling dns in an alternate account"
   sensitive   = true
+  default     = ""
 }
 
 variable "indico_aws_secret_access_key" {
   type        = string
   description = "The AWS secret key for controlling dns in an alternate account"
   sensitive   = true
+  default     = ""
 }
 
 variable "direct_connect" {
