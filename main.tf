@@ -357,7 +357,7 @@ module "snowflake" {
   snowflake_db_name     = var.snowflake_db_name
   kms_key_arn           = module.kms_key.key_arn
   s3_bucket_name        = module.s3-storage.data_s3_bucket_name
-  snowflake_private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
+  snowflake_private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake[0].data_json)["snowflake_private_key"]
   snowflake_account     = var.snowflake_account
   snowflake_username    = var.snowflake_username
   region                = var.region
