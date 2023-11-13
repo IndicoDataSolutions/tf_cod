@@ -313,6 +313,7 @@ variable "argo_repo" {
 
 variable "argo_branch" {
   description = "Branch to use on argo_repo"
+  default     = ""
 }
 
 variable "argo_namespace" {
