@@ -94,6 +94,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     enable_k8s_dashboard = "${jsonencode(var.enable_k8s_dashboard)}"
     use_acm = "${jsonencode(var.use_acm)}"
     enable_waf = "${jsonencode(var.enable_waf)}"
+    vault_mount_path = "${jsonencode(var.vault_mount_path)}"
     terraform_vault_mount_path = "${jsonencode(var.terraform_vault_mount_path)}"
     snowflake_enabled = "${jsonencode(var.snowflake_enabled)}"
     snowflake_region = "${jsonencode(var.snowflake_region)}"

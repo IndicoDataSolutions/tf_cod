@@ -534,6 +534,10 @@ variable "enable_waf" {
   description = "enables aws alb controller for app-edge, also creates waf rules."
 }
 
+variable "vault_mount_path" {
+  type    = string
+  default = "terraform"
+}
 
 variable "terraform_vault_mount_path" {
   type    = string
@@ -541,7 +545,7 @@ variable "terraform_vault_mount_path" {
 }
 
 variable "snowflake_enabled" {
-  type = bool
+  type    = bool
   default = true
 }
 
