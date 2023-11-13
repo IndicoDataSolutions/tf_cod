@@ -402,13 +402,13 @@ provider "aws" {
 }
 
 data "aws_eks_cluster" "thanos" {
-  count = var.thanos_enabled == true ? 1 : 0
+  count    = var.thanos_enabled == true ? 1 : 0
   name     = var.thanos_cluster_name
   provider = aws.aws-indico-devops
 }
 
 data "aws_eks_cluster_auth" "thanos" {
-   count = var.thanos_enabled == true ? 1 : 0
+  count    = var.thanos_enabled == true ? 1 : 0
   name     = var.thanos_cluster_name
   provider = aws.aws-indico-devops
 }
