@@ -1,5 +1,6 @@
 resource "kubernetes_config_map" "terraform-variables" {
 # this file is generated via pre-commit, DO NOT EDIT !
+
   depends_on = [null_resource.sleep-5-minutes-wait-for-charts-smoketest-build]
   metadata {
     name = "terraform-variables"
@@ -92,6 +93,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     k8s_dashboard_chart_version = "${jsonencode(var.k8s_dashboard_chart_version)}"
     enable_k8s_dashboard = "${jsonencode(var.enable_k8s_dashboard)}"
     use_acm = "${jsonencode(var.use_acm)}"
+    enable_waf = "${jsonencode(var.enable_waf)}"
     terraform_vault_mount_path = "${jsonencode(var.terraform_vault_mount_path)}"
     snowflake_region = "${jsonencode(var.snowflake_region)}"
     snowflake_username = "${jsonencode(var.snowflake_username)}"
