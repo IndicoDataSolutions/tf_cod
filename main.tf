@@ -119,7 +119,7 @@ provider "snowflake" {
   username    = var.snowflake_username
   account     = var.snowflake_account
   region      = var.snowflake_region
-  private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake[0].data_json)["snowflake_private_key"]
+  private_key = var.enable_weather_station == true ? jsondecode(data.vault_kv_secret_v2.terraform-snowflake[0].data_json)["snowflake_private_key"] : ""
 }
 
 provider "htpasswd" {}
