@@ -305,6 +305,7 @@ variable "argo_username" {
 
 variable "argo_password" {
   sensitive = true
+  default   = "not used"
 }
 
 variable "argo_repo" {
