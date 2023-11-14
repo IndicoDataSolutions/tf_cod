@@ -310,7 +310,7 @@ module "secrets-operator-setup" {
   kubernetes_host = module.cluster.kubernetes_host
 }
 
-resource "helm_release" "ipa-crds" {
+resource "helm_release" "ipa-vso" {
   count = var.thanos_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
