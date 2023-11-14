@@ -311,8 +311,6 @@ module "secrets-operator-setup" {
 }
 
 resource "helm_release" "ipa-crds" {
-  count = var.argo_enabled == true ? 1 : 0
-
   depends_on = [
     module.cluster,
     data.github_repository_file.data-crds-values,
