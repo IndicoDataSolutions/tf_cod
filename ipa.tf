@@ -379,7 +379,7 @@ resource "helm_release" "ipa-crds" {
         serviceAccount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
 
     defaultVaultConnection:
-      enabled: ${var.argo_enabled}
+      enabled: ${var.argo_enabled == true && var.thanos_enabled}
       address: ${var.vault_address}
       skipTLSVerify: false
       spec:
