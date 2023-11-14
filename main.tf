@@ -54,8 +54,8 @@ terraform {
 provider "time" {}
 
 provider "keycloak" {
-  client_id     = "terraform-master"
-  url           = "https://keycloak.devops.indico.io"
+  #client_id     = "terraform-master"
+  #url           = "https://keycloak.devops.indico.io"
   initial_login = var.keycloak_enabled
 }
 
