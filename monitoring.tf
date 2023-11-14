@@ -239,10 +239,8 @@ authentication:
   ingressPassword: ${random_password.monitoring-password.result}
 
 ${local.alerting_configuration_values}
-
 kube-prometheus-stack:
 ${local.kube_prometheus_stack_values}
-
 EOF
   ]
 }
