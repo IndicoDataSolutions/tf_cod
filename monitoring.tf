@@ -8,7 +8,7 @@ locals {
             key: thanos_storage.yaml
   EOT
     ) : (<<EOT
-      thanos:{}
+      thanos: {}
   EOT
   )
 
@@ -60,7 +60,7 @@ EOT
       enabled:  ${var.thanos_enabled}
 
     prometheusSpec:
-      disableCompaction: true
+      disableCompaction: ${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
