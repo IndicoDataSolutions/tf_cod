@@ -373,10 +373,10 @@ resource "helm_release" "ipa-crds" {
       enabled: ${var.argo_enabled}
       namespace: default
       method: kubernetes
-      mount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : ""}
+      mount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
       kubernetes:
         role: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
-        tokenAudiences: ${var.argo_enabled == true ? [module.secrets-operator-setup[0].vault_auth_audience] : ["vault"]}
+        tokenAudiences: ["vault"]
         serviceAccount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
 
     defaultVaultConnection:
