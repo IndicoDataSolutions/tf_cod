@@ -57,7 +57,7 @@ provider "keycloak" {
   client_secret = "none"
   client_id     = "terraform-master"
   url           = "https://keycloak.devops.indico.io"
-  initial_login = false
+  initial_login = var.keycloak_enabled
 }
 
 provider "vault" {
