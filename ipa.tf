@@ -409,50 +409,6 @@ resource "helm_release" "ipa-crds" {
         kubernetes.io/os: linux
     enabled: true
     installCRDs: true
-
-  vault-secrets-operator:
-    enabled: ${var.thanos_enabled}
-    controller: 
-      manager:
-        resources:
-          limits:
-            cpu: 500m
-            memory: 512Mi
-          requests:
-            cpu: 10m
-            memory: 64Mi
-
-    controller: 
-      manager:
-        resources:
-          limits:
-            cpu: 500m
-            memory: 512Mi
-          requests:
-            cpu: 10m
-            memory: 64Mi
-
-    defaultAuthMethod:
-      enabled: ${var.argo_enabled}
-      namespace: default
-      method: kubernetes
-      mount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
-      kubernetes:
-        role: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
-        tokenAudiences: ["vault"]
-        serviceAccount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
-
-    defaultVaultConnection:
-      enabled: ${var.argo_enabled == true && var.thanos_enabled}
-      address: ${var.vault_address}
-      skipTLSVerify: false
-      spec:
-      template:
-        spec:
-          containers:
-          - name: manager
-            args:
-            - "--client-cache-persistence-model=direct-encrypted"
 EOF
     ,
     <<EOT
