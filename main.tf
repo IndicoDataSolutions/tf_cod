@@ -116,12 +116,11 @@ data "vault_kv_secret_v2" "terraform-snowflake" {
 }
 
 provider "snowflake" {
-  validate_default_parameters = false
-  role                        = "ACCOUNTADMIN"
-  username                    = var.snowflake_username
-  account                     = var.snowflake_account
-  region                      = var.snowflake_region
-  private_key                 = var.enable_weather_station == true ? jsondecode(data.vault_kv_secret_v2.terraform-snowflake[0].data_json)["snowflake_private_key"] : var.snowflake_private_key
+  role        = "ACCOUNTADMIN"
+  username    = var.snowflake_username
+  account     = var.snowflake_account
+  region      = var.snowflake_region
+  private_key = var.enable_weather_station == true ? jsondecode(data.vault_kv_secret_v2.terraform-snowflake[0].data_json)["snowflake_private_key"] : var.snowflake_private_key
 }
 
 provider "htpasswd" {}
