@@ -347,8 +347,7 @@ resource "helm_release" "ipa-crds" {
     installCRDs: true
 
   vault-secrets-operator:
-    enabled: true
-    
+    enabled: ${var.argo_enabled}
     controller: 
       manager:
         resources:
