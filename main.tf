@@ -54,7 +54,6 @@ terraform {
 provider "time" {}
 
 provider "keycloak" {
-  client_secret = "none"
   client_id     = "terraform-master"
   url           = "https://keycloak.devops.indico.io"
   initial_login = var.keycloak_enabled
@@ -438,7 +437,7 @@ provider "helm" {
 
 module "argo-registration" {
   count = var.argo_enabled == true ? 1 : 0
-  
+
   depends_on = [
     module.cluster
   ]
