@@ -7,7 +7,7 @@ locals {
             name: thanos-storage
             key: thanos_storage.yaml
   EOT
-  ) : (<< EOT
+    ) : (<<EOT
       thanos:{}
   EOT
   )
@@ -144,7 +144,7 @@ EOT
 
 resource "aws_route53_record" "grafana-caa" {
   count   = var.monitoring_enabled == true ? 1 : 0
-  zone_id =  data.aws_route53_zone.primary.zone_id
+  zone_id = data.aws_route53_zone.primary.zone_id
   name    = lower("grafana.${local.dns_name}")
   type    = "CAA"
   ttl     = 300
