@@ -55,8 +55,9 @@ provider "time" {}
 
 provider "keycloak" {
   client_secret = "none"
-  client_id = "terraform-master"
-  url       = "https://keycloak.devops.indico.io"
+  client_id     = "terraform-master"
+  url           = "https://keycloak.devops.indico.io"
+  initial_login = false
 }
 
 provider "vault" {
