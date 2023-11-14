@@ -132,6 +132,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     indico_devops_aws_region = "${jsonencode(var.indico_devops_aws_region)}"
     thanos_enabled = "${jsonencode(var.thanos_enabled)}"
     keycloak_enabled = "${jsonencode(var.keycloak_enabled)}"
+    terraform_smoketests_enabled = "${jsonencode(var.terraform_smoketests_enabled)}"
 
     }
   }

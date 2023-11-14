@@ -779,7 +779,13 @@ variable "thanos_enabled" {
 }
 
 variable "keycloak_enabled" {
-  type = bool
+  type    = bool
   default = true
 }
+
+variable "terraform_smoketests_enabled" {
+  type    = bool
+  default = true
+}
+
 
