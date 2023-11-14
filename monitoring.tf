@@ -1,4 +1,17 @@
 locals {
+  thanos_config = var.thanos_enabled == true ? (<<EOT
+      thanos: # this is the one being used
+        blockSize: 5m
+        objectStorageConfig:
+          existingSecret:
+            name: thanos-storage
+            key: thanos_storage.yaml
+  EOT
+  ) : (<< EOT
+      thanos:{}
+  EOT
+  )
+
   alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
 noExtraConfigs: true
   EOT
@@ -53,13 +66,7 @@ EOT
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
-      thanos: 
-        blockSize: 5m
-        objectStorageConfig:
-          existingSecret:
-            name: thanos-storage
-            key: thanos_storage.yaml
-
+${local.thanos_config}
       nodeSelector:
         node_group: static-workers
     ingress:
@@ -115,12 +122,7 @@ EOT
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
-      thanos: # this is the one being used
-        blockSize: 5m
-        objectStorageConfig:
-          existingSecret:
-            name: thanos-storage
-            key: thanos_storage.yaml
+${local.thanos_config}
       nodeSelector:
         node_group: static-workers
     ingress:
