@@ -393,7 +393,7 @@ resource "helm_release" "ipa-crds" {
 EOF
     ,
     <<EOT
-${data.github_repository_file.data-crds-values[0].content}
+${var.argo_enabled == true ? data.github_repository_file.data-crds-values[0].content : ""}
 EOT
   ]
 }
