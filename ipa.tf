@@ -736,6 +736,8 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
 }
 
 resource "helm_release" "terraform-smoketests" {
+  count = var.ipa_smoketest_enabled == true ? 1 : 0
+
   depends_on = [
     null_resource.wait-for-tf-cod-chart-build,
     #null_resource.sleep-5-minutes-wait-for-charts-smoketest-build,
