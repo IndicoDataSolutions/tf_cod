@@ -110,7 +110,6 @@ provider "azurerm" {
 }
 
 data "vault_kv_secret_v2" "terraform-snowflake" {
-  count = var.enable_weather_station == true ? 1 : 0
   mount = var.terraform_vault_mount_path
   name  = "snowflake"
 }
@@ -120,7 +119,7 @@ provider "snowflake" {
   username    = var.snowflake_username
   account     = var.snowflake_account
   region      = var.snowflake_region
-  private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake[0].data_json)["snowflake_private_key"]
+  private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
 }
 
 provider "htpasswd" {}
@@ -359,7 +358,7 @@ module "snowflake" {
   snowflake_db_name     = var.snowflake_db_name
   kms_key_arn           = module.kms_key.key_arn
   s3_bucket_name        = module.s3-storage.data_s3_bucket_name
-  snowflake_private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake[0].data_json)["snowflake_private_key"]
+  snowflake_private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
   snowflake_account     = var.snowflake_account
   snowflake_username    = var.snowflake_username
   region                = var.region
