@@ -54,8 +54,7 @@ terraform {
 provider "time" {}
 
 provider "keycloak" {
-  client_id = "terraform-master"
-  url       = "https://keycloak.devops.indico.io"
+  initial_login = false
 }
 
 provider "vault" {
@@ -466,7 +465,7 @@ locals {
 
 
 data "aws_route53_zone" "primary" {
-  name  = var.is_alternate_account_domain == "false" ? lower("${var.aws_account}.indico.io") : lower(local.alternate_domain_root)
+  name     = var.is_alternate_account_domain == "false" ? lower("${var.aws_account}.indico.io") : lower(local.alternate_domain_root)
   provider = aws.dns-control
 }
 
