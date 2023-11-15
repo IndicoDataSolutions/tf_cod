@@ -418,20 +418,22 @@ provider "aws" {
 }
 
 data "aws_eks_cluster" "thanos" {
+  count    = var.thanos_enabled == true ? 1 : 0
   name     = var.thanos_cluster_name
   provider = aws.aws-indico-devops
 }
 
 data "aws_eks_cluster_auth" "thanos" {
+  count    = var.thanos_enabled == true ? 1 : 0
   name     = var.thanos_cluster_name
   provider = aws.aws-indico-devops
 }
 
 provider "kubectl" {
   alias                  = "thanos-kubectl"
-  host                   = data.aws_eks_cluster.thanos.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.thanos.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.thanos.token
+  host                   = var.thanos_enabled == true ? data.aws_eks_cluster.thanos[0].endpoint : ""
+  cluster_ca_certificate = var.thanos_enabled == true ? base64decode(data.aws_eks_cluster.thanos[0].certificate_authority[0].data) : ""
+  token                  = var.thanos_enabled == true ? data.aws_eks_cluster_auth.thanos[0].token : ""
   load_config_file       = false
 }
 
@@ -450,6 +452,8 @@ provider "helm" {
 }
 
 module "argo-registration" {
+  count = var.argo_enabled == true ? 1 : 0
+
   depends_on = [
     module.cluster
   ]
@@ -458,6 +462,7 @@ module "argo-registration" {
     kubernetes = kubernetes,
     argocd     = argocd
   }
+
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
   version                      = "1.1.16"
   cluster_name                 = var.label
@@ -477,13 +482,13 @@ module "argo-registration" {
 locals {
   security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
   cluster_name      = var.label
-  dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${var.aws_account}.indico.io") : var.domain_host
+  dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${var.aws_account}.${var.domain_suffix}") : var.domain_host
   #dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
 }
 
 
 data "aws_route53_zone" "primary" {
-  name     = var.is_alternate_account_domain == "false" ? lower("${var.aws_account}.indico.io") : lower(local.alternate_domain_root)
+  name     = var.is_alternate_account_domain == "false" ? lower("${var.aws_account}.${var.domain_suffix}") : lower(local.alternate_domain_root)
   provider = aws.dns-control
 }
 

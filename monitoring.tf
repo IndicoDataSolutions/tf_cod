@@ -1,4 +1,17 @@
 locals {
+  thanos_config = var.thanos_enabled == true ? (<<EOT
+      thanos: # this is the one being used
+        blockSize: 5m
+        objectStorageConfig:
+          existingSecret:
+            name: thanos-storage
+            key: thanos_storage.yaml
+  EOT
+    ) : (<<EOT
+      thanos: {}
+  EOT
+  )
+
   alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
 noExtraConfigs: true
   EOT
@@ -40,6 +53,9 @@ EOT
           hosts:
             - alertmanager-${local.dns_name}
   prometheus:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
     thanosServiceMonitor:
       enabled: ${var.thanos_enabled}
 
@@ -47,19 +63,13 @@ EOT
       enabled:  ${var.thanos_enabled}
 
     prometheusSpec:
-      disableCompaction: true
+      disableCompaction: ${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
-      thanos: 
-        blockSize: 5m
-        objectStorageConfig:
-          existingSecret:
-            name: thanos-storage
-            key: thanos_storage.yaml
-
+${local.thanos_config}
       nodeSelector:
         node_group: static-workers
     ingress:
@@ -102,6 +112,9 @@ EOT
         acme.cert-manager.io/dns01-solver: "true"
 
   prometheus:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
     thanosServiceMonitor:
       enabled: ${var.thanos_enabled}
 
@@ -109,18 +122,13 @@ EOT
       enabled: ${var.thanos_enabled}
     
     prometheusSpec:
-      disableCompaction: true
+      disableCompaction: ${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
-      thanos: # this is the one being used
-        blockSize: 5m
-        objectStorageConfig:
-          existingSecret:
-            name: thanos-storage
-            key: thanos_storage.yaml
+${local.thanos_config}
       nodeSelector:
         node_group: static-workers
     ingress:
@@ -237,10 +245,8 @@ authentication:
   ingressPassword: ${random_password.monitoring-password.result}
 
 ${local.alerting_configuration_values}
-
 kube-prometheus-stack:
 ${local.kube_prometheus_stack_values}
-
 EOF
   ]
 }
