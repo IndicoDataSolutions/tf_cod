@@ -417,6 +417,7 @@ EOT
   ]
 }
 
+
 resource "time_sleep" "wait_1_minutes_after_crds" {
   depends_on = [helm_release.ipa-crds]
 

@@ -15,6 +15,12 @@ variable "label" {
   description = "The unique string to be prepended to resources names"
 }
 
+variable "environment" {
+  type        = string
+  default     = "development"
+  description = "The environment of the cluster, determines which account readapi to use, options production/development"
+}
+
 variable "message" {
   type        = string
   default     = "Managed by Terraform"
@@ -211,6 +217,25 @@ variable "enable_readapi" {
   type    = bool
   default = true
 }
+variable "azure_readapi_client_id" {
+  type    = string
+  default = ""
+}
+variable "azure_readapi_client_secret" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+variable "azure_readapi_subscription_id" {
+  type    = string
+  default = ""
+}
+variable "azure_readapi_tenant_id" {
+  type    = string
+  default = ""
+}
+
+# Old provider configuration to remove orphaned readapi resources
 variable "azure_indico_io_client_id" {
   type    = string
   default = ""
