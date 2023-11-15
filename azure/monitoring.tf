@@ -163,6 +163,9 @@ kube-prometheus-stack:
     enabled: false
 
   prometheus:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
     thanosServiceMonitor:
       enabled: ${var.thanos_enabled}
 

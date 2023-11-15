@@ -60,6 +60,8 @@ EOT
       enabled:  ${var.thanos_enabled}
 
     prometheusSpec:
+      annotations:
+        reloader.stakater.com/auto: "true"
       disableCompaction: ${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.aws_account}
@@ -116,7 +118,9 @@ ${local.thanos_config}
       enabled: ${var.thanos_enabled}
     
     prometheusSpec:
-      disableCompaction: true
+      annotations:
+        reloader.stakater.com/auto: "true"
+      disableCompaction: ${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
