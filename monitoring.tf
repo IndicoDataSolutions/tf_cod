@@ -53,6 +53,9 @@ EOT
           hosts:
             - alertmanager-${local.dns_name}
   prometheus:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
     thanosServiceMonitor:
       enabled: ${var.thanos_enabled}
 
@@ -60,8 +63,6 @@ EOT
       enabled:  ${var.thanos_enabled}
 
     prometheusSpec:
-      annotations:
-        reloader.stakater.com/auto: "true"
       disableCompaction: ${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.aws_account}
@@ -111,6 +112,9 @@ ${local.thanos_config}
         acme.cert-manager.io/dns01-solver: "true"
 
   prometheus:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
     thanosServiceMonitor:
       enabled: ${var.thanos_enabled}
 
@@ -118,8 +122,6 @@ ${local.thanos_config}
       enabled: ${var.thanos_enabled}
     
     prometheusSpec:
-      annotations:
-        reloader.stakater.com/auto: "true"
       disableCompaction: ${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.aws_account}
