@@ -22,6 +22,15 @@
         "clean",
         "os3"
       ]
-    }
+    },
+    {
+      "name": "Python: Argo migration",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceRoot}/transition_to_count_argo_registration.py",
+      "args": ["Indico-Dev-us-east-2-dev-ci"],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
   ]
 }
