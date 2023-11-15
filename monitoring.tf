@@ -56,9 +56,8 @@ EOT
       thanos: 
         blockSize: 5m
         objectStorageConfig:
-          existingSecret:
-            name: thanos-storage
-            key: thanos_storage.yaml
+          name: thanos-storage
+          key: thanos_storage.yaml
 
       nodeSelector:
         node_group: static-workers
@@ -118,9 +117,8 @@ EOT
       thanos: # this is the one being used
         blockSize: 5m
         objectStorageConfig:
-          existingSecret:
-            name: thanos-storage
-            key: thanos_storage.yaml
+          name: thanos-storage
+          key: thanos_storage.yaml
       nodeSelector:
         node_group: static-workers
     ingress:
@@ -142,7 +140,7 @@ EOT
 
 resource "aws_route53_record" "grafana-caa" {
   count   = var.monitoring_enabled == true ? 1 : 0
-  zone_id =  data.aws_route53_zone.primary.zone_id
+  zone_id = data.aws_route53_zone.primary.zone_id
   name    = lower("grafana.${local.dns_name}")
   type    = "CAA"
   ttl     = 300
