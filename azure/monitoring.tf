@@ -166,8 +166,9 @@ kube-prometheus-stack:
       thanos: 
         blockSize: 5m
         objectStorageConfig:
-          name: thanos-storage
-          key: thanos_storage.yaml
+          existingSecret:
+            name: thanos-storage
+            key: thanos_storage.yaml
       nodeSelector:
         node_group: static-workers
       storageSpec:
