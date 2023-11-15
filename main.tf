@@ -99,6 +99,15 @@ provider "aws" {
 
 provider "azurerm" {
   features {}
+  alias           = "readapi"
+  client_id       = var.azure_readapi_client_id
+  client_secret   = var.azure_readapi_client_secret
+  subscription_id = var.azure_readapi_subscription_id
+  tenant_id       = var.azure_readapi_tenant_id
+}
+
+provider "azurerm" {
+  features {}
   alias           = "indicoio"
   client_id       = var.azure_indico_io_client_id
   client_secret   = var.azure_indico_io_client_secret
@@ -314,35 +323,44 @@ module "cluster" {
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
 }
 
-module "readapi" {
+module "readapi_queue" {
   count = var.enable_readapi ? 1 : 0
   providers = {
-    azurerm = azurerm.indicoio
+    azurerm = azurerm.readapi
   }
-  source          = "app.terraform.io/indico/indico-azure-readapi/mod"
-  version         = "2.1.2"
-  readapi_name    = lower("${var.aws_account}-${var.label}")
-  client_id       = var.azure_indico_io_client_id
-  client_secret   = var.azure_indico_io_client_secret
-  subscription_id = var.azure_indico_io_subscription_id
-  tenant_id       = var.azure_indico_io_tenant_id
+  source       = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
+  version      = "1.0.0"
+  readapi_name = lower("${var.aws_account}-${var.label}")
+}
+
+locals {
+  readapi_secret_path = var.environment == "production" ? "prod-readapi" : "dev-readapi"
+}
+
+data "vault_kv_secret_v2" "readapi_secret" {
+  mount = "customer-${var.aws_account}"
+  name  = local.readapi_secret_path
 }
 
 resource "kubernetes_secret" "readapi" {
   count      = var.enable_readapi ? 1 : 0
-  depends_on = [module.cluster, module.readapi]
+  depends_on = [module.cluster]
   metadata {
-    name = "readapi-queue-auth"
+    name = "readapi-secret"
   }
 
   data = {
-    endpoint                   = module.readapi[0].endpoint
-    access_key                 = module.readapi[0].access_key
-    storage_account_name       = module.readapi[0].storage_account_name
-    storage_account_id         = module.readapi[0].storage_account_id
-    storage_account_access_key = module.readapi[0].storage_account_access_key
-    storage_queue_name         = module.readapi[0].storage_queue_name
-    storage_connection_string  = module.readapi[0].storage_connection_string
+    billing                       = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_url"]
+    apikey                        = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
+    READAPI_COMPUTER_VISION_HOST  = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_url"]
+    READAPI_COMPUTER_VISION_KEY   = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
+    READAPI_FORM_RECOGNITION_HOST = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_url"]
+    READAPI_FORM_RECOGNITION_KEY  = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_key"]
+    storage_account_name          = module.readapi_queue[0].storage_account_name
+    storage_account_id            = module.readapi_queue[0].storage_account_id
+    storage_account_access_key    = module.readapi_queue[0].storage_account_access_key
+    storage_queue_name            = module.readapi_queue[0].storage_queue_name
+    QUEUE_CONNECTION_STRING       = module.readapi_queue[0].storage_connection_string
   }
 }
 
