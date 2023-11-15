@@ -1,11 +1,11 @@
 resource "kubernetes_config_map" "terraform-variables" {
-# this file is generated via pre-commit, DO NOT EDIT !
-  depends_on = [null_resource.sleep-5-minutes-wait-for-charts-smoketest-build]
-  metadata {
-    name = "terraform-variables"
-  }
-  data = {
-    is_azure = "${jsonencode(var.is_azure)}"
+  # this file is generated via pre-commit, DO NOT EDIT !
+    depends_on = [null_resource.sleep-5-minutes-wait-for-charts-smoketest-build]
+    metadata {
+      name = "terraform-variables"
+    }
+    data = {
+      is_azure = "${jsonencode(var.is_azure)}"
     is_aws = "${jsonencode(var.is_aws)}"
     label = "${jsonencode(var.label)}"
     environment = "${jsonencode(var.environment)}"
@@ -40,7 +40,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     azure_readapi_subscription_id = "${jsonencode(var.azure_readapi_subscription_id)}"
     azure_readapi_tenant_id = "${jsonencode(var.azure_readapi_tenant_id)}"
     azure_indico_io_client_id = "${jsonencode(var.azure_indico_io_client_id)}"
-    azure_indico_io_client_secret = "${jsonencode(var.azure_indico_io_client_secret)}"
     azure_indico_io_subscription_id = "${jsonencode(var.azure_indico_io_subscription_id)}"
     azure_indico_io_tenant_id = "${jsonencode(var.azure_indico_io_tenant_id)}"
     eks_cluster_iam_role = "${jsonencode(var.eks_cluster_iam_role)}"
@@ -125,5 +124,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     local_registry_enabled = "${jsonencode(var.local_registry_enabled)}"
     local_registry_harbor_robot_account_name = "${jsonencode(var.local_registry_harbor_robot_account_name)}"
 
+    }
   }
-}
+  

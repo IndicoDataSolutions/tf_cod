@@ -401,17 +401,21 @@ variable "enable_readapi" {
   default = true
 }
 variable "azure_readapi_client_id" {
-  type = string
+  type    = string
+  default = ""
 }
 variable "azure_readapi_client_secret" {
   type      = string
   sensitive = true
+  default   = ""
 }
 variable "azure_readapi_subscription_id" {
-  type = string
+  type    = string
+  default = ""
 }
 variable "azure_readapi_tenant_id" {
   type = string
+  default = ""
 }
 
 # Old provider configuration to remove orphaned readapi resources
@@ -420,6 +424,7 @@ variable "azure_indico_io_client_id" {
 }
 variable "azure_indico_io_client_secret" {
   type = string
+  sensitive = true
 }
 variable "azure_indico_io_subscription_id" {
   type = string
