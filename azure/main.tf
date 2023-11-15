@@ -292,7 +292,7 @@ module "readapi_queue" {
   }
   source       = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
   version      = "1.0.0"
-  readapi_name = lower("${var.account}-${var.label}")
+  readapi_name = lower("${var.account}-${var.label}-s")
 }
 
 locals {
