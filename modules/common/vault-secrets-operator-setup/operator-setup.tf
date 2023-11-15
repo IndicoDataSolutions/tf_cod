@@ -1,5 +1,5 @@
 
-resource "kubernetes_service_account_v1" "vault-auth" {
+resource "kubernetes_service_account_v1" "vault-auth-default" {
   metadata {
     name      = "vault-auth"
     namespace = "default"
@@ -24,21 +24,23 @@ resource "kubernetes_cluster_role_binding" "vault-auth" {
   }
   subject {
     kind      = "ServiceAccount"
-    name      = kubernetes_service_account_v1.vault-auth.metadata.0.name
-    namespace = "default"
+    name      = kubernetes_service_account_v1.vault-auth-default.metadata.0.name
+    namespace = kubernetes_service_account_v1.vault-auth-default.metadata.0.namespace
   }
 }
 
-resource "kubernetes_secret_v1" "vault-auth" {
+resource "kubernetes_secret_v1" "vault-auth-default" {
+  depends_on = [kubernetes_service_account_v1.vault-auth-default]
   metadata {
     name      = "vault-auth"
     namespace = "default"
     annotations = {
-      "kubernetes.io/service-account.name" = kubernetes_service_account_v1.vault-auth.metadata.0.name
+      "kubernetes.io/service-account.name" = kubernetes_service_account_v1.vault-auth-default.metadata.0.name
     }
   }
   type = "kubernetes.io/service-account-token"
 }
+
 
 resource "vault_auth_backend" "kubernetes" {
   type = "kubernetes"
@@ -51,8 +53,8 @@ resource "vault_kubernetes_auth_backend_config" "vault-auth" {
   disable_local_ca_jwt   = true
   backend                = vault_auth_backend.kubernetes.path
   kubernetes_host        = var.kubernetes_host
-  token_reviewer_jwt     = kubernetes_secret_v1.vault-auth.data["token"]
-  kubernetes_ca_cert     = kubernetes_secret_v1.vault-auth.data["ca.crt"]
+  token_reviewer_jwt     = kubernetes_secret_v1.vault-auth-default.data["token"]
+  kubernetes_ca_cert     = kubernetes_secret_v1.vault-auth-default.data["ca.crt"]
 }
 
 resource "vault_policy" "vault-auth-policy" {
@@ -62,7 +64,8 @@ resource "vault_policy" "vault-auth-policy" {
 path "indico-common/*" {
   capabilities = ["read", "list"]
 }
-path "customer/Indico-Devops/thanos-s3-sa" {
+
+path "customer-Indico-Devops/data/thanos-storage" {
   capabilities = ["read", "list"]
 }
 path "customer-${var.account}/*" {
@@ -75,7 +78,7 @@ EOT
 resource "vault_kubernetes_auth_backend_role" "vault-auth-role" {
   backend                          = vault_auth_backend.kubernetes.path
   role_name                        = "vault-auth-role"
-  bound_service_account_names      = [kubernetes_service_account_v1.vault-auth.metadata.0.name]
+  bound_service_account_names      = [kubernetes_service_account_v1.vault-auth-default.metadata.0.name]
   bound_service_account_namespaces = ["default"]
   token_ttl                        = 3600
   token_policies                   = [vault_policy.vault-auth-policy.name]

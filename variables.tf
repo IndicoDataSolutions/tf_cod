@@ -66,6 +66,18 @@ variable "aws_secret_key" {
   sensitive   = true
 }
 
+variable "indico_aws_access_key_id" {
+  type        = string
+  description = "The AWS access key for controlling dns in an alternate account"
+  sensitive   = true
+}
+
+variable "indico_aws_secret_access_key" {
+  type        = string
+  description = "The AWS secret key for controlling dns in an alternate account"
+  sensitive   = true
+}
+
 variable "direct_connect" {
   type        = bool
   default     = false
@@ -302,6 +314,10 @@ variable "aws_account" {
   description = "The Name of the AWS Acccount this cluster lives in"
 }
 
+variable "argo_enabled" {
+  default = true
+  type = bool
+}
 variable "argo_host" {
   type    = string
   default = "argo.devops.indico.io"
@@ -528,6 +544,12 @@ variable "use_acm" {
   description = "create cluster that will use acm"
 }
 
+variable "enable_waf" {
+  type        = bool
+  default     = false
+  description = "enables aws alb controller for app-edge, also creates waf rules."
+}
+
 
 variable "terraform_vault_mount_path" {
   type    = string
@@ -692,3 +714,65 @@ variable "local_registry_harbor_robot_account_name" {
   type    = string
   default = "unused"
 }
+
+variable "devops_tools_cluster_host" {
+  type    = string
+  default = "provided from the varset devops-tools-cluster"
+}
+
+variable "devops_tools_cluster_ca_certificate" {
+  type      = string
+  sensitive = true
+  default   = "provided from the varset devops-tools-cluster"
+}
+
+variable "thanos_grafana_admin_username" {
+  type    = string
+  default = "provided from the varset devops-tools-cluster"
+}
+
+variable "thanos_grafana_admin_password" {
+  type      = string
+  sensitive = true
+  default   = "provided from the varset thanos"
+}
+
+variable "thanos_cluster_ca_certificate" {
+  type      = string
+  sensitive = true
+  default   = "provided from the varset thanos"
+}
+
+variable "thanos_cluster_host" {
+  type    = string
+  default = "provided from the varset thanos"
+}
+
+
+variable "thanos_cluster_name" {
+  type    = string
+  default = "thanos"
+}
+
+variable "indico_devops_aws_access_key_id" {
+  type        = string
+  description = "The Indico-Devops account access key"
+  sensitive   = true
+}
+
+variable "indico_devops_aws_secret_access_key" {
+  type        = string
+  description = "The Indico-Devops account secret"
+  sensitive   = true
+}
+
+variable "indico_devops_aws_region" {
+  type        = string
+  description = "The Indico-Devops devops cluster region"
+}
+
+variable "thanos_enabled" {
+  type = bool
+  default = true
+}
+

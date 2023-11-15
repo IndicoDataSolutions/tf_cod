@@ -125,6 +125,18 @@ provider "kubectl" {
   load_config_file       = false
 }
 
+provider "kubectl" {
+  alias                  = "devops-tools"
+  host                   = var.devops_tools_cluster_host
+  cluster_ca_certificate = var.devops_tools_cluster_ca_certificate
+  #token                  = module.cluster.kubernetes_token
+  load_config_file = false
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", var.label]
+    command     = "aws"
+  }
+}
 
 provider "helm" {
   debug = true
@@ -135,6 +147,33 @@ provider "helm" {
     cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
   }
 }
+
+
+provider "aws" {
+  access_key = var.indico_devops_aws_access_key_id
+  secret_key = var.indico_devops_aws_secret_access_key
+  region     = var.indico_devops_aws_region
+  alias      = "aws-indico-devops"
+}
+
+data "aws_eks_cluster" "thanos" {
+  name     = var.thanos_cluster_name
+  provider = aws.aws-indico-devops
+}
+
+data "aws_eks_cluster_auth" "thanos" {
+  name     = var.thanos_cluster_name
+  provider = aws.aws-indico-devops
+}
+
+provider "kubectl" {
+  alias                  = "thanos-kubectl"
+  host                   = data.aws_eks_cluster.thanos.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.thanos.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.thanos.token
+  load_config_file       = false
+}
+
 
 module "argo-registration" {
   depends_on = [

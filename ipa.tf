@@ -55,7 +55,7 @@ locals {
  EOF
   ] : []
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
-  acm_ipa_values = var.use_acm == true ? (<<EOT
+  alb_ipa_values = var.enable_waf == true ? (<<EOT
 app-edge:
   alternateDomain: ""
   service:
@@ -63,23 +63,29 @@ app-edge:
     ports:
       http_port: 31755
       http_api_port: 31270
+  nginx:
+    httpPort: 8080
   aws-load-balancer-controller:
     enabled: true
+    aws-load-balancer-controller:
+      enabled: true
+      clusterName: ${var.label}
     ingress:
       enabled: true
-      annotations:
-        acme.cert-manager.io/http01-edit-in-place: "true"
-        cert-manager.io/cluster-issuer: zerossl      
+      useStaticCertificate: ${var.use_static_ssl_certificates}
+      labels:
+        indico.io/cluster: ${var.label}
       tls:
-        - secretName: indico-ssl-cm-cert
+        - secretName: ${var.ssl_static_secret_name}
           hosts:
             - ${local.dns_name}
       alb:
         publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
+        wafArn: ${aws_wafv2_web_acl.wafv2-acl[0].arn}
         acmArn: ${aws_acm_certificate_validation.alb[0].certificate_arn}
       service:
         name: app-edge
-        port: 80
+        port: 8080
       hosts:
         - host: ${local.dns_name}
           paths:
@@ -269,6 +275,7 @@ resource "github_repository_file" "crds-values-yaml" {
 }
 
 data "github_repository_file" "data-crds-values" {
+  count = var.argo_enabled == true ? 1 : 0
   depends_on = [
     github_repository_file.crds-values-yaml
   ]
@@ -290,12 +297,77 @@ module "secrets-operator-setup" {
   depends_on = [
     module.cluster
   ]
+  count           = var.argo_enabled == true ? 1 : 0
   source          = "./modules/common/vault-secrets-operator-setup"
   vault_address   = var.vault_address
   account         = var.aws_account
   region          = var.region
   name            = var.label
   kubernetes_host = module.cluster.kubernetes_host
+}
+
+resource "helm_release" "ipa-vso" {
+  count = var.thanos_enabled == true ? 1 : 0
+  depends_on = [
+    module.cluster,
+    data.github_repository_file.data-crds-values,
+    module.secrets-operator-setup
+  ]
+
+  verify           = false
+  name             = "ipa-vso"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://helm.releases.hashicorp.com"
+  chart            = "vault-secrets-operator"
+  version          = "0.3.4"
+  wait             = true
+
+  values = [
+    <<EOF
+  controller: 
+    manager:
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 10m
+          memory: 64Mi
+
+  controller: 
+    manager:
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 10m
+          memory: 64Mi
+
+  defaultAuthMethod:
+    enabled: true
+    namespace: default
+    method: kubernetes
+    mount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+    kubernetes:
+      role: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+      tokenAudiences: ["vault"]
+      serviceAccount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+
+  defaultVaultConnection:
+    enabled: true
+    address: ${var.vault_address}
+    skipTLSVerify: false
+    spec:
+    template:
+      spec:
+        containers:
+        - name: manager
+          args:
+          - "--client-cache-persistence-model=direct-encrypted"
+EOF
+  ]
 }
 
 resource "helm_release" "ipa-crds" {
@@ -333,53 +405,47 @@ resource "helm_release" "ipa-crds" {
         kubernetes.io/os: linux
     enabled: true
     installCRDs: true
-
-  vault-secrets-operator:
-    enabled: true
-    
-    controller: 
-      manager:
-        resources:
-          limits:
-            cpu: 500m
-            memory: 512Mi
-          requests:
-            cpu: 10m
-            memory: 64Mi
-
-    defaultAuthMethod:
-      enabled: true
-      namespace: default
-      method: kubernetes
-      mount: ${module.secrets-operator-setup.vault_mount_path}
-      kubernetes:
-        role: ${module.secrets-operator-setup.vault_auth_role_name}
-        tokenAudiences: [${module.secrets-operator-setup.vault_auth_audience}]
-        serviceAccount: ${module.secrets-operator-setup.vault_auth_service_account_name}
-
-    defaultVaultConnection:
-      enabled: true
-      address: ${var.vault_address}
-      skipTLSVerify: false
-      spec:
-      template:
-        spec:
-          containers:
-          - name: manager
-            args:
-            - "--client-cache-persistence-model=direct-encrypted"
 EOF
     ,
     <<EOT
-${data.github_repository_file.data-crds-values.content}
+${var.argo_enabled == true ? data.github_repository_file.data-crds-values[0].content : ""}
 EOT
   ]
 }
+
 
 resource "time_sleep" "wait_1_minutes_after_crds" {
   depends_on = [helm_release.ipa-crds]
 
   create_duration = "1m"
+}
+
+resource "kubectl_manifest" "thanos-storage-secret" {
+  count      = var.thanos_enabled ? 1 : 0
+  depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
+  yaml_body  = <<YAML
+    apiVersion: "secrets.hashicorp.com/v1beta1"
+    kind: "VaultStaticSecret"
+    metadata:
+      name:  vault-thanos-storage
+      namespace: default
+    spec:
+      type: "kv-v2"
+      namespace: default
+      mount: customer-Indico-Devops
+      path: thanos-storage
+      refreshAfter: 60s
+      rolloutRestartTargets:
+        - name: prometheus-monitoring-kube-prometheus-prometheus
+          kind: StatefulSet
+      destination:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+        create: true
+        name: thanos-storage
+      vaultAuthRef: default
+  YAML
 }
 
 resource "helm_release" "ipa-pre-requisites" {
@@ -433,40 +499,6 @@ secrets:
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
 
 ${local.dns_configuration_values}
-
-monitoring:
-  enabled: true
-  global:
-      host: "${local.dns_name}"
-    
-  ingress-nginx:
-    enabled: true
-
-    rbac:
-      create: true
-
-    admissionWebhooks:
-      patch:
-        nodeSelector.beta.kubernetes.io/os: linux
-  
-    defaultBackend:
-      nodeSelector.beta.kubernetes.io/os: linux
-  
-  authentication:
-    ingressUsername: monitoring
-    ingressPassword: ${random_password.monitoring-password.result}
-
-  kube-prometheus-stack:
-    prometheus:
-      prometheusSpec:
-        nodeSelector:
-          node_group: static-workers
-
-apiModels:
-  enabled: true
-  nodeSelector:
-    node_group: static-workers
-
 external-dns:
   enabled: ${local.enable_external_dns}
   logLevel: debug
@@ -685,6 +717,7 @@ output "git_branch" {
   value = data.external.git_information.result.branch
 }
 
+/*
 resource "null_resource" "sleep-5-minutes-wait-for-charts-smoketest-build" {
   depends_on = [
     time_sleep.wait_1_minutes_after_pre_reqs
@@ -698,11 +731,29 @@ resource "null_resource" "sleep-5-minutes-wait-for-charts-smoketest-build" {
     command = "sleep 300"
   }
 }
+*/
 
+resource "null_resource" "wait-for-tf-cod-chart-build" {
+  depends_on = [
+    time_sleep.wait_1_minutes_after_pre_reqs
+  ]
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    environment = {
+      HARBOR_API_TOKEN = jsondecode(data.vault_kv_secret_v2.harbor-api-token.data_json)["bearer_token"]
+    }
+    command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+  }
+}
 
 resource "helm_release" "terraform-smoketests" {
   depends_on = [
-    null_resource.sleep-5-minutes-wait-for-charts-smoketest-build,
+    null_resource.wait-for-tf-cod-chart-build,
+    #null_resource.sleep-5-minutes-wait-for-charts-smoketest-build,
     kubernetes_config_map.terraform-variables
   ]
 
@@ -714,7 +765,7 @@ resource "helm_release" "terraform-smoketests" {
   version          = "0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
   wait             = true
   wait_for_jobs    = true
-  timeout          = "1800" # 30 minutes
+  timeout          = "300" # 5 minutes
   disable_webhooks = false
   values = [<<EOF
   cluster:
@@ -737,6 +788,12 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
 data "vault_kv_secret_v2" "account-robot-credentials" {
   mount = "harbor-robot-accounts"
   name  = lower(var.aws_account)
+}
+
+
+data "vault_kv_secret_v2" "harbor-api-token" {
+  mount = "tools/argo"
+  name  = "harbor-api"
 }
 
 resource "kubernetes_namespace" "local-registry" {
@@ -1059,7 +1116,7 @@ resource "github_repository_file" "alb-values-yaml" {
     aws_acm_certificate_validation.alb[0]
   ]
 
-  content = local.acm_ipa_values
+  content = local.alb_ipa_values
 }
 
 resource "github_repository_file" "argocd-application-yaml" {
@@ -1076,7 +1133,7 @@ resource "github_repository_file" "argocd-application-yaml" {
   }
   depends_on = [
     module.cluster,
-    aws_acm_certificate_validation.alb[0]
+    aws_wafv2_web_acl.wafv2-acl[0]
   ]
 
   content = <<EOT
@@ -1134,7 +1191,7 @@ spec:
                 ingressUser: monitoring
                 ingressPassword: ${random_password.monitoring-password.result}
                 ${indent(14, local.runtime_scanner_ingress_values)} 
-            ${indent(12, local.acm_ipa_values)}         
+            ${indent(12, local.alb_ipa_values)}         
 
         - name: HELM_VALUES
           value: |

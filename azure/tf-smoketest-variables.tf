@@ -1,6 +1,6 @@
 resource "kubernetes_config_map" "terraform-variables" {
   # this file is generated via pre-commit, DO NOT EDIT !
-    depends_on = [null_resource.sleep-5-minutes-wait-for-charts-smoketest-build]
+    depends_on = [null_resource.wait-for-tf-cod-chart-build]
     metadata {
       name = "terraform-variables"
     }
@@ -94,6 +94,12 @@ resource "kubernetes_config_map" "terraform-variables" {
     monitor_retention_in_days = "${jsonencode(var.monitor_retention_in_days)}"
     local_registry_version = "${jsonencode(var.local_registry_version)}"
     local_registry_enabled = "${jsonencode(var.local_registry_enabled)}"
+    devops_tools_cluster_host = "${jsonencode(var.devops_tools_cluster_host)}"
+    thanos_grafana_admin_username = "${jsonencode(var.thanos_grafana_admin_username)}"
+    thanos_cluster_host = "${jsonencode(var.thanos_cluster_host)}"
+    indico_devops_aws_region = "${jsonencode(var.indico_devops_aws_region)}"
+    thanos_cluster_name = "${jsonencode(var.thanos_cluster_name)}"
+    thanos_enabled = "${jsonencode(var.thanos_enabled)}"
 
     }
   }

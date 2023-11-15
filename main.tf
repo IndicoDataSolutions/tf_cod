@@ -54,8 +54,7 @@ terraform {
 provider "time" {}
 
 provider "keycloak" {
-  client_id = "terraform-master"
-  url       = "https://keycloak.devops.indico.io"
+  initial_login = false
 }
 
 provider "vault" {
@@ -75,6 +74,7 @@ provider "github" {
 
 provider "random" {}
 
+
 provider "aws" {
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
@@ -83,6 +83,19 @@ provider "aws" {
     tags = var.default_tags
   }
 }
+
+
+provider "aws" {
+  access_key = var.is_alternate_account_domain == "true" ? var.indico_aws_access_key_id : var.aws_access_key
+  secret_key = var.is_alternate_account_domain == "true" ? var.indico_aws_secret_access_key : var.aws_secret_key
+  region     = var.region
+  alias      = "dns-control"
+  default_tags {
+    tags = var.default_tags
+  }
+}
+
+
 
 provider "azurerm" {
   features {}
@@ -397,6 +410,30 @@ provider "kubectl" {
   }
 }
 
+provider "aws" {
+  access_key = var.indico_devops_aws_access_key_id
+  secret_key = var.indico_devops_aws_secret_access_key
+  region     = var.indico_devops_aws_region
+  alias      = "aws-indico-devops"
+}
+
+data "aws_eks_cluster" "thanos" {
+  name     = var.thanos_cluster_name
+  provider = aws.aws-indico-devops
+}
+
+data "aws_eks_cluster_auth" "thanos" {
+  name     = var.thanos_cluster_name
+  provider = aws.aws-indico-devops
+}
+
+provider "kubectl" {
+  alias                  = "thanos-kubectl"
+  host                   = data.aws_eks_cluster.thanos.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.thanos.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.thanos.token
+  load_config_file       = false
+}
 
 provider "helm" {
   debug = true
@@ -446,8 +483,10 @@ locals {
 
 
 data "aws_route53_zone" "primary" {
-  name = lower("${var.aws_account}.indico.io")
+  name     = var.is_alternate_account_domain == "false" ? lower("${var.aws_account}.indico.io") : lower(local.alternate_domain_root)
+  provider = aws.dns-control
 }
+
 
 resource "aws_route53_record" "ipa-app-caa" {
   count   = var.is_alternate_account_domain == "true" ? 0 : 1
@@ -462,6 +501,8 @@ resource "aws_route53_record" "ipa-app-caa" {
     "0 issue \"amazonaws.com\"",
     "0 issue \"awstrust.com\""
   ]
+  provider = aws.dns-control
 }
+
 
 
