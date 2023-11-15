@@ -238,7 +238,7 @@ variable "azure_indico_io_client_id" {
   type = string
 }
 variable "azure_indico_io_client_secret" {
-  type = string
+  type      = string
   sensitive = true
 }
 variable "azure_indico_io_subscription_id" {
@@ -316,7 +316,7 @@ variable "aws_account" {
 
 variable "argo_enabled" {
   default = true
-  type = bool
+  type    = bool
 }
 variable "argo_host" {
   type    = string
@@ -710,11 +710,6 @@ variable "local_registry_enabled" {
   default = false
 }
 
-variable "local_registry_harbor_robot_account_name" {
-  type    = string
-  default = "unused"
-}
-
 variable "devops_tools_cluster_host" {
   type    = string
   default = "provided from the varset devops-tools-cluster"
@@ -772,7 +767,7 @@ variable "indico_devops_aws_region" {
 }
 
 variable "thanos_enabled" {
-  type = bool
+  type    = bool
   default = true
 }
 
