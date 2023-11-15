@@ -97,7 +97,9 @@ resource "kubernetes_config_map" "terraform-variables" {
     enable_k8s_dashboard = "${jsonencode(var.enable_k8s_dashboard)}"
     use_acm = "${jsonencode(var.use_acm)}"
     enable_waf = "${jsonencode(var.enable_waf)}"
+    vault_mount_path = "${jsonencode(var.vault_mount_path)}"
     terraform_vault_mount_path = "${jsonencode(var.terraform_vault_mount_path)}"
+    snowflake_enabled = "${jsonencode(var.snowflake_enabled)}"
     snowflake_region = "${jsonencode(var.snowflake_region)}"
     snowflake_username = "${jsonencode(var.snowflake_username)}"
     snowflake_account = "${jsonencode(var.snowflake_account)}"
@@ -106,6 +108,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     enable_weather_station = "${jsonencode(var.enable_weather_station)}"
     aws_primary_dns_role_arn = "${jsonencode(var.aws_primary_dns_role_arn)}"
     is_alternate_account_domain = "${jsonencode(var.is_alternate_account_domain)}"
+    domain_suffix = "${jsonencode(var.domain_suffix)}"
     domain_host = "${jsonencode(var.domain_host)}"
     alerting_enabled = "${jsonencode(var.alerting_enabled)}"
     alerting_slack_enabled = "${jsonencode(var.alerting_slack_enabled)}"
@@ -131,6 +134,8 @@ resource "kubernetes_config_map" "terraform-variables" {
     thanos_cluster_name = "${jsonencode(var.thanos_cluster_name)}"
     indico_devops_aws_region = "${jsonencode(var.indico_devops_aws_region)}"
     thanos_enabled = "${jsonencode(var.thanos_enabled)}"
+    keycloak_enabled = "${jsonencode(var.keycloak_enabled)}"
+    terraform_smoketests_enabled = "${jsonencode(var.terraform_smoketests_enabled)}"
 
     }
   }

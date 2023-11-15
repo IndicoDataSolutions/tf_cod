@@ -244,7 +244,8 @@ output "ns" {
 
 
 resource "github_repository_file" "pre-reqs-values-yaml" {
-  repository          = data.github_repository.argo-github-repo.name
+  count               = var.argo_enabled == true ? 1 : 0
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/pre-reqs-values.values"
   commit_message      = var.message
@@ -260,7 +261,8 @@ resource "github_repository_file" "pre-reqs-values-yaml" {
 
 
 resource "github_repository_file" "crds-values-yaml" {
-  repository          = data.github_repository.argo-github-repo.name
+  count               = var.argo_enabled == true ? 1 : 0
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/crds-values.values"
   commit_message      = var.message
@@ -279,16 +281,18 @@ data "github_repository_file" "data-crds-values" {
   depends_on = [
     github_repository_file.crds-values-yaml
   ]
-  repository = data.github_repository.argo-github-repo.name
+  repository = data.github_repository.argo-github-repo[0].name
   branch     = var.argo_branch
   file       = var.argo_path == "." ? "helm/crds-values.values" : "${var.argo_path}/helm/crds-values.values"
 }
 
 data "github_repository_file" "data-pre-reqs-values" {
+  count = var.argo_enabled == true ? 1 : 0
+
   depends_on = [
     github_repository_file.pre-reqs-values-yaml
   ]
-  repository = data.github_repository.argo-github-repo.name
+  repository = data.github_repository.argo-github-repo[0].name
   branch     = var.argo_branch
   file       = var.argo_path == "." ? "helm/pre-reqs-values.values" : "${var.argo_path}/helm/pre-reqs-values.values"
 }
@@ -688,7 +692,7 @@ aws-load-balancer-controller:
 EOF
     ,
     <<EOT
-${data.github_repository_file.data-pre-reqs-values.content}
+${var.argo_enabled == true ? data.github_repository_file.data-pre-reqs-values[0].content : ""}
 EOT
   ])
 }
@@ -734,6 +738,8 @@ resource "null_resource" "sleep-5-minutes-wait-for-charts-smoketest-build" {
 */
 
 resource "null_resource" "wait-for-tf-cod-chart-build" {
+  count = var.argo_enabled == true ? 1 : 0
+
   depends_on = [
     time_sleep.wait_1_minutes_after_pre_reqs
   ]
@@ -744,13 +750,25 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
 
   provisioner "local-exec" {
     environment = {
-      HARBOR_API_TOKEN = jsondecode(data.vault_kv_secret_v2.harbor-api-token.data_json)["bearer_token"]
+      HARBOR_API_TOKEN = jsondecode(data.vault_kv_secret_v2.harbor-api-token[0].data_json)["bearer_token"]
     }
     command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
   }
 }
 
+
+output "harbor-api-token" {
+  sensitive = true
+  value     = jsondecode(data.vault_kv_secret_v2.harbor-api-token[0].data_json)["bearer_token"]
+}
+
+output "smoketest_chart_version" {
+  value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+}
+
 resource "helm_release" "terraform-smoketests" {
+  count = var.terraform_smoketests_enabled == true ? 1 : 0
+
   depends_on = [
     null_resource.wait-for-tf-cod-chart-build,
     #null_resource.sleep-5-minutes-wait-for-charts-smoketest-build,
@@ -786,12 +804,14 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
 }
 
 data "vault_kv_secret_v2" "account-robot-credentials" {
+  count = var.local_registry_enabled == true ? 1 : 0
   mount = "harbor-robot-accounts"
   name  = lower(var.aws_account)
 }
 
 
 data "vault_kv_secret_v2" "harbor-api-token" {
+  count = var.argo_enabled == true ? 1 : 0
   mount = "tools/argo"
   name  = "harbor-api"
 }
@@ -1007,7 +1027,7 @@ metrics-server:
   enabled: false
 
 proxyRegistryAccess:
-  proxyPassword: ${jsondecode(data.vault_kv_secret_v2.account-robot-credentials.data_json)[var.local_registry_harbor_robot_account_name]}
+  proxyPassword: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)[var.local_registry_harbor_robot_account_name] : ""}
   proxyPullSecretName: remote-access
   proxyUrl: https://harbor.devops.indico.io
   proxyUsername: "robot${"$"}${var.local_registry_harbor_robot_account_name}"
@@ -1031,13 +1051,14 @@ output "local_registry_username" {
 
 
 data "github_repository" "argo-github-repo" {
+  count     = var.argo_enabled == true ? 1 : 0
   full_name = "IndicoDataSolutions/${var.argo_repo}"
 }
 
 resource "github_repository_file" "smoketest-application-yaml" {
-  count = var.ipa_smoketest_enabled == true ? 1 : 0
+  count = var.ipa_smoketest_enabled == true && var.argo_enabled == true ? 1 : 0
 
-  repository          = data.github_repository.argo-github-repo.name
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/ipa_smoketest.yaml"
   commit_message      = var.message
@@ -1068,7 +1089,7 @@ spec:
   destination:
     server: ${module.cluster.kubernetes_host}
     namespace: default
-  project: ${module.argo-registration.argo_project_name}
+  project: ${module.argo-registration[0].argo_project_name}
   syncPolicy:
     automated:
       prune: true
@@ -1100,7 +1121,8 @@ EOT
 }
 
 resource "github_repository_file" "alb-values-yaml" {
-  repository          = data.github_repository.argo-github-repo.name
+  count               = var.argo_enabled == true ? 1 : 0
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/alb.values"
   commit_message      = var.message
@@ -1120,7 +1142,8 @@ resource "github_repository_file" "alb-values-yaml" {
 }
 
 resource "github_repository_file" "argocd-application-yaml" {
-  repository          = data.github_repository.argo-github-repo.name
+  count               = var.argo_enabled == true ? 1 : 0
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/ipa_application.yaml"
   commit_message      = var.message
@@ -1160,7 +1183,7 @@ spec:
   destination:
     server: ${module.cluster.kubernetes_host}
     namespace: default
-  project: ${module.argo-registration.argo_project_name}
+  project: ${module.argo-registration[0].argo_project_name}
   syncPolicy:
     automated:
       prune: true
@@ -1207,7 +1230,7 @@ EOT
 
 
 data "vault_kv_secret_v2" "zerossl_data" {
-  mount = "tools/argo"
+  mount = var.vault_mount_path
   name  = "zerossl"
 }
 
@@ -1240,7 +1263,7 @@ resource "argocd_application" "ipa" {
   }
 
   spec {
-    project = module.argo-registration.argo_project_name
+    project = module.argo-registration[0].argo_project_name
 
     source {
       repo_url        = "https://github.com/IndicoDataSolutions/${var.argo_repo}.git"
@@ -1279,10 +1302,9 @@ resource "argocd_application" "ipa" {
 
 
 resource "github_repository_file" "custom-application-yaml" {
+  for_each = var.argo_enabled == true ? var.applications : {}
 
-  for_each = var.applications
-
-  repository          = data.github_repository.argo-github-repo.name
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/${each.value.name}_application.yaml"
   commit_message      = var.message
@@ -1314,7 +1336,7 @@ spec:
   destination:
     server: ${module.cluster.kubernetes_host}
     namespace: ${each.value.namespace}
-  project: ${module.argo-registration.argo_project_name}
+  project: ${module.argo-registration[0].argo_project_name}
   syncPolicy:
     automated:
       prune: true

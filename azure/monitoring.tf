@@ -1,4 +1,17 @@
 locals {
+  thanos_config = var.thanos_enabled == true ? (<<EOT
+      thanos: # this is the one being used
+        blockSize: 5m
+        objectStorageConfig:
+          existingSecret:
+            name: thanos-storage
+            key: thanos_storage.yaml
+  EOT
+    ) : (<<EOT
+      thanos: {}
+  EOT
+  )
+
   alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
 noExtraConfigs: true
   EOT
@@ -150,6 +163,9 @@ kube-prometheus-stack:
     enabled: false
 
   prometheus:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
     thanosServiceMonitor:
       enabled: ${var.thanos_enabled}
 
@@ -157,18 +173,13 @@ kube-prometheus-stack:
       enabled: ${var.thanos_enabled}
     
     prometheusSpec:
-      disableCompaction: true
+      disableCompaction: ${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.account}
         clusterRegion: ${var.region}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.account}-${var.region}-${var.name}")}
-      thanos: 
-        blockSize: 5m
-        objectStorageConfig:
-          existingSecret:
-            name: thanos-storage
-            key: thanos_storage.yaml
+${local.thanos_config}
       nodeSelector:
         node_group: static-workers
       storageSpec:

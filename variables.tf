@@ -70,12 +70,14 @@ variable "indico_aws_access_key_id" {
   type        = string
   description = "The AWS access key for controlling dns in an alternate account"
   sensitive   = true
+  default     = ""
 }
 
 variable "indico_aws_secret_access_key" {
   type        = string
   description = "The AWS secret key for controlling dns in an alternate account"
   sensitive   = true
+  default     = ""
 }
 
 variable "direct_connect" {
@@ -235,17 +237,20 @@ variable "azure_readapi_tenant_id" {
 
 # Old provider configuration to remove orphaned readapi resources
 variable "azure_indico_io_client_id" {
-  type = string
+  type    = string
+  default = ""
 }
 variable "azure_indico_io_client_secret" {
-  type = string
-  sensitive = true
+  type    = string
+  default = ""
 }
 variable "azure_indico_io_subscription_id" {
-  type = string
+  type    = string
+  default = ""
 }
 variable "azure_indico_io_tenant_id" {
-  type = string
+  type    = string
+  default = ""
 }
 
 # IAM
@@ -315,9 +320,10 @@ variable "aws_account" {
 }
 
 variable "argo_enabled" {
+  type    = bool
   default = true
-  type = bool
 }
+
 variable "argo_host" {
   type    = string
   default = "argo.devops.indico.io"
@@ -330,14 +336,17 @@ variable "argo_username" {
 
 variable "argo_password" {
   sensitive = true
+  default   = "not used"
 }
 
 variable "argo_repo" {
   description = "Argo Github Repository containing the IPA Application"
+  default     = ""
 }
 
 variable "argo_branch" {
   description = "Branch to use on argo_repo"
+  default     = ""
 }
 
 variable "argo_namespace" {
@@ -550,10 +559,19 @@ variable "enable_waf" {
   description = "enables aws alb controller for app-edge, also creates waf rules."
 }
 
+variable "vault_mount_path" {
+  type    = string
+  default = "terraform"
+}
 
 variable "terraform_vault_mount_path" {
   type    = string
   default = "terraform"
+}
+
+variable "snowflake_enabled" {
+  type    = bool
+  default = true
 }
 
 variable "snowflake_region" {
@@ -602,6 +620,12 @@ variable "is_alternate_account_domain" {
   type        = string
   default     = "false"
   description = "domain name is controlled by a different aws account"
+}
+
+variable "domain_suffix" {
+  type        = string
+  default     = "indico.io"
+  description = "Domain suffix"
 }
 
 variable "domain_host" {
@@ -758,21 +782,35 @@ variable "indico_devops_aws_access_key_id" {
   type        = string
   description = "The Indico-Devops account access key"
   sensitive   = true
+  default     = ""
 }
 
 variable "indico_devops_aws_secret_access_key" {
   type        = string
   description = "The Indico-Devops account secret"
   sensitive   = true
+  default     = ""
 }
 
 variable "indico_devops_aws_region" {
   type        = string
   description = "The Indico-Devops devops cluster region"
+  default     = ""
 }
 
 variable "thanos_enabled" {
-  type = bool
+  type    = bool
   default = true
 }
+
+variable "keycloak_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "terraform_smoketests_enabled" {
+  type    = bool
+  default = true
+}
+
 
