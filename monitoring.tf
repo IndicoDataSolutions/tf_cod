@@ -3,8 +3,9 @@ locals {
       thanos: # this is the one being used
         blockSize: 5m
         objectStorageConfig:
-          name: thanos-storage
-          key: thanos_storage.yaml
+          existingSecret:
+            name: thanos-storage
+            key: thanos_storage.yaml
   EOT
     ) : (<<EOT
       thanos: {}
