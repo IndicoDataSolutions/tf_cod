@@ -502,6 +502,7 @@ resource "kubectl_manifest" "thanos-storage-secret" {
           kind: StatefulSet
       destination:
         annotations:
+          reloader.stakater.com/auto: "true"
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
         create: true
