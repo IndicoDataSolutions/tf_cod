@@ -136,6 +136,70 @@ module "secrets-operator-setup" {
   kubernetes_host = module.cluster.kubernetes_host
 }
 
+resource "helm_release" "ipa-vso" {
+  count = var.thanos_enabled == true ? 1 : 0
+  depends_on = [
+    module.cluster,
+    data.github_repository_file.data-crds-values,
+    module.secrets-operator-setup
+  ]
+
+  verify           = false
+  name             = "ipa-vso"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://helm.releases.hashicorp.com"
+  chart            = "vault-secrets-operator"
+  version          = "0.3.4"
+  wait             = true
+
+  values = [
+    <<EOF
+  controller: 
+    manager:
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 10m
+          memory: 64Mi
+
+  controller: 
+    manager:
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 10m
+          memory: 64Mi
+
+  defaultAuthMethod:
+    enabled: true
+    namespace: default
+    method: kubernetes
+    mount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+    kubernetes:
+      role: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+      tokenAudiences: ["vault"]
+      serviceAccount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+
+  defaultVaultConnection:
+    enabled: true
+    address: ${var.vault_address}
+    skipTLSVerify: false
+    spec:
+    template:
+      spec:
+        containers:
+        - name: manager
+          args:
+          - "--client-cache-persistence-model=direct-encrypted"
+EOF
+  ]
+}
+
 resource "helm_release" "ipa-crds" {
   depends_on = [
     module.cluster,
@@ -178,31 +242,6 @@ resource "helm_release" "ipa-crds" {
     installCRDs: true
   aws-ebs-csi-driver:
     enabled: false
-
-  vault-secrets-operator:
-    enabled: true
-
-    defaultAuthMethod:
-      enabled: true
-      namespace: default
-      method: kubernetes
-      mount: ${module.secrets-operator-setup.vault_mount_path}
-      kubernetes:
-        role: ${module.secrets-operator-setup.vault_auth_role_name}
-        tokenAudiences: [${module.secrets-operator-setup.vault_auth_audience}]
-        serviceAccount: ${module.secrets-operator-setup.vault_auth_service_account_name}
-
-    defaultVaultConnection:
-      enabled: true
-      address: ${var.vault_address}
-      skipTLSVerify: false
-      spec:
-      template:
-        spec:
-          containers:
-          - name: manager
-            args:
-            - "--client-cache-persistence-model=direct-encrypted"
 EOF
     ,
     <<EOT
