@@ -241,7 +241,8 @@ variable "azure_indico_io_client_id" {
   default = ""
 }
 variable "azure_indico_io_client_secret" {
-  type    = string
+  type      = string
+  sensitive = true
   default = ""
 }
 variable "azure_indico_io_subscription_id" {
@@ -732,11 +733,6 @@ variable "local_registry_version" {
 variable "local_registry_enabled" {
   type    = bool
   default = false
-}
-
-variable "local_registry_harbor_robot_account_name" {
-  type    = string
-  default = "unused"
 }
 
 variable "devops_tools_cluster_host" {
