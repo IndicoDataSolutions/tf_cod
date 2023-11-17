@@ -161,7 +161,16 @@ kube-prometheus-stack:
   enabled: true
   nodeExporter:
     enabled: false
-
+  grafana:
+    sidecar:
+      dashboards:
+        enabled: true
+        searchNamespace: ALL
+        multicluster:
+          global:
+            enabled: true
+          etcd:
+            enabled: true
   prometheus:
     annotations:
       reloader.stakater.com/auto: "true"

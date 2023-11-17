@@ -52,6 +52,16 @@ EOT
         - secretName: ${var.ssl_static_secret_name}
           hosts:
             - alertmanager-${local.dns_name}
+  grafana:
+    sidecar:
+      dashboards:
+        enabled: true
+        searchNamespace: ALL
+        multicluster:
+          global:
+            enabled: true
+          etcd:
+            enabled: true
   prometheus:
     annotations:
       reloader.stakater.com/auto: "true"
@@ -110,7 +120,16 @@ ${local.thanos_config}
         cert-manager.io/cluster-issuer: zerossl
       labels:
         acme.cert-manager.io/dns01-solver: "true"
-
+  grafana:
+    sidecar:
+      dashboards:
+        enabled: true
+        searchNamespace: ALL
+        multicluster:
+          global:
+            enabled: true
+          etcd:
+            enabled: true
   prometheus:
     annotations:
       reloader.stakater.com/auto: "true"
