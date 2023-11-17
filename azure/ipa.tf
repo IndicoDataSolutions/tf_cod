@@ -1024,3 +1024,21 @@ spec:
 EOT
 }
 
+resource "helm_release" "external-secrets" {
+  depends_on = [
+    module.cluster,
+    data.github_repository_file.data-crds-values,
+    module.secrets-operator-setup
+  ]
+
+
+  verify           = false
+  name             = "external-secrets"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://charts.external-secrets.io/"
+  chart            = "external-secrets"
+  version          = var.external_secrets_version
+  wait             = true
+
+}
