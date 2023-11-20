@@ -813,7 +813,7 @@ resource "helm_release" "terraform-smoketests" {
     region: ${var.region}
     name: ${var.label}
   image:
-    tag: ${substr(data.external.git_information.result.sha, 0, 8)}
+    tag: "${substr(data.external.git_information.result.sha, 0, 8)}"
   EOF
   ]
 }
