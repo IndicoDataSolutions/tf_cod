@@ -255,7 +255,8 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
 resource "helm_release" "terraform-smoketests" {
   depends_on = [
     null_resource.wait-for-tf-cod-chart-build,
-    kubernetes_config_map.terraform-variables
+    kubernetes_config_map.terraform-variables,
+    helm_release.monitoring
   ]
 
   verify           = false

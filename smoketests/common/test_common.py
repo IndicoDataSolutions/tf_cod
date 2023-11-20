@@ -23,6 +23,12 @@ class TestCommon:
         print(
             f"\nTeardown method called using {cloudProvider} {account}/{region}/{name}\n")
 
+    def test_external_secrets_operator(self, cloudProvider, account, region, name):
+        p = Process(account, region, name)
+        output = p.run(["kubectl", "get", "secret", "-n",
+                       "monitoring", "sql-exporter-dsn"], stdout=subprocess.PIPE)
+        assert output.returncode == 0, f"Unable to get External Generated Secret sql-exporter-dsn : {output.stderr}"
+
     # validate that the vault-secrets-operator is able to make secrets
 
     def test_vault_secrets_operator(self, cloudProvider, account, region, name):
