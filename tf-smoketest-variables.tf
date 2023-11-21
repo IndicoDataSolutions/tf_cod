@@ -87,6 +87,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     monitoring_enabled = "${jsonencode(var.monitoring_enabled)}"
     hibernation_enabled = "${jsonencode(var.hibernation_enabled)}"
     keda_version = "${jsonencode(var.keda_version)}"
+    external_secrets_version = "${jsonencode(var.external_secrets_version)}"
     opentelemetry_collector_version = "${jsonencode(var.opentelemetry-collector_version)}"
     include_fsx = "${jsonencode(var.include_fsx)}"
     include_pgbackup = "${jsonencode(var.include_pgbackup)}"

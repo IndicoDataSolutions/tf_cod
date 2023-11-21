@@ -206,6 +206,7 @@ resource "helm_release" "monitoring" {
   depends_on = [
     module.cluster,
     helm_release.ipa-pre-requisites,
+    helm_release.external-secrets,
     aws_route53_record.alertmanager-caa,
     aws_route53_record.grafana-caa,
     aws_route53_record.prometheus-caa,

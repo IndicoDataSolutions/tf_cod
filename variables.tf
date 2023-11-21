@@ -504,6 +504,12 @@ variable "keda_version" {
   default = "2.11.2"
 }
 
+variable "external_secrets_version" {
+  type    = string
+  default = "0.9.9"
+  description = "Version of external-secrets helm chart"
+}
+
 variable "opentelemetry-collector_version" {
   default = "0.30.0"
 }

@@ -310,6 +310,7 @@ module "secrets-operator-setup" {
   kubernetes_host = module.cluster.kubernetes_host
 }
 
+
 resource "helm_release" "ipa-vso" {
   count = var.thanos_enabled == true ? 1 : 0
   depends_on = [
@@ -373,6 +374,26 @@ resource "helm_release" "ipa-vso" {
 EOF
   ]
 }
+
+resource "helm_release" "external-secrets" {
+  depends_on = [
+    module.cluster,
+    data.github_repository_file.data-crds-values,
+    module.secrets-operator-setup
+  ]
+
+
+  verify           = false
+  name             = "external-secrets"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://charts.external-secrets.io/"
+  chart            = "external-secrets"
+  version          = var.external_secrets_version
+  wait             = true
+
+}
+
 
 resource "helm_release" "ipa-crds" {
   depends_on = [
@@ -772,7 +793,8 @@ resource "helm_release" "terraform-smoketests" {
   depends_on = [
     null_resource.wait-for-tf-cod-chart-build,
     #null_resource.sleep-5-minutes-wait-for-charts-smoketest-build,
-    kubernetes_config_map.terraform-variables
+    kubernetes_config_map.terraform-variables,
+    helm_release.monitoring
   ]
 
   verify           = false
@@ -792,7 +814,7 @@ resource "helm_release" "terraform-smoketests" {
     region: ${var.region}
     name: ${var.label}
   image:
-    tag: ${substr(data.external.git_information.result.sha, 0, 8)}
+    tag: "${substr(data.external.git_information.result.sha, 0, 8)}"
   EOF
   ]
 }
