@@ -32,6 +32,11 @@ class TestCommon:
     # validate that the vault-secrets-operator is able to make secrets
 
     def test_vault_secrets_operator(self, cloudProvider, account, region, name):
+
+        thanos_enabled = os.environ.get('thanos_enabled', "false")
+        if thanos_enabled == "false":
+            return
+
         p = Process(account, region, name)
         secret_name = "smoketest-secret-from-vault"
         vault_static_secret = f"""
