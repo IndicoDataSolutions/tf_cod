@@ -24,6 +24,8 @@ class TestCommon:
             f"\nTeardown method called using {cloudProvider} {account}/{region}/{name}\n")
 
     def test_external_secrets_operator(self, cloudProvider, account, region, name):
+        if os.environ.get('monitoring_enabled', "false") == "false":
+            return
         p = Process(account, region, name)
         output = p.run(["kubectl", "get", "secret", "-n",
                        "monitoring", "sql-exporter-dsn"], stdout=subprocess.PIPE)
