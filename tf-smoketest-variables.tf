@@ -40,7 +40,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     azure_readapi_subscription_id = "${jsonencode(var.azure_readapi_subscription_id)}"
     azure_readapi_tenant_id = "${jsonencode(var.azure_readapi_tenant_id)}"
     azure_indico_io_client_id = "${jsonencode(var.azure_indico_io_client_id)}"
-    azure_indico_io_client_secret = "${jsonencode(var.azure_indico_io_client_secret)}"
     azure_indico_io_subscription_id = "${jsonencode(var.azure_indico_io_subscription_id)}"
     azure_indico_io_tenant_id = "${jsonencode(var.azure_indico_io_tenant_id)}"
     eks_cluster_iam_role = "${jsonencode(var.eks_cluster_iam_role)}"
