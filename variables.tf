@@ -819,3 +819,8 @@ variable "harness_delegate" {
   type    = bool
   default = false
 }
+
+variable "harness_mount_path" {
+  type    = string
+  default = "harness"
+}
