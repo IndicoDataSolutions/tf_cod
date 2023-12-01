@@ -1,8 +1,7 @@
 module "delegate" {
   count = var.harness_delegate == true ? 1 : 0
 
-  source = "harness/harness-delegate/kubernetes"
-  version = "0.1.6"
+  source  = "./harness"
 
   account_id       = jsondecode(data.vault_kv_secret_v2.delegate_secrets.data_json)["DELEGATE_ACCOUNT_ID"]
   delegate_token   = jsondecode(data.vault_kv_secret_v2.delegate_secrets.data_json)["DELEGATE_TOKEN"]
