@@ -1,5 +1,5 @@
 module "harness_delegate" {
-  count = var.harness_delegate && contains(lower(var.aws_account), "indico") ? 1 : 0
+  count = var.harness_delegate && strcontains(lower(var.aws_account), "indico") ? 1 : 0
 
   source  = "./harness"
 
