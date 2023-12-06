@@ -202,7 +202,7 @@ variable "node_disk_size" {
 
 variable "cluster_node_policies" {
   type        = list(any)
-  default     = []
+  default     = ["IAMReadOnlyAccess"]
   description = "Additonal IAM policies to add to the cluster IAM role"
 }
 
@@ -243,7 +243,7 @@ variable "azure_indico_io_client_id" {
 variable "azure_indico_io_client_secret" {
   type      = string
   sensitive = true
-  default = ""
+  default   = ""
 }
 variable "azure_indico_io_subscription_id" {
   type    = string
@@ -505,8 +505,8 @@ variable "keda_version" {
 }
 
 variable "external_secrets_version" {
-  type    = string
-  default = "0.9.9"
+  type        = string
+  default     = "0.9.9"
   description = "Version of external-secrets helm chart"
 }
 
