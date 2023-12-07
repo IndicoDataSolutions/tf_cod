@@ -76,3 +76,7 @@ output "kube_token" {
   sensitive = true
   value     = module.cluster.kubernetes_token
 }
+
+output "harness_delegate_name" {
+  value = var.harness_delegate == true ? module.harness_delegate.delegate_name : ""
+}
