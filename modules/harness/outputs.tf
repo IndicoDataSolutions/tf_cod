@@ -1,4 +1,4 @@
 output "delegate_name" {
-  value = "${var.cluster_name}-harness-delegate"
+  value = var.delegate_name
   description = "The name of the harness delegate"
 }
