@@ -78,5 +78,5 @@ output "kube_token" {
 }
 
 output "harness_delegate_name" {
-  value = var.harness_delegate == true && length(module.harness_delegate) > 0 ? module.harness_delegate.delegate_name : ""
+  value = var.harness_delegate == true && length(module.harness_delegate) > 0 ? module.harness_delegate[0].delegate_name : ""
 }
