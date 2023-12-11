@@ -380,7 +380,7 @@ module "snowflake" {
   aws_account_name      = var.aws_account
 }
 
-# argo 
+# argo
 provider "argocd" {
   server_addr = var.argo_host
   username    = var.argo_username
@@ -483,6 +483,7 @@ locals {
   security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
   cluster_name      = var.label
   dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${var.aws_account}.${var.domain_suffix}") : var.domain_host
+  ipa_version       = var.ipa_version
   #dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
 }
 
