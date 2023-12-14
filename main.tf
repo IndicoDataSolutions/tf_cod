@@ -527,6 +527,6 @@ resource "null_resource" "test-kubectl" {
   }
 
   provisioner "local-exec" {
-    command = "kubectl get pods"
+    command = "pwd && ls -lah"
   }
 }
