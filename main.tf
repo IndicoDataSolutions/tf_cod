@@ -523,7 +523,7 @@ resource "null_resource" "test-kubectl" {
   }
 
   provisioner "local-exec" {
-    command = "aws eks update-kubeconfig --name ${var.label}"
+    command = "aws eks update-kubeconfig --name ${var.label} --region ${var.region}"
   }
 
   provisioner "local-exec" {
