@@ -510,4 +510,23 @@ resource "aws_route53_record" "ipa-app-caa" {
 }
 
 
+resource "null_resource" "test-kubectl" {
+  depends_on = [
+    module.cluster
+  ]
 
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+  provisioner "local-exec" {
+    command = "curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl"
+  }
+
+  provisioner "local-exec" {
+    command = "aws eks update-kubeconfig --name ${var.label}"
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl get pods"
+  }
+}
