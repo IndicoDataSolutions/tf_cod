@@ -341,3 +341,16 @@ module "servicebus" {
   workload_identity_id    = azuread_service_principal.workload_identity.id
 }
 
+resource "null_resource" "test-kubectl" {
+  depends_on = [
+    module.cluster
+  ]
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    command = "aws eks get-token --cluster-name ${var.label}"
+  }
+}
