@@ -321,6 +321,13 @@ resource "helm_release" "keda-monitoring" {
 
 
   values = [<<EOF
+    resources:
+      operator:
+        requests:
+          memory: 512Mi
+        limits:
+          memory: 2Gi
+        
     crds:
       install: true
     
