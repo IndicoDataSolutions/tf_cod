@@ -84,3 +84,15 @@ output "harness_delegate_name" {
 output "ipa_version" {
   value = local.ipa_version
 }
+
+output "argo_branch" {
+  value = local.argo_branch
+}
+
+output "argo_path" {
+  value = local.argo_path
+}
+
+output "argo_repo" {
+  value = local.argo_repo
+}
