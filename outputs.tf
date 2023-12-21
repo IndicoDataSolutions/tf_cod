@@ -55,6 +55,10 @@ output "cluster_name" {
   value = local.cluster_name
 }
 
+output "cluster_region" {
+  value = local.cluster_region
+}
+
 output "dns_name" {
   value = local.dns_name
 }
