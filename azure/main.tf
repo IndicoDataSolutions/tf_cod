@@ -220,6 +220,10 @@ locals {
   kube_prometheus_stack_enabled = true
 
   indico_storage_class_name = "azurefile"
+  ipa_version               = var.ipa_version
+  argo_branch               = var.argo_branch
+  argo_path                 = var.argo_path
+  argo_repo                 = var.argo_repo
 }
 
 resource "tls_private_key" "pk" {

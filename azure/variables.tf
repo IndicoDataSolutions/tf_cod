@@ -48,7 +48,7 @@ variable "message" {
 
 variable "account" {
   type        = string
-  default     = "Azure-Dev"
+  default     = "indico-dev-azure"
   description = "The name of the subscription that this cluster falls under"
 }
 
@@ -110,7 +110,6 @@ variable "argo_namespace" {
   type    = string
   default = "argo"
 }
-
 
 variable "argo_repo" {
   description = "Argo Github Repository containing the IPA Application"
@@ -312,8 +311,8 @@ variable "keda_version" {
 }
 
 variable "external_secrets_version" {
-  type    = string
-  default = "0.9.9"
+  type        = string
+  default     = "0.9.9"
   description = "Version of external-secrets helm chart"
 }
 
@@ -420,7 +419,7 @@ variable "azure_readapi_subscription_id" {
   default = ""
 }
 variable "azure_readapi_tenant_id" {
-  type = string
+  type    = string
   default = ""
 }
 
@@ -429,7 +428,7 @@ variable "azure_indico_io_client_id" {
   type = string
 }
 variable "azure_indico_io_client_secret" {
-  type = string
+  type      = string
   sensitive = true
 }
 variable "azure_indico_io_subscription_id" {
@@ -640,3 +639,12 @@ variable "thanos_enabled" {
   default = true
 }
 
+variable "harness_delegate" {
+  type    = bool
+  default = false
+}
+
+variable "harness_mount_path" {
+  type    = string
+  default = "harness"
+}

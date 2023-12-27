@@ -545,15 +545,15 @@ aws-for-fluent-bit:
   enabled: true
   cloudWatchLogs:
     region: ${var.region}
-    logGroupName: "/aws/eks/fluentbit-cloudwatch/${local.cluster_name}/logs"
-    logGroupTemplate: "/aws/eks/fluentbit-cloudwatch/${local.cluster_name}/workload/$kubernetes['namespace_name']"
+    logGroupName: "/aws/eks/fluentbit-cloudwatch/${var.label}/logs"
+    logGroupTemplate: "/aws/eks/fluentbit-cloudwatch/${var.label}/workload/$kubernetes['namespace_name']"
 cluster-autoscaler:
   cluster-autoscaler:
     awsRegion: ${var.region}
     image:
       tag: "v1.20.0"
     autoDiscovery:
-      clusterName: "${local.cluster_name}"
+      clusterName: "${var.label}"
 crunchy-postgres:
   enabled: true
   postgres-data:

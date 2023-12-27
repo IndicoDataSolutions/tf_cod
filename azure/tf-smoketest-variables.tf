@@ -101,6 +101,8 @@ resource "kubernetes_config_map" "terraform-variables" {
     indico_devops_aws_region = "${jsonencode(var.indico_devops_aws_region)}"
     thanos_cluster_name = "${jsonencode(var.thanos_cluster_name)}"
     thanos_enabled = "${jsonencode(var.thanos_enabled)}"
+    harness_delegate = "${jsonencode(var.harness_delegate)}"
+    harness_mount_path = "${jsonencode(var.harness_mount_path)}"
 
     }
   }

@@ -52,11 +52,11 @@ output "fsx_storage_fsx_rwx_subnet_id" {
 }
 
 output "cluster_name" {
-  value = local.cluster_name
+  value = var.label
 }
 
 output "cluster_region" {
-  value = local.cluster_region
+  value = var.region
 }
 
 output "dns_name" {
@@ -86,17 +86,17 @@ output "harness_delegate_name" {
 }
 
 output "ipa_version" {
-  value = local.ipa_version
+  value = var.ipa_version
 }
 
 output "argo_branch" {
-  value = local.argo_branch
+  value = var.argo_branch
 }
 
 output "argo_path" {
-  value = local.argo_path
+  value = var.argo_path
 }
 
 output "argo_repo" {
-  value = local.argo_repo
+  value = var.argo_repo
 }
