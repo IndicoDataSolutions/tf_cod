@@ -815,4 +815,7 @@ variable "terraform_smoketests_enabled" {
   default = true
 }
 
-
+variable "on_prem_enabled" {
+  type    = bool
+  default = false
+}

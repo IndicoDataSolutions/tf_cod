@@ -508,7 +508,53 @@ resource "aws_route53_record" "ipa-app-caa" {
   ]
   provider = aws.dns-control
 }
+#To DO:
+# Install nfs helm chart
+# get ip of service
+# install nfs driver with IP
+# make nfs sc the default
+# install pre-reqs etc.
+resource "helm_release" "nfs-server" {
+  count = var.on_prem_enabled == true ? 1 : 0
+  depends_on = [
+    module.cluster,
+    helm_release.monitoring
+  ]
 
+  name             = "keda"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://kedacore.github.io/charts"
+  chart            = "keda"
+  version          = var.keda_version
+
+
+  values = [<<EOF
+    crds:
+      install: true
+    
+    podAnnotations:
+      keda:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8080"
+      metricsAdapter: 
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "9022"
+
+    prometheus:
+      metricServer:
+        enabled: true
+        podMonitor:
+          enabled: true
+      operator:
+        enabled: true
+        podMonitor:
+          enabled: true
+ EOF
+  ]
+}
 
 resource "null_resource" "test-kubectl" {
   depends_on = [
