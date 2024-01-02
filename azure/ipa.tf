@@ -830,7 +830,6 @@ spec:
       limit: 2
       backoff:
         duration: 30m0s
-        max_duration: 60m0s
         factor: 2
   source:
     chart: ipa
