@@ -827,9 +827,9 @@ spec:
     syncOptions:
       - CreateNamespace=true
     retry:
-      limit: 2
+      limit: 5
       backoff:
-        duration: 30m0s
+        duration: 5m0s
         factor: 2
   source:
     chart: ipa
