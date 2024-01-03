@@ -263,6 +263,16 @@ resource "helm_release" "keda-monitoring" {
 
 
   values = [<<EOF
+    image:
+      metricsApiServer:
+        repository: harbor.devops.indico.io/ghcr.io/kedacore/keda-metrics-apiserver
+      webhooks:
+        repository: harbor.devops.indico.io/ghcr.io/kedacore/keda-admission-webhooks
+      keda:
+        repository: harbor.devops.indico.io/ghcr.io/kedacore/keda
+    imagePullSecrets:
+      - name: harbor-pull-secret
+      
     resources:
       operator:
         requests:
