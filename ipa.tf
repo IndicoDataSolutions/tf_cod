@@ -333,6 +333,9 @@ resource "helm_release" "ipa-vso" {
   controller: 
     imagePullSecrets:
       - name: harbor-pull-secret
+    kubeRbacProxy:
+      image:
+        repository: harbor.devops.indico.io/gcr.io/kubebuilder/kube-rbac-proxy
     manager:
       image:
         repository: harbor.devops.indico.io/docker.io/hashicorp/vault-secrets-operator
@@ -385,6 +388,12 @@ resource "helm_release" "external-secrets" {
   chart            = "external-secrets"
   version          = var.external_secrets_version
   wait             = true
+
+  values = [<<EOF
+    image:
+      repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+  EOF
+  ]
 
 }
 
