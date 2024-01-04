@@ -327,6 +327,8 @@ resource "helm_release" "opentelemetry-collector" {
 
   values = [<<EOF
     enabled: true
+    imagePullSecrets:
+      - name: harbor-pull-secret
     image:
       repository: harbor.devops.indico.io/docker.io/otel/opentelemetry-collector-contrib
     fullnameOverride: "collector-collector"
