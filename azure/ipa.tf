@@ -150,7 +150,7 @@ resource "helm_release" "ipa-vso" {
   namespace        = "default"
   repository       = "https://helm.releases.hashicorp.com"
   chart            = "vault-secrets-operator"
-  version          = "0.3.4"
+  version          = "0.4.2"
   wait             = true
 
   values = [
