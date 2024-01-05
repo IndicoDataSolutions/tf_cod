@@ -325,7 +325,7 @@ resource "helm_release" "ipa-vso" {
   namespace        = "default"
   repository       = "https://helm.releases.hashicorp.com"
   chart            = "vault-secrets-operator"
-  version          = "0.4.2"
+  version          = "0.4.2
   wait             = true
 
   values = [
@@ -336,6 +336,13 @@ resource "helm_release" "ipa-vso" {
     kubeRbacProxy:
       image:
         repository: harbor.devops.indico.io/gcr.io/kubebuilder/kube-rbac-proxy
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1024Mi
+        requests:
+          cpu: 500m
+          memory: 512Mi
     manager:
       image:
         repository: harbor.devops.indico.io/docker.io/hashicorp/vault-secrets-operator
