@@ -167,10 +167,10 @@ resource "helm_release" "ipa-vso" {
       resources:
         limits:
           cpu: 500m
-          memory: 512Mi
+          memory: 1024Mi
         requests:
-          cpu: 10m
-          memory: 64Mi
+          cpu: 500m
+          memory: 512Mi
 
   defaultAuthMethod:
     enabled: true
