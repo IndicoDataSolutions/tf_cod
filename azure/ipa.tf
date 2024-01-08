@@ -831,6 +831,11 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
+    retry:
+      limit: 8
+      backoff:
+        duration: 1m0s
+        factor: 2
   source:
     chart: ipa
     repoURL: ${var.ipa_repo}
