@@ -154,10 +154,10 @@ resource "null_resource" "update_storage_class" {
   }
 
   provisioner "local-exec" {
-    command = "patch storageclass gp2 -p '{""metadata"": {""annotations"":{""storageclass.kubernetes.io/is-default-class"":""false""}}}'"
+    command = "patch storageclass gp2 -p '{\"metadata\": {\"annotations\":{\"storageclass.kubernetes.io/is-default-class\":\"false\"}}}'"
   }
 
   provisioner "local-exec" {
-    command = "patch storageclass nfs -p '{""metadata"": {""annotations"":{""storageclass.kubernetes.io/is-default-class"":""true""}}}'"
+    command = "patch storageclass nfs -p '{\"metadata\": {\"annotations\":{\"storageclass.kubernetes.io/is-default-class\":\"true\"}}}'"
   }
 }
