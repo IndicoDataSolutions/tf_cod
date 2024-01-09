@@ -44,6 +44,10 @@ spec:
         app: nfs-server
     spec:
       containers:
+      resources:
+          requests:
+            cpu: 450m
+            memory: 2Gi
       - name: nfs-server
         image: k8s.gcr.io/volume-nfs:0.8
         ports:
