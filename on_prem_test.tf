@@ -57,7 +57,7 @@ spec:
           privileged: true
         volumeMounts:
         - name: storage
-          mountPath: /exports
+          mountPath: /nfs-storage
         resources:
           requests:
             cpu: 450m
@@ -125,9 +125,6 @@ resource "null_resource" "get_nfs_server_ip" {
     command = "./kubectl get service nfs-service -o jsonpath='{.spec.clusterIP}' > ${path.module}/nfs_server_ip.txt"
   }
 
-  provisioner "local-exec" {
-    command = "./kubectl get pods --no-headers | grep nfs-server | awk '{print $1}'| xargs -I {} sh -c 'kubectl exec {} -- sh -c \"mkdir -pm 755 /exports/nfs-storage\"'"
-  }
 }
 
 resource "helm_release" "nfs-provider" {
