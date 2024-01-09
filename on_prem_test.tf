@@ -44,7 +44,7 @@ spec:
         app: nfs-server
     spec:
       containers:
-      resources:
+        resources:
           requests:
             cpu: 450m
             memory: 2Gi
