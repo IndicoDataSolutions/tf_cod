@@ -6,7 +6,7 @@ locals {
   the_domain            = local.the_splits[local.the_length - 2]
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
 
-  storage_class = var.on_prem_test == false ? "encrypted-gp2" : "nfs"
+  storage_class = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
 
   enable_external_dns = var.use_static_ssl_certificates == false ? true : false
   efs_values = var.include_efs == true ? [<<EOF
