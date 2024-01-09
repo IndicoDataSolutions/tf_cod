@@ -482,7 +482,8 @@ resource "helm_release" "ipa-pre-requisites" {
     module.fsx-storage,
     helm_release.ipa-crds,
     data.vault_kv_secret_v2.zerossl_data,
-    data.github_repository_file.data-pre-reqs-values
+    data.github_repository_file.data-pre-reqs-values,
+    null_resource.update_storage_class
   ]
 
   verify           = false
@@ -666,7 +667,7 @@ crunchy-postgres:
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
       dataVolumeClaimSpec:
-        storageClassName: encrypted-gp2
+        storageClassName: ${local.storage_class}
         accessModes:
         - ReadWriteOnce
         resources:

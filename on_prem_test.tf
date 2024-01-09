@@ -128,7 +128,9 @@ resource "null_resource" "get_nfs_server_ip" {
 resource "helm_release" "nfs-provider" {
   count     = var.on_prem_test == true ? 1 : 0
   name = "nfs-subdir-external-provisioner"
-  chart = "https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner"
+  repository       = "https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner"
+  chart            = "nfs-subdir-external-provisioner"
+  version          = "4.0.18"
   namespace = "default"
   depends_on = [
     module.cluster,
