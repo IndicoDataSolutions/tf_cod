@@ -124,6 +124,10 @@ resource "null_resource" "get_nfs_server_ip" {
   provisioner "local-exec" {
     command = "./kubectl get service nfs-service -o jsonpath='{.spec.clusterIP}' > ${path.module}/nfs_server_ip.txt"
   }
+  
+  provisioner "local-exec" {
+    command = "./kubectl get pods --no-headers | grep nfs-server | awk '{print $1}'| xargs -I {} sh -c 'kubectl exec {} -- sh -c \"mkdir -p /exports/nfs-storage\"'"
+  }
 
 }
 
@@ -162,6 +166,6 @@ resource "null_resource" "update_storage_class" {
   }
 
   provisioner "local-exec" {
-    command = "patch storageclass nfs -p '{\"metadata\": {\"annotations\":{\"storageclass.kubernetes.io/is-default-class\":\"true\"}}}'"
+    command = "patch storageclass nfs-client -p '{\"metadata\": {\"annotations\":{\"storageclass.kubernetes.io/is-default-class\":\"true\"}}}'"
   }
 }
