@@ -139,7 +139,7 @@ resource "helm_release" "nfs-provider" {
   // prometheus URL
   set {
     name = "nfs.server"
-    value = "${data.local_file.nfs_ip.content}"
+    value = "${data.local_file.nfs_ip[0].content}"
   }
 }
 
