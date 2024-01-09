@@ -126,7 +126,7 @@ resource "null_resource" "get_nfs_server_ip" {
   }
   
   provisioner "local-exec" {
-    command = "./kubectl get pods --no-headers | grep nfs-server | awk '{print $1}'| xargs -I {} sh -c 'kubectl exec {} -- sh -c \"mkdir -p /exports/nfs-storage\"'"
+    command = "./kubectl get pods --no-headers | grep nfs-server | awk '{print $1}'| xargs -I {} sh -c './kubectl exec {} -- sh -c \"mkdir -p /exports/nfs-storage\"'"
   }
 
 }
