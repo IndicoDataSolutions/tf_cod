@@ -91,6 +91,7 @@ spec:
 YAML
 }
 
+
 data "local_file" "nfs_ip" {
   count     = var.on_prem_test == true ? 1 : 0
   filename = "${path.module}/nfs_server_ip.txt"
@@ -122,6 +123,10 @@ resource "null_resource" "get_nfs_server_ip" {
 
   provisioner "local-exec" {
     command = "./kubectl get service nfs-service -o jsonpath='{.spec.clusterIP}' > ${path.module}/nfs_server_ip.txt"
+  }
+
+  provisioner "local-exec" {
+    command = "./kubectl get pods --no-headers | grep nfs-server | awk '{print $1}'| xargs -I {} sh -c 'kubectl exec {} -- sh -c \"mkdir -pm 755 /exports/nfs-storage\"'"
   }
 }
 
