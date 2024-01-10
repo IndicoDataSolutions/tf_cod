@@ -20,7 +20,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 500Gi
+      storage: 1000Gi
 YAML
 }
 
