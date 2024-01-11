@@ -150,30 +150,35 @@ resource "helm_release" "ipa-vso" {
   namespace        = "default"
   repository       = "https://helm.releases.hashicorp.com"
   chart            = "vault-secrets-operator"
-  version          = "0.3.4"
+  version          = "0.4.2"
   wait             = true
 
   values = [
     <<EOF
   controller: 
-    manager:
+    imagePullSecrets:
+      - name: harbor-pull-secret
+    kubeRbacProxy:
+      image:
+        repository: harbor.devops.indico.io/gcr.io/kubebuilder/kube-rbac-proxy
       resources:
         limits:
           cpu: 500m
-          memory: 512Mi
+          memory: 1024Mi
         requests:
-          cpu: 10m
-          memory: 64Mi
+          cpu: 500m
+          memory: 512Mi
 
-  controller: 
     manager:
+      image:
+        repository: harbor.devops.indico.io/docker.io/hashicorp/vault-secrets-operator
       resources:
         limits:
           cpu: 500m
-          memory: 512Mi
+          memory: 1024Mi
         requests:
-          cpu: 10m
-          memory: 64Mi
+          cpu: 500m
+          memory: 512Mi
 
   defaultAuthMethod:
     enabled: true
@@ -826,6 +831,11 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
+    retry:
+      limit: 8
+      backoff:
+        duration: 1m0s
+        factor: 2
   source:
     chart: ipa
     repoURL: ${var.ipa_repo}
@@ -1017,4 +1027,9 @@ resource "helm_release" "external-secrets" {
   version          = var.external_secrets_version
   wait             = true
 
+  values = [<<EOF
+    image:
+      repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+  EOF
+  ]
 }

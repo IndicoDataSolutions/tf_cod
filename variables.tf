@@ -618,7 +618,7 @@ variable "enable_weather_station" {
 }
 
 variable "aws_primary_dns_role_arn" {
-  type        = string
+  type        = string 
   default     = ""
   description = "The AWS arn for the role needed to manage route53 DNS in a different account."
 }
@@ -818,4 +818,13 @@ variable "terraform_smoketests_enabled" {
 variable "on_prem_test" {
   type    = bool
   default = false
+}
+variable "harness_delegate" {
+  type    = bool
+  default = false
+}
+
+variable "harness_mount_path" {
+  type    = string
+  default = "harness"
 }

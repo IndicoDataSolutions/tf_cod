@@ -187,7 +187,7 @@ module "argo-registration" {
     argocd     = argocd
   }
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.1.16"
+  version                      = "1.2.1"
   cluster_name                 = var.label
   region                       = var.region
   argo_password                = var.argo_password
@@ -198,6 +198,7 @@ module "argo-registration" {
   argo_github_team_admin_group = var.argo_github_team_owner
   endpoint                     = module.cluster.kubernetes_host
   ca_data                      = module.cluster.kubernetes_cluster_ca_certificate
+  indico_dev_cluster           = var.account == "indico-dev-azure"
 }
 
 provider "local" {}
@@ -220,6 +221,10 @@ locals {
   kube_prometheus_stack_enabled = true
 
   indico_storage_class_name = "azurefile"
+  ipa_version               = var.ipa_version
+  argo_branch               = var.argo_branch
+  argo_path                 = var.argo_path
+  argo_repo                 = var.argo_repo
 }
 
 resource "tls_private_key" "pk" {

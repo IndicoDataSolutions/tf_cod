@@ -327,30 +327,33 @@ resource "helm_release" "ipa-vso" {
   namespace        = "default"
   repository       = "https://helm.releases.hashicorp.com"
   chart            = "vault-secrets-operator"
-  version          = "0.3.4"
+  version          = "0.4.2"
   wait             = true
-
   values = [
     <<EOF
   controller: 
-    manager:
+    imagePullSecrets:
+      - name: harbor-pull-secret
+    kubeRbacProxy:
+      image:
+        repository: harbor.devops.indico.io/gcr.io/kubebuilder/kube-rbac-proxy
       resources:
         limits:
           cpu: 500m
-          memory: 512Mi
+          memory: 1024Mi
         requests:
-          cpu: 10m
-          memory: 64Mi
-
-  controller: 
+          cpu: 500m
+          memory: 512Mi
     manager:
+      image:
+        repository: harbor.devops.indico.io/docker.io/hashicorp/vault-secrets-operator
       resources:
         limits:
           cpu: 500m
-          memory: 512Mi
+          memory: 1024Mi
         requests:
-          cpu: 10m
-          memory: 64Mi
+          cpu: 500m
+          memory: 512Mi
 
   defaultAuthMethod:
     enabled: true
@@ -393,6 +396,19 @@ resource "helm_release" "external-secrets" {
   chart            = "external-secrets"
   version          = var.external_secrets_version
   wait             = true
+
+  values = [<<EOF
+    image:
+      repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+    webhook:
+     image:
+        repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+    certController:
+      image:
+        repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+
+  EOF
+  ]
 
 }
 
@@ -548,15 +564,15 @@ aws-for-fluent-bit:
   enabled: true
   cloudWatchLogs:
     region: ${var.region}
-    logGroupName: "/aws/eks/fluentbit-cloudwatch/${local.cluster_name}/logs"
-    logGroupTemplate: "/aws/eks/fluentbit-cloudwatch/${local.cluster_name}/workload/$kubernetes['namespace_name']"
+    logGroupName: "/aws/eks/fluentbit-cloudwatch/${var.label}/logs"
+    logGroupTemplate: "/aws/eks/fluentbit-cloudwatch/${var.label}/workload/$kubernetes['namespace_name']"
 cluster-autoscaler:
   cluster-autoscaler:
     awsRegion: ${var.region}
     image:
       tag: "v1.20.0"
     autoDiscovery:
-      clusterName: "${local.cluster_name}"
+      clusterName: "${var.label}"
 crunchy-postgres:
   enabled: true
   postgres-data:

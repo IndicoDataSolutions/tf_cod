@@ -380,7 +380,7 @@ module "snowflake" {
   aws_account_name      = var.aws_account
 }
 
-# argo 
+# argo
 provider "argocd" {
   server_addr = var.argo_host
   username    = var.argo_username
@@ -464,7 +464,7 @@ module "argo-registration" {
   }
 
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.1.16"
+  version                      = "1.2.1"
   cluster_name                 = var.label
   region                       = var.region
   argo_password                = var.argo_password
@@ -476,12 +476,11 @@ module "argo-registration" {
   argo_github_team_admin_group = var.argo_github_team_owner
   endpoint                     = module.cluster.kubernetes_host
   ca_data                      = module.cluster.kubernetes_cluster_ca_certificate
-
+  indico_dev_cluster           = var.aws_account == "Indico-Dev"
 }
 
 locals {
   security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
-  cluster_name      = var.label
   dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${var.aws_account}.${var.domain_suffix}") : var.domain_host
   #dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
 }

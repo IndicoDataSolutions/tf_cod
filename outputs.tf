@@ -52,7 +52,11 @@ output "fsx_storage_fsx_rwx_subnet_id" {
 }
 
 output "cluster_name" {
-  value = local.cluster_name
+  value = var.label
+}
+
+output "cluster_region" {
+  value = var.region
 }
 
 output "dns_name" {
@@ -75,4 +79,24 @@ output "kube_ca_certificate" {
 output "kube_token" {
   sensitive = true
   value     = module.cluster.kubernetes_token
+}
+
+output "harness_delegate_name" {
+  value = var.harness_delegate == true && length(module.harness_delegate) > 0 ? module.harness_delegate[0].delegate_name : ""
+}
+
+output "ipa_version" {
+  value = var.ipa_version
+}
+
+output "argo_branch" {
+  value = var.argo_branch
+}
+
+output "argo_path" {
+  value = var.argo_path
+}
+
+output "argo_repo" {
+  value = var.argo_repo
 }

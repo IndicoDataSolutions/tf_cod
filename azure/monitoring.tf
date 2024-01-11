@@ -263,6 +263,23 @@ resource "helm_release" "keda-monitoring" {
 
 
   values = [<<EOF
+    image:
+      metricsApiServer:
+        repository: harbor.devops.indico.io/ghcr.io/kedacore/keda-metrics-apiserver
+      webhooks:
+        repository: harbor.devops.indico.io/ghcr.io/kedacore/keda-admission-webhooks
+      keda:
+        repository: harbor.devops.indico.io/ghcr.io/kedacore/keda
+    imagePullSecrets:
+      - name: harbor-pull-secret
+      
+    resources:
+      operator:
+        requests:
+          memory: 512Mi
+        limits:
+          memory: 2Gi
+
     crds:
       install: true
     
@@ -310,6 +327,10 @@ resource "helm_release" "opentelemetry-collector" {
 
   values = [<<EOF
     enabled: true
+    imagePullSecrets:
+      - name: harbor-pull-secret
+    image:
+      repository: harbor.devops.indico.io/docker.io/otel/opentelemetry-collector-contrib
     fullnameOverride: "collector-collector"
     mode: deployment
     tolerations:
