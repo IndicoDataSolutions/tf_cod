@@ -815,6 +815,10 @@ variable "terraform_smoketests_enabled" {
   default = true
 }
 
+variable "on_prem_test" {
+  type    = bool
+  default = false
+}
 variable "harness_delegate" {
   type    = bool
   default = false

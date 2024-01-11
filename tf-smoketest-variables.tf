@@ -136,9 +136,9 @@ resource "kubernetes_config_map" "terraform-variables" {
     thanos_enabled = "${jsonencode(var.thanos_enabled)}"
     keycloak_enabled = "${jsonencode(var.keycloak_enabled)}"
     terraform_smoketests_enabled = "${jsonencode(var.terraform_smoketests_enabled)}"
+    on_prem_test = "${jsonencode(var.on_prem_test)}"
     harness_delegate = "${jsonencode(var.harness_delegate)}"
     harness_mount_path = "${jsonencode(var.harness_mount_path)}"
-
     }
   }
   

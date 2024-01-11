@@ -507,6 +507,3 @@ resource "aws_route53_record" "ipa-app-caa" {
   ]
   provider = aws.dns-control
 }
-
-
-

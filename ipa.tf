@@ -6,6 +6,8 @@ locals {
   the_domain            = local.the_splits[local.the_length - 2]
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
 
+  storage_class = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
+
   enable_external_dns = var.use_static_ssl_certificates == false ? true : false
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:
@@ -496,7 +498,8 @@ resource "helm_release" "ipa-pre-requisites" {
     module.fsx-storage,
     helm_release.ipa-crds,
     data.vault_kv_secret_v2.zerossl_data,
-    data.github_repository_file.data-pre-reqs-values
+    data.github_repository_file.data-pre-reqs-values,
+    null_resource.update_storage_class
   ]
 
   verify           = false
@@ -606,7 +609,7 @@ crunchy-postgres:
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
       dataVolumeClaimSpec:
-        storageClassName: encrypted-gp2
+        storageClassName: ${local.storage_class}
         accessModes:
         - ReadWriteOnce
         resources:
@@ -680,7 +683,7 @@ crunchy-postgres:
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
       dataVolumeClaimSpec:
-        storageClassName: encrypted-gp2
+        storageClassName: ${local.storage_class}
         accessModes:
         - ReadWriteOnce
         resources:
