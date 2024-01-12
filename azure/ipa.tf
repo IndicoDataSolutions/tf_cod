@@ -221,7 +221,7 @@ resource "helm_release" "ipa-crds" {
   repository       = var.ipa_repo
   chart            = "ipa-crds"
   version          = var.ipa_crds_version
-  timeout          = "600" # 10 minutes
+  timeout          = "1800" # 30 minutes
   wait             = true
 
   values = [<<EOF
