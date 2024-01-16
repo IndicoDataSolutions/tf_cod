@@ -188,7 +188,7 @@ module "sqs_sns" {
   version = "1.2.0"
   region  = var.region
   label   = var.label
-   kms_master_key_id = module.kms_key.key
+  kms_master_key_id = module.kms_key.key.id
 }
 
 module "kms_key" {
