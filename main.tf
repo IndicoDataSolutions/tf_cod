@@ -185,14 +185,15 @@ module "private_networking" {
 module "sqs_sns" {
   count   = var.sqs_sns == true ? 1 : 0
   source  = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
-  version = "1.1.2"
+  version = "1.2.0"
   region  = var.region
   label   = var.label
+  kms_master_key_id = module.kms_key.key.id
 }
 
 module "kms_key" {
   source           = "app.terraform.io/indico/indico-aws-kms/mod"
-  version          = "2.0.2"
+  version          = "2.1.0"
   label            = var.label
   additional_tags  = var.additional_tags
   existing_kms_key = var.existing_kms_key
