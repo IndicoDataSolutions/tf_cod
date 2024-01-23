@@ -8,7 +8,7 @@ vnet_cidr               = "192.168.0.0/20"
 subnet_cidrs            = ["192.168.0.0/22"]
 storage_account_name    = ""
 private_cluster_enabled = false
-k8s_version             = "1.27.3"
+k8s_version             = "1.28.3"
 
 default_node_pool = {
   name       = "defaultpool"
