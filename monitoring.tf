@@ -120,7 +120,7 @@ ${local.thanos_config}
 
     thanosService:
       enabled: ${var.thanos_enabled}
-    
+
     prometheusSpec:
       disableCompaction: ${var.thanos_enabled}
       externalLabels:
@@ -190,16 +190,6 @@ resource "random_password" "monitoring-password" {
   length  = 16
   special = false
 }
-
-output "monitoring-username" {
-  value = "monitoring"
-}
-
-output "monitoring-password" {
-  sensitive = true
-  value     = random_password.monitoring-password.result
-}
-
 
 resource "helm_release" "monitoring" {
   count = var.monitoring_enabled == true ? 1 : 0
@@ -337,16 +327,16 @@ resource "helm_release" "keda-monitoring" {
           memory: 512Mi
         limits:
           memory: 2Gi
-        
+
     crds:
       install: true
-    
+
     podAnnotations:
       keda:
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "8080"
-      metricsAdapter: 
+      metricsAdapter:
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "9022"

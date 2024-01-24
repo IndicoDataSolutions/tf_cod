@@ -100,3 +100,12 @@ output "argo_path" {
 output "argo_repo" {
   value = var.argo_repo
 }
+
+output "monitoring-username" {
+  value = "monitoring"
+}
+
+output "monitoring-password" {
+  sensitive = true
+  value     = var.monitoring_enabled == true ? random_password.monitoring-password.result : ""
+}
