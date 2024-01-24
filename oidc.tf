@@ -81,7 +81,7 @@ resource "kubernetes_cluster_role_binding" "devops-rbac-bindings" {
     module.cluster
   ]
 
-  count = var.oidc_enabled == true
+  count = var.oidc_enabled == true ? 1 : 0
 
   metadata {
     name = "oidc-cod-devops-admins"
