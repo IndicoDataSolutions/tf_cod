@@ -74,6 +74,7 @@ data "vault_kv_secret_v2" "harbor-api-token" {
 }
 
 resource "github_repository_file" "pre-reqs-values-yaml" {
+  count               = var.argo_enabled == true ? 1 : 0
   repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/pre-reqs-values.values"
@@ -90,6 +91,7 @@ resource "github_repository_file" "pre-reqs-values-yaml" {
 
 
 resource "github_repository_file" "crds-values-yaml" {
+  count               = var.argo_enabled == true ? 1 : 0
   repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/crds-values.values"
@@ -105,6 +107,8 @@ resource "github_repository_file" "crds-values-yaml" {
 }
 
 data "github_repository_file" "data-crds-values" {
+  count = var.argo_enabled == true ? 1 : 0
+
   depends_on = [
     github_repository_file.crds-values-yaml
   ]
@@ -115,6 +119,8 @@ data "github_repository_file" "data-crds-values" {
 
 
 data "github_repository_file" "data-pre-reqs-values" {
+  count = var.argo_enabled == true ? 1 : 0
+
   depends_on = [
     github_repository_file.pre-reqs-values-yaml
   ]
