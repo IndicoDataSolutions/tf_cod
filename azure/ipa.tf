@@ -256,7 +256,7 @@ resource "helm_release" "ipa-crds" {
 EOF
     ,
     <<EOT
-${data.github_repository_file.data-crds-values.content}
+${data.github_repository_file.data-crds-values[0].content}
 EOT
   ]
 }
