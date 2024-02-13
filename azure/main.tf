@@ -39,7 +39,15 @@ terraform {
       source  = "hashicorp/vault"
       version = "3.13.0"
     }
+    statuscake = {
+      source  = "StatusCakeDev/statuscake"
+      version = "2.2.2"
+    }
   }
+}
+
+provider "statuscake" {
+  api_token = var.statuscake_api_key
 }
 
 provider "azurerm" {

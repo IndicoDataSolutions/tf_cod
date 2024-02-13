@@ -618,7 +618,7 @@ variable "enable_weather_station" {
 }
 
 variable "aws_primary_dns_role_arn" {
-  type        = string 
+  type        = string
   default     = ""
   description = "The AWS arn for the role needed to manage route53 DNS in a different account."
 }
@@ -828,3 +828,15 @@ variable "harness_mount_path" {
   type    = string
   default = "harness"
 }
+
+variable "statuscake_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "statuscake_api_key" {
+  type      = string
+  sensitive = true
+}
+
+
