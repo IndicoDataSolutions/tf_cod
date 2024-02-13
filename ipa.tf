@@ -313,6 +313,19 @@ module "secrets-operator-setup" {
 }
 
 
+module "statuscake-monitoring" {
+  depends_on = [
+    module.cluster
+  ]
+  count        = var.argo_enabled == true && var.statuscake_enabled == true ? 1 : 0
+  source       = "./modules/common/statuscake"
+  app_edge_url = "https://{local.dns_name}"
+  cluster_name = lower("${var.aws_account}-${var.region}-${var.label}")
+}
+
+
+
+
 resource "helm_release" "ipa-vso" {
   count = var.thanos_enabled == true ? 1 : 0
   depends_on = [
