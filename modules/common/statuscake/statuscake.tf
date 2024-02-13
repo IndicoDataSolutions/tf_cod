@@ -1,5 +1,5 @@
 resource "statuscake_ssl_check" "app-edge" {
-  check_interval   = 43200 # every 12 hours
+  check_interval   = 3600 # every 6 hours
   user_agent       = "terraform managed SSL check"
   follow_redirects = true
 
