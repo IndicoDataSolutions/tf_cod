@@ -323,9 +323,6 @@ module "statuscake-monitoring" {
   cluster_name = lower("${var.aws_account}-${var.region}-${var.label}")
 }
 
-
-
-
 resource "helm_release" "ipa-vso" {
   count = var.thanos_enabled == true ? 1 : 0
   depends_on = [
