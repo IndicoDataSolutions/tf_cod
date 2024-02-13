@@ -312,7 +312,6 @@ module "secrets-operator-setup" {
   kubernetes_host = module.cluster.kubernetes_host
 }
 
-
 module "statuscake-monitoring" {
   depends_on = [
     module.cluster
