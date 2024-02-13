@@ -837,6 +837,7 @@ variable "statuscake_enabled" {
 variable "statuscake_api_key" {
   type      = string
   sensitive = true
+  default   = ""
 }
 
 
