@@ -1,3 +1,25 @@
+resource "statuscake_ssl_check" "app-edge" {
+  check_interval   = 43200 # every 12 hours
+  user_agent       = "terraform managed SSL check"
+  follow_redirects = true
+
+  alert_config {
+    alert_at    = [29, 7, 1]
+    on_broken   = false
+    on_expiry   = true
+    on_mixed    = false
+    on_reminder = true
+  }
+
+  contact_groups = [
+    var.statuscake_devops_sa_contact_group_id
+  ]
+
+  monitored_resource {
+    address = var.app_edge_url
+  }
+}
+
 resource "statuscake_uptime_check" "app-edge" {
   check_interval = 60
   confirmation   = 3
