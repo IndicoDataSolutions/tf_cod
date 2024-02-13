@@ -107,3 +107,5 @@ include_fsx                 = false
 include_efs                 = true
 #cluster
 az_count = 2
+
+statuscake_enabled = true

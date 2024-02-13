@@ -648,3 +648,14 @@ variable "harness_mount_path" {
   type    = string
   default = "harness"
 }
+
+variable "statuscake_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "statuscake_api_key" {
+  type      = string
+  sensitive = true
+  default = ""
+}

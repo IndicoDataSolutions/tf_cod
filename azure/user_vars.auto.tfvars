@@ -139,3 +139,5 @@ additional_node_pools = {
     cluster_auto_scaling_max_count = 1
   }
 }
+
+statuscake_enabled = true
