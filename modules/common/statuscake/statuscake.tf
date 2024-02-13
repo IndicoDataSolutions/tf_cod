@@ -35,7 +35,3 @@ resource "statuscake_uptime_check" "app-edge" {
     "tf_cod"
   ]
 }
-
-output "example_com_uptime_check_id" {
-  value = statuscake_uptime_check.example_com.id
-}
