@@ -5,7 +5,7 @@ resource "statuscake_uptime_check" "app-edge" {
   trigger_rate   = 10
 
   contact_groups = [
-    data.statuscake_contact_group.devops-sa.id
+    var.statuscake_devops_sa_contact_group_id
   ]
 
 
