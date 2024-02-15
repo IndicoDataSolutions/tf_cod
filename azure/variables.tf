@@ -648,3 +648,8 @@ variable "harness_mount_path" {
   type    = string
   default = "harness"
 }
+
+variable "terraform_smoketests_enabled" {
+  type    = bool
+  default = true
+}
