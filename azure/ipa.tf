@@ -472,6 +472,7 @@ resource "kubernetes_config_map" "azure_dns_credentials" {
 
 
 resource "kubectl_manifest" "thanos-storage-secret" {
+  count      = var.thanos_enabled ? 1 : 0
   depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
   yaml_body  = <<YAML
     apiVersion: "secrets.hashicorp.com/v1beta1"
