@@ -156,6 +156,7 @@ provider "aws" {
   alias                       = "aws-indico-devops"
   skip_credentials_validation = var.thanos_enabled == true ? false : true
   skip_requesting_account_id  = var.thanos_enabled == true ? false : true
+  skip_metadata_api_check     = var.thanos_enabled == true ? false : true
 }
 
 data "aws_eks_cluster" "thanos" {

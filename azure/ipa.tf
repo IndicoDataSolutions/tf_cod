@@ -309,6 +309,7 @@ resource "helm_release" "terraform-smoketests" {
     kubernetes_config_map.terraform-variables,
     helm_release.monitoring
   ]
+  count = var.terraform_smoketests_enabled == true ? 1 : 0
 
   verify           = false
   name             = "terraform-smoketests-${substr(data.external.git_information.result.sha, 0, 8)}"
