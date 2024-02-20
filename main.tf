@@ -183,11 +183,11 @@ module "private_networking" {
 }
 
 module "sqs_sns" {
-  count   = var.sqs_sns == true ? 1 : 0
-  source  = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
-  version = "1.2.0"
-  region  = var.region
-  label   = var.label
+  count             = var.sqs_sns == true ? 1 : 0
+  source            = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
+  version           = "1.2.0"
+  region            = var.region
+  label             = var.label
   kms_master_key_id = module.kms_key.key.id
 }
 
@@ -210,13 +210,14 @@ module "security-group" {
 
 module "s3-storage" {
   source            = "app.terraform.io/indico/indico-aws-buckets/mod"
-  version           = "2.0.3"
+  version           = "3.2.0"
   force_destroy     = true # allows terraform to destroy non-empty buckets.
   label             = var.label
   kms_key_arn       = module.kms_key.key.arn
   submission_expiry = var.submission_expiry
   uploads_expiry    = var.uploads_expiry
   include_rox       = var.include_rox
+  enable_backup     = var.enable_s3_backup
 }
 
 

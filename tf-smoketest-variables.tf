@@ -139,6 +139,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     on_prem_test = "${jsonencode(var.on_prem_test)}"
     harness_delegate = "${jsonencode(var.harness_delegate)}"
     harness_mount_path = "${jsonencode(var.harness_mount_path)}"
+    enable_s3_backup = "${jsonencode(var.enable_s3_backup)}"
 
     }
   }
