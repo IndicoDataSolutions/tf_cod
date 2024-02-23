@@ -239,7 +239,7 @@ module "efs-storage" {
 module "fsx-storage" {
   count                       = var.include_fsx == true ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-fsx/mod"
-  version                     = "1.4.1"
+  version                     = "1.4.2"
   label                       = var.label
   additional_tags             = var.additional_tags
   region                      = var.region
