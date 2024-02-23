@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.38.0"
+      version = "~> 5.14.0"
     }
     time = {
       source  = "hashicorp/time"
@@ -239,7 +239,7 @@ module "efs-storage" {
 module "fsx-storage" {
   count                       = var.include_fsx == true ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-fsx/mod"
-  version                     = "1.4.1"
+  version                     = "1.4.2"
   label                       = var.label
   additional_tags             = var.additional_tags
   region                      = var.region
