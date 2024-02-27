@@ -209,7 +209,7 @@ module "argo-registration" {
 provider "local" {}
 
 locals {
-  resource_group_name = "${var.label}-${var.region}"
+  resource_group_name = coalesce(var.resource_group_name, "${var.label}-${var.region}")
 
   snapshot_storage_account_name = replace(lower("${var.account}snapshots"), "-", "")
   storage_account_name          = replace(lower(var.storage_account_name), "-", "")

@@ -653,3 +653,9 @@ variable "terraform_smoketests_enabled" {
   type    = bool
   default = true
 }
+
+variable "resource_group_name" {
+  type    = string
+  default = null
+}
+
