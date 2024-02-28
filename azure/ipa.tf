@@ -309,6 +309,7 @@ resource "helm_release" "terraform-smoketests" {
     kubernetes_config_map.terraform-variables,
     helm_release.monitoring
   ]
+  count = var.terraform_smoketests_enabled == true ? 1 : 0
 
   verify           = false
   name             = "terraform-smoketests-${substr(data.external.git_information.result.sha, 0, 8)}"
@@ -471,6 +472,7 @@ resource "kubernetes_config_map" "azure_dns_credentials" {
 
 
 resource "kubectl_manifest" "thanos-storage-secret" {
+  count      = var.thanos_enabled ? 1 : 0
   depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
   yaml_body  = <<YAML
     apiVersion: "secrets.hashicorp.com/v1beta1"

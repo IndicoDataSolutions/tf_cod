@@ -156,6 +156,7 @@ provider "aws" {
   alias                       = "aws-indico-devops"
   skip_credentials_validation = var.thanos_enabled == true ? false : true
   skip_requesting_account_id  = var.thanos_enabled == true ? false : true
+  skip_metadata_api_check     = var.thanos_enabled == true ? false : true
 }
 
 data "aws_eks_cluster" "thanos" {
@@ -208,7 +209,7 @@ module "argo-registration" {
 provider "local" {}
 
 locals {
-  resource_group_name = "${var.label}-${var.region}"
+  resource_group_name = coalesce(var.resource_group_name, "${var.label}-${var.region}")
 
   snapshot_storage_account_name = replace(lower("${var.account}snapshots"), "-", "")
   storage_account_name          = replace(lower(var.storage_account_name), "-", "")
