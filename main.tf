@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.14.0"
+      version = "5.38.0"
     }
     time = {
       source  = "hashicorp/time"
@@ -295,6 +295,11 @@ module "fsx-storage" {
 }
 
 module "cluster" {
+  depends_on = [ 
+    module.fsx-storage,
+    module.efs-storage,
+    module.efs-storage-local-registry
+   ]
   cod_snapshots_enabled      = true
   allow_dns_management       = true
   aws_account_name           = var.aws_account
