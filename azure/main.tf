@@ -310,7 +310,7 @@ locals {
 }
 
 data "vault_kv_secret_v2" "readapi_secret" {
-  mount = "customer-${var.account}"
+  mount = "customer-${var.vault_mount_path}"
   name  = local.readapi_secret_path
 }
 
