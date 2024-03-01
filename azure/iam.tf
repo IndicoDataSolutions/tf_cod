@@ -23,7 +23,7 @@ resource "azurerm_role_assignment" "cluster_admin" {
   count                = var.enable_ad_group_mapping == true ? 1 : 0
   scope                = module.cluster.id
   role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
-  principal_id         = azuread_group.cluster_admin.object_id
+  principal_id         = azuread_group.cluster_admin.0.object_id
 }
 
 resource "azuread_group" "default_admin" {
@@ -37,7 +37,7 @@ resource "azurerm_role_assignment" "default_admin" {
   count                = var.enable_ad_group_mapping == true ? 1 : 0
   scope                = "${module.cluster.id}/namespaces/default"
   role_definition_name = "Azure Kubernetes Service RBAC Admin"
-  principal_id         = azuread_group.default_admin.object_id
+  principal_id         = azuread_group.default_admin.0.object_id
 }
 
 resource "azuread_group" "default_write" {
@@ -51,7 +51,7 @@ resource "azurerm_role_assignment" "default_write" {
   count                = var.enable_ad_group_mapping == true ? 1 : 0
   scope                = "${module.cluster.id}/namespaces/default"
   role_definition_name = "Azure Kubernetes Service RBAC Writer"
-  principal_id         = azuread_group.default_write.object_id
+  principal_id         = azuread_group.default_write.0.object_id
 }
 
 resource "azuread_group" "default_read" {
@@ -65,7 +65,7 @@ resource "azurerm_role_assignment" "default_read" {
   count                = var.enable_ad_group_mapping == true ? 1 : 0
   scope                = "${module.cluster.id}/namespaces/default"
   role_definition_name = "Azure Kubernetes Service RBAC Reader"
-  principal_id         = azuread_group.default_read.object_id
+  principal_id         = azuread_group.default_read.0.object_id
 }
 
 resource "kubectl_manifest" "engineering-role-binding" {
