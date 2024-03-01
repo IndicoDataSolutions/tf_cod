@@ -15,7 +15,7 @@ resource "azuread_group" "cluster_admin" {
 # add engineering group to admins
 resource "azuread_group_member" "engineering" {
   count            = var.enable_ad_group_mapping == true ? 1 : 0
-  group_object_id  = azuread_group.cluster_admin.id
+  group_object_id  = azuread_group.cluster_admin.0.id
   member_object_id = data.azuread_group.engineering.0.id
 }
 
