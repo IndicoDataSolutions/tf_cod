@@ -45,13 +45,13 @@ EOT
       enabled: true
       ingressClassName: nginx
       hosts:
-        - alertmanager-${local.dns_name}
+        - alertmanager-${var.dns_name}
       paths:
         - /
       tls:
         - secretName: ${var.ssl_static_secret_name}
           hosts:
-            - alertmanager-${local.dns_name}
+            - alertmanager-${var.dns_name}
   prometheus:
     annotations:
       reloader.stakater.com/auto: "true"
@@ -68,7 +68,7 @@ EOT
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
         clusterName: ${var.label}
-        clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
+        clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.label}")}
 ${local.thanos_config}
       nodeSelector:
         node_group: static-workers
@@ -80,13 +80,13 @@ ${local.thanos_config}
         acme.cert-manager.io/dns01-solver: "true"
       ingressClassName: nginx
       hosts:
-        - prometheus-${local.dns_name}
+        - prometheus-${var.dns_name}
       paths:
         - /
       tls:
         - secretName: ${var.ssl_static_secret_name}
           hosts:
-            - prometheus-${local.dns_name}
+            - prometheus-${var.dns_name}
   grafana:
     ingress:
       annotations:
@@ -96,12 +96,12 @@ ${local.thanos_config}
       enabled: true
       ingressClassName: nginx
       hosts:
-        - grafana-${local.dns_name}
+        - grafana-${var.dns_name}
       path: /
       tls:
         - secretName: ${var.ssl_static_secret_name}
           hosts:
-            - grafana-${local.dns_name}
+            - grafana-${var.dns_name}
   EOT
     ) : (<<EOT
   alertmanager:
@@ -127,7 +127,7 @@ ${local.thanos_config}
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
         clusterName: ${var.label}
-        clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
+        clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.label}")}
 ${local.thanos_config}
       nodeSelector:
         node_group: static-workers
@@ -146,10 +146,7 @@ EOT
   )
 }
 
-
-
 resource "aws_route53_record" "grafana-caa" {
-  count   = var.monitoring_enabled == true ? 1 : 0
   zone_id = data.aws_route53_zone.primary.zone_id
   name    = lower("grafana.${local.dns_name}")
   type    = "CAA"
@@ -160,9 +157,7 @@ resource "aws_route53_record" "grafana-caa" {
   provider = aws.dns-control
 }
 
-
 resource "aws_route53_record" "prometheus-caa" {
-  count   = var.monitoring_enabled == true ? 1 : 0
   zone_id = data.aws_route53_zone.primary.zone_id
   name    = lower("prometheus.${local.dns_name}")
   type    = "CAA"
@@ -174,7 +169,6 @@ resource "aws_route53_record" "prometheus-caa" {
 }
 
 resource "aws_route53_record" "alertmanager-caa" {
-  count   = var.monitoring_enabled == true ? 1 : 0
   zone_id = data.aws_route53_zone.primary.zone_id
   name    = lower("alertmanager.${local.dns_name}")
   type    = "CAA"
@@ -202,7 +196,6 @@ output "monitoring-password" {
 
 
 resource "helm_release" "monitoring" {
-  count = var.monitoring_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
     helm_release.ipa-pre-requisites,
@@ -227,7 +220,7 @@ resource "helm_release" "monitoring" {
 
   values = [<<EOF
 global:
-  host: "${local.dns_name}"
+  host: "${var.dns_name}"
 
 ingress-nginx:
   enabled: true
@@ -253,61 +246,7 @@ EOF
   ]
 }
 
-
-resource "kubectl_manifest" "thanos-datasource-credentials" {
-  count     = var.thanos_enabled ? 1 : 0
-  provider  = kubectl.thanos-kubectl
-  yaml_body = <<YAML
-apiVersion: v1
-stringData:
-  admin-password: ${random_password.monitoring-password.result}
-kind: Secret
-metadata:
-  name: ${replace(local.dns_name, ".", "-")}
-  namespace: default
-type: Opaque
-  YAML
-}
-
-resource "kubectl_manifest" "thanos-datasource" {
-  count      = var.thanos_enabled ? 1 : 0
-  depends_on = [kubectl_manifest.thanos-datasource-credentials]
-  provider   = kubectl.thanos-kubectl
-  yaml_body  = <<YAML
-apiVersion: grafana.integreatly.org/v1beta1
-kind: GrafanaDatasource
-metadata:
-  name: ${replace(local.dns_name, ".", "-")}
-  namespace: default
-spec:
-  valuesFrom:
-    - targetPath: "secureJsonData.basicAuthPassword"
-      valueFrom:
-        secretKeyRef:
-          name: ${replace(local.dns_name, ".", "-")}
-          key: admin-password
-  datasource:
-    basicAuth: true
-    basicAuthUser: monitoring
-    editable: false
-    access: proxy
-    editable: true
-    jsonData:
-      timeInterval: 5s
-      tlsSkipVerify: true
-    name: ${local.dns_name}
-    secureJsonData:
-      basicAuthPassword: $${admin-password}
-    type: prometheus
-    url: https://prometheus.${local.dns_name}/prometheus
-  instanceSelector:
-    matchLabels:
-      dashboards: external-grafana
-  YAML
-}
-
 resource "helm_release" "keda-monitoring" {
-  count = var.monitoring_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
     helm_release.monitoring
@@ -365,7 +304,6 @@ resource "helm_release" "keda-monitoring" {
 }
 
 resource "helm_release" "opentelemetry-collector" {
-  count = var.monitoring_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
     helm_release.monitoring
