@@ -140,6 +140,7 @@ module "local-registry" {
   ipa_repo               = var.ipa_repo
   local_registry_version = var.local_registry_version
   dns_name               = local.dns_name
+  efs_filesystem_id      = module.infra.local_registry_efs_filesystem_id
 }
 /*
 module "monitoring" {

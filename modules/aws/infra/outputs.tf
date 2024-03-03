@@ -14,8 +14,13 @@ output "kube_token" {
 
 # EFS outputs
 output "efs_filesystem_id" {
-  description = "ID of the EFS filesystem"
   value       = var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""
+  description = "ID of the EFS filesystem"
+}
+
+output "local_registry_efs_filesystem_id" {
+  value = var.local_registry_enabled ? module.efs-storage-local-registry[0].efs_filesystem_id : null
+  description = "ID of the EFS filesystem for local-registry"
 }
 
 # FSX outputs

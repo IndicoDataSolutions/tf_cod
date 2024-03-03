@@ -3,16 +3,7 @@ data "vault_kv_secret_v2" "account-robot-credentials" {
   name  = "harbor-registry"
 }
 
-data "vault_kv_secret_v2" "harbor-api-token" {
-  count = var.argo_enabled == true ? 1 : 0
-  mount = "tools/argo"
-  name  = "harbor-api"
-}
-
-
 resource "aws_efs_access_point" "local-registry" {
-  depends_on = [module.efs-storage-local-registry[0]]
-
   root_directory {
     path = "/registry"
     creation_info {
@@ -26,13 +17,12 @@ resource "aws_efs_access_point" "local-registry" {
     gid = 1000
     uid = 1000
   }
-  file_system_id = module.efs-storage-local-registry[0].efs_filesystem_id
+  file_system_id = var.efs_filesystem_id
 }
 
 
 # TODO: move all kubernetes resources here to the helm chart
 resource "kubernetes_persistent_volume_claim" "local-registry" {
-
   depends_on = [
     kubernetes_namespace.local-registry,
     kubernetes_persistent_volume.local-registry
@@ -55,10 +45,6 @@ resource "kubernetes_persistent_volume_claim" "local-registry" {
 }
 
 resource "kubernetes_persistent_volume" "local-registry" {
-  depends_on = [
-    module.efs-storage-local-registry[0]
-  ]
-
   metadata {
     name = "local-registry"
   }
@@ -74,9 +60,15 @@ resource "kubernetes_persistent_volume" "local-registry" {
     persistent_volume_source {
       csi {
         driver        = "efs.csi.aws.com"
-        volume_handle = "${module.efs-storage-local-registry[0].efs_filesystem_id}::${aws_efs_access_point.local-registry[0].id}"
+        volume_handle = "${var.efs_filesystem_id}::${aws_efs_access_point.local-registry.id}"
       }
     }
+  }
+}
+
+resource "kubernetes_namespace" "local-registry" { #TODO: set create_namespace = true for local-registry
+  metadata {
+    name = "local-registry"
   }
 }
 
@@ -92,8 +84,6 @@ resource "kubernetes_storage_class_v1" "local-registry" { #TODO: add to local-re
 resource "helm_release" "local-registry" {
   depends_on = [
     kubernetes_namespace.local-registry,
-    time_sleep.wait_1_minutes_after_pre_reqs,
-    module.cluster,
     kubernetes_persistent_volume_claim.local-registry
   ]
 

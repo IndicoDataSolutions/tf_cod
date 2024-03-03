@@ -24,3 +24,8 @@ variable "dns_name" {
   type        = string
   description = "dns name for the cluster"
 }
+
+variable "efs_filesystem_id" {
+  type        = string
+  description = "id for local-registry efs filesystem"
+}
