@@ -135,7 +135,6 @@ resource "helm_release" "nfs-provider" {
   version    = "4.0.18"
   namespace  = "default"
   depends_on = [
-    module.cluster,
     kubectl_manifest.nfs_server_service,
     data.local_file.nfs_ip
   ]
