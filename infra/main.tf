@@ -87,9 +87,10 @@ module "common_helm" {
   depends_on = [null_resource.stage_one]
 
   providers = {
-    github = github
-    helm   = helm
-    vault  = vault
+    github  = github
+    helm    = helm
+    kubectl = kubectl
+    vault   = vault
   }
 
   aws_account = var.aws_account

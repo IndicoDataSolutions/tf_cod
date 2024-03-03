@@ -6,6 +6,9 @@ terraform {
     helm = {
       source = "hashicorp/helm"
     }
+    kubectl = {
+      source = "gavinbunney/kubectl"
+    }
     vault = {
       source = "hashicorp/vault"
     }

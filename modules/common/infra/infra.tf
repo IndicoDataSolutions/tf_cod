@@ -214,25 +214,6 @@ EOT
   )
 }
 
-resource "null_resource" "update_storage_class" {
-  count     = var.on_prem_test == true ? 1 : 0
-  depends_on = [
-    helm_release.nfs-provider
-  ]
-
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-
-  provisioner "local-exec" {
-    command = "./kubectl patch storageclass gp2 -p '{\"metadata\": {\"annotations\":{\"storageclass.kubernetes.io/is-default-class\":\"false\"}}}'"
-  }
-
-  provisioner "local-exec" {
-    command = "./kubectl patch storageclass nfs-client -p '{\"metadata\": {\"annotations\":{\"storageclass.kubernetes.io/is-default-class\":\"true\"}}}'"
-  }
-}
-
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
     time_sleep.wait_1_minutes_after_crds,
