@@ -108,11 +108,11 @@ resource "github_repository_file" "infra-pre-reqs-values-yaml" {
   content = base64decode(var.infra-pre-reqs-values-yaml-b64)
 }
 
-data "github_repository_file" "data-pre-reqs-values" {
+data "github_repository_file" "data-infra-pre-reqs-values" {
   count = var.argo_enabled == true ? 1 : 0
 
   depends_on = [
-    github_repository_file.pre-reqs-values-yaml
+    github_repository_file.infra-pre-reqs-values-yaml
   ]
   repository = data.github_repository.argo-github-repo[0].name
   branch     = var.argo_branch
