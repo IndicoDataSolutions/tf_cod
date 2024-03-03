@@ -64,7 +64,7 @@ resource "null_resource" "stage_one" {
   }
 }
 
-module "infra" {
+module "aws_helm" {
   source = "../modules/aws/helm"
 
   depends_on = [null_resource.stage_one]
@@ -75,9 +75,9 @@ module "infra" {
     kubernetes      = kubernetes
   }
 
-  dns_name                 = local.dns_name
-  k8s_dashboard_chart_version                      = var.k8s_dashboard_chart_version
-  ipa_repo                       = var.ipa_repo
-  use_static_ssl_certificates                        = var.use_static_ssl_certificates
-  ssl_static_secret_name             = var.ssl_static_secret_name
+  dns_name                    = local.dns_name
+  k8s_dashboard_chart_version = var.k8s_dashboard_chart_version
+  ipa_repo                    = var.ipa_repo
+  use_static_ssl_certificates = var.use_static_ssl_certificates
+  ssl_static_secret_name      = var.ssl_static_secret_name
 }
