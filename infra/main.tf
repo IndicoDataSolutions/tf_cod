@@ -55,3 +55,11 @@ module "infra" {
 
   aws_primary_dns_role_arn = var.aws_primary_dns_role_arn
 }
+
+resource "null_resource" "stage_one" {
+  depends_on = [module.infra]
+
+  provisioner "local-exec" {
+    command = "echo Infrastructure Creation complete, moving on to general charts"
+  }
+}
