@@ -10,10 +10,6 @@ data "vault_kv_secret_v2" "zerossl_data" {
 
 # TODO: move to helm chart
 resource "kubernetes_secret" "harbor-pull-secret" {
-  depends_on = [
-    module.cluster
-  ]
-
   metadata {
     name      = "harbor-pull-secret"
     namespace = "default"
@@ -58,9 +54,7 @@ data "github_repository_file" "data-crds-values" {
 
 resource "helm_release" "ipa-crds" {
   depends_on = [
-    module.cluster,
     data.github_repository_file.data-crds-values,
-    module.secrets-operator-setup
   ]
 
   verify           = false
