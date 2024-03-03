@@ -141,9 +141,10 @@ module "local-registry" {
   local_registry_version = var.local_registry_version
   dns_name               = local.dns_name
   efs_filesystem_id      = module.infra.local_registry_efs_filesystem_id
-  htpasswd               = htpasswd_password.hash.bcrypt
-  general_password       = random_password.password
+  htpasswd_bcrypt        = htpasswd_password.hash.bcrypt
+  general_password       = random_password.password.result
 }
+
 /*
 module "monitoring" {
   source = "../modules/aws/helm"

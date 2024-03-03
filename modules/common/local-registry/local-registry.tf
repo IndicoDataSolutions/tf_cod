@@ -168,10 +168,10 @@ docker-registry:
   replicaCount: 3
   
   secrets:
-    htpasswd: local-user:${var.htpasswd.bcrypt}
+    htpasswd: local-user:${var.htpasswd_bcrypt}
 
 localPullSecret:
-  password: ${var.general_password.result}
+  password: ${var.general_password}
   secretName: local-pull-secret
   username: local-user
 
