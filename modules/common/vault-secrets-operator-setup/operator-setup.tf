@@ -1,3 +1,6 @@
+locals {
+  account_region_name = lower("${var.account}-${var.region}-${var.name}")
+}
 
 resource "kubernetes_service_account_v1" "vault-auth-default" {
   metadata {
