@@ -24,19 +24,6 @@ output "smoketest_chart_version" {
   value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
 }
 
-resource "random_password" "password" {
-  length = 12
-}
-
-resource "random_password" "salt" {
-  length = 8
-}
-
-resource "htpasswd_password" "hash" {
-  password = random_password.password.result
-  salt     = random_password.salt.result
-}
-
 output "local_registry_password" {
   value = htpasswd_password.hash.bcrypt
 }

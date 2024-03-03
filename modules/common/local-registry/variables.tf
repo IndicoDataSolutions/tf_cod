@@ -29,3 +29,15 @@ variable "efs_filesystem_id" {
   type        = string
   description = "id for local-registry efs filesystem"
 }
+
+variable "htpasswd" {
+  type        = string
+  description = "Generated htpasswd"
+  sensitive   = true
+}
+
+variable "general_password" {
+  type        = string
+  description = "Generated general password"
+  sensitive   = true
+}
