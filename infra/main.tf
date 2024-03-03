@@ -87,8 +87,9 @@ module "common_helm" {
   depends_on = [null_resource.stage_one]
 
   providers = {
-    kubernetes = kubernetes
-    helm       = helm
+    github = github
+    helm   = helm
+    vault  = vault
   }
 
   harbor_pull_secret_b64 = var.harbor_pull_secret_b64
