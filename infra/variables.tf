@@ -835,3 +835,8 @@ variable "harness_mount_path" {
   type    = string
   default = "harness"
 }
+
+variable "infra_crds_version" {
+  type    = string
+  default = "1.2.2"
+}

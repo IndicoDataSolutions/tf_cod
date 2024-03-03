@@ -80,3 +80,91 @@ module "aws_helm" {
   use_static_ssl_certificates = var.use_static_ssl_certificates
   ssl_static_secret_name      = var.ssl_static_secret_name
 }
+
+module "common_helm" {
+  source = "../modules/common/infra"
+
+  depends_on = [null_resource.stage_one]
+
+  providers = {
+    kubernetes = kubernetes
+    helm       = helm
+  }
+
+  harbor_pull_secret_b64 = var.harbor_pull_secret_b64
+  vault_mount_path       = var.vault_mount_path
+  argo_enabled           = var.argo_enabled
+  argo_branch            = var.argo_branch
+  argo_path              = var.argo_path
+  message                = var.message
+  ipa_repo               = var.ipa_repo
+  infra_crds_version     = var.infra_crds_version
+  crds-values-yaml-b64   = var.crds-values-yaml-b64
+}
+/*
+module "local-registry" {
+  source = "../modules/aws/helm"
+
+  depends_on = [null_resource.stage_one]
+
+  providers = {
+    kubernetes = kubernetes
+    helm       = helm
+  }
+
+  dns_name                    = local.dns_name
+  k8s_dashboard_chart_version = var.k8s_dashboard_chart_version
+  ipa_repo                    = var.ipa_repo
+  use_static_ssl_certificates = var.use_static_ssl_certificates
+  ssl_static_secret_name      = var.ssl_static_secret_name
+}
+
+module "monitoring" {
+  source = "../modules/aws/helm"
+
+  depends_on = [null_resource.stage_one]
+
+  providers = {
+    kubernetes = kubernetes
+    helm       = helm
+  }
+
+  dns_name                    = local.dns_name
+  k8s_dashboard_chart_version = var.k8s_dashboard_chart_version
+  ipa_repo                    = var.ipa_repo
+  use_static_ssl_certificates = var.use_static_ssl_certificates
+  ssl_static_secret_name      = var.ssl_static_secret_name
+}
+
+module "vault_secrets_operator" {
+  source = "../modules/aws/helm"
+
+  depends_on = [null_resource.stage_one]
+
+  providers = {
+    kubernetes = kubernetes
+    helm       = helm
+  }
+
+  dns_name                    = local.dns_name
+  k8s_dashboard_chart_version = var.k8s_dashboard_chart_version
+  ipa_repo                    = var.ipa_repo
+  use_static_ssl_certificates = var.use_static_ssl_certificates
+  ssl_static_secret_name      = var.ssl_static_secret_name
+}
+
+resource "null_resource" "stage_one" {
+  depends_on = [
+    module.aws_helm,
+    module.common_helm,
+    module.local-registry,
+    module.monitoring,
+    module.vault_secrets_operator
+  ]
+
+  provisioner "local-exec" {
+    command = "echo General Indico Cluster configuration complete, moving on to product deployment and testing"
+  }
+}
+
+*/
