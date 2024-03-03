@@ -8,7 +8,8 @@ terraform {
       source = "hashicorp/helm"
     }
     kubectl = {
-      source = "gavinbunney/kubectl"
+      source                = "gavinbunney/kubectl"
+      configuration_aliases = [kubectl.thanos-kubectl]
     }
     random = {
       source = "hashicorp/random"

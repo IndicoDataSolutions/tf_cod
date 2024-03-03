@@ -160,6 +160,7 @@ module "monitoring" {
     aws.dns-control = aws.dns-control
     helm            = helm
     kubectl         = kubectl
+    kubectl         = kubectl.thanos-kubectl
     random          = random
   }
 
