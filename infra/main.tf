@@ -1,5 +1,4 @@
 module "infra" {
-  count  = var.create_infra == true ? 1 : 0
   source = "../modules/aws/infra"
 
   providers = {
