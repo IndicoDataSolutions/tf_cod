@@ -156,9 +156,10 @@ module "monitoring" {
   depends_on = [null_resource.stage_one]
 
   providers = {
-    aws    = aws
-    helm   = helm
-    random = random
+    aws     = aws
+    helm    = helm
+    kubectl = kubectl
+    random  = random
   }
 
   aws_account = var.aws_account
