@@ -1,15 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source                = "hashicorp/aws"
-      configuration_aliases = [aws.dns-control]
-    }
-    kubernetes = {
-      source = "hashicorp/kubernetes"
-    }
-  }
-}
-
 data "aws_caller_identity" "current" {}
 
 # Private Key for Cluster Manager (TODO:remove)
