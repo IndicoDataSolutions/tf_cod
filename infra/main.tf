@@ -70,9 +70,8 @@ module "aws_helm" {
   depends_on = [null_resource.stage_one]
 
   providers = {
-    aws             = aws
-    aws.dns-control = aws.dns-control
-    kubernetes      = kubernetes
+    kubernetes = kubernetes
+    helm       = helm
   }
 
   dns_name                    = local.dns_name
