@@ -54,6 +54,8 @@ module "infra" {
   eks_addon_version_guardduty = var.eks_addon_version_guardduty
 
   aws_primary_dns_role_arn = var.aws_primary_dns_role_arn
+
+  monitoring_enabled = var.monitoring_enabled
 }
 
 resource "null_resource" "stage_one" {
@@ -174,14 +176,14 @@ module "vault_secrets_operator" {
 module "monitoring" {
   source = "../modules/common/monitoring"
 
+  count = var.monitoring_enabled ? 1 : 0
+
   depends_on = [
     null_resource.stage_one,
     module.vault_secrets_operator
   ]
 
   providers = {
-    aws                    = aws
-    aws.dns-control        = aws.dns-control
     helm                   = helm
     kubectl                = kubectl
     kubectl.thanos-kubectl = kubectl.thanos-kubectl

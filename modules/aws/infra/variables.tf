@@ -226,3 +226,9 @@ variable "is_alternate_account_domain" {
   default     = "false"
   description = "domain name is controlled by a different aws account"
 }
+
+# Set up routes for monitoring
+variable "monitoring_enabled" {
+  type    = bool
+  default = true
+}
