@@ -127,8 +127,12 @@ module "common_helm" {
 module "local-registry" {
   source = "../modules/common/local-registry"
 
-  depends_on = [null_resource.stage_one,
-  module.common_helm]
+  count = var.local_registry_enabled ? 1 : 0
+
+  depends_on = [
+    null_resource.stage_one,
+    module.common_helm
+  ]
 
   providers = {
     kubernetes = kubernetes
