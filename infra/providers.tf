@@ -133,9 +133,8 @@ provider "argocd" {
 }
 
 provider "kubernetes" {
-  host                   = module.cluster.kubernetes_host
-  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  #token                  = module.cluster.kubernetes_token
+  host                   = module.infra.kube_host
+  cluster_ca_certificate = module.infra.kube_ca_certificate
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     args        = ["eks", "get-token", "--cluster-name", var.label]
@@ -144,10 +143,9 @@ provider "kubernetes" {
 }
 
 provider "kubectl" {
-  host                   = module.cluster.kubernetes_host
-  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  #token                  = module.cluster.kubernetes_token
-  load_config_file = false
+  host                   = module.infra.kube_host
+  cluster_ca_certificate = module.infra.kube_ca_certificate
+  load_config_file       = false
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     args        = ["eks", "get-token", "--cluster-name", var.label]
@@ -158,9 +156,8 @@ provider "kubectl" {
 provider "helm" {
   debug = true
   kubernetes {
-    host                   = module.cluster.kubernetes_host
-    cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-    #token                  = module.cluster.kubernetes_token
+    host                   = module.infra.kube_host
+    cluster_ca_certificate = module.infra.kube_ca_certificate
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
       args        = ["eks", "get-token", "--cluster-name", var.label]

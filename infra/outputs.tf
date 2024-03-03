@@ -1,54 +1,55 @@
 
 output "api_models_s3_bucket_name" {
   description = "Name of the api-models s3 bucket"
-  value       = module.s3-storage.api_models_s3_bucket_name
+  value       = module.infra.api_models_s3_bucket_name
 }
 
 output "data_s3_bucket_name" {
   description = "Name of the data s3 bucket"
-  value       = module.s3-storage.data_s3_bucket_name
+  value       = module.infra.data_s3_bucket_name
 }
 
 output "s3_role_id" {
   description = "ID of the S3 role"
-  value       = module.cluster.s3_role_id
+  value       = module.infra.s3_role_id
 }
 
 
 output "efs_filesystem_id" {
   description = "ID of the EFS filesystem"
-  value       = var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""
+  value       = module.infra.efs_filesystem_id
 }
+
 output "fsx-rwx" {
   description = "Read write filesystem"
-  value       = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx : null
+  value       = module.infra.fsx-rwx
 }
 
 output "fsx-rox" {
   description = "Read only filesystem"
-  value       = var.include_rox ? module.fsx-storage[0].fsx-rox : ""
+  value       = module.infra.fsx-rox
 }
 
 output "key_pem" {
-  value       = tls_private_key.pk.private_key_pem
+  value       = module.infra.key_pem
   description = "Generated private key for key pair"
   sensitive   = true
 }
 
 output "fsx_storage_fsx_rwx_dns_name" {
-  value = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.dns_name : ""
+  value = module.infra.fsx_storage_fsx_rwx_dns_name
 }
 
 output "fsx_storage_fsx_rwx_mount_name" {
-  value = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.mount_name : ""
+  value = module.infra.fsx_storage_fsx_rwx_mount_name
 }
 
 output "fsx_storage_fsx_rwx_volume_handle" {
-  value = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.id : ""
+  value = module.infra.fsx_storage_fsx_rwx_volume_handle
 }
 
 output "fsx_storage_fsx_rwx_subnet_id" {
-  value = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.subnet_ids[0] : ""
+  value = module.infra.fsx_storage_fsx_rwx_subnet_id
 }
 
 output "cluster_name" {
@@ -69,21 +70,21 @@ output "dns_name" {
 
 
 output "kube_host" {
-  value = module.cluster.kubernetes_host
+  value = module.infra.kube_host
 }
 
 output "kube_ca_certificate" {
-  value = base64encode(module.cluster.kubernetes_cluster_ca_certificate)
+  value = module.infra.kube_ca_certificate
 
 }
 output "kube_token" {
   sensitive = true
-  value     = module.cluster.kubernetes_token
+  value     = module.infra.kube_token
 }
 
-output "harness_delegate_name" {
-  value = var.harness_delegate == true && length(module.harness_delegate) > 0 ? module.harness_delegate[0].delegate_name : ""
-}
+#output "harness_delegate_name" {
+#  value = var.harness_delegate == true && length(module.harness_delegate) > 0 ? module.harness_delegate[0].delegate_name : ""
+#}
 
 output "ipa_version" {
   value = var.ipa_version
@@ -104,3 +105,9 @@ output "argo_repo" {
 output "monitoring_enabled" {
   value = var.monitoring_enabled
 }
+
+
+#output "harbor-api-token" {
+#  sensitive = true
+#  value     = var.argo_enabled == true ? jsondecode(data.vault_kv_secret_v2.harbor-api-token[0].data_json)["bearer_token"] : ""
+#}

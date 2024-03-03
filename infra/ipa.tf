@@ -18,10 +18,7 @@ output "git_branch" {
   value = data.external.git_information.result.branch
 }
 
-output "harbor-api-token" {
-  sensitive = true
-  value     = var.argo_enabled == true ? jsondecode(data.vault_kv_secret_v2.harbor-api-token[0].data_json)["bearer_token"] : ""
-}
+
 
 output "smoketest_chart_version" {
   value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
@@ -48,7 +45,7 @@ output "local_registry_username" {
   value = "local-user"
 }
 
-output "zerossl" {
-  sensitive = true
-  value     = data.vault_kv_secret_v2.zerossl_data.data_json
-}
+#output "zerossl" {
+#  sensitive = true
+#  value     = data.vault_kv_secret_v2.zerossl_data.data_json
+#}
