@@ -138,7 +138,7 @@ locals {
       provisioner: efs.csi.aws.com
       parameters:
         provisioningMode: efs-ap
-        fileSystemId: ${module.efs-storage[0].efs_filesystem_id}
+        fileSystemId: ${var.efs_filesystem_id}
         directoryPerms: "700"
         gidRangeStart: "1000" # optional
         gidRangeEnd: "2000" # optional
@@ -281,7 +281,7 @@ cluster-autoscaler:
 EOF
     ,
     <<EOT
-${var.argo_enabled == true ? data.github_repository_file.data-pre-reqs-values[0].content : base64decode(var.infra-pre-reqs-values-yaml-b64)}
+${var.argo_enabled == true ? data.github_repository_file.data-infra-pre-reqs-values[0].content : base64decode(var.infra-pre-reqs-values-yaml-b64)}
 EOT
   ])
 }
