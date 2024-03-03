@@ -92,16 +92,35 @@ module "common_helm" {
     vault  = vault
   }
 
+  aws_account = var.aws_account
+  region      = var.region
+  label       = var.label
+  dns_name    = local.dns_name
+
+  argo_enabled = var.argo_enabled
+  argo_repo    = var.argo_repo
+  argo_branch  = var.argo_branch
+  argo_path    = var.argo_path
+  message      = var.message
+
   harbor_pull_secret_b64 = var.harbor_pull_secret_b64
   vault_mount_path       = var.vault_mount_path
-  argo_enabled           = var.argo_enabled
-  argo_repo              = var.argo_repo
-  argo_branch            = var.argo_branch
-  argo_path              = var.argo_path
-  message                = var.message
-  ipa_repo               = var.ipa_repo
-  infra_crds_version     = var.infra_crds_version
-  crds-values-yaml-b64   = var.crds-values-yaml-b64
+
+  ipa_repo                       = var.ipa_repo
+  infra_crds_version             = var.infra_crds_version
+  infra-crds-values-yaml-b64     = var.crds-values-yaml-b64
+  infra_pre_reqs_version         = var.infra_pre_reqs_version
+  infra-pre-reqs-values-yaml-b64 = var.pre-reqs-values-yaml-b64
+
+  include_efs       = var.include_efs
+  efs_filesystem_id = module.infra.efs_filesystem_id
+  include_fsx       = var.include_fsx
+  security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
+  fsx_rwx_subnet_id = module.infra.fsx_storage_fsx_rwx_subnet_id
+  local_registry_enabled = var.local_registry_enabled
+  use_static_ssl_certificates = var.use_static_ssl_certificates
+  is_alternate_account_domain = var.is_alternate_account_domain
+  aws_primary_dns_role_arn = var.aws_primary_dns_role_arn
 }
 /*
 module "local-registry" {

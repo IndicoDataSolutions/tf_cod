@@ -840,3 +840,8 @@ variable "infra_crds_version" {
   type    = string
   default = "1.2.2"
 }
+
+variable "infra_pre_reqs_version" {
+  type    = string
+  default = "2.1.2"
+}
