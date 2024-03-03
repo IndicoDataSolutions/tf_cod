@@ -123,24 +123,25 @@ module "common_helm" {
   is_alternate_account_domain = var.is_alternate_account_domain
   aws_primary_dns_role_arn    = var.aws_primary_dns_role_arn
 }
-/*
+
 module "local-registry" {
   source = "../modules/aws/helm"
 
-  depends_on = [null_resource.stage_one]
+  depends_on = [null_resource.stage_one,
+  module.common_helm]
 
   providers = {
     kubernetes = kubernetes
     helm       = helm
   }
 
-  dns_name                    = local.dns_name
-  k8s_dashboard_chart_version = var.k8s_dashboard_chart_version
-  ipa_repo                    = var.ipa_repo
-  use_static_ssl_certificates = var.use_static_ssl_certificates
-  ssl_static_secret_name      = var.ssl_static_secret_name
+  aws_account            = var.aws_account
+  argo_enabled           = var.argo_enabled
+  ipa_repo               = var.ipa_repo
+  local_registry_version = var.local_registry_version
+  dns_name               = local.dns_name
 }
-
+/*
 module "monitoring" {
   source = "../modules/aws/helm"
 
