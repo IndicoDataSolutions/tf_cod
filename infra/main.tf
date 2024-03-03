@@ -156,10 +156,11 @@ module "monitoring" {
   depends_on = [null_resource.stage_one]
 
   providers = {
-    aws     = aws
-    helm    = helm
-    kubectl = kubectl
-    random  = random
+    aws             = aws
+    aws.dns-control = aws.dns-control
+    helm            = helm
+    kubectl         = kubectl
+    random          = random
   }
 
   aws_account = var.aws_account
@@ -191,7 +192,6 @@ module "monitoring" {
   ssl_static_secret_name      = var.ssl_static_secret_name
 
   dns_name = local.dns_name
-
 }
 
 
