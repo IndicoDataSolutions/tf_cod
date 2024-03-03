@@ -49,7 +49,7 @@ oauth2-proxy:
       value: 'true'
 
   config:
-    clientID: ${data.keycloak_openid_client.kube-oidc-proxy.client}
+    clientID: ${data.keycloak_openid_client.kube-oidc-proxy.client_id}
     clientSecret: ${data.keycloak_openid_client.kube-oidc-proxy.client_secret}
    
   service:
@@ -116,7 +116,7 @@ oauth2-proxy:
       value: 'true'
 
   config:
-    clientID: ${data.keycloak_openid_client.kube-oidc-proxy.client}
+    clientID: ${data.keycloak_openid_client.kube-oidc-proxy.client_id}
     clientSecret: ${data.keycloak_openid_client.kube-oidc-proxy.client_secret}
    
   service:
