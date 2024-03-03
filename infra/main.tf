@@ -170,11 +170,14 @@ module "vault_secrets_operator" {
   kubernetes_host          = module.infra.kube_host
   external_secrets_version = var.external_secrets_version
 }
-/*
+
 module "monitoring" {
   source = "../modules/common/monitoring"
 
-  depends_on = [null_resource.stage_one]
+  depends_on = [
+    null_resource.stage_one,
+    module.vault_secrets_operator
+  ]
 
   providers = {
     aws                    = aws
@@ -216,18 +219,16 @@ module "monitoring" {
   dns_name = local.dns_name
 }
 
-resource "null_resource" "stage_one" {
+resource "null_resource" "stage_two" {
   depends_on = [
     module.aws_helm,
     module.common_helm,
     module.local-registry,
+    module.vault_secrets_operator,
     module.monitoring,
-    module.vault_secrets_operator
   ]
 
   provisioner "local-exec" {
     command = "echo General Indico Cluster configuration complete, moving on to product deployment and testing"
   }
 }
-
-*/
