@@ -89,12 +89,7 @@ resource "vault_kubernetes_auth_backend_role" "vault-auth-role" {
 }
 
 resource "helm_release" "ipa-vso" {
-  depends_on = [
-    module.cluster,
-    data.github_repository_file.data-crds-values,
-    module.secrets-operator-setup
-  ]
-
+  depends_on       = [vault_kubernetes_auth_backend_role.vault-auth-role]
   verify           = false
   name             = "ipa-vso"
   create_namespace = true
@@ -156,13 +151,7 @@ EOF
 
 
 resource "helm_release" "external-secrets" {
-  depends_on = [
-    module.cluster,
-    data.github_repository_file.data-crds-values,
-    module.secrets-operator-setup
-  ]
-
-
+  depends_on       = [vault_kubernetes_auth_backend_role.vault-auth-role]
   verify           = false
   name             = "external-secrets"
   create_namespace = true
