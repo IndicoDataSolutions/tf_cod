@@ -136,5 +136,8 @@ variable "aws_primary_dns_role_arn" {
   description = "The AWS arn for the role needed to manage route53 DNS in a different account."
 }
 
-
-
+# Storage class change
+variable "on_prem_test" {
+  type    = bool
+  default = false
+}
