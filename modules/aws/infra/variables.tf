@@ -34,6 +34,12 @@ variable "default_tags" {
   description = "Default tags to add to each resource (redundant?)"
 }
 
+variable "dns_name" {
+  type        = string
+  default     = ".indico.io"
+  description = "DNS name"
+}
+
 variable "domain_suffix" {
   type        = string
   default     = "indico.io"
@@ -119,15 +125,15 @@ variable "include_efs" {
   description = "Create efs"
 }
 
-variable "local_registry_enabled" {
-  type    = bool
-  default = false
-}
-
 variable "include_fsx" {
   type        = bool
   default     = false
   description = "Create a fsx file system(s)"
+}
+
+variable "local_registry_enabled" {
+  type    = bool
+  default = false
 }
 
 variable "storage_capacity" {

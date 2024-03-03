@@ -1,3 +1,9 @@
+# Main flags for resource creation
+variable "create_infra" {
+  type        = bool
+  default     = true
+  description = "Flag to enable infrastructure creation"
+}
 
 variable "is_azure" {
   type    = bool
