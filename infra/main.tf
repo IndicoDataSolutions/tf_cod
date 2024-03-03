@@ -149,24 +149,52 @@ module "local-registry" {
   general_password       = random_password.password.result
 }
 
-/*
+
 module "monitoring" {
-  source = "../modules/aws/helm"
+  source = "../modules/common/monitoring"
 
   depends_on = [null_resource.stage_one]
 
   providers = {
-    kubernetes = kubernetes
-    helm       = helm
+    aws    = aws
+    helm   = helm
+    random = random
   }
 
-  dns_name                    = local.dns_name
-  k8s_dashboard_chart_version = var.k8s_dashboard_chart_version
-  ipa_repo                    = var.ipa_repo
+  aws_account = var.aws_account
+  region      = var.region
+  label       = var.label
+
+  ipa_repo                        = var.ipa_repo
+  monitoring_version              = var.monitoring_version
+  keda_version                    = var.keda_version
+  opentelemetry-collector_version = var.opentelemetry-collector_version
+
+  thanos_enabled = var.thanos_enabled
+  argo_enabled   = var.argo_enabled
+  vault_address  = var.vault_address
+
+  alerting_enabled                   = var.alerting_enabled
+  alerting_slack_enabled             = var.alerting_slack_enabled
+  alerting_pagerduty_enabled         = var.alerting_pagerduty_enabled
+  alerting_email_enabled             = var.alerting_email_enabled
+  alerting_slack_token               = var.alerting_slack_token
+  alerting_slack_channel             = var.alerting_slack_channel
+  alerting_pagerduty_integration_key = var.alerting_pagerduty_integration_key
+  alerting_email_from                = var.alerting_email_from
+  alerting_email_to                  = var.alerting_email_to
+  alerting_email_username            = var.alerting_email_username
+  alerting_email_password            = var.alerting_email_password
+
   use_static_ssl_certificates = var.use_static_ssl_certificates
   ssl_static_secret_name      = var.ssl_static_secret_name
+
+  dns_name = local.dns_name
+
 }
 
+
+/*
 module "vault_secrets_operator" {
   source = "../modules/aws/helm"
 
