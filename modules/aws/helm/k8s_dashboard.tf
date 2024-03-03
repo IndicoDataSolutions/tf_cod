@@ -1,6 +1,6 @@
 locals {
+  #TODO: reduce this
   ingress_values = var.use_static_ssl_certificates == false ? (<<EOT
-#TODO: reduce this
 oauth2-proxy:
   
   extraArgs:
@@ -32,7 +32,7 @@ oauth2-proxy:
     - name: OAUTH2_PROXY_OIDC_ISSUER_URL
       value: https://keycloak.devops.indico.io/auth/realms/GoogleAuth
     - name: OAUTH2_PROXY_REDIRECT_URL
-      value: https://k8s.${var.local_dns_name}/oauth2/callback
+      value: https://k8s.${var.dns_name}/oauth2/callback
     - name: OAUTH2_PROXY_PASS_AUTHORIZATION_HEADER
       value: 'true'
     - name: OAUTH2_PROXY_EMAIL_DOMAINS
@@ -54,17 +54,17 @@ oauth2-proxy:
    
   service:
     annotations:
-      external-dns.alpha.kubernetes.io/hostname: k8s.${var.local_dns_name}  
+      external-dns.alpha.kubernetes.io/hostname: k8s.${var.dns_name}  
   ingress:
     enabled: true
     hosts:
-      - k8s.${var.local_dns_name}
+      - k8s.${var.dns_name}
     annotations:
       kubernetes.io/ingress.class: nginx
       cert-manager.io/cluster-issuer: zerossl
     tls:
       - hosts:
-          - k8s.${var.local_dns_name}
+          - k8s.${var.dns_name}
         secretName: k8s-proxy-tls
   EOT
     ) : (<<EOT
@@ -99,7 +99,7 @@ oauth2-proxy:
     - name: OAUTH2_PROXY_OIDC_ISSUER_URL
       value: https://keycloak.devops.indico.io/auth/realms/GoogleAuth
     - name: OAUTH2_PROXY_REDIRECT_URL
-      value: https://k8s-${var.local_dns_name}/oauth2/callback
+      value: https://k8s-${var.dns_name}/oauth2/callback
     - name: OAUTH2_PROXY_PASS_AUTHORIZATION_HEADER
       value: 'true'
     - name: OAUTH2_PROXY_EMAIL_DOMAINS
@@ -121,16 +121,16 @@ oauth2-proxy:
    
   service:
     annotations:
-      external-dns.alpha.kubernetes.io/hostname: k8s-${var.local_dns_name}
+      external-dns.alpha.kubernetes.io/hostname: k8s-${var.dns_name}
   ingress:
     enabled: true
     hosts:
-      - k8s-${var.local_dns_name}
+      - k8s-${var.dns_name}
     annotations:
       kubernetes.io/ingress.class: nginx
     tls:
       - hosts:
-          - k8s-${var.local_dns_name}
+          - k8s-${var.dns_name}
         secretName: ${var.ssl_static_secret_name}
 EOT
   )
@@ -151,7 +151,7 @@ resource "helm_release" "k8s-dashboard" {
 kubernetes-dashboard:
   extraArgs:
   - --enable-insecure-login
-  - --system-banner="Viewing ${var.local_dns_name}"
+  - --system-banner="Viewing ${var.dns_name}"
   - --token-ttl=43200
   - --enable-skip-login
 
@@ -159,7 +159,7 @@ kubernetes-dashboard:
   protocolHttp: true
 
   settings:
-    clusterName: "${var.local_dns_name}"
+    clusterName: "${var.dns_name}"
     itemsPerPage: 40
     logsAutoRefreshTimeInterval: 5
     resourceAutoRefreshTimeInterval: 5

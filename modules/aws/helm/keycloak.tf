@@ -1,15 +1,3 @@
-terraform {
-  required_providers {
-    keycloak = {
-      source  = "mrparkers/keycloak"
-    }
-    helm = {
-      source  = "hashicorp/helm"
-    }
-  }
-}
-
-
 data "keycloak_realm" "realm" {
   realm = "GoogleAuth"
 }
@@ -22,13 +10,13 @@ data "keycloak_openid_client" "kube-oidc-proxy" {
 resource "null_resource" "register-callback" {
   # Ensure this runs only if we change these.
   triggers = {
-    dns_name      = var.local_dns_name
+    dns_name      = var.dns_name
     client_secret = data.keycloak_openid_client.kube-oidc-proxy.client_secret
   }
   # must use full resource def for the apply, but must use self.triggers for destroy
   # annoying: https://stackoverflow.com/questions/72820832/self-triggers-is-null-when-trying-to-use-trigger-values-in-local-exec-provisio
   provisioner "local-exec" {
-    command = "curl -XPOST -H 'Content-Type: application/json' -H \"Authorization: Bearer ${data.keycloak_openid_client.kube-oidc-proxy.client_secret}\" -v https://keycloak-service.devops.indico.io/add --data '{\"url\": \"https://k8s.${var.local_dns_name}/oauth2/callback\"}'"
+    command = "curl -XPOST -H 'Content-Type: application/json' -H \"Authorization: Bearer ${data.keycloak_openid_client.kube-oidc-proxy.client_secret}\" -v https://keycloak-service.devops.indico.io/add --data '{\"url\": \"https://k8s.${var.dns_name}/oauth2/callback\"}'"
   }
 
   provisioner "local-exec" {
