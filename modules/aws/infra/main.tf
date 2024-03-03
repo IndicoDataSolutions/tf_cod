@@ -4,23 +4,8 @@ terraform {
       source                = "hashicorp/aws"
       configuration_aliases = [aws.dns-control]
     }
-    azurerm = {
-      source = "hashicorp/azurerm"
-    }
-    keycloak = {
-      source = "mrparkers/keycloak"
-    }
     kubernetes = {
       source = "hashicorp/kubernetes"
-    }
-    kubectl = {
-      source = "gavinbunney/kubectl"
-    }
-    helm = {
-      source = "hashicorp/helm"
-    }
-    snowflake = {
-      source = "Snowflake-Labs/snowflake"
     }
   }
 }
