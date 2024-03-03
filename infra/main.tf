@@ -94,6 +94,7 @@ module "common_helm" {
   harbor_pull_secret_b64 = var.harbor_pull_secret_b64
   vault_mount_path       = var.vault_mount_path
   argo_enabled           = var.argo_enabled
+  argo_repo              = var.argo_repo
   argo_branch            = var.argo_branch
   argo_path              = var.argo_path
   message                = var.message

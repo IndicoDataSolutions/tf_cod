@@ -1,3 +1,7 @@
+data "github_repository" "argo-github-repo" {
+  count     = var.argo_enabled == true ? 1 : 0
+  full_name = "IndicoDataSolutions/${var.argo_repo}"
+}
 
 data "vault_kv_secret_v2" "zerossl_data" {
   mount = var.vault_mount_path
