@@ -49,7 +49,7 @@ data "github_repository_file" "data-crds-values" {
   ]
   repository = data.github_repository.argo-github-repo[0].name
   branch     = var.argo_branch
-  file       = var.argo_path == "." ? "helm/crds-values.values" : "${var.argo_path}/helm/infra-crds-values.values"
+  file       = var.argo_path == "." ? "helm/infra-crds-values.values" : "${var.argo_path}/helm/infra-crds-values.values"
 }
 
 resource "helm_release" "ipa-crds" {
