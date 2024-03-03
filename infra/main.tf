@@ -125,7 +125,7 @@ module "common_helm" {
 }
 
 module "local-registry" {
-  source = "../modules/aws/helm"
+  source = "../modules/common/local-registry"
 
   depends_on = [null_resource.stage_one,
   module.common_helm]
