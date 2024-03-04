@@ -140,6 +140,11 @@ variable "indico_vpc_id" {
   description = ""
 }
 
+variable "public_subnet_ids" {
+  description = "Public subnet ids of the cluster"
+  default     = []
+}
+
 variable "argo_project_name" {
   type        = string
   description = ""
@@ -167,10 +172,28 @@ variable "enable_waf" {
   description = "enables aws alb controller for app-edge, also creates waf rules."
 }
 
+variable "waf_arn" {
+  type        = string
+  description = "waf acl web arn"
+  default     = ""
+}
+
+variable "acm_arn" {
+  type        = string
+  description = "acm cert validation arn"
+  default     = ""
+}
+
 variable "include_efs" {
   type        = bool
   default     = true
   description = "Create efs"
+}
+
+variable "efs_filesystem_id" {
+  type        = string
+  description = "EFS filesystem id"
+  default     = ""
 }
 
 variable "include_fsx" {
@@ -181,6 +204,7 @@ variable "include_fsx" {
 
 variable "fsx_rwx" {
   description = "fsx_rwx object from infra module output"
+  default     = {}
 }
 
 # Smoketest

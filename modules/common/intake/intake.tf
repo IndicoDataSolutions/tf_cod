@@ -26,9 +26,9 @@ app-edge:
           hosts:
             - ${var.dns_name}
       alb:
-        publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
-        wafArn: ${aws_wafv2_web_acl.wafv2-acl[0].arn}
-        acmArn: ${aws_acm_certificate_validation.alb[0].certificate_arn}
+        publicSubnets: ${join(",", var.public_subnet_ids)}
+        wafArn: ${var.waf_arn}
+        acmArn: ${var.acm_arn}
       service:
         name: app-edge
         port: 8080
@@ -53,7 +53,7 @@ EOT
       mountOptions: []
       csi:
         driver: efs.csi.aws.com
-        volumeHandle: ${module.efs-storage[0].efs_filesystem_id}
+        volumeHandle: ${var.efs_filesystem_id}
  EOF
   ] : []
   fsx_values = var.include_fsx == true ? [<<EOF
@@ -63,8 +63,8 @@ EOT
         driver: fsx.csi.aws.com
         volumeAttributes:
           dnsname: ${var.fsx_rwx.dns_name}
-          mountname: ${var.fsx-rwx.mount_name}
-        volumeHandle: ${var.fsx-rwx.id}
+          mountname: ${var.fsx_rwx.mount_name}
+        volumeHandle: ${var.fsx_rwx.id}
  EOF
   ] : []
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
@@ -406,9 +406,9 @@ spec:
         - /spec/replicas
       kind: Deployment
   destination:
-    server: ${module.cluster.kubernetes_host}
+    server: ${var.kubernetes_host}
     namespace: default
-  project: ${module.argo-registration[0].argo_project_name}
+  project: ${var.argo_project_name}
   syncPolicy:
     automated:
       prune: true

@@ -304,14 +304,18 @@ module "intake" {
   key_arn                  = module.infra.kms_key_arn
   s3_role_id               = module.infra.s3_role_id
   pgbackup_s3_bucket_name  = module.infra.pgbackup_s3_bucket_name
+  enable_waf               = var.enable_waf
+  waf_arn                  = module.infra.wafv2_arn
   use_acm                  = var.use_acm
+  acm_arn                  = module.infra.acm_arn
   kubernetes_host          = module.infra.kube_host
   indico_vpc_id            = module.infra.network.indico_vpc_id
+  public_subnet_ids        = module.infra.network.public_subnet_ids
   argo_project_name        = module.argo_registration[0].argo_project_name
   local_registry_enabled   = var.local_registry_enabled
   on_prem_test             = var.on_prem_test
-  enable_waf               = var.enable_waf
   include_efs              = var.include_efs
+  efs_filesystem_id        = module.infra.efs_filesystem_id
   include_fsx              = var.include_fsx
   fsx_rwx                  = module.infra.fsx-rwx
 
