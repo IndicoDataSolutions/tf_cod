@@ -1,3 +1,6 @@
+locals {
+  account_region_name = lower("${var.account}-${var.region}-${var.name}")
+}
 
 resource "kubernetes_service_account_v1" "vault-auth-default" {
   metadata {
@@ -83,4 +86,92 @@ resource "vault_kubernetes_auth_backend_role" "vault-auth-role" {
   token_ttl                        = 3600
   token_policies                   = [vault_policy.vault-auth-policy.name]
   audience                         = var.audience
+}
+
+resource "helm_release" "ipa-vso" {
+  depends_on       = [vault_kubernetes_auth_backend_role.vault-auth-role]
+  verify           = false
+  name             = "ipa-vso"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://helm.releases.hashicorp.com"
+  chart            = "vault-secrets-operator"
+  version          = "0.4.2"
+  wait             = true
+  values = [
+    <<EOF
+  controller: 
+    imagePullSecrets:
+      - name: harbor-pull-secret
+    kubeRbacProxy:
+      image:
+        repository: harbor.devops.indico.io/gcr.io/kubebuilder/kube-rbac-proxy
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1024Mi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    manager:
+      image:
+        repository: harbor.devops.indico.io/docker.io/hashicorp/vault-secrets-operator
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1024Mi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+
+  defaultAuthMethod:
+    enabled: true
+    namespace: default
+    method: kubernetes
+    mount: ${local.account_region_name}
+    kubernetes:
+      role: ${vault_kubernetes_auth_backend_role.vault-auth-role.role_name}
+      tokenAudiences: ["vault"]
+      serviceAccount: ${kubernetes_service_account_v1.vault-auth-default.metadata.0.name}
+
+  defaultVaultConnection:
+    enabled: true
+    address: ${var.vault_address}
+    skipTLSVerify: false
+    spec:
+    template:
+      spec:
+        containers:
+        - name: manager
+          args:
+          - "--client-cache-persistence-model=direct-encrypted"
+EOF
+  ]
+}
+
+
+resource "helm_release" "external-secrets" {
+  depends_on       = [vault_kubernetes_auth_backend_role.vault-auth-role]
+  verify           = false
+  name             = "external-secrets"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://charts.external-secrets.io/"
+  chart            = "external-secrets"
+  version          = var.external_secrets_version
+  wait             = true
+
+  values = [<<EOF
+    image:
+      repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+    webhook:
+     image:
+        repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+    certController:
+      image:
+        repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+
+  EOF
+  ]
+
 }

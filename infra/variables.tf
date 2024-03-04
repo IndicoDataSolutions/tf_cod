@@ -1,3 +1,9 @@
+# Main flags for resource creation
+variable "create_infra" {
+  type        = bool
+  default     = true
+  description = "Flag to enable infrastructure creation"
+}
 
 variable "is_azure" {
   type    = bool
@@ -538,6 +544,7 @@ variable "performance_bucket" {
   default     = false
   description = "Add permission to connect to indico-locust-benchmark-test-results"
 }
+
 variable "crds-values-yaml-b64" {
   default = "Cg=="
 }
@@ -618,7 +625,7 @@ variable "enable_weather_station" {
 }
 
 variable "aws_primary_dns_role_arn" {
-  type        = string 
+  type        = string
   default     = ""
   description = "The AWS arn for the role needed to manage route53 DNS in a different account."
 }
@@ -827,4 +834,14 @@ variable "harness_delegate" {
 variable "harness_mount_path" {
   type    = string
   default = "harness"
+}
+
+variable "infra_crds_version" {
+  type    = string
+  default = "1.2.2"
+}
+
+variable "infra_pre_reqs_version" {
+  type    = string
+  default = "2.1.2"
 }

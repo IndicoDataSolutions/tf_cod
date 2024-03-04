@@ -146,8 +146,6 @@ EOT
   )
 }
 
-
-
 resource "aws_route53_record" "grafana-caa" {
   count   = var.monitoring_enabled == true ? 1 : 0
   zone_id = data.aws_route53_zone.primary.zone_id
@@ -159,7 +157,6 @@ resource "aws_route53_record" "grafana-caa" {
   ]
   provider = aws.dns-control
 }
-
 
 resource "aws_route53_record" "prometheus-caa" {
   count   = var.monitoring_enabled == true ? 1 : 0
