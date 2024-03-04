@@ -58,6 +58,11 @@ variable "argo_enabled" {
   default = true
 }
 
+variable "argo_namespace" {
+  type    = string
+  default = ""
+}
+
 variable "argo_repo" {
   description = "Argo Github Repository containing the IPA Application"
   default     = ""

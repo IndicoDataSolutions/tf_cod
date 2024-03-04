@@ -291,6 +291,7 @@ module "intake" {
 
   ipa_repo                 = var.ipa_repo
   argo_enabled             = var.argo_enabled
+  argo_namespace           = var.argo_namespace
   argo_repo                = var.argo_repo
   argo_branch              = var.argo_branch
   argo_path                = var.argo_path
