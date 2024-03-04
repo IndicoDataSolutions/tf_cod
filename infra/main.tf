@@ -313,6 +313,7 @@ module "intake" {
   enable_waf               = var.enable_waf
   include_efs              = var.include_efs
   include_fsx              = var.include_fsx
+  fsx_rwx                  = module.infra.fsx-rwx
 
   ipa_smoketest_values  = var.ipa_smoketest_values
   ipa_smoketest_repo    = var.ipa_smoketest_repo

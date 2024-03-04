@@ -179,6 +179,10 @@ variable "include_fsx" {
   description = "Create a fsx file system(s)"
 }
 
+variable "fsx_rwx" {
+  description = "fsx_rwx object from infra module output"
+}
+
 # Smoketest
 variable "ipa_smoketest_values" {
   type    = string

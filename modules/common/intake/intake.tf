@@ -62,9 +62,9 @@ EOT
       csi:
         driver: fsx.csi.aws.com
         volumeAttributes:
-          dnsname: ${module.fsx-storage[0].fsx-rwx.dns_name}
-          mountname: ${module.fsx-storage[0].fsx-rwx.mount_name}
-        volumeHandle: ${module.fsx-storage[0].fsx-rwx.id}
+          dnsname: ${fsx_rwx.dns_name}
+          mountname: ${fsx-rwx.mount_name}
+        volumeHandle: ${fsx-rwx.id}
  EOF
   ] : []
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
@@ -151,15 +151,6 @@ data "github_repository_file" "data-pre-reqs-values" {
 }
 
 resource "helm_release" "ipa-pre-requisites" {
-  depends_on = [
-    module.cluster,
-    module.fsx-storage,
-    helm_release.ipa-crds,
-    data.vault_kv_secret_v2.zerossl_data,
-    data.github_repository_file.data-pre-reqs-values,
-    null_resource.update_storage_class
-  ]
-
   verify           = false
   name             = "ipa-pre-reqs"
   create_namespace = true
@@ -376,10 +367,6 @@ resource "github_repository_file" "alb-values-yaml" {
       content
     ]
   }
-  depends_on = [
-    module.cluster,
-    aws_acm_certificate_validation.alb[0]
-  ]
 
   content = local.alb_ipa_values
 }
@@ -397,11 +384,6 @@ resource "github_repository_file" "argocd-application-yaml" {
       content
     ]
   }
-  depends_on = [
-    module.cluster,
-    aws_wafv2_web_acl.wafv2-acl[0]
-  ]
-
   content = <<EOT
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -468,13 +450,9 @@ EOT
 
 resource "argocd_application" "ipa" {
   depends_on = [
-    # local_file.kubeconfig,
-    helm_release.ipa-pre-requisites,
     time_sleep.wait_1_minutes_after_pre_reqs,
-    module.argo-registration,
     kubernetes_job.snapshot-restore-job,
     github_repository_file.argocd-application-yaml,
-    helm_release.monitoring
   ]
 
   count = var.argo_enabled == true ? 1 : 0
