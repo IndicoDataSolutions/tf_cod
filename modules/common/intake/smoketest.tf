@@ -31,9 +31,9 @@ metadata:
     argocd.argoproj.io/sync-wave: "2"
 spec:
   destination:
-    server: ${module.cluster.kubernetes_host}
+    server: ${var.kubernetes_host}
     namespace: default
-  project: ${module.argo-registration[0].argo_project_name}
+  project: ${var.argo_project_name}
   syncPolicy:
     automated:
       prune: true
