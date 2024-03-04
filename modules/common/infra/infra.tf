@@ -221,11 +221,11 @@ resource "helm_release" "ipa-pre-requisites" {
   ]
 
   verify           = false
-  name             = "ipa-pre-reqs"
+  name             = "infra-pre-reqs"
   create_namespace = true
   namespace        = "default"
   repository       = var.ipa_repo
-  chart            = "ipa-pre-requisites"
+  chart            = "infra-pre-reqs"
   version          = var.infra_pre_reqs_version
   wait             = false
   timeout          = "1800" # 30 minutes
