@@ -828,3 +828,8 @@ variable "harness_mount_path" {
   type    = string
   default = "harness"
 }
+
+variable "enable_intake" {
+  type = string
+  default = true
+} 
