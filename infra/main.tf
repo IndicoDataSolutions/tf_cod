@@ -318,6 +318,7 @@ module "intake" {
   efs_filesystem_id        = module.infra.efs_filesystem_id
   include_fsx              = var.include_fsx
   fsx_rwx                  = module.infra.fsx-rwx
+  monitoring_password      = module.monitoring.monitoring-password
 
   ipa_smoketest_values  = var.ipa_smoketest_values
   ipa_smoketest_repo    = var.ipa_smoketest_repo

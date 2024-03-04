@@ -207,6 +207,13 @@ variable "fsx_rwx" {
   default     = {}
 }
 
+variable "monitoring_password" {
+  type        = string
+  description = "Generated password for monitoring"
+  sensitive   = true
+  default     = ""
+}
+
 # Smoketest
 variable "ipa_smoketest_values" {
   type    = string

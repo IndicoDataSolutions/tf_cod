@@ -240,12 +240,12 @@ crunchy-postgres:
         repo1-path: /pgbackrest/postgres-data/repo1
         repo1-retention-full: '5'
         repo1-s3-key-type: auto
-        repo1-s3-kms-key-id: "${module.kms_key.key_arn}"
-        repo1-s3-role: ${module.cluster.s3_role_id}
+        repo1-s3-kms-key-id: "${var.key_arn}"
+        repo1-s3-role: ${var.s3_role_id}
       repos:
       - name: repo1
         s3:
-          bucket: ${module.s3-storage.pgbackup_s3_bucket_name}
+          bucket: ${var.pgbackup_s3_bucket_name}
           endpoint: s3.${var.region}.amazonaws.com
           region: ${var.region}
         schedules:
@@ -314,12 +314,12 @@ crunchy-postgres:
         repo1-path: /pgbackrest/postgres-metrics/repo1
         repo1-retention-full: '5'
         repo1-s3-key-type: auto
-        repo1-s3-kms-key-id: "${module.kms_key.key_arn}"
-        repo1-s3-role: ${module.cluster.s3_role_id}
+        repo1-s3-kms-key-id: "${var.key_arn}"
+        repo1-s3-role: ${var.s3_role_id}
       repos:
       - name: repo1
         s3:
-          bucket: ${module.s3-storage.pgbackup_s3_bucket_name}
+          bucket: ${var.pgbackup_s3_bucket_name}
           endpoint: s3.${var.region}.amazonaws.com
           region: ${var.region}
         schedules:
@@ -437,7 +437,7 @@ spec:
               enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
               authentication:
                 ingressUser: monitoring
-                ingressPassword: ${random_password.monitoring-password.result}
+                ingressPassword: ${var.monitoring_password}
                 ${indent(14, local.runtime_scanner_ingress_values)} 
             ${indent(12, local.alb_ipa_values)}         
 
