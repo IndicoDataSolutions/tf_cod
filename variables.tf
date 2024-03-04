@@ -1114,3 +1114,9 @@ variable "fsx_rox_arn" {
   type        = string
   default     = null
 }
+
+variable "enable_intake" {
+  type    = string
+  default = true
+}
+
