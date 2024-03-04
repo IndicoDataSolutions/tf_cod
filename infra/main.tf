@@ -272,9 +272,11 @@ module "intake" {
   ]
 
   providers = {
-    kubernetes = kubernetes
-    helm       = helm
-    vault      = vault
+    argocd  = argocd
+    github  = github
+    helm    = helm
+    kubectl = kubectl
+    time    = time
   }
 
   dns_name    = local.dns_name

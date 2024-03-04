@@ -150,15 +150,8 @@ data "github_repository_file" "data-pre-reqs-values" {
   file       = var.argo_path == "." ? "helm/pre-reqs-values.values" : "${var.argo_path}/helm/pre-reqs-values.values"
 }
 
-resource "time_sleep" "wait_1_minutes_after_crds" {
-  depends_on = [helm_release.ipa-crds]
-
-  create_duration = "1m"
-}
-
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
-    time_sleep.wait_1_minutes_after_crds,
     module.cluster,
     module.fsx-storage,
     helm_release.ipa-crds,
