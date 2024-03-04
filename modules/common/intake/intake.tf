@@ -468,7 +468,7 @@ resource "argocd_application" "ipa" {
   }
 
   spec {
-    project = module.argo-registration[0].argo_project_name
+    project = var.argo_project_name
 
     source {
       repo_url        = "https://github.com/IndicoDataSolutions/${var.argo_repo}.git"
