@@ -62,9 +62,9 @@ EOT
       csi:
         driver: fsx.csi.aws.com
         volumeAttributes:
-          dnsname: ${fsx_rwx.dns_name}
-          mountname: ${fsx-rwx.mount_name}
-        volumeHandle: ${fsx-rwx.id}
+          dnsname: ${var.fsx_rwx.dns_name}
+          mountname: ${var.fsx-rwx.mount_name}
+        volumeHandle: ${var.fsx-rwx.id}
  EOF
   ] : []
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
