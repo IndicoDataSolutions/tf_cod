@@ -12,6 +12,12 @@ output "kube_token" {
   value     = module.cluster.kubernetes_token
 }
 
+# KMS outputs
+output "kms_key_arn" {
+  value       = module.kms_key.key_arn
+  description = "KMS key arn"
+}
+
 # EFS outputs
 output "efs_filesystem_id" {
   value       = var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""
@@ -19,7 +25,7 @@ output "efs_filesystem_id" {
 }
 
 output "local_registry_efs_filesystem_id" {
-  value = var.local_registry_enabled ? module.efs-storage-local-registry[0].efs_filesystem_id : null
+  value       = var.local_registry_enabled ? module.efs-storage-local-registry[0].efs_filesystem_id : null
   description = "ID of the EFS filesystem for local-registry"
 }
 
@@ -66,6 +72,11 @@ output "s3_role_id" {
   value       = module.cluster.s3_role_id
 }
 
+output "pgbackup_s3_bucket_name" {
+  description = "S3 pgbackup bucket name"
+  value       = module.s3-storage.pgbackup_s3_bucket_name
+}
+
 # Misc
 output "acm_arn" {
   description = "arn of the acm"
@@ -81,4 +92,8 @@ output "key_pem" {
   value       = tls_private_key.pk.private_key_pem
   description = "Generated private key for key pair"
   sensitive   = true
+}
+
+output "network" {
+  value = local.network[0]
 }

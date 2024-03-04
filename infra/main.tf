@@ -235,11 +235,40 @@ resource "null_resource" "stage_two" {
   }
 }
 
+module "argo_registration" {
+  count = var.argo_enabled == true ? 1 : 0
+
+  depends_on = [
+    null_resource.stage_two,
+  ]
+
+  providers = {
+    kubernetes = kubernetes,
+    argocd     = argocd
+  }
+
+  source                       = "app.terraform.io/indico/indico-argo-registration/mod"
+  version                      = "1.2.1"
+  cluster_name                 = var.label
+  region                       = var.region
+  argo_password                = var.argo_password
+  argo_username                = var.argo_username
+  argo_namespace               = var.argo_namespace
+  argo_host                    = var.argo_host
+  account                      = var.aws_account
+  cloud_provider               = "aws"
+  argo_github_team_admin_group = var.argo_github_team_owner
+  endpoint                     = module.cluster.kubernetes_host
+  ca_data                      = module.cluster.kubernetes_cluster_ca_certificate
+  indico_dev_cluster           = var.aws_account == "Indico-Dev"
+}
+
 module "intake" {
   source = "../modules/common/intake"
 
   depends_on = [
     null_resource.stage_two,
+    module.argo_registration
   ]
 
   providers = {
@@ -248,12 +277,48 @@ module "intake" {
     vault      = vault
   }
 
-  vault_address            = var.vault_address
-  account                  = var.aws_account
-  region                   = var.region
-  name                     = var.label
+  dns_name    = local.dns_name
+  aws_account = var.aws_account
+  region      = var.region
+  label       = var.label
+
+  use_static_ssl_certificates = var.use_static_ssl_certificates
+  ssl_static_secret_name      = var.ssl_static_secret_name
+  is_alternate_account_domain = var.is_alternate_account_domain
+  aws_primary_dns_role_arn    = var.aws_primary_dns_role_arn
+
+  ipa_repo                 = var.ipa_repo
+  argo_enabled             = var.argo_enabled
+  argo_repo                = var.argo_repo
+  argo_branch              = var.argo_branch
+  argo_path                = var.argo_path
+  message                  = var.message
+  ipa_pre_reqs_version     = var.ipa_pre_reqs_version
+  pre-reqs-values-yaml-b64 = var.pre-reqs-values-yaml-b64
+  ipa_version              = var.ipa_version
+  k8s_version              = var.k8s_version
+  ipa_values               = var.ipa_values
+  az_count                 = var.az_count
+  key_arn                  = module.infra.kms_key_arn
+  s3_role_id               = module.infra.s3_role_id
+  pgbackup_s3_bucket_name  = module.infra.pgbackup_s3_bucket_name
+  use_acm                  = var.use_acm
   kubernetes_host          = module.infra.kube_host
-  external_secrets_version = var.external_secrets_version
+  indico_vpc_id            = module.infra.network.indico_vpc_id
+  argo_project_name        = module.argo_registration[0].argo_project_name
+  local_registry_enabled   = var.local_registry_enabled
+  on_prem_test             = var.on_prem_test
+  enable_waf               = var.enable_waf
+  include_efs              = var.include_efs
+  include_fsx              = var.include_fsx
+
+  ipa_smoketest_values  = var.ipa_smoketest_values
+  ipa_smoketest_repo    = var.ipa_smoketest_repo
+  ipa_smoketest_version = var.ipa_smoketest_version
+  ipa_smoketest_enabled = var.ipa_smoketest_enabled
+
+  restore_snapshot_enabled = var.restore_snapshot_enabled
+  restore_snapshot_name    = var.restore_snapshot_name
 }
 
 /*
