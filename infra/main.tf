@@ -258,8 +258,8 @@ module "argo_registration" {
   account                      = var.aws_account
   cloud_provider               = "aws"
   argo_github_team_admin_group = var.argo_github_team_owner
-  endpoint                     = module.cluster.kubernetes_host
-  ca_data                      = module.cluster.kubernetes_cluster_ca_certificate
+  endpoint                     = module.infra.kube_host
+  ca_data                      = module.infra.kube_ca_certificate
   indico_dev_cluster           = var.aws_account == "Indico-Dev"
 }
 
