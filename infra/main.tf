@@ -231,6 +231,71 @@ resource "null_resource" "stage_two" {
   ]
 
   provisioner "local-exec" {
-    command = "echo General Indico Cluster configuration complete, moving on to product deployment and testing"
+    command = "echo General Indico Cluster configuration complete, moving on to product deployment"
   }
 }
+
+module "intake" {
+  source = "../modules/common/intake"
+
+  depends_on = [
+    null_resource.stage_two,
+  ]
+
+  providers = {
+    kubernetes = kubernetes
+    helm       = helm
+    vault      = vault
+  }
+
+  vault_address            = var.vault_address
+  account                  = var.aws_account
+  region                   = var.region
+  name                     = var.label
+  kubernetes_host          = module.infra.kube_host
+  external_secrets_version = var.external_secrets_version
+}
+
+/*
+module "applications" {
+  source = "../modules/common/applications"
+
+  depends_on = [
+    null_resource.stage_two,
+  ]
+
+  providers = {
+    kubernetes = kubernetes
+    helm       = helm
+    vault      = vault
+  }
+
+  vault_address            = var.vault_address
+  account                  = var.aws_account
+  region                   = var.region
+  name                     = var.label
+  kubernetes_host          = module.infra.kube_host
+  external_secrets_version = var.external_secrets_version
+}
+
+module "terraform_smoketest" {
+  source = "../modules/common/terraform_smoketest"
+
+  depends_on = [
+    null_resource.stage_two,
+  ]
+
+  providers = {
+    kubernetes = kubernetes
+    helm       = helm
+    vault      = vault
+  }
+
+  vault_address            = var.vault_address
+  account                  = var.aws_account
+  region                   = var.region
+  name                     = var.label
+  kubernetes_host          = module.infra.kube_host
+  external_secrets_version = var.external_secrets_version
+}
+*/

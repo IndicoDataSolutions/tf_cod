@@ -18,7 +18,7 @@ resource "github_repository_file" "smoketest-application-yaml" {
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${local.argo_smoketest_app_name}
+  name: ${lower("${var.aws_account}.${var.region}.${var.label}-smoketest")}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
@@ -59,7 +59,7 @@ spec:
               name: ${var.label}
               region: ${var.region}
               account: ${var.aws_account}
-            host: ${local.dns_name}
+            host: ${var.dns_name}
             ${indent(12, base64decode(var.ipa_smoketest_values))}    
 EOT
 }

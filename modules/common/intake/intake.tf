@@ -1,56 +1,7 @@
 locals {
   storage_class = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
 
-  the_splits            = var.dns_name != "" ? split(".", var.dns_name) : split(".", "test.domain.com")
-  the_length            = length(local.the_splits)
-  the_tld               = local.the_splits[local.the_length - 1]
-  the_domain            = local.the_splits[local.the_length - 2]
-  alternate_domain_root = join(".", [local.the_domain, local.the_tld])
-  enable_external_dns   = var.use_static_ssl_certificates == false ? true : false
-  dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT
-clusterIssuer:
-  additionalSolvers:
-    - dns01:
-        route53:
-          region: ${var.region}
-      selector:
-        matchLabels:
-          "acme.cert-manager.io/dns01-solver": "true"
-  EOT
-    ) : (<<EOT
-clusterIssuer:
-  additionalSolvers:
-    - dns01:
-        route53:
-          region: ${var.region}
-          role: ${var.aws_primary_dns_role_arn}
-      selector:
-        matchLabels:
-          "acme.cert-manager.io/dns01-solver": "true"
-external-dns:
-  enabled: ${local.enable_external_dns}
-alternate-external-dns:
-  enabled: true
-  logLevel: debug
-  policy: sync
-  txtOwnerId: "${var.dns_name}-${var.label}-${var.region}"
-  domainFilters:
-    - ${local.alternate_domain_root}
-  extraArgs:
-    - "--exclude-domains=${var.aws_account}.indico.io"
-    - "--aws-assume-role=${var.aws_primary_dns_role_arn}"
-
-  provider: aws
-  aws:
-    zoneType: public
-    region: ${var.region}
-
-  policy: sync
-  sources:
-    - ingress
-EOT
-  )
-  lb_ipa_values = var.enable_waf == true ? (<<EOT
+  alb_ipa_values = var.enable_waf == true ? (<<EOT
 app-edge:
   alternateDomain: ""
   service:
@@ -73,7 +24,7 @@ app-edge:
       tls:
         - secretName: ${var.ssl_static_secret_name}
           hosts:
-            - ${local.dns_name}
+            - ${var.dns_name}
       alb:
         publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
         wafArn: ${aws_wafv2_web_acl.wafv2-acl[0].arn}
@@ -82,7 +33,7 @@ app-edge:
         name: app-edge
         port: 8080
       hosts:
-        - host: ${local.dns_name}
+        - host: ${var.dns_name}
           paths:
             - path: /
               pathType: Prefix
@@ -91,15 +42,11 @@ app-edge:
 app-edge:
   alternateDomain: ""
   image:
-    registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "harbor.devops.indico.io"}/indico
+    registry: ${var.local_registry_enabled ? "local-registry.${var.dns_name}" : "harbor.devops.indico.io"}/indico
 EOT 
   )
 
   efs_values = var.include_efs == true ? [<<EOF
-  aws-fsx-csi-driver:
-    enabled: false
-  aws-efs-csi-driver:
-    enabled: true
   storage:
     pvcSpec:
       volumeMode: Filesystem
@@ -107,24 +54,9 @@ EOT
       csi:
         driver: efs.csi.aws.com
         volumeHandle: ${module.efs-storage[0].efs_filesystem_id}
-    indicoStorageClass:
-      enabled: true
-      name: indico-sc
-      provisioner: efs.csi.aws.com
-      parameters:
-        provisioningMode: efs-ap
-        fileSystemId: ${module.efs-storage[0].efs_filesystem_id}
-        directoryPerms: "700"
-        gidRangeStart: "1000" # optional
-        gidRangeEnd: "2000" # optional
-        basePath: "/dynamic_provisioning" # optional
  EOF
   ] : []
   fsx_values = var.include_fsx == true ? [<<EOF
-  aws-fsx-csi-driver:
-    enabled: true
-  aws-efs-csi-driver:
-    enabled: ${var.local_registry_enabled} 
   storage:
     pvcSpec:
       csi:
@@ -133,13 +65,6 @@ EOT
           dnsname: ${module.fsx-storage[0].fsx-rwx.dns_name}
           mountname: ${module.fsx-storage[0].fsx-rwx.mount_name}
         volumeHandle: ${module.fsx-storage[0].fsx-rwx.id}
-    indicoStorageClass:
-      enabled: true
-      name: indico-sc
-      provisioner: fsx.csi.aws.com
-      parameters:
-        securityGroupIds: ${local.security_group_id}
-        subnetId: ${module.fsx-storage[0].fsx-rwx.subnet_ids[0]}
  EOF
   ] : []
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
@@ -266,53 +191,13 @@ cluster:
   argoPath: ${var.argo_path}
   ipaVersion: ${var.ipa_version}
   ipaPreReqsVersion: ${var.ipa_pre_reqs_version}
-  ipaCrdsVersion: ${var.ipa_crds_version}
 
 secrets:
   rabbitmq:
     create: true
-  
   general:
     create: true
 
-  clusterIssuer:
-    zerossl:
-      create: true
-      eabEmail: devops-sa@indico.io
-      eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
-      eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
-
-${local.dns_configuration_values}
-external-dns:
-  enabled: ${local.enable_external_dns}
-  logLevel: debug
-  policy: sync
-  txtOwnerId: "${var.label}-${var.region}"
-  domainFilters:
-    - ${lower(var.aws_account)}.indico.io.
-
-  provider: aws
-  aws:
-    zoneType: public
-    region: ${var.region}
-
-  policy: sync
-  sources:
-    - service
-    - ingress
-aws-for-fluent-bit:
-  enabled: true
-  cloudWatchLogs:
-    region: ${var.region}
-    logGroupName: "/aws/eks/fluentbit-cloudwatch/${var.label}/logs"
-    logGroupTemplate: "/aws/eks/fluentbit-cloudwatch/${var.label}/workload/$kubernetes['namespace_name']"
-cluster-autoscaler:
-  cluster-autoscaler:
-    awsRegion: ${var.region}
-    image:
-      tag: "v1.20.0"
-    autoDiscovery:
-      clusterName: "${var.label}"
 crunchy-postgres:
   enabled: true
   postgres-data:
@@ -528,7 +413,7 @@ resource "github_repository_file" "argocd-application-yaml" {
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${local.argo_app_name}
+  name: ${lower("${var.aws_account}.${var.region}.${var.label}-ipa")}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
