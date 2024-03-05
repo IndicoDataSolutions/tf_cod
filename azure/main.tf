@@ -244,9 +244,9 @@ resource "azurerm_resource_group" "cod-cluster" {
 }
 
 module "networking" {
-  depends_on = [
-    var.resource_group_name != null ? azurerm_resource_group.cod-cluster : ""
-  ]
+  #  depends_on = [
+  #    var.resource_group_name != null ? azurerm_resource_group.cod-cluster : ""
+  #  ]
 
   source              = "app.terraform.io/indico/indico-azure-network/mod"
   version             = "3.0.5"
@@ -258,9 +258,9 @@ module "networking" {
 }
 
 module "storage" {
-  depends_on = [
-    var.resource_group_name != null ? azurerm_resource_group.cod-cluster : ""
-  ]
+  # depends_on = [
+  #   var.resource_group_name != null ? azurerm_resource_group.cod-cluster : ""
+  # ]
 
   source               = "app.terraform.io/indico/indico-azure-blob/mod"
   version              = "0.1.14"
@@ -271,9 +271,9 @@ module "storage" {
 }
 
 module "cluster" {
-  depends_on = [
-    var.resource_group_name != null ? azurerm_resource_group.cod-cluster : ""
-  ]
+  # depends_on = [
+  #   var.resource_group_name != null ? azurerm_resource_group.cod-cluster : ""
+  # ]
 
   source                     = "app.terraform.io/indico/indico-azure-cluster/mod"
   insights_retention_in_days = var.monitor_retention_in_days
@@ -340,9 +340,9 @@ resource "kubernetes_secret" "readapi" {
 }
 
 module "servicebus" {
-  depends_on = [
-    var.resource_group_name != null ? azurerm_resource_group.cod-cluster : ""
-  ]
+  #depends_on = [
+  #  var.resource_group_name != null ? azurerm_resource_group.cod-cluster : ""
+  #]
 
   count                   = var.enable_servicebus == true ? 1 : 0
   source                  = "app.terraform.io/indico/indico-azure-servicebus/mod"
