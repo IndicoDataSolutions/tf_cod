@@ -237,10 +237,10 @@ resource "tls_private_key" "pk" {
   rsa_bits  = 4096
 }
 
-data "azurerm_resource_group" "cod-cluster" {
-  name     = local.resource_group_name
-  location = var.region
-}
+#data "azurerm_resource_group" "cod-cluster" {
+#  name     = local.resource_group_name
+#  location = var.region
+#}
 
 module "networking" {
   #depends_on = [
