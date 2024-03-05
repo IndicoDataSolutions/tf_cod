@@ -618,7 +618,7 @@ variable "enable_weather_station" {
 }
 
 variable "aws_primary_dns_role_arn" {
-  type        = string 
+  type        = string
   default     = ""
   description = "The AWS arn for the role needed to manage route53 DNS in a different account."
 }
@@ -827,4 +827,10 @@ variable "harness_delegate" {
 variable "harness_mount_path" {
   type    = string
   default = "harness"
+}
+
+variable "enable_s3_backup" {
+  type        = bool
+  default     = true
+  description = "Allow backing up data bucket on s3"
 }
