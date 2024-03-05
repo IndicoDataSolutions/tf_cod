@@ -237,15 +237,17 @@ resource "tls_private_key" "pk" {
   rsa_bits  = 4096
 }
 
-#data "azurerm_resource_group" "cod-cluster" {
-#  name     = local.resource_group_name
-#  location = var.region
-#}
+resource "azurerm_resource_group" "cod-cluster" {
+  count = var.resource_group_name != null ? 1 : 0
+  name     = local.resource_group_name
+  location = var.region
+}
 
 module "networking" {
-  #depends_on = [
-  #  azurerm_resource_group.cod-cluster
-  #]
+   depends_on = [
+      var.resource_group_name != null ? azurerm_resource_group.cod-cluster ? ""
+   ]
+
   source              = "app.terraform.io/indico/indico-azure-network/mod"
   version             = "3.0.5"
   label               = var.label
@@ -256,9 +258,10 @@ module "networking" {
 }
 
 module "storage" {
-  #depends_on = [
-  #  azurerm_resource_group.cod-cluster
-  #]
+   depends_on = [
+      var.resource_group_name != null ? azurerm_resource_group.cod-cluster ? ""
+   ]
+
   source               = "app.terraform.io/indico/indico-azure-blob/mod"
   version              = "0.1.14"
   label                = var.label
@@ -268,9 +271,9 @@ module "storage" {
 }
 
 module "cluster" {
-  #depends_on = [
-  #  azurerm_resource_group.cod-cluster
-  #]
+  depends_on = [
+      var.resource_group_name != null ? azurerm_resource_group.cod-cluster ? ""
+  ]
 
   source                     = "app.terraform.io/indico/indico-azure-cluster/mod"
   insights_retention_in_days = var.monitor_retention_in_days
@@ -337,9 +340,10 @@ resource "kubernetes_secret" "readapi" {
 }
 
 module "servicebus" {
-  #depends_on = [
-  #  azurerm_resource_group.cod-cluster
-  #]
+  depends_on = [
+      var.resource_group_name != null ? azurerm_resource_group.cod-cluster ? ""
+  ]
+
   count                   = var.enable_servicebus == true ? 1 : 0
   source                  = "app.terraform.io/indico/indico-azure-servicebus/mod"
   version                 = "1.1.1"
