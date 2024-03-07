@@ -437,7 +437,11 @@ resource "helm_release" "ipa-crds" {
     updateCRDs: 
       enabled: true
 
-  
+  aws-ebs-csi-driver:
+    controller:
+      extraVolumeTags:
+        ${indent(8, yamlencode(var.default_tags))}
+
   cert-manager:
     nodeSelector:
       kubernetes.io/os: linux
