@@ -1,12 +1,12 @@
 data "azuread_client_config" "current" {}
 
-resource "azuread_application" "workload_identity" {
+data "azuread_application" "workload_identity" {
   display_name = "${var.label}-${var.region}-workload-identity"
-  owners       = [data.azuread_client_config.current.object_id]
+
 }
 
 resource "azuread_service_principal" "workload_identity" {
-  application_id               = azuread_application.workload_identity.application_id
+  application_id               = data.azuread_application.workload_identity.application_id
   app_role_assignment_required = false
   owners                       = [data.azuread_client_config.current.object_id]
 }
@@ -25,7 +25,7 @@ resource "azurerm_role_assignment" "dns-zone-dns-zone-contributor" {
 
 resource "azuread_application_password" "workload_identity" {
   display_name          = "workload_identity"
-  application_object_id = azuread_application.workload_identity.object_id
+  application_object_id = data.azuread_application.workload_identity.object_id
 }
 
 resource "kubernetes_secret" "workload_identity" {
@@ -40,7 +40,7 @@ resource "kubernetes_secret" "workload_identity" {
   data = {
     ARM_SUBSCRIPTION_ID = "${data.azurerm_subscription.primary.subscription_id}"
     ARM_TENANT_ID       = "${data.azuread_client_config.current.tenant_id}"
-    ARM_CLIENT_ID       = "${azuread_application.workload_identity.application_id}"
+    ARM_CLIENT_ID       = "${data.azuread_application.workload_identity.application_id}"
     ARM_CLIENT_SECRET   = "${azuread_application_password.workload_identity.value}"
   }
 
@@ -105,7 +105,7 @@ resource "kubernetes_service_account" "workload_identity" {
     name      = "workload-identity-storage-account"
     namespace = "default"
     annotations = {
-      "azure.workload.identity/client-id" = azuread_application.workload_identity.application_id
+      "azure.workload.identity/client-id" = data.azuread_application.workload_identity.application_id
     }
     labels = {
       "azure.workload.identity/use" = "true"
@@ -115,7 +115,7 @@ resource "kubernetes_service_account" "workload_identity" {
 
 resource "azuread_application_federated_identity_credential" "workload_identity" {
   count                 = var.use_workload_identity == true ? 1 : 0
-  application_object_id = azuread_application.workload_identity.object_id
+  application_object_id = data.azuread_application.workload_identity.object_id
   display_name          = "${var.label}-${var.region}-workload-identity"
   description           = "Initial workload identity for cluster"
   audiences             = ["api://AzureADTokenExchange"]
@@ -126,7 +126,7 @@ resource "azuread_application_federated_identity_credential" "workload_identity"
 
 resource "azuread_application_federated_identity_credential" "workload_snapshot_identity" {
   count                 = var.use_workload_identity == true ? 1 : 0
-  application_object_id = azuread_application.workload_identity.object_id
+  application_object_id = data.azuread_application.workload_identity.object_id
   display_name          = "${var.label}-${var.region}-workload-snapshot-identity"
   description           = "Initial workload snapshot identity for cluster"
   audiences             = ["api://AzureADTokenExchange"]
