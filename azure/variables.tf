@@ -659,3 +659,7 @@ variable "resource_group_name" {
   default = null
 }
 
+variable "create_resource_group" {
+  type    = bool
+  default = true
+}
