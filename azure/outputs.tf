@@ -1,5 +1,5 @@
 output "workload_identity_client_id" {
-  value = azuread_application.workload_identity.application_id
+  value = data.azuread_application.workload_identity.application_id
 }
 
 output "cluster_name" {

@@ -4,7 +4,7 @@ locals {
   "tenantId" : "${data.azurerm_client_config.current.tenant_id}",
   "subscriptionId" : "${split("/", data.azurerm_subscription.primary.id)[2]}",
   "resourceGroup" : "${var.common_resource_group}",
-  "aadClientId": "${azuread_application.workload_identity.application_id}",
+  "aadClientId": "${data.azuread_application.workload_identity.application_id}",
   "aadClientSecret": "${azuread_application_password.workload_identity.value}"
   }
   EOF
