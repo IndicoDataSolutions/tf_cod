@@ -106,6 +106,8 @@ resource "kubernetes_config_map" "terraform-variables" {
     terraform_smoketests_enabled = "${jsonencode(var.terraform_smoketests_enabled)}"
     resource_group_name = "${jsonencode(var.resource_group_name)}"
     create_resource_group = "${jsonencode(var.create_resource_group)}"
+    use_static_ssl_certificates = "${jsonencode(var.use_static_ssl_certificates)}"
+    ssl_static_secret_name = "${jsonencode(var.ssl_static_secret_name)}"
 
     }
   }
