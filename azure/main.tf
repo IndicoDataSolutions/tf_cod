@@ -296,7 +296,7 @@ module "cluster" {
   # this feature can be checked using:
   # az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/EnableWorkloadIdentityPreview')].{Name:name,State:properties.state}"
   # az provider register --namespace Microsoft.ContainerService
-  enable_workload_identity = true # requires: az feature register --namespace "Microsoft.ContainerService" --name "EnableWorkloadIdentityPreview"
+  enable_workload_identity = var.use_workload_identity # requires: az feature register --namespace "Microsoft.ContainerService" --name "EnableWorkloadIdentityPreview"
   enable_oidc_issuer       = true
 }
 
@@ -345,7 +345,7 @@ module "servicebus" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  count                   = var.enable_servicebus == true ? 1 : 0
+  count                   = var.use_workload_identity == true && var.enable_servicebus == true ? 1 : 0
   source                  = "app.terraform.io/indico/indico-azure-servicebus/mod"
   version                 = "1.1.1"
   label                   = var.label
@@ -353,6 +353,6 @@ module "servicebus" {
   region                  = var.region
   svp_client_id           = var.svp_client_id
   servicebus_pricing_tier = var.servicebus_pricing_tier
-  workload_identity_id    = azuread_service_principal.workload_identity.id
+  workload_identity_id    = azuread_service_principal.workload_identity.0.id
 }
 
