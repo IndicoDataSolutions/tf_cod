@@ -151,7 +151,7 @@ resource "azuread_application_federated_identity_credential" "workload_snapshot_
 
 
 #### Not using Workload Identity 
-resource "azurerm_role_assignment" "blob_storage_account_owner" {
+resource "azurerm_role_assignment" "blob_storage_account_owner_no_wi" {
   count                            = var.use_workload_identity == false ? 1 : 0
   scope                            = module.storage.storage_account_id
   role_definition_name             = "Owner"
@@ -159,7 +159,7 @@ resource "azurerm_role_assignment" "blob_storage_account_owner" {
   skip_service_principal_aad_check = true
 }
 
-resource "azurerm_role_assignment" "blob_storage_account_blob_contributer" {
+resource "azurerm_role_assignment" "blob_storage_account_blob_contributer_no_wi" {
   count                            = var.use_workload_identity == false ? 1 : 0
   scope                            = module.storage.storage_account_id
   role_definition_name             = "Storage Blob Data Contributor"
@@ -167,7 +167,7 @@ resource "azurerm_role_assignment" "blob_storage_account_blob_contributer" {
   skip_service_principal_aad_check = true
 }
 
-resource "azurerm_role_assignment" "blob_storage_account_queue_contributer" {
+resource "azurerm_role_assignment" "blob_storage_account_queue_contributer_no_wi" {
   count                            = var.use_workload_identity == false ? 1 : 0
   scope                            = module.storage.storage_account_id
   role_definition_name             = "Storage Queue Data Contributor"
