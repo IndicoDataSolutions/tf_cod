@@ -1,5 +1,5 @@
 output "workload_identity_client_id" {
-  value = azuread_application.workload_identity.0.application_id
+  value = var.use_workload_identity == true ? azuread_application.workload_identity.0.application_id : ""
 }
 
 output "cluster_name" {
