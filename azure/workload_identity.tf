@@ -1,5 +1,9 @@
 data "azuread_client_config" "current" {}
 
+
+
+
+
 resource "azuread_application" "workload_identity" {
   count        = var.use_workload_identity == true ? 1 : 0
   display_name = "${var.label}-${var.region}-workload-identity"
@@ -143,3 +147,31 @@ resource "azuread_application_federated_identity_credential" "workload_snapshot_
   issuer                = module.cluster.oidc_issuer_url
   subject               = "system:serviceaccount:default:cod-snapshots"
 }
+
+
+
+#### Not using Workload Identity 
+resource "azurerm_role_assignment" "blob_storage_account_owner" {
+  count                            = var.use_workload_identity == false ? 1 : 0
+  scope                            = module.storage.storage_account_id
+  role_definition_name             = "Owner"
+  principal_id                     = module.cluster.kubelet_identity.object_id
+  skip_service_principal_aad_check = true
+}
+
+resource "azurerm_role_assignment" "blob_storage_account_blob_contributer" {
+  count                            = var.use_workload_identity == false ? 1 : 0
+  scope                            = module.storage.storage_account_id
+  role_definition_name             = "Storage Blob Data Contributor"
+  principal_id                     = module.cluster.kubelet_identity.object_id
+  skip_service_principal_aad_check = true
+}
+
+resource "azurerm_role_assignment" "blob_storage_account_queue_contributer" {
+  count                            = var.use_workload_identity == false ? 1 : 0
+  scope                            = module.storage.storage_account_id
+  role_definition_name             = "Storage Queue Data Contributor"
+  principal_id                     = module.cluster.kubelet_identity.object_id
+  skip_service_principal_aad_check = true
+}
+
