@@ -297,7 +297,7 @@ module "cluster" {
   # az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/EnableWorkloadIdentityPreview')].{Name:name,State:properties.state}"
   # az provider register --namespace Microsoft.ContainerService
   enable_workload_identity = var.use_workload_identity # requires: az feature register --namespace "Microsoft.ContainerService" --name "EnableWorkloadIdentityPreview"
-  enable_oidc_issuer       = true
+  enable_oidc_issuer       = var.use_workload_identity
 }
 
 module "readapi_queue" {
