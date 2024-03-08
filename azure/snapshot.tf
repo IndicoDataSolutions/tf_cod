@@ -11,7 +11,7 @@ resource "kubernetes_secret" "cod-snapshot-client-id" {
   }
 
   data = {
-    id = "${azuread_application.workload_identity.application_id}"
+    id = "${azuread_application.workload_identity.0.application_id}"
   }
 }
 
