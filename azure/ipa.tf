@@ -446,7 +446,7 @@ resource "kubernetes_secret" "azure_storage_key" {
   }
 
   data = {
-    AZURE_CLIENT_ID         = module.cluster.kubelet_identity.object_id
+    AZURE_CLIENT_ID         = module.cluster.kubelet_identity.client_id
     azurestorageaccountname = module.storage.storage_account_name
     azurestorageaccountkey  = module.storage.storage_account_primary_access_key
     AZURE_ACCOUNT_NAME      = module.storage.storage_account_name
