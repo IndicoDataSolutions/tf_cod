@@ -99,6 +99,7 @@ resource "helm_release" "monitoring" {
   count = var.monitoring_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
+    helm_release.external-secrets,
     helm_release.ipa-pre-requisites,
     azurerm_dns_caa_record.alertmanager-caa,
     azurerm_dns_caa_record.grafana-caa,

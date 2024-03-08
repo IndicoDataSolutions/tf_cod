@@ -3,7 +3,7 @@ resource "kubernetes_secret" "cod-snapshot-client-id" {
   depends_on = [
     module.cluster
   ]
-  count = var.restore_snapshot_enabled == true ? 1 : 0
+  count = var.use_workload_identity == true && var.restore_snapshot_enabled == true ? 1 : 0
 
   metadata {
     name      = "cod-snapshot-client-id"
@@ -24,7 +24,7 @@ resource "helm_release" "cod-snapshot-restore" {
     kubernetes_service_account.workload_identity
   ]
 
-  count            = var.restore_snapshot_enabled == true ? 1 : 0
+  count            = var.use_workload_identity == true && var.restore_snapshot_enabled == true ? 1 : 0
   name             = "cod-snapshot-restore"
   create_namespace = true
   namespace        = "default"
@@ -63,7 +63,7 @@ serviceAccount:
 
   # https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview
   annotations:
-    "azure.workload.identity/client-id": "${azuread_application.workload_identity.application_id}"
+    "azure.workload.identity/client-id": "${azuread_application.workload_identity.0.application_id}"
     "azure.workload.identity/tenant-id": "${data.azurerm_client_config.current.tenant_id}"
   EOF
   ]
