@@ -653,6 +653,8 @@ resource "helm_release" "ipa-pre-requisites" {
     null_resource.update_storage_class
   ]
 
+  count = var.enable_intake ? 1 : 0
+
   verify           = false
   name             = "ipa-pre-reqs"
   create_namespace = true
@@ -1398,7 +1400,7 @@ resource "github_repository_file" "alb-values-yaml" {
 }
 
 resource "github_repository_file" "argocd-application-yaml" {
-  count               = var.argo_enabled == true ? 1 : 0
+  count               = var.argo_enabled == true && var.enable_intake ? 1 : 0
   repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/ipa_application.yaml"
