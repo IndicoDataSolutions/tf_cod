@@ -833,3 +833,8 @@ variable "enable_intake" {
   type = string
   default = true
 } 
+
+variable "enable_crds" {
+  type = string
+  default = true
+} 
