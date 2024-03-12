@@ -109,7 +109,7 @@ resource "aws_eks_addon" "guardduty" {
   depends_on = [
     module.cluster
   ]
-  count = var.eks_addon_version_guardduty != null ? 1 : 0
+  count = var.eks_addon_version_guardduty ? 1 : 0
 
 
   cluster_name      = var.label
