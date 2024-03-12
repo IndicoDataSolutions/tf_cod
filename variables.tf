@@ -1124,3 +1124,8 @@ variable "enable_crds" {
   type    = string
   default = true
 }
+
+variable "enable_external_secrets" {
+  type    = string
+  default = true
+}

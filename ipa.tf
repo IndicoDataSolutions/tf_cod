@@ -420,6 +420,7 @@ resource "helm_release" "external-secrets" {
     module.secrets-operator-setup
   ]
 
+  count = var.enable_external_secrets ? 1 : 0
 
   verify           = false
   name             = "external-secrets"
