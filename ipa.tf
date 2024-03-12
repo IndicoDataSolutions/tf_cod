@@ -454,6 +454,8 @@ resource "helm_release" "ipa-crds" {
     module.secrets-operator-setup
   ]
 
+  count = var.enable_crds ? 1 : 0
+
   verify           = false
   name             = "ipa-crds"
   create_namespace = true

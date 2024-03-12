@@ -1120,3 +1120,7 @@ variable "enable_intake" {
   default = true
 }
 
+variable "enable_crds" {
+  type    = string
+  default = true
+}
