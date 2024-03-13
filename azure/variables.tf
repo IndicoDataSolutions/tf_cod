@@ -376,7 +376,7 @@ variable "cod_snapshot_restore_version" {
 
 variable "vault_mount_path" {
   type    = string
-  default = "terraform"
+  default = null
 }
 
 variable "vault_username" {

@@ -311,11 +311,12 @@ module "readapi_queue" {
 }
 
 locals {
-  readapi_secret_path = var.environment == "production" ? "prod-readapi" : "dev-readapi"
+  readapi_secret_path    = var.environment == "production" ? "prod-readapi" : "dev-readapi"
+  local_vault_mount_path = coalesce(var.vault_mount_path, var.account)
 }
 
 data "vault_kv_secret_v2" "readapi_secret" {
-  mount = "customer-${var.vault_mount_path}"
+  mount = "customer-${local.local_vault_mount_path}"
   name  = local.readapi_secret_path
 }
 
