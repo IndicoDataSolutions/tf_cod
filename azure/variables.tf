@@ -674,3 +674,18 @@ variable "ssl_static_secret_name" {
   default     = "indico-ssl-static-cert"
   description = "secret_name for static ssl certificate"
 }
+
+# Log analytics
+
+variable "sentinel_workspace_name" {
+  type    = string
+  default = null # "${var.account}-sentinel-workspace"
+}
+
+variable "sentinel_workspace_resource_group_name" {
+  type    = string
+  default = null # "${var.account}-sentinel-group"
+}
+
+
+
