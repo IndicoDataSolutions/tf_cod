@@ -311,8 +311,9 @@ module "readapi_queue" {
 }
 
 locals {
-  readapi_secret_path    = var.environment == "production" ? "prod-readapi" : "dev-readapi"
-  local_vault_mount_path = coalesce(var.vault_mount_path, var.account)
+  readapi_secret_path             = var.environment == "production" ? "prod-readapi" : "dev-readapi"
+  customer_local_vault_mount_path = coalesce(var.vault_mount_path, "terraform")
+  local_vault_mount_path          = coalesce(var.vault_mount_path, var.account)
 }
 
 data "vault_kv_secret_v2" "readapi_secret" {
