@@ -893,7 +893,7 @@ EOT
 }
 
 data "vault_kv_secret_v2" "zerossl_data" {
-  mount = local.local_vault_mount_path
+  mount = "customer-${local.local_vault_mount_path}"
   name  = "zerossl"
 }
 
