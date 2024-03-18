@@ -104,6 +104,12 @@ resource "kubernetes_config_map" "terraform-variables" {
     harness_delegate = "${jsonencode(var.harness_delegate)}"
     harness_mount_path = "${jsonencode(var.harness_mount_path)}"
     terraform_smoketests_enabled = "${jsonencode(var.terraform_smoketests_enabled)}"
+    resource_group_name = "${jsonencode(var.resource_group_name)}"
+    create_resource_group = "${jsonencode(var.create_resource_group)}"
+    use_static_ssl_certificates = "${jsonencode(var.use_static_ssl_certificates)}"
+    ssl_static_secret_name = "${jsonencode(var.ssl_static_secret_name)}"
+    sentinel_workspace_name = "${jsonencode(var.sentinel_workspace_name)}"
+    sentinel_workspace_resource_group_name = "${jsonencode(var.sentinel_workspace_resource_group_name)}"
 
     }
   }

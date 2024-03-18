@@ -209,7 +209,10 @@ module "argo-registration" {
 provider "local" {}
 
 locals {
-  resource_group_name = "${var.label}-${var.region}"
+  resource_group_name = coalesce(var.resource_group_name, "${var.label}-${var.region}")
+
+  sentinel_workspace_name                = coalesce(var.sentinel_workspace_name, "${var.account}-sentinel-workspace")
+  sentinel_workspace_resource_group_name = coalesce(var.sentinel_workspace_resource_group_name, "${var.account}-sentinel-group")
 
   snapshot_storage_account_name = replace(lower("${var.account}snapshots"), "-", "")
   storage_account_name          = replace(lower(var.storage_account_name), "-", "")
@@ -238,6 +241,7 @@ resource "tls_private_key" "pk" {
 }
 
 resource "azurerm_resource_group" "cod-cluster" {
+  count    = var.create_resource_group == true ? 1 : 0
   name     = local.resource_group_name
   location = var.region
 }
@@ -246,6 +250,7 @@ module "networking" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
+
   source              = "app.terraform.io/indico/indico-azure-network/mod"
   version             = "3.0.5"
   label               = var.label
@@ -259,6 +264,8 @@ module "storage" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
+
+
   source               = "app.terraform.io/indico/indico-azure-blob/mod"
   version              = "0.1.14"
   label                = var.label
@@ -272,9 +279,10 @@ module "cluster" {
     azurerm_resource_group.cod-cluster
   ]
 
+
   source                     = "app.terraform.io/indico/indico-azure-cluster/mod"
   insights_retention_in_days = var.monitor_retention_in_days
-  version                    = "3.1.5"
+  version                    = "3.1.6"
   label                      = var.label
   public_key                 = tls_private_key.pk.public_key_openssh
   region                     = var.region
@@ -288,10 +296,15 @@ module "cluster" {
   resource_group_name        = local.resource_group_name
   admin_group_name           = var.admin_group_name
   account                    = var.account
+
+  sentinel_workspace_name                = local.sentinel_workspace_name
+  sentinel_workspace_resource_group_name = local.sentinel_workspace_resource_group_name
+
+
   # this feature can be checked using:
   # az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/EnableWorkloadIdentityPreview')].{Name:name,State:properties.state}"
   # az provider register --namespace Microsoft.ContainerService
-  enable_workload_identity = true # requires: az feature register --namespace "Microsoft.ContainerService" --name "EnableWorkloadIdentityPreview"
+  enable_workload_identity = var.use_workload_identity # requires: az feature register --namespace "Microsoft.ContainerService" --name "EnableWorkloadIdentityPreview"
   enable_oidc_issuer       = true
 }
 
@@ -306,11 +319,13 @@ module "readapi_queue" {
 }
 
 locals {
-  readapi_secret_path = var.environment == "production" ? "prod-readapi" : "dev-readapi"
+  readapi_secret_path       = var.environment == "production" ? "prod-readapi" : "dev-readapi"
+  default_mount_path        = coalesce(var.vault_mount_path, "terraform")
+  customer_vault_mount_path = "customer-${coalesce(var.vault_mount_path, var.account)}"
 }
 
 data "vault_kv_secret_v2" "readapi_secret" {
-  mount = "customer-${var.account}"
+  mount = local.customer_vault_mount_path
   name  = local.readapi_secret_path
 }
 
@@ -340,14 +355,14 @@ module "servicebus" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  count                   = var.enable_servicebus == true ? 1 : 0
+  count                   = var.use_workload_identity == true && var.enable_servicebus == true ? 1 : 0
   source                  = "app.terraform.io/indico/indico-azure-servicebus/mod"
   version                 = "1.1.1"
   label                   = var.label
-  resource_group_name     = azurerm_resource_group.cod-cluster.name
+  resource_group_name     = var.resource_group_name
   region                  = var.region
   svp_client_id           = var.svp_client_id
   servicebus_pricing_tier = var.servicebus_pricing_tier
-  workload_identity_id    = azuread_service_principal.workload_identity.id
+  workload_identity_id    = azuread_service_principal.workload_identity.0.id
 }
 

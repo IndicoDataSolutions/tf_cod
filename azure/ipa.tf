@@ -4,8 +4,8 @@ locals {
   "tenantId" : "${data.azurerm_client_config.current.tenant_id}",
   "subscriptionId" : "${split("/", data.azurerm_subscription.primary.id)[2]}",
   "resourceGroup" : "${var.common_resource_group}",
-  "aadClientId": "${azuread_application.workload_identity.application_id}",
-  "aadClientSecret": "${azuread_application_password.workload_identity.value}"
+  "aadClientId": "${var.use_workload_identity == true ? azuread_application.workload_identity.0.application_id : ""}",
+  "aadClientSecret": "${var.use_workload_identity == true ? azuread_application_password.workload_identity.0.value : ""}"
   }
   EOF
 
@@ -446,6 +446,7 @@ resource "kubernetes_secret" "azure_storage_key" {
   }
 
   data = {
+    AZURE_CLIENT_ID         = module.cluster.kubelet_identity.client_id
     azurestorageaccountname = module.storage.storage_account_name
     azurestorageaccountkey  = module.storage.storage_account_primary_access_key
     AZURE_ACCOUNT_NAME      = module.storage.storage_account_name
@@ -892,7 +893,7 @@ EOT
 }
 
 data "vault_kv_secret_v2" "zerossl_data" {
-  mount = var.vault_mount_path
+  mount = local.default_mount_path
   name  = "zerossl"
 }
 

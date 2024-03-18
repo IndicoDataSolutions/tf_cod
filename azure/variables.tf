@@ -376,7 +376,7 @@ variable "cod_snapshot_restore_version" {
 
 variable "vault_mount_path" {
   type    = string
-  default = "terraform"
+  default = null
 }
 
 variable "vault_username" {
@@ -653,3 +653,39 @@ variable "terraform_smoketests_enabled" {
   type    = bool
   default = true
 }
+
+variable "resource_group_name" {
+  type    = string
+  default = null
+}
+
+variable "create_resource_group" {
+  type    = bool
+  default = true
+}
+
+variable "use_static_ssl_certificates" {
+  type    = bool
+  default = false
+}
+
+variable "ssl_static_secret_name" {
+  type        = string
+  default     = "indico-ssl-static-cert"
+  description = "secret_name for static ssl certificate"
+}
+
+# Log analytics
+
+variable "sentinel_workspace_name" {
+  type    = string
+  default = null # "${var.account}-sentinel-workspace"
+}
+
+variable "sentinel_workspace_resource_group_name" {
+  type    = string
+  default = null # "${var.account}-sentinel-group"
+}
+
+
+
