@@ -824,6 +824,11 @@ variable "harness_delegate" {
   default = false
 }
 
+variable "harness_delegate_replicas" {
+  type    = number
+  default = 1
+}
+
 variable "harness_mount_path" {
   type    = string
   default = "harness"
