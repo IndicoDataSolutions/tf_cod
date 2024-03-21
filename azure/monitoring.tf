@@ -35,7 +35,119 @@ alerting:
     integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
 EOT
   )
+
+
+  kube_prometheus_stack_values = var.use_static_ssl_certificates == true ? (<<EOT
+  alertmanager:
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - alertmanager-${local.dns_name}
+      paths:
+        - /
+      tls:
+        - secretName: ${var.ssl_static_secret_name}
+          hosts:
+            - alertmanager-${local.dns_name}
+  prometheus:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
+    thanosServiceMonitor:
+      enabled: ${var.thanos_enabled}
+
+    thanosService:
+      enabled:  ${var.thanos_enabled}
+
+    prometheusSpec:
+      disableCompaction: ${var.thanos_enabled}
+      externalLabels:
+        clusterAccount: ${var.account}
+        clusterRegion: ${var.region}
+        clusterName: ${var.label}
+        clusterFullName: ${lower("${var.account}-${var.region}-${var.name}")}
+${local.thanos_config}
+      nodeSelector:
+        node_group: static-workers
+    ingress:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+      ingressClassName: nginx
+      hosts:
+        - prometheus-${local.dns_name}
+      paths:
+        - /
+      tls:
+        - secretName: ${var.ssl_static_secret_name}
+          hosts:
+            - prometheus-${local.dns_name}
+  grafana:
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - grafana-${local.dns_name}
+      path: /
+      tls:
+        - secretName: ${var.ssl_static_secret_name}
+          hosts:
+            - grafana-${local.dns_name}
+  EOT
+    ) : (<<EOT
+  alertmanager:
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+
+  prometheus:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
+    thanosServiceMonitor:
+      enabled: ${var.thanos_enabled}
+
+    thanosService:
+      enabled: ${var.thanos_enabled}
+    
+    prometheusSpec:
+      disableCompaction: ${var.thanos_enabled}
+      externalLabels:
+        clusterAccount: ${var.account}
+        clusterRegion: ${var.region}
+        clusterName: ${var.label}
+        clusterFullName: ${lower("${var.account}-${var.region}-${var.name}")}
+${local.thanos_config}
+      nodeSelector:
+        node_group: static-workers
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+  grafana:
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+EOT
+  )
 }
+
 resource "azurerm_dns_caa_record" "grafana-caa" {
   count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
   name                = lower("grafana.${local.dns_prefix}")
@@ -99,6 +211,7 @@ resource "helm_release" "monitoring" {
   count = var.monitoring_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
+    helm_release.external-secrets,
     helm_release.ipa-pre-requisites,
     azurerm_dns_caa_record.alertmanager-caa,
     azurerm_dns_caa_record.grafana-caa,
@@ -158,37 +271,7 @@ authentication:
 
 ${local.alerting_configuration_values}
 kube-prometheus-stack:
-  enabled: true
-  nodeExporter:
-    enabled: false
-
-  prometheus:
-    annotations:
-      reloader.stakater.com/auto: "true"
-
-    thanosServiceMonitor:
-      enabled: ${var.thanos_enabled}
-
-    thanosService:
-      enabled: ${var.thanos_enabled}
-    
-    prometheusSpec:
-      disableCompaction: ${var.thanos_enabled}
-      externalLabels:
-        clusterAccount: ${var.account}
-        clusterRegion: ${var.region}
-        clusterName: ${var.label}
-        clusterFullName: ${lower("${var.account}-${var.region}-${var.name}")}
-${local.thanos_config}
-      nodeSelector:
-        node_group: static-workers
-      storageSpec:
-        volumeClaimTemplate:
-          spec:
-            storageClassName: default
-
-prometheus-adapter:
-  enabled: false
+${local.kube_prometheus_stack_values}
 EOF
   ]
 }

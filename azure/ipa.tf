@@ -4,8 +4,8 @@ locals {
   "tenantId" : "${data.azurerm_client_config.current.tenant_id}",
   "subscriptionId" : "${split("/", data.azurerm_subscription.primary.id)[2]}",
   "resourceGroup" : "${var.common_resource_group}",
-  "aadClientId": "${azuread_application.workload_identity.application_id}",
-  "aadClientSecret": "${azuread_application_password.workload_identity.value}"
+  "aadClientId": "${var.use_workload_identity == true ? azuread_application.workload_identity.0.application_id : ""}",
+  "aadClientSecret": "${var.use_workload_identity == true ? azuread_application_password.workload_identity.0.value : ""}"
   }
   EOF
 
@@ -309,6 +309,7 @@ resource "helm_release" "terraform-smoketests" {
     kubernetes_config_map.terraform-variables,
     helm_release.monitoring
   ]
+  count = var.terraform_smoketests_enabled == true ? 1 : 0
 
   verify           = false
   name             = "terraform-smoketests-${substr(data.external.git_information.result.sha, 0, 8)}"
@@ -445,6 +446,7 @@ resource "kubernetes_secret" "azure_storage_key" {
   }
 
   data = {
+    AZURE_CLIENT_ID         = module.cluster.kubelet_identity.client_id
     azurestorageaccountname = module.storage.storage_account_name
     azurestorageaccountkey  = module.storage.storage_account_primary_access_key
     AZURE_ACCOUNT_NAME      = module.storage.storage_account_name
@@ -471,6 +473,7 @@ resource "kubernetes_config_map" "azure_dns_credentials" {
 
 
 resource "kubectl_manifest" "thanos-storage-secret" {
+  count      = var.thanos_enabled ? 1 : 0
   depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
   yaml_body  = <<YAML
     apiVersion: "secrets.hashicorp.com/v1beta1"
@@ -890,7 +893,7 @@ EOT
 }
 
 data "vault_kv_secret_v2" "zerossl_data" {
-  mount = var.vault_mount_path
+  mount = local.default_mount_path
   name  = "zerossl"
 }
 
