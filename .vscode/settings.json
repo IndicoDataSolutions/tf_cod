@@ -17,5 +17,11 @@
   ],
   "python.testing.cwd": "${workspaceRoot}/smoketests",
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true
+  "python.testing.pytestEnabled": true,
+  "editor.formatOnSave": true,
+  "workbench.editor.autoLockGroups": {
+    "default": true
+  },
+  "workbench.editor.defaultBinaryEditor": "default",
+  "terraform.experimentalFeatures.prefillRequiredFields": true
 }

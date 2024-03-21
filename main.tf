@@ -52,6 +52,10 @@ terraform {
       source  = "StatusCakeDev/statuscake"
       version = "2.2.2"
     }
+    azurerm = {
+      source = "hashicorp/azurerm"
+      version = "3.95.0"
+    }
   }
 }
 
@@ -218,13 +222,14 @@ module "security-group" {
 
 module "s3-storage" {
   source            = "app.terraform.io/indico/indico-aws-buckets/mod"
-  version           = "2.0.3"
+  version           = "3.2.0"
   force_destroy     = true # allows terraform to destroy non-empty buckets.
   label             = var.label
   kms_key_arn       = module.kms_key.key.arn
   submission_expiry = var.submission_expiry
   uploads_expiry    = var.uploads_expiry
   include_rox       = var.include_rox
+  enable_backup     = var.enable_s3_backup
 }
 
 
@@ -288,7 +293,7 @@ module "efs-storage-local-registry" {
 module "fsx-storage" {
   count                       = var.include_fsx == true ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-fsx/mod"
-  version                     = "1.4.1"
+  version                     = "1.4.2"
   label                       = var.label
   additional_tags             = var.additional_tags
   region                      = var.region
