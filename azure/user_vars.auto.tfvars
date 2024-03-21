@@ -140,4 +140,4 @@ additional_node_pools = {
   }
 }
 
-statuscake_enabled = true
+statuscake_enabled = strcontains(lower(var.account), "indico-") ? true : false

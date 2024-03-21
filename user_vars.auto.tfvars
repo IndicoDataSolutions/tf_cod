@@ -108,4 +108,7 @@ include_efs                 = true
 #cluster
 az_count = 2
 
-statuscake_enabled = true
+statuscake_enabled = strcontains(lower(var.aws_account), "indico-") ? true : false
+
+
+
