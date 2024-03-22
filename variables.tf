@@ -839,3 +839,25 @@ variable "enable_s3_backup" {
   default     = true
   description = "Allow backing up data bucket on s3"
 }
+
+variable "network_allow_public" {
+  type        = bool
+  default     = true
+  description = "If enabled this will create public subnets, IGW, and NAT gateway."
+}
+
+variable "network_type" {
+  type    = string
+  default = "create"
+
+  validation {
+    condition     = var.network_type == "create" || var.network_type == "load"
+    error_message = "${var.network_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "load_vpc_id" {
+  type        = string
+  default     = ""
+  description = "This is required if loading a network rather than creating one."
+}

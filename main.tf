@@ -49,7 +49,7 @@ terraform {
       version = "1.0.4"
     }
     azurerm = {
-      source = "hashicorp/azurerm"
+      source  = "hashicorp/azurerm"
       version = "3.95.0"
     }
   }
@@ -138,7 +138,7 @@ data "aws_caller_identity" "current" {}
 
 # define the networking module we're using locally
 locals {
-  network = var.direct_connect == true ? module.private_networking : module.public_networking
+  network = module.networking
   aws_usernames = [
     "svc_jenkins",
     "terraform-sa"
@@ -166,24 +166,18 @@ resource "aws_key_pair" "kp" {
   public_key = tls_private_key.pk.public_key_openssh
 }
 
-module "public_networking" {
+module "networking" {
   count                = var.direct_connect == true ? 0 : 1
   source               = "app.terraform.io/indico/indico-aws-network/mod"
-  version              = "1.2.0"
+  version              = "2.0.0"
   label                = var.label
   vpc_cidr             = var.vpc_cidr
   private_subnet_cidrs = var.private_subnet_cidrs
   public_subnet_cidrs  = var.public_subnet_cidrs
   subnet_az_zones      = var.subnet_az_zones
-}
-
-module "private_networking" {
-  count                = var.direct_connect == true ? 1 : 0
-  source               = "app.terraform.io/indico/indico-aws-dc-network/mod"
-  version              = "1.0.0"
-  vpc_cidr             = var.vpc_cidr
-  private_subnet_cidrs = var.private_subnet_cidrs
-  subnet_az_zones      = var.subnet_az_zones
+  allow_public         = var.network_allow_public
+  network_type         = var.network_type
+  load_vpc_id          = var.load_vpc_id
 }
 
 module "sqs_sns" {
