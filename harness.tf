@@ -13,7 +13,7 @@ module "harness_delegate" {
   namespace        = "harness-delegate-ng"
   manager_endpoint = "https://app.harness.io/gratis"
   delegate_image   = jsondecode(data.vault_kv_secret_v2.delegate_secrets[0].data_json)["DELEGATE_IMAGE"]
-  replicas         = 1
+  replicas         = var.harness_delegate_replicas
   upgrader_enabled = false
 
   # Additional optional values to pass to the helm chart
