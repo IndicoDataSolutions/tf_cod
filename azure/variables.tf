@@ -687,5 +687,11 @@ variable "sentinel_workspace_resource_group_name" {
   default = null # "${var.account}-sentinel-group"
 }
 
+variable "sentinel_workspace_id" {
+  type    = string
+  default = null
+}
+
+
 
 
