@@ -190,6 +190,19 @@ module "sqs_sns" {
   label   = var.label
 }
 
+module "lambda-sns-forwarder" {
+  count                = var.lambda_sns_forwarder_enabled == true ? 1 : 0
+  source               = "app.terraform.io/indico/indico-lambda-sns-forwarder/mod"
+  version              = "1.0.0"
+  region               = var.region
+  label                = var.label
+  subnet_ids           = flatten([local.network[0].private_subnet_ids])
+  security_group_id    = module.security-group.all_subnets_sg_id
+  kms_key              = module.kms_key.key_arn
+  sns_arn              = module.sqs_sns.indico_ipa_topic_arn
+  destination_endpoint = var.lambda_sns_forwarder_destination_endpoint
+}
+
 module "kms_key" {
   source           = "app.terraform.io/indico/indico-aws-kms/mod"
   version          = "2.0.2"

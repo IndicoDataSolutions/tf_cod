@@ -824,3 +824,15 @@ variable "harness_mount_path" {
   type    = string
   default = "harness"
 }
+
+variable "lambda_sns_forwarder_enabled" {
+  type = bool
+  default = false
+  description = "If enabled a lamda will be provisioned to forward sns messages to an external endpoint."
+}
+
+variable "lambda_sns_forwarder_destination_endpoint" {
+  type = string
+  default = ""
+  description = "destination URL for the lambda sns forwarder"
+}
