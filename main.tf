@@ -167,17 +167,21 @@ resource "aws_key_pair" "kp" {
 }
 
 module "networking" {
-  count                = var.direct_connect == true ? 0 : 1
-  source               = "app.terraform.io/indico/indico-aws-network/mod"
-  version              = "2.0.0"
-  label                = var.label
-  vpc_cidr             = var.vpc_cidr
-  private_subnet_cidrs = var.private_subnet_cidrs
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  subnet_az_zones      = var.subnet_az_zones
-  allow_public         = var.network_allow_public
-  network_type         = var.network_type
-  load_vpc_id          = var.load_vpc_id
+  count                    = var.direct_connect == true ? 0 : 1
+  source                   = "app.terraform.io/indico/indico-aws-network/mod"
+  version                  = "2.0.0"
+  label                    = var.label
+  vpc_cidr                 = var.vpc_cidr
+  private_subnet_cidrs     = var.private_subnet_cidrs
+  public_subnet_cidrs      = var.public_subnet_cidrs
+  subnet_az_zones          = var.subnet_az_zones
+  allow_public             = var.network_allow_public
+  network_type             = var.network_type
+  load_vpc_id              = var.load_vpc_id
+  private_subnet_tag_name  = var.private_subnet_tag_name
+  private_subnet_tag_value = var.private_subnet_tag_value
+  public_subnet_tag_name   = var.public_subnet_tag_name
+  public_subnet_tag_value  = var.private_subnet_tag_value
 }
 
 module "sqs_sns" {

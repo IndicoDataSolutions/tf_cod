@@ -861,3 +861,23 @@ variable "load_vpc_id" {
   default     = ""
   description = "This is required if loading a network rather than creating one."
 }
+
+variable "private_subnet_tag_name" {
+  type = string
+  default = "Name"
+}
+
+variable "private_subnet_tag_value" {
+  type = string
+  default = "*private*"
+}
+
+variable "public_subnet_tag_name" {
+  type = string
+  default = "Name"
+}
+
+variable "public_subnet_tag_value" {
+  type = string
+  default = "*public*"
+}
