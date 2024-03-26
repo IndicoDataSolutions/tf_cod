@@ -863,21 +863,37 @@ variable "load_vpc_id" {
 }
 
 variable "private_subnet_tag_name" {
-  type = string
+  type    = string
   default = "Name"
 }
 
 variable "private_subnet_tag_value" {
-  type = string
+  type    = string
   default = "*private*"
 }
 
 variable "public_subnet_tag_name" {
-  type = string
+  type    = string
   default = "Name"
 }
 
 variable "public_subnet_tag_value" {
-  type = string
+  type    = string
   default = "*public*"
+}
+
+variable "sg_tag_name" {
+  type    = string
+  default = "Name"
+}
+
+variable "sg_tag_value" {
+  type    = string
+  default = "*-allow-subnets"
+}
+
+variable "s3_endpoint_enabled" {
+  type        = bool
+  default     = false
+  description = "If set to true, an S3 VPC endpoint will be created. If this variable is set, the `region` variable must also be set"
 }

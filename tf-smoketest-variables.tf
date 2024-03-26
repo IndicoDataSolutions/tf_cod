@@ -148,6 +148,9 @@ resource "kubernetes_config_map" "terraform-variables" {
     private_subnet_tag_value = "${jsonencode(var.private_subnet_tag_value)}"
     public_subnet_tag_name = "${jsonencode(var.public_subnet_tag_name)}"
     public_subnet_tag_value = "${jsonencode(var.public_subnet_tag_value)}"
+    sg_tag_name = "${jsonencode(var.sg_tag_name)}"
+    sg_tag_value = "${jsonencode(var.sg_tag_value)}"
+    s3_endpoint_enabled = "${jsonencode(var.s3_endpoint_enabled)}"
 
     }
   }

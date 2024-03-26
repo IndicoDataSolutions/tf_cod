@@ -182,6 +182,8 @@ module "networking" {
   private_subnet_tag_value = var.private_subnet_tag_value
   public_subnet_tag_name   = var.public_subnet_tag_name
   public_subnet_tag_value  = var.private_subnet_tag_value
+  sg_tag_name              = var.sg_tag_name
+  sg_tag_value             = var.sg_tag_value
 }
 
 module "sqs_sns" {
