@@ -203,7 +203,7 @@ module "lambda-sns-forwarder" {
   subnet_ids           = flatten([local.network[0].private_subnet_ids])
   security_group_id    = module.security-group.all_subnets_sg_id
   kms_key              = module.kms_key.key_arn
-  sns_arn              = var.lambda_sns_forwarder_topic_arn == "" ? module.sqs_sns[0].indico_ipa_topic_arn : var.lambda_sns_forwarder_topic_arn
+  sns_arn              = var.lambda_sns_forwarder_topic_arn != "" ? module.sqs_sns[0].indico_ipa_topic_arn : var.lambda_sns_forwarder_topic_arn
   destination_endpoint = var.lambda_sns_forwarder_destination_endpoint
 }
 
