@@ -360,7 +360,7 @@ module "servicebus" {
   source                  = "app.terraform.io/indico/indico-azure-servicebus/mod"
   version                 = "1.1.1"
   label                   = var.label
-  resource_group_name     = var.resource_group_name
+  resource_group_name     = local.resource_group_name
   region                  = var.region
   svp_client_id           = var.svp_client_id
   servicebus_pricing_tier = var.servicebus_pricing_tier
