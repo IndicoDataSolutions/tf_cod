@@ -143,6 +143,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     enable_s3_backup = "${jsonencode(var.enable_s3_backup)}"
     network_allow_public = "${jsonencode(var.network_allow_public)}"
     network_type = "${jsonencode(var.network_type)}"
+    sg_type = "${jsonencode(var.sg_type)}"
     load_vpc_id = "${jsonencode(var.load_vpc_id)}"
     private_subnet_tag_name = "${jsonencode(var.private_subnet_tag_name)}"
     private_subnet_tag_value = "${jsonencode(var.private_subnet_tag_value)}"
