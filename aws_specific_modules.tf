@@ -41,7 +41,7 @@ resource "aws_vpc_endpoint" "eks_vpc_guardduty" {
   policy = data.aws_iam_policy_document.eks_vpc_guardduty.json
 
   security_group_ids  = [aws_security_group.eks_vpc_endpoint_guardduty.id]
-  subnet_ids          = local.network[0].public_subnet_ids
+  subnet_ids          = local.network[0].private_subnet_ids
   private_dns_enabled = true
 }
 
