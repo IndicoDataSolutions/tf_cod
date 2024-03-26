@@ -836,3 +836,9 @@ variable "lambda_sns_forwarder_destination_endpoint" {
   default = ""
   description = "destination URL for the lambda sns forwarder"
 }
+
+variable "lambda_sns_forwarder_topic_arn" {
+  type = string
+  default = "false"
+  description = "SNS topic to triger lambda forwarder."
+}

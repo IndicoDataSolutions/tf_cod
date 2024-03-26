@@ -140,6 +140,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     harness_mount_path = "${jsonencode(var.harness_mount_path)}"
     lambda_sns_forwarder_enabled = "${jsonencode(var.lambda_sns_forwarder_enabled)}"
     lambda_sns_forwarder_destination_endpoint = "${jsonencode(var.lambda_sns_forwarder_destination_endpoint)}"
+    lambda_sns_forwarder_topic_arn = "${jsonencode(var.lambda_sns_forwarder_topic_arn)}"
 
     }
   }
