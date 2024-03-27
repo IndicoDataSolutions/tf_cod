@@ -48,11 +48,19 @@ terraform {
       source  = "loafoe/htpasswd"
       version = "1.0.4"
     }
+    statuscake = {
+      source  = "StatusCakeDev/statuscake"
+      version = "2.2.2"
+    }
     azurerm = {
       source = "hashicorp/azurerm"
       version = "3.95.0"
     }
   }
+}
+
+provider "statuscake" {
+  api_token = var.statuscake_api_key
 }
 
 provider "time" {}
