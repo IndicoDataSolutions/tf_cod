@@ -501,7 +501,7 @@ variable "hibernation_enabled" {
 }
 
 variable "keda_version" {
-  default = "2.11.2"
+  default = "2.13.2"
 }
 
 variable "external_secrets_version" {

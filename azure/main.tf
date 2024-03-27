@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     azurerm = {
-      source = "hashicorp/azurerm"
+      source  = "hashicorp/azurerm"
       version = "3.95.0"
     }
     azuread = {
@@ -290,7 +290,7 @@ module "cluster" {
 
   source                     = "app.terraform.io/indico/indico-azure-cluster/mod"
   insights_retention_in_days = var.monitor_retention_in_days
-  version                    = "3.1.6"
+  version                    = "3.1.7"
   label                      = var.label
   public_key                 = tls_private_key.pk.public_key_openssh
   region                     = var.region
@@ -307,6 +307,7 @@ module "cluster" {
 
   sentinel_workspace_name                = local.sentinel_workspace_name
   sentinel_workspace_resource_group_name = local.sentinel_workspace_resource_group_name
+  sentinel_workspace_id                  = var.sentinel_workspace_id
 
 
   # this feature can be checked using:
@@ -367,7 +368,7 @@ module "servicebus" {
   source                  = "app.terraform.io/indico/indico-azure-servicebus/mod"
   version                 = "1.1.1"
   label                   = var.label
-  resource_group_name     = var.resource_group_name
+  resource_group_name     = local.resource_group_name
   region                  = var.region
   svp_client_id           = var.svp_client_id
   servicebus_pricing_tier = var.servicebus_pricing_tier

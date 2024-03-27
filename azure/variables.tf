@@ -306,7 +306,7 @@ variable "monitoring_enabled" {
 
 variable "keda_version" {
   type        = string
-  default     = "2.11.2"
+  default     = "2.13.2"
   description = "Version of keda helm chart"
 }
 
@@ -697,3 +697,7 @@ variable "sentinel_workspace_resource_group_name" {
   default = null # "${var.account}-sentinel-group"
 }
 
+variable "sentinel_workspace_id" {
+  type    = string
+  default = null
+}
