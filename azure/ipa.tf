@@ -166,7 +166,7 @@ resource "helm_release" "ipa-vso" {
       - name: harbor-pull-secret
     kubeRbacProxy:
       image:
-        repository: harbor.devops.indico.io/gcr.io/kubebuilder/kube-rbac-proxy
+        repository: ${var.image_registry}/gcr.io/kubebuilder/kube-rbac-proxy
       resources:
         limits:
           cpu: 500m
@@ -177,7 +177,7 @@ resource "helm_release" "ipa-vso" {
 
     manager:
       image:
-        repository: harbor.devops.indico.io/docker.io/hashicorp/vault-secrets-operator
+        repository: ${var.image_registry}/docker.io/hashicorp/vault-secrets-operator
       resources:
         limits:
           cpu: 500m
@@ -1038,7 +1038,7 @@ resource "helm_release" "external-secrets" {
 
   values = [<<EOF
     image:
-      repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+      repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
   EOF
   ]
 }

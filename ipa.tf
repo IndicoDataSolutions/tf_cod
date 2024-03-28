@@ -98,7 +98,7 @@ app-edge:
 app-edge:
   alternateDomain: ""
   image:
-    registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "harbor.devops.indico.io"}/indico
+    registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
 EOT
   )
   dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT
@@ -336,7 +336,7 @@ resource "helm_release" "ipa-vso" {
       - name: harbor-pull-secret
     kubeRbacProxy:
       image:
-        repository: harbor.devops.indico.io/gcr.io/kubebuilder/kube-rbac-proxy
+        repository: ${var.image_registry}/gcr.io/kubebuilder/kube-rbac-proxy
       resources:
         limits:
           cpu: 500m
@@ -346,7 +346,7 @@ resource "helm_release" "ipa-vso" {
           memory: 512Mi
     manager:
       image:
-        repository: harbor.devops.indico.io/docker.io/hashicorp/vault-secrets-operator
+        repository: ${var.image_registry}/docker.io/hashicorp/vault-secrets-operator
       resources:
         limits:
           cpu: 500m
@@ -399,13 +399,13 @@ resource "helm_release" "external-secrets" {
 
   values = [<<EOF
     image:
-      repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+      repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
     webhook:
      image:
-        repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+        repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
     certController:
       image:
-        repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+        repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
 
   EOF
   ]
@@ -1055,7 +1055,7 @@ docker-registry:
 
   proxy:
     enabled: true
-    remoteurl: https://harbor.devops.indico.io
+    remoteurl: https://${var.image_registry}
     secretRef: remote-access
   replicaCount: 3
   
@@ -1075,7 +1075,7 @@ metrics-server:
 proxyRegistryAccess:
   proxyPassword: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_password"] : ""}
   proxyPullSecretName: remote-access
-  proxyUrl: https://harbor.devops.indico.io
+  proxyUrl: https://${var.image_registry}
   proxyUsername: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_username"] : ""}
   
 registryUrl: local-registry.${local.dns_name}
@@ -1252,7 +1252,7 @@ spec:
           value: |
             global:
               image:
-                registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "harbor.devops.indico.io"}/indico
+                registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
             ${indent(12, local.local_registry_tf_cod_values)}
             runtime-scanner:
               enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}

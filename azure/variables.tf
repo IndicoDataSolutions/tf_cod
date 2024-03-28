@@ -687,5 +687,9 @@ variable "sentinel_workspace_resource_group_name" {
   default = null # "${var.account}-sentinel-group"
 }
 
-
+variable "image_registry" {
+  type = string
+  default = "harbor.devops.indico.io"
+  description = "docker image registry to use for pulling images."
+}
 

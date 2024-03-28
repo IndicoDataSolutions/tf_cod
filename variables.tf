@@ -858,7 +858,7 @@ variable "network_type" {
 
 variable "sg_type" {
   type    = string
-  default = "create"
+  default = "load"
 
   validation {
     condition     = var.sg_type == "create" || var.sg_type == "load"
@@ -906,4 +906,10 @@ variable "s3_endpoint_enabled" {
   type        = bool
   default     = false
   description = "If set to true, an S3 VPC endpoint will be created. If this variable is set, the `region` variable must also be set"
+}
+
+variable "image_registry" {
+  type = string
+  default = "harbor.devops.indico.io"
+  description = "docker image registry to use for pulling images."
 }

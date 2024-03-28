@@ -152,6 +152,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     sg_tag_name = "${jsonencode(var.sg_tag_name)}"
     sg_tag_value = "${jsonencode(var.sg_tag_value)}"
     s3_endpoint_enabled = "${jsonencode(var.s3_endpoint_enabled)}"
+    image_registry = "${jsonencode(var.image_registry)}"
 
     }
   }
