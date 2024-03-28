@@ -175,6 +175,7 @@ module "networking" {
   private_subnet_cidrs     = var.private_subnet_cidrs
   public_subnet_cidrs      = var.public_subnet_cidrs
   subnet_az_zones          = var.subnet_az_zones
+  region                   = var.region
   allow_public             = var.network_allow_public
   network_type             = var.network_type
   load_vpc_id              = var.load_vpc_id
@@ -332,7 +333,7 @@ module "cluster" {
   cluster_version            = var.k8s_version
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
-  private_endpoint_enabled = true
+  private_endpoint_enabled   = true
 }
 
 module "readapi_queue" {

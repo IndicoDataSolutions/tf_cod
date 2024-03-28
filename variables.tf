@@ -909,7 +909,7 @@ variable "s3_endpoint_enabled" {
 }
 
 variable "image_registry" {
-  type = string
-  default = "harbor.devops.indico.io"
+  type        = string
+  default     = "harbor.devops.indico.io"
   description = "docker image registry to use for pulling images."
 }
