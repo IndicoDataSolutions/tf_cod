@@ -252,15 +252,16 @@ module "networking" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  source              = "app.terraform.io/indico/indico-azure-network/mod"
-  network_type        = var.network_type
-  version             = "4.0.1"
-  label               = var.label
-  vnet_cidr           = var.vnet_cidr
-  subnet_cidrs        = var.subnet_cidrs
-  resource_group_name = local.network_resource_group_name
-  region              = var.region
+  source               = "app.terraform.io/indico/indico-azure-network/mod"
+  network_type         = var.network_type
+  version              = "4.0.1"
+  label                = var.label
+  vnet_cidr            = var.vnet_cidr
+  subnet_cidrs         = var.subnet_cidrs
+  resource_group_name  = local.network_resource_group_name
+  region               = var.region
   virtual_network_name = var.virtual_network_name
+  virtual_subnet_name  = var.virtual_subnet_name
 }
 
 module "storage" {

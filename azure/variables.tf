@@ -726,5 +726,12 @@ variable "virtual_network_name" {
 }
 
 
+variable "virtual_subnet_name" {
+  default = null
+  type    = string
+}
+
+
+
 
 
