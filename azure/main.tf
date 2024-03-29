@@ -209,8 +209,8 @@ module "argo-registration" {
 provider "local" {}
 
 locals {
-  resource_group_name = coalesce(var.resource_group_name, "${var.label}-${var.region}")
-  network_resource_group_name = var.network_type == "load" ? var.network_resource_group_name ? local.resource_group_name
+  resource_group_name         = coalesce(var.resource_group_name, "${var.label}-${var.region}")
+  network_resource_group_name = var.network_type == "load" ? var.network_resource_group_name : local.resource_group_name
 
   sentinel_workspace_name                = coalesce(var.sentinel_workspace_name, "${var.account}-sentinel-workspace")
   sentinel_workspace_resource_group_name = coalesce(var.sentinel_workspace_resource_group_name, "${var.account}-sentinel-group")
