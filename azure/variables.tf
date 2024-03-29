@@ -693,5 +693,34 @@ variable "sentinel_workspace_id" {
 }
 
 
+### cluster manager variables
+variable "cluster_manager_vm_size" {
+  type        = string
+  default     = "Standard_Fs_v2"
+  description = "The cluster manager instance size"
+}
+
+variable "public_key_path" {
+  type        = string
+  description = "The path of a public key with which to connect to the cluster manager instance"
+}
+
+variable "network_type" {
+  type    = string
+  default = "create"
+
+  validation {
+    condition     = var.network_type == "create" || var.network_type == "load"
+    error_message = "${var.network_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "network_resource_group_name" {
+  type    = string
+  default = null
+}
+
+
+
 
 

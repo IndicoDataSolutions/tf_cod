@@ -38,3 +38,8 @@ output "harness_delegate_name" {
 output "resource_group_name" {
   value = local.resource_group_name
 }
+
+output "cluster_manager_ip" {
+  value = var.private_cluster_enabled == true ? module.cluster-manager[0].cluster_manager_ip : ""
+}
+
