@@ -437,7 +437,6 @@ resource "helm_release" "ipa-crds" {
     updateCRDs: 
       enabled: true
     pgo: 
-      ## Provide image repository and tag
       controllerImages:
         cluster: ${var.image_registry}/registry.crunchydata.com/crunchydata/postgres-operator:ubi8-5.5.0-2
       relatedImages:
