@@ -517,7 +517,7 @@ resource "helm_release" "ipa-crds" {
       nodeSelector:
         kubernetes.io/os: linux
     image:
-      repository:${var.image_registry}/quay.io/jetstack/cert-manager-controller
+      repository: ${var.image_registry}/quay.io/jetstack/cert-manager-controller
     webhook:
       image:
         repository: ${var.image_registry}/quay.io/jetstack/cert-manager-webhook
