@@ -720,6 +720,10 @@ variable "network_resource_group_name" {
   default = null
 }
 
+variable "virtual_network_name" {
+  default = null
+  type    = string
+}
 
 
 

@@ -260,6 +260,7 @@ module "networking" {
   subnet_cidrs        = var.subnet_cidrs
   resource_group_name = local.network_resource_group_name
   region              = var.region
+  virtual_network_name = var.virtual_network_name
 }
 
 module "storage" {
