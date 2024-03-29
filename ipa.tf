@@ -15,6 +15,9 @@ locals {
   aws-efs-csi-driver:
     enabled: true
   storage:
+    volumeSetup:
+      image:
+        registry: "${var.image_registry}"
     pvcSpec:
       volumeMode: Filesystem
       mountOptions: []
@@ -40,6 +43,9 @@ locals {
   aws-efs-csi-driver:
     enabled: ${var.local_registry_enabled} 
   storage:
+    volumeSetup:
+      image:
+        registry: "${var.image_registry}"
     pvcSpec:
       csi:
         driver: fsx.csi.aws.com
@@ -663,8 +669,9 @@ ipaConfig:
   image:
     registry: ${var.image_registry}
 rabbitmq:
-  image:
-    registry: ${var.image_registry}
+  rabbitmq:
+    image:
+      registry: ${var.image_registry}
 cluster-autoscaler:
   cluster-autoscaler:
     awsRegion: ${var.region}
