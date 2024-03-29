@@ -476,7 +476,7 @@ resource "helm_release" "ipa-crds" {
           image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-upgrade:ubi8-5.5.0-2
         standalone_pgadmin:
           image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-7.8-2
-  migration-operator:
+  migrations-operator:
     image:
       repository: ${var.image_registry}/indico/migrations-operator
     controllerImage:
