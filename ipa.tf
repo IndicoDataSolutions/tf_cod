@@ -436,8 +436,74 @@ resource "helm_release" "ipa-crds" {
     enabled: true
     updateCRDs: 
       enabled: true
-
+    pgo: 
+      ## Provide image repository and tag
+      controllerImages:
+        cluster: ${var.image_registry}/registry.crunchydata.com/crunchydata/postgres-operator:ubi8-5.5.0-2
+      relatedImages:
+        postgres_16:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-16.1-2
+        postgres_16_gis_3.4:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.1-3.4-2
+        postgres_16_gis_3.3:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.1-3.3-2
+        postgres_15:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-15.5-2
+        postgres_15_gis_3.3:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-15.5-3.3-2
+        postgres_14:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.10-2
+        postgres_14_gis_3.1:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.10-3.1-2
+        postgres_14_gis_3.2:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.10-3.2-2
+        postgres_14_gis_3.3:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.10-3.3-2
+        postgres_13:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-13.13-2
+        postgres_13_gis_3.0:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.13-3.0-2
+        postgres_13_gis_3.1:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.13-3.1-2
+        pgadmin:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-4.30-21
+        pgbackrest:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.47-4
+        pgbouncer:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbouncer:ubi8-1.21-2
+        pgexporter:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi8-0.15.0-0
+        pgupgrade:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-upgrade:ubi8-5.5.0-2
+        standalone_pgadmin:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-7.8-2
+  migration-operator:
+    image:
+      repository: ${var.image_registry}/indico/migrations-operator
+    controllerImage:
+      repository: ${var.image_registry}/indico/migrations-controller
   aws-ebs-csi-driver:
+    image:
+      repository: ${var.image_registry}/public.ecr.aws/ebs-csi-driver/aws-ebs-csi-driver
+    sidecars:
+      provisioner:
+        image:
+          repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
+      attacher:
+        image:
+          repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-attacher
+      snapshotter:
+        image:
+          repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-snapshotter/csi-snapshotter
+      livenessProbe:
+        image:
+          repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/livenessprobe
+      resizer:
+        image:
+          repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-resizer
+      nodeDriverRegistrar:
+        image:
+          repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
     controller:
       extraVolumeTags:
         ${indent(8, yamlencode(var.default_tags))}
@@ -451,6 +517,20 @@ resource "helm_release" "ipa-crds" {
     cainjector:
       nodeSelector:
         kubernetes.io/os: linux
+    image:
+      repository:${var.image_registry}/quay.io/jetstack/cert-manager-controller
+    webhook:
+      image:
+        repository: ${var.image_registry}/quay.io/jetstack/cert-manager-webhook
+    cainjector:
+      image:
+        repository: ${var.image_registry}/quay.io/jetstack/cert-manager-cainjector
+    acmesolver:
+      image:
+        repository: ${var.image_registry}/quay.io/jetstack/cert-manager-acmesolver
+    startupapicheck:
+      image:
+        repository: ${var.image_registry}/quay.io/jetstack/cert-manager-ctl
     enabled: true
     installCRDs: true
 EOF
@@ -519,7 +599,9 @@ resource "helm_release" "ipa-pre-requisites" {
   disable_webhooks = false
 
   values = concat(local.storage_spec, [<<EOF
-
+global:
+  image:
+    registry: ${var.image_registry}
 cluster:
   cloudProvider: aws
   name: ${var.label}
@@ -548,8 +630,13 @@ secrets:
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
 
 ${local.dns_configuration_values}
+alternate-external-dns:
+  image:
+    repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
 external-dns:
   enabled: ${local.enable_external_dns}
+  image:
+    repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
   logLevel: debug
   policy: sync
   txtOwnerId: "${var.label}-${var.region}"
@@ -567,14 +654,23 @@ external-dns:
     - ingress
 aws-for-fluent-bit:
   enabled: true
+  image:
+    repository: ${var.image_registry}/public.ecr.aws/aws-observability/aws-for-fluent-bit
   cloudWatchLogs:
     region: ${var.region}
     logGroupName: "/aws/eks/fluentbit-cloudwatch/${var.label}/logs"
     logGroupTemplate: "/aws/eks/fluentbit-cloudwatch/${var.label}/workload/$kubernetes['namespace_name']"
+ipaConfig:
+  image:
+    registry: ${var.image_registry}
+rabbitmq:
+  image:
+    registry: ${var.image_registry}
 cluster-autoscaler:
   cluster-autoscaler:
     awsRegion: ${var.region}
     image:
+      repository: ${var.image_registry}/public-gcr-k8s-proxy/autoscaling/cluster-autoscaler
       tag: "v1.20.0"
     autoDiscovery:
       clusterName: "${var.label}"
@@ -728,12 +824,72 @@ crunchy-postgres:
             memory: 3000Mi
     imagePullSecrets:
       - name: harbor-pull-secret
+reflector:
+  image:
+    repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
+apiModels:
+  image:
+    registry: ${var.image_registry}
+migrationsArtifactsInstall:
+  image:
+    registry: ${var.image_registry}
 aws-load-balancer-controller:
   enabled: ${var.use_acm}
   aws-load-balancer-controller:
     clusterName: ${var.label}
     vpcId: ${local.network[0].indico_vpc_id}
     region: ${var.region}
+aws-fsx-csi-driver:
+  image:  
+    repository: ${var.image_registry}/public.ecr.aws/fsx-csi-driver/aws-fsx-csi-driver
+    pullPolicy: IfNotPresent
+  imagePullSecrets:
+    - harbor-pull-secret
+  sidecars:
+    livenessProbe:
+      image:
+        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/livenessprobe
+    nodeDriverRegistrar:
+      image:
+        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
+    provisioner:
+      image:
+        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
+    resizer:
+      image:
+        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-resizer
+aws-efs-csi-driver:
+  image:
+    repository: ${var.image_registry}/docker.io/amazon/aws-efs-csi-driver
+  sidecars:
+    livenessProbe:
+      image:
+        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/livenessprobe
+    nodeDriverRegistrar:
+      image:
+        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
+    csiProvisioner:
+      image:
+        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
+metrics-server:
+  global:
+    imageRegistry: ${var.image_registry}/docker.io
+celery-backend:
+  redis:
+    global:
+      imageRegistry: ${var.image_registry}
+opentelemetry-operator:
+  testFramework:
+    image:
+      repository: ${var.image_registry}/docker.io/busybox
+  kubeRBACProxy:
+    image:
+      repository: ${var.image_registry}/quay.io/brancz/kube-rbac-proxy
+  manager:
+    image:
+      repository: ${var.image_registry}/ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator
+    collectorImage:
+      repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
 EOF
     ,
     <<EOT
