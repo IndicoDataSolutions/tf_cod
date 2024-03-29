@@ -708,11 +708,6 @@ variable "public_key_path" {
 variable "network_type" {
   type    = string
   default = "create"
-
-  validation {
-    condition     = var.network_type == "create" || var.network_type == "load"
-    error_message = "${var.network_type} not valid. Type must be either create or load"
-  }
 }
 
 variable "network_resource_group_name" {
