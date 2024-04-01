@@ -42,7 +42,7 @@ resource "aws_acm_certificate_validation" "alb" {
 }
 
 resource "aws_acmpca_certificate_authority_certificate" "indico" {
-  count                     = var.network_allow_public == false ? 0 : 1
+  count                     = var.network_allow_public == false ? 1 : 0
   certificate_authority_arn = aws_acmpca_certificate_authority.indico[0].arn
 
   certificate       = aws_acmpca_certificate.indico[0].certificate
@@ -50,7 +50,7 @@ resource "aws_acmpca_certificate_authority_certificate" "indico" {
 }
 
 resource "aws_acmpca_certificate" "indico" {
-  count                       = var.network_allow_public == false ? 0 : 1
+  count                       = var.network_allow_public == false ? 1 : 0
   certificate_authority_arn   = aws_acmpca_certificate_authority.indico[0].arn
   certificate_signing_request = aws_acmpca_certificate_authority.indico[0].certificate_signing_request
   signing_algorithm           = "SHA256WITHRSA"
@@ -66,7 +66,7 @@ resource "aws_acmpca_certificate" "indico" {
 data "aws_partition" "current" {}
 
 resource "aws_acmpca_certificate_authority" "indico" {
-  count = var.network_allow_public == false ? 0 : 1
+  count = var.network_allow_public == false ? 1 : 0
   type  = "ROOT"
   certificate_authority_configuration {
     key_algorithm     = "RSA_2048"

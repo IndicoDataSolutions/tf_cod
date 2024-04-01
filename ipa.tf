@@ -244,6 +244,7 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 
 data "aws_route53_zone" "aws-zone" {
   name = var.network_allow_public == true ? lower("${var.aws_account}.indico.io") : lower("private-${var.aws_account}.indico.io")
+  private_zone = var.network_allow_public == true ? false : true
 }
 
 output "ns" {
