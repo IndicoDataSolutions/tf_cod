@@ -647,7 +647,7 @@ external-dns:
   policy: sync
   txtOwnerId: "${var.label}-${var.region}"
   domainFilters:
-    - ${dns_zone}.indico.io.
+    - ${local.dns_zone}.indico.io.
 
   provider: aws
   aws:
