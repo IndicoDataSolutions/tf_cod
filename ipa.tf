@@ -680,6 +680,8 @@ cluster-autoscaler:
       tag: "v1.20.0"
     autoDiscovery:
       clusterName: "${var.label}"
+    extraArgs:
+      aws-use-static-instance-list: true
 crunchy-postgres:
   enabled: true
   postgres-data:
