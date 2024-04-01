@@ -334,7 +334,7 @@ module "cluster" {
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
   private_endpoint_enabled   = true
-  pca_arns                   = [var.network_allow_public == false ? aws_acmpca_certificate_authority.indico[0].id] : ""]
+  pca_arns                   = [var.network_allow_public == false ? aws_acmpca_certificate_authority.indico[0].id : ""]
 }
 
 module "readapi_queue" {
