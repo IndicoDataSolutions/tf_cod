@@ -497,6 +497,7 @@ locals {
   security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
   dns_zone          = var.network_allow_public == true ? lower("${var.aws_account}") : lower("private-${var.aws_account}")
   dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${local.dns_zone}.${var.domain_suffix}") : var.domain_host
+  dns_zone_public = var.network_allow_public == true ? "public" : "private"
   #dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
 }
 

@@ -142,7 +142,7 @@ alternate-external-dns:
 
   provider: aws
   aws:
-    zoneType: public
+    zoneType: ${local.dns_zone_public}
     region: ${var.region}
 
   policy: sync

@@ -26,3 +26,9 @@ variable "ssl_static_secret_name" {
   default     = "indico-ssl-static-cert"
   description = "secret_name for static ssl certificate"
 }
+
+variable "image_registry" {
+  type        = string
+  default     = "harbor.devops.indico.io"
+  description = "docker image registry to use for pulling images."
+}

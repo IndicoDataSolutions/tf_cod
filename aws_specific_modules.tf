@@ -23,6 +23,7 @@ module "k8s_dashboard" {
   keycloak_client_secret      = module.keycloak[0].client_secret
   use_static_ssl_certificates = var.use_static_ssl_certificates
   ssl_static_secret_name      = var.ssl_static_secret_name
+  image_registry = var.image_registry
 }
 
 data "aws_vpc_endpoint_service" "guardduty" {
