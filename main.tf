@@ -502,7 +502,8 @@ locals {
 
 
 data "aws_route53_zone" "primary" {
-  name     = var.is_alternate_account_domain == "false" ? lower("${var.aws_account}.${var.domain_suffix}") : lower(local.alternate_domain_root)
+  name     = var.is_alternate_account_domain == "false" ? lower("${local.dns_zone}.${var.domain_suffix}") : lower(local.alternate_domain_root)
+  private_zone = var.network_allow_public == true ? false : true
   provider = aws.dns-control
 }
 
