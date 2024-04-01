@@ -1,4 +1,5 @@
 locals {
+  internal_elb = var.network_allow_public == false ? true : false
   thanos_config = var.thanos_enabled == true ? (<<EOT
       thanos: # this is the one being used
         blockSize: 5m
@@ -241,6 +242,9 @@ ingress-nginx:
 
   defaultBackend:
     nodeSelector.beta.kubernetes.io/os: linux
+  service:
+    annotations:
+      service.beta.kubernetes.io/oci-load-balancer-internal: "${local.internal_elb}"
 
 authentication:
   ingressUsername: monitoring

@@ -40,3 +40,42 @@ resource "aws_acm_certificate_validation" "alb" {
     aws_acm_certificate.alb[0]
   ]
 }
+
+resource "aws_acmpca_certificate_authority_certificate" "indico" {
+  count                     = var.network_allow_public == false ? 0 : 1
+  certificate_authority_arn = aws_acmpca_certificate_authority.indico[0].arn
+
+  certificate       = aws_acmpca_certificate.indico[0].certificate
+  certificate_chain = aws_acmpca_certificate.indico[0].certificate_chain
+}
+
+resource "aws_acmpca_certificate" "indico" {
+  count                       = var.network_allow_public == false ? 0 : 1
+  certificate_authority_arn   = aws_acmpca_certificate_authority.indico[0].arn
+  certificate_signing_request = aws_acmpca_certificate_authority.indico[0].certificate_signing_request
+  signing_algorithm           = "SHA256WITHRSA"
+
+  template_arn = "arn:${data.aws_partition.current.partition}:acm-pca:::template/RootCACertificate/V1"
+
+  validity {
+    type  = "YEARS"
+    value = 5
+  }
+}
+
+data "aws_partition" "current" {}
+
+resource "aws_acmpca_certificate_authority" "indico" {
+  count = var.network_allow_public == false ? 0 : 1
+  type  = "ROOT"
+  certificate_authority_configuration {
+    key_algorithm     = "RSA_2048"
+    signing_algorithm = "SHA256WITHRSA"
+
+    subject {
+      common_name = local.dns_name
+    }
+  }
+  usage_mode                      = "SHORT_LIVED_CERTIFICATE"
+  permanent_deletion_time_in_days = 7
+}
