@@ -319,7 +319,26 @@ global:
 
 ingress-nginx:
   enabled: true
-
+  controller:
+    service:
+      external:
+        enabled: ${var.network_allow_public}
+    service:
+      internal:
+        enabled: ${local.internal_elb}
+        annotations:
+          # Create internal NLB
+          #service.beta.kubernetes.io/aws-load-balancer-scheme: "internal"
+          # Create internal ELB(Deprecated)
+          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
+    image:
+      registry: ${var.image_registry}/registry.k8s.io
+      digest: ""
+    admissionWebhooks:
+      patch:
+        image:
+          registry: ${var.image_registry}/registry.k8s.io
+          digest: ""
   rbac:
     create: true
 
@@ -336,16 +355,7 @@ ingress-nginx:
 authentication:
   ingressUsername: monitoring
   ingressPassword: ${random_password.monitoring-password.result}
-ingress-nginx:
-  controller:
-    image:
-      registry: ${var.image_registry}/registry.k8s.io
-      digest: ""
-    admissionWebhooks:
-      patch:
-        image:
-          registry: ${var.image_registry}/registry.k8s.io
-          digest: ""
+
 ${local.alerting_configuration_values}
 kube-prometheus-stack:
 ${local.kube_prometheus_stack_values}
