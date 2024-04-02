@@ -323,7 +323,6 @@ ingress-nginx:
     service:
       external:
         enabled: ${var.network_allow_public}
-    service:
       internal:
         enabled: ${local.internal_elb}
         annotations:
