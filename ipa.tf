@@ -141,9 +141,6 @@ alternate-external-dns:
     - "--aws-assume-role=${var.aws_primary_dns_role_arn}"
 
   provider: aws
-  aws:
-    zoneType: ${local.dns_zone_public}
-    region: ${var.region}
 
   policy: sync
   sources:
@@ -242,13 +239,8 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
-data "aws_route53_zone" "aws-zone" {
-  name = var.network_allow_public == true ? lower("${var.aws_account}.indico.io") : lower("private-${var.aws_account}.indico.io")
-  private_zone = var.network_allow_public == true ? false : true
-}
-
 output "ns" {
-  value = data.aws_route53_zone.aws-zone.name_servers
+  value = data.aws_route53_zone.primary.name_servers
 }
 
 
@@ -650,9 +642,9 @@ external-dns:
     - ${local.dns_zone}.indico.io.
 
   provider: aws
-  aws:
-    zoneType: public
-    region: ${var.region}
+  extraArgs:
+    - "--aws-zone-type=${local.dns_zone_public}"
+    
 
   policy: sync
   sources:
