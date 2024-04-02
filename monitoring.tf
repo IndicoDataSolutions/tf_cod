@@ -340,10 +340,12 @@ ingress-nginx:
   controller:
     image:
       registry: ${var.image_registry}/registry.k8s.io
+      digest: ""
     admissionWebhooks:
       patch:
         image:
           registry: ${var.image_registry}/registry.k8s.io
+          digest: ""
 ${local.alerting_configuration_values}
 kube-prometheus-stack:
 ${local.kube_prometheus_stack_values}
