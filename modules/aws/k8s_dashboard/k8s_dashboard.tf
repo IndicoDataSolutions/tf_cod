@@ -80,7 +80,7 @@ oauth2-proxy:
 
   redis:
     global:
-      imageRegistry: "${var.image_registry}"
+      imageRegistry: "${var.image_registry}/docker.io"
     enabled: true
     replica:
       replicaCount: 1

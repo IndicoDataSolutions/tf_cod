@@ -330,6 +330,7 @@ ingress-nginx:
           #service.beta.kubernetes.io/aws-load-balancer-scheme: "internal"
           # Create internal ELB(Deprecated)
           service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].private_subnet_ids)}"
     image:
       registry: ${var.image_registry}/registry.k8s.io
       digest: ""
