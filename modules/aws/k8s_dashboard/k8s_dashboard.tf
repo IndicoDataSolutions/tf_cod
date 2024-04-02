@@ -157,7 +157,7 @@ resource "helm_release" "k8s-dashboard" {
     <<EOF
 kubernetes-dashboard:
   image:
-    repository: ${var.image_registry}docker.io/kubernetesui/dashboard
+    repository: ${var.image_registry}/docker.io/kubernetesui/dashboard
   extraArgs:
   - --enable-insecure-login
   - --system-banner="Viewing ${var.local_dns_name}"

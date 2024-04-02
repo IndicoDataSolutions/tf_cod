@@ -37,7 +37,13 @@ alerting:
 EOT
   )
   kube_prometheus_stack_values = var.use_static_ssl_certificates == true ? (<<EOT
+  prometheus-node-exporter:
+    image:
+      registry: ${var.image_registry}/quay.io
   alertmanager:
+    alertmanagerSpec:
+      image:
+        registry: ${var.image_registry}/quay.io
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
@@ -53,6 +59,26 @@ EOT
         - secretName: ${var.ssl_static_secret_name}
           hosts:
             - alertmanager-${local.dns_name}
+  prometheusOperator:
+    thanosImage:
+      registry:  ${var.image_registry}/quay.io
+
+    prometheusConfigReloader:
+      image:
+        registry: ${var.image_registry}/quay.io
+
+    prometheusDefaultBaseImageRegistry: ${var.image_registry}/quay.io 
+    alertmanagerDefaultBaseImageRegistry: ${var.image_registry}/quay.io 
+    image:
+      registry: ${var.image_registry}/quay.io
+
+    admissionWebhooks:
+      patch:
+        image:
+          registry: ${var.image_registry}/registry.k8s.io
+  kube-state-metrics:
+    image:
+      registry: ${var.image_registry}/registry.k8s.io
   prometheus:
     annotations:
       reloader.stakater.com/auto: "true"
@@ -64,6 +90,8 @@ EOT
       enabled:  ${var.thanos_enabled}
 
     prometheusSpec:
+      image:
+        registry: ${var.image_registry}/quay.io
       disableCompaction: ${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.aws_account}
@@ -89,6 +117,16 @@ ${local.thanos_config}
           hosts:
             - prometheus-${local.dns_name}
   grafana:
+    downloadDashboardsImage:
+      registry: ${var.image_registry}/docker.io
+    testFramework:
+      image:
+        registry: ${var.image_registry}/docker.io
+    image:
+      registry: ${var.image_registry}/docker.io
+    sidecar:
+      image:
+        registry: ${var.image_registry}/quay.io
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
@@ -103,15 +141,46 @@ ${local.thanos_config}
         - secretName: ${var.ssl_static_secret_name}
           hosts:
             - grafana-${local.dns_name}
+sql-exporter:
+  image:
+    repository: '${var.image_registry}/dockerhub-proxy/burningalchemist/sql_exporter'
+tempo:
+  tempo:
+    repository: ${var.image_registry}/docker.io/grafana/tempo
   EOT
     ) : (<<EOT
+  prometheus-node-exporter:
+    image:
+      registry: ${var.image_registry}/quay.io
   alertmanager:
+    alertmanagerSpec:
+      image:
+        registry: ${var.image_registry}/quay.io
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
       labels:
         acme.cert-manager.io/dns01-solver: "true"
+  prometheusOperator:
+    thanosImage:
+      registry:  ${var.image_registry}/quay.io
 
+    prometheusConfigReloader:
+      image:
+        registry: ${var.image_registry}/quay.io
+
+    prometheusDefaultBaseImageRegistry: ${var.image_registry}/quay.io 
+    alertmanagerDefaultBaseImageRegistry: ${var.image_registry}/quay.io 
+    image:
+      registry: ${var.image_registry}/quay.io
+
+    admissionWebhooks:
+      patch:
+        image:
+          registry: ${var.image_registry}/registry.k8s.io
+  kube-state-metrics:
+    image:
+      registry: ${var.image_registry}/registry.k8s.io
   prometheus:
     annotations:
       reloader.stakater.com/auto: "true"
@@ -123,6 +192,8 @@ ${local.thanos_config}
       enabled: ${var.thanos_enabled}
     
     prometheusSpec:
+      image:
+        registry: ${var.image_registry}/quay.io
       disableCompaction: ${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.aws_account}
@@ -138,11 +209,27 @@ ${local.thanos_config}
       labels:
         acme.cert-manager.io/dns01-solver: "true"
   grafana:
+    downloadDashboardsImage:
+      registry: ${var.image_registry}/docker.io
+    testFramework:
+      image:
+        registry: ${var.image_registry}/docker.io
+    image:
+      registry: ${var.image_registry}/docker.io
+    sidecar:
+      image:
+        registry: ${var.image_registry}/quay.io
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
       labels:
         acme.cert-manager.io/dns01-solver: "true"
+sql-exporter:
+  image:
+    repository: '${var.image_registry}/dockerhub-proxy/burningalchemist/sql_exporter'
+tempo:
+  tempo:
+    repository: ${var.image_registry}/docker.io/grafana/tempo
 EOT
   )
 }
@@ -249,7 +336,14 @@ ingress-nginx:
 authentication:
   ingressUsername: monitoring
   ingressPassword: ${random_password.monitoring-password.result}
-
+ingress-nginx:
+  controller:
+    image:
+      registry: ${var.image_registry}/registry.k8s.io
+    admissionWebhooks:
+      patch:
+        image:
+          registry: ${var.image_registry}/registry.k8s.io
 ${local.alerting_configuration_values}
 kube-prometheus-stack:
 ${local.kube_prometheus_stack_values}
