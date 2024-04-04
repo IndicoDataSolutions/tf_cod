@@ -649,6 +649,11 @@ variable "harness_mount_path" {
   default = "harness"
 }
 
+variable "statuscake_enabled" {
+  type    = bool
+  default = false
+}
+
 variable "terraform_smoketests_enabled" {
   type    = bool
   default = true
@@ -669,6 +674,12 @@ variable "use_static_ssl_certificates" {
   default = false
 }
 
+variable "statuscake_api_key" {
+  type      = string
+  sensitive = true
+  default = ""
+}
+
 variable "ssl_static_secret_name" {
   type        = string
   default     = "indico-ssl-static-cert"
@@ -676,7 +687,6 @@ variable "ssl_static_secret_name" {
 }
 
 # Log analytics
-
 variable "sentinel_workspace_name" {
   type    = string
   default = null # "${var.account}-sentinel-workspace"
@@ -691,7 +701,3 @@ variable "sentinel_workspace_id" {
   type    = string
   default = null
 }
-
-
-
-

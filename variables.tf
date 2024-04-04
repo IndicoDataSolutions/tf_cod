@@ -834,6 +834,17 @@ variable "harness_mount_path" {
   default = "harness"
 }
 
+variable "statuscake_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "statuscake_api_key" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
 variable "enable_s3_backup" {
   type        = bool
   default     = true

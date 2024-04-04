@@ -103,6 +103,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     thanos_enabled = "${jsonencode(var.thanos_enabled)}"
     harness_delegate = "${jsonencode(var.harness_delegate)}"
     harness_mount_path = "${jsonencode(var.harness_mount_path)}"
+    statuscake_enabled = "${jsonencode(var.statuscake_enabled)}"
     terraform_smoketests_enabled = "${jsonencode(var.terraform_smoketests_enabled)}"
     resource_group_name = "${jsonencode(var.resource_group_name)}"
     create_resource_group = "${jsonencode(var.create_resource_group)}"
@@ -111,7 +112,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     sentinel_workspace_name = "${jsonencode(var.sentinel_workspace_name)}"
     sentinel_workspace_resource_group_name = "${jsonencode(var.sentinel_workspace_resource_group_name)}"
     sentinel_workspace_id = "${jsonencode(var.sentinel_workspace_id)}"
-
     }
   }
   
