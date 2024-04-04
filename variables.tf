@@ -913,3 +913,9 @@ variable "image_registry" {
   default     = "harbor.devops.indico.io"
   description = "docker image registry to use for pulling images."
 }
+
+variable "secrets_operator_enabled" {
+  type = bool
+  default = true
+  description = "Use to enable the secrets operator which is used for maintaining thanos connection"
+}

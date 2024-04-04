@@ -133,7 +133,7 @@ module "secrets-operator-setup" {
   depends_on = [
     module.cluster
   ]
-  count           = var.argo_enabled == true ? 1 : 0
+  count           = var.secrets_operator_enabled == true ? 1 : 0
   source          = "../modules/common/vault-secrets-operator-setup"
   vault_address   = var.vault_address
   account         = var.account
@@ -190,11 +190,11 @@ resource "helm_release" "ipa-vso" {
     enabled: true
     namespace: default
     method: kubernetes
-    mount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+    mount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
     kubernetes:
-      role: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+      role: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
       tokenAudiences: ["vault"]
-      serviceAccount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+      serviceAccount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
 
   defaultVaultConnection:
     enabled: true
