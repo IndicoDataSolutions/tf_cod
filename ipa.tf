@@ -17,7 +17,7 @@ locals {
   storage:
     volumeSetup:
       image:
-        registry: "${var.image_registry}"
+        registry: "${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}"
     pvcSpec:
       volumeMode: Filesystem
       mountOptions: []
@@ -45,7 +45,7 @@ locals {
   storage:
     volumeSetup:
       image:
-        registry: "${var.image_registry}"
+        registry: "${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}"
     pvcSpec:
       csi:
         driver: fsx.csi.aws.com
@@ -104,7 +104,7 @@ app-edge:
 app-edge:
   alternateDomain: ""
   image:
-    registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
+    registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}"}/indico
 EOT
   )
   dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT
@@ -1320,6 +1320,8 @@ spec:
               region: ${var.region}
               account: ${var.aws_account}
             host: ${local.dns_name}
+            image:
+              repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/integration_tests
             ${indent(12, base64decode(var.ipa_smoketest_values))}    
 EOT
 }
@@ -1414,10 +1416,38 @@ spec:
             ${indent(12, local.local_registry_tf_cod_values)}
             runtime-scanner:
               enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
+              image:
+                repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico-devops/runtime-scanner
               authentication:
                 ingressUser: monitoring
                 ingressPassword: ${random_password.monitoring-password.result}
-                ${indent(14, local.runtime_scanner_ingress_values)} 
+                ${indent(14, local.runtime_scanner_ingress_values)}
+            celery-flower:
+              image:
+                repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/flower
+            aws-node-termination:
+              image:
+                repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/aws-node-termination-handler
+            nvidia-device-plugin:
+              image:
+                repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/public-nvcr-proxy/nvidia/k8s-device-plugin
+            reloader:
+              reloader:
+                deployment:
+                  image:
+                    name: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/stakater/reloader
+            kafka-strimzi:
+              strimzi-kafka-operator: 
+                defaultImageRegistry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/strimzi-proxy
+              kafkacat:
+                image:
+                  registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/confluentinc
+              schemaRegistry:
+                image:
+                  registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/confluentinc
+              kafkaConnect:
+                image:
+                  registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
             ${indent(12, local.alb_ipa_values)}         
 
         - name: HELM_VALUES
