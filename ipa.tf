@@ -478,8 +478,11 @@ resource "helm_release" "ipa-crds" {
   migrations-operator:
     image:
       repository: ${var.image_registry}/indico/migrations-operator
+      tag: "3.0.13"
     controllerImage:
       repository: ${var.image_registry}/indico/migrations-controller
+      kubectlImage: ${var.image_registry}/indico/migrations-controller-kubectl
+      tag: "3.0.12"
   aws-ebs-csi-driver:
     image:
       repository: ${var.image_registry}/public.ecr.aws/ebs-csi-driver/aws-ebs-csi-driver
@@ -1426,16 +1429,19 @@ spec:
               image:
                 repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/flower
             aws-node-termination:
-              image:
-                repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/aws-node-termination-handler
+              aws-node-termination-handler:
+                image:
+                  repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/aws-node-termination-handler
             nvidia-device-plugin:
-              image:
-                repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/public-nvcr-proxy/nvidia/k8s-device-plugin
+              nvidia-device-plugin:
+                image:
+                  repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/public-nvcr-proxy/nvidia/k8s-device-plugin
             reloader:
               reloader:
-                deployment:
-                  image:
-                    name: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/stakater/reloader
+                reloader:
+                  deployment:
+                    image:
+                      name: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/stakater/reloader
             kafka-strimzi:
               strimzi-kafka-operator: 
                 defaultImageRegistry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/strimzi-proxy
