@@ -117,6 +117,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     network_resource_group_name = "${jsonencode(var.network_resource_group_name)}"
     virtual_network_name = "${jsonencode(var.virtual_network_name)}"
     virtual_subnet_name = "${jsonencode(var.virtual_subnet_name)}"
+    keyvault_name = "${jsonencode(var.keyvault_name)}"
 
     }
   }

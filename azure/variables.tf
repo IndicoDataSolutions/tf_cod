@@ -719,13 +719,14 @@ variable "virtual_network_name" {
   type    = string
 }
 
-
 variable "virtual_subnet_name" {
   default = null
   type    = string
 }
 
-
-
+variable "keyvault_name" {
+  default = null
+  type    = string
+}
 
 
