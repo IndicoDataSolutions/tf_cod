@@ -264,14 +264,13 @@ module "storage" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-
-
   source               = "app.terraform.io/indico/indico-azure-blob/mod"
-  version              = "0.1.14"
+  version              = "0.1.144" # 0.1.144 is a branch off 0.1.14
   label                = var.label
   region               = var.region
   resource_group_name  = local.resource_group_name
   storage_account_name = local.storage_account_name
+  keyvault_name        = var.keyvault_name
 }
 
 module "cluster" {

@@ -692,6 +692,9 @@ variable "sentinel_workspace_id" {
   default = null
 }
 
-
+variable "keyvault_name" {
+  type    = string
+  default = null # defaults to: "kv-${var.region}-${var.label}")
+}
 
 
