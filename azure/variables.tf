@@ -306,7 +306,7 @@ variable "monitoring_enabled" {
 
 variable "keda_version" {
   type        = string
-  default     = "2.11.2"
+  default     = "2.13.2"
   description = "Version of keda helm chart"
 }
 
@@ -692,6 +692,9 @@ variable "sentinel_workspace_id" {
   default = null
 }
 
-
+variable "keyvault_name" {
+  type    = string
+  default = null # defaults to: "kv-${var.region}-${var.label}")
+}
 
 

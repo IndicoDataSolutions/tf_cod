@@ -111,6 +111,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     sentinel_workspace_name = "${jsonencode(var.sentinel_workspace_name)}"
     sentinel_workspace_resource_group_name = "${jsonencode(var.sentinel_workspace_resource_group_name)}"
     sentinel_workspace_id = "${jsonencode(var.sentinel_workspace_id)}"
+    keyvault_name = "${jsonencode(var.keyvault_name)}"
 
     }
   }
