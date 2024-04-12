@@ -142,6 +142,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     harness_mount_path = "${jsonencode(var.harness_mount_path)}"
     enable_s3_backup = "${jsonencode(var.enable_s3_backup)}"
     network_allow_public = "${jsonencode(var.network_allow_public)}"
+    network_module = "${jsonencode(var.network_module)}"
     network_type = "${jsonencode(var.network_type)}"
     sg_type = "${jsonencode(var.sg_type)}"
     load_vpc_id = "${jsonencode(var.load_vpc_id)}"

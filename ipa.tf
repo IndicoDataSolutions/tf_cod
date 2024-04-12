@@ -1024,6 +1024,7 @@ data "vault_kv_secret_v2" "harbor-api-token" {
 }
 
 resource "kubernetes_namespace" "local-registry" {
+  count = var.local_registry_enabled == true ? 1 : 0
   metadata {
     name = "local-registry"
   }

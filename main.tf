@@ -138,7 +138,7 @@ data "aws_caller_identity" "current" {}
 
 # define the networking module we're using locally
 locals {
-  network = module.networking
+  network = var.network_module == "public_networking" ? module.public_networking : module.networking
   aws_usernames = [
     "svc_jenkins",
     "terraform-sa"
@@ -166,8 +166,19 @@ resource "aws_key_pair" "kp" {
   public_key = tls_private_key.pk.public_key_openssh
 }
 
+module "public_networking" {
+  count                = var.direct_connect == false && var.network_module == "public_networking" ? 1 : 0
+  source               = "app.terraform.io/indico/indico-aws-network/mod"
+  version              = "1.2.0"
+  label                = var.label
+  vpc_cidr             = var.vpc_cidr
+  private_subnet_cidrs = var.private_subnet_cidrs
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  subnet_az_zones      = var.subnet_az_zones
+}
+
 module "networking" {
-  count                    = var.direct_connect == true ? 0 : 1
+  count                    = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
   source                   = "app.terraform.io/indico/indico-aws-network/mod"
   version                  = "2.0.0"
   label                    = var.label
@@ -333,7 +344,7 @@ module "cluster" {
   cluster_version            = var.k8s_version
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
-  private_endpoint_enabled   = true
+  private_endpoint_enabled   = var.network_allow_public == true ? false : true
 }
 
 module "readapi_queue" {

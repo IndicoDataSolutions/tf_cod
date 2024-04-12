@@ -846,6 +846,16 @@ variable "network_allow_public" {
   description = "If enabled this will create public subnets, IGW, and NAT gateway."
 }
 
+variable "network_module" {
+  type    = string
+  default = "networking"
+
+  validation {
+    condition     = var.network_module == "public_networking" || var.network_module == "networking"
+    error_message = "${var.network_module} not valid. Type must be either public_networking or networking"
+  }
+}
+
 variable "network_type" {
   type    = string
   default = "create"
