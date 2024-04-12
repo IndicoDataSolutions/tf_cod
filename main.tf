@@ -197,7 +197,7 @@ module "sqs_sns" {
 
 module "lambda-sns-forwarder" {
   count                = var.lambda_sns_forwarder_enabled == true ? 1 : 0
-  source               = "app.terraform.io/indico/indico-lambda-sns-forwarder/mod"
+  source               = "app.terraform.io/indico/indico-lambda-sns-forwarder-convex/mod"
   version              = "1.3.0"
   region               = var.region
   label                = var.label
