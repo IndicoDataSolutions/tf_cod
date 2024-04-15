@@ -298,8 +298,7 @@ module "cluster" {
   resource_group_name        = local.resource_group_name
   admin_group_name           = var.admin_group_name
   account                    = var.account
-
-  network_plugin = "azure"
+  network_plugin             = var.network_plugin
 
   sentinel_workspace_name                = local.sentinel_workspace_name
   sentinel_workspace_resource_group_name = local.sentinel_workspace_resource_group_name
