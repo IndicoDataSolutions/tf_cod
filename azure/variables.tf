@@ -692,9 +692,40 @@ variable "sentinel_workspace_id" {
   default = null
 }
 
-variable "keyvault_name" {
-  type    = string
-  default = null # defaults to: "kv-${var.region}-${var.label}")
+### cluster manager variables
+variable "cluster_manager_vm_size" {
+  type        = string
+  default     = "Standard_Fs_v2"
+  description = "The cluster manager instance size"
 }
 
+variable "network_type" {
+  type    = string
+  default = "create"
+}
+
+variable "network_resource_group_name" {
+  type    = string
+  default = null
+}
+
+variable "virtual_network_name" {
+  default = null
+  type    = string
+}
+
+variable "virtual_subnet_name" {
+  default = null
+  type    = string
+}
+
+variable "keyvault_name" {
+  default = null
+  type    = string
+}
+
+variable "network_plugin" {
+  default = "kubenet"
+  type = string
+}
 

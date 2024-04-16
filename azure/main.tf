@@ -209,7 +209,8 @@ module "argo-registration" {
 provider "local" {}
 
 locals {
-  resource_group_name = coalesce(var.resource_group_name, "${var.label}-${var.region}")
+  resource_group_name         = coalesce(var.resource_group_name, "${var.label}-${var.region}")
+  network_resource_group_name = var.network_type == "load" ? var.network_resource_group_name : local.resource_group_name
 
   sentinel_workspace_name                = coalesce(var.sentinel_workspace_name, "${var.account}-sentinel-workspace")
   sentinel_workspace_resource_group_name = coalesce(var.sentinel_workspace_resource_group_name, "${var.account}-sentinel-group")
@@ -246,18 +247,21 @@ resource "azurerm_resource_group" "cod-cluster" {
   location = var.region
 }
 
+
 module "networking" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-
-  source              = "app.terraform.io/indico/indico-azure-network/mod"
-  version             = "3.0.5"
-  label               = var.label
-  vnet_cidr           = var.vnet_cidr
-  subnet_cidrs        = var.subnet_cidrs
-  resource_group_name = local.resource_group_name
-  region              = var.region
+  source               = "app.terraform.io/indico/indico-azure-network/mod"
+  network_type         = var.network_type
+  version              = "4.0.1"
+  label                = var.label
+  vnet_cidr            = var.vnet_cidr
+  subnet_cidrs         = var.subnet_cidrs
+  resource_group_name  = local.network_resource_group_name
+  region               = var.region
+  virtual_network_name = var.virtual_network_name
+  virtual_subnet_name  = var.virtual_subnet_name
 }
 
 module "storage" {
@@ -265,7 +269,7 @@ module "storage" {
     azurerm_resource_group.cod-cluster
   ]
   source               = "app.terraform.io/indico/indico-azure-blob/mod"
-  version              = "0.1.144" # 0.1.144 is a branch off 0.1.14
+  version              = "0.1.145" # 0.1.144 is a branch off 0.1.14
   label                = var.label
   region               = var.region
   resource_group_name  = local.resource_group_name
@@ -278,10 +282,9 @@ module "cluster" {
     azurerm_resource_group.cod-cluster
   ]
 
-
   source                     = "app.terraform.io/indico/indico-azure-cluster/mod"
   insights_retention_in_days = var.monitor_retention_in_days
-  version                    = "3.1.7"
+  version                    = "4.0.0"
   label                      = var.label
   public_key                 = tls_private_key.pk.public_key_openssh
   region                     = var.region
@@ -295,6 +298,7 @@ module "cluster" {
   resource_group_name        = local.resource_group_name
   admin_group_name           = var.admin_group_name
   account                    = var.account
+  network_plugin             = var.network_plugin
 
   sentinel_workspace_name                = local.sentinel_workspace_name
   sentinel_workspace_resource_group_name = local.sentinel_workspace_resource_group_name
