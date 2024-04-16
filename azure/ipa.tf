@@ -581,7 +581,7 @@ secrets:
 
   clusterIssuer:
     zerossl:
-      create: ${var.enable_zerossl_issuer}
+      create: ${var.enable_custom_cluster_issuer == false ? true : false}
       eabEmail: devops-sa@indico.io
       eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
