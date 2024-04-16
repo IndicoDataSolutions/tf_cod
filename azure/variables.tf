@@ -726,6 +726,24 @@ variable "keyvault_name" {
 
 variable "network_plugin" {
   default = "kubenet"
-  type = string
+  type    = string
 }
+
+variable "enable_zerossl_issuer" {
+  default = true
+  type    = bool
+}
+
+variable "enable_custom_cluster_issuer" {
+  default = false
+  type    = bool
+}
+
+variable "custom_cluster_issuer_spec" {
+  default = false
+  type    = string
+}
+
+
+
 
