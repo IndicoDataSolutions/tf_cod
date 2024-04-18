@@ -726,6 +726,10 @@ variable "keyvault_name" {
 
 variable "network_plugin" {
   default = "kubenet"
-  type = string
+  type    = string
 }
 
+variable "network_plugin_mode" {
+  default = null
+  type    = string
+}
