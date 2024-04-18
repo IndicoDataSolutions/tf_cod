@@ -119,6 +119,8 @@ resource "kubernetes_config_map" "terraform-variables" {
     keyvault_name = "${jsonencode(var.keyvault_name)}"
     network_plugin = "${jsonencode(var.network_plugin)}"
     network_plugin_mode = "${jsonencode(var.network_plugin_mode)}"
+    enable_custom_cluster_issuer = "${jsonencode(var.enable_custom_cluster_issuer)}"
+    custom_cluster_issuer_spec = "${jsonencode(var.custom_cluster_issuer_spec)}"
 
     }
   }
