@@ -299,6 +299,7 @@ module "cluster" {
   admin_group_name           = var.admin_group_name
   account                    = var.account
   network_plugin             = var.network_plugin
+  network_plugin_mode        = var.network_plugin_mode
 
   sentinel_workspace_name                = local.sentinel_workspace_name
   sentinel_workspace_resource_group_name = local.sentinel_workspace_resource_group_name
