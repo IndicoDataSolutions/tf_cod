@@ -519,7 +519,7 @@ resource "kubectl_manifest" "custom-cluster-issuer" {
     kind: ClusterIssuer
     metadata:
       name: zerossl
-    spec: |
+    spec:
       ${indent(6, var.custom_cluster_issuer_spec)} 
   YAML
 }
