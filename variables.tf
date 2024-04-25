@@ -929,3 +929,20 @@ variable "secrets_operator_enabled" {
   default = true
   description = "Use to enable the secrets operator which is used for maintaining thanos connection"
 }
+
+variable "firewall_subnet_cidrs" {
+  type        = list(string)
+  default     = []
+  description = "CIDR ranges for the firewall subnets"
+}
+
+variable "enable_firewall" {
+  type = bool
+  default = false
+  description = "If enabled this will create firewall and internet gateway"
+}
+
+variable "firewall_allow_list" {
+  type = list(string)
+  default = [".cognitiveservices.azure.com"]
+}

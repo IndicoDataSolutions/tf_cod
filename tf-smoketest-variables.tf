@@ -155,6 +155,9 @@ resource "kubernetes_config_map" "terraform-variables" {
     s3_endpoint_enabled = "${jsonencode(var.s3_endpoint_enabled)}"
     image_registry = "${jsonencode(var.image_registry)}"
     secrets_operator_enabled = "${jsonencode(var.secrets_operator_enabled)}"
+    firewall_subnet_cidrs = "${jsonencode(var.firewall_subnet_cidrs)}"
+    enable_firewall = "${jsonencode(var.enable_firewall)}"
+    firewall_allow_list = "${jsonencode(var.firewall_allow_list)}"
 
     }
   }
