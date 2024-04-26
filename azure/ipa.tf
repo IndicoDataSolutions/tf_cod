@@ -239,7 +239,7 @@ resource "helm_release" "ipa-crds" {
 
   cert-manager:    
     #dns01RecursiveNameserversOnly: true
-    #dns01RecursiveNameservers: "$#{data.azurerm_dns_zone.domain.name_servers[0]}:53,$#{data.azurerm_dns_zone.domain.name_servers[1]}:53,$#{data.azurerm_dns_zone.domain.name_servers[2]}:53,$#{data.azurerm_dns_zone.domain.name_servers[3]}:53"
+    #dns01RecursiveNameservers: "$#{local.dns_zone.name_servers[0]}:53,$#{local.dns_zone.name_servers[1]}:53,$#{local.dns_zone.name_servers[2]}:53,$#{local.dns_zone.name_servers[3]}:53"
 
     nodeSelector:
       kubernetes.io/os: linux
@@ -431,7 +431,7 @@ resource "azurerm_role_assignment" "external_dns" {
   depends_on = [
     module.cluster
   ]
-  scope                            = data.azurerm_dns_zone.domain.id
+  scope                            = local.dns_zone.id
   role_definition_name             = "DNS Zone Contributor"
   principal_id                     = module.cluster.kubelet_identity.object_id
   skip_service_principal_aad_check = true
@@ -591,7 +591,7 @@ clusterIssuer:
     - dns01:
         azureDNS:
           environment: AzurePublicCloud
-          hostedZoneName: ${data.azurerm_dns_zone.domain.name}
+          hostedZoneName: ${local.dns_zone.name}
           managedIdentity:
             clientID: ${module.cluster.kubelet_identity.client_id}
           resourceGroupName: ${var.common_resource_group}
@@ -606,7 +606,7 @@ apiModels:
     node_group: static-workers
 
 external-dns:
-  enabled: true
+  enabled: ${var.enable_external_dns}
   logLevel: debug
   policy: sync
   txtOwnerId: "${var.label}-${var.region}"

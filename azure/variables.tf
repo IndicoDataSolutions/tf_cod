@@ -743,6 +743,13 @@ variable "custom_cluster_issuer_spec" {
   type    = string
 }
 
+variable "private_dns_zone" {
+  default = false
+  type    = bool
+}
 
-
+variable "enable_external_dns" {
+  default = true
+  type    = bool
+}
 
