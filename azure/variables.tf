@@ -753,3 +753,16 @@ variable "enable_external_dns" {
   type    = bool
 }
 
+variable "enable_custom_cluster_issuer" {
+  default = false
+  type    = bool
+}
+
+variable "custom_cluster_issuer_spec" {
+  default = ""
+  type    = string
+}
+
+
+
+
