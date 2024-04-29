@@ -67,9 +67,6 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
-<<<<<<< HEAD
-resource "github_repository_file" "pre-reqs-values-yaml" {
-=======
 data "vault_kv_secret_v2" "harbor-api-token" {
   count = var.argo_enabled == true ? 1 : 0
   mount = "tools/argo"
@@ -78,7 +75,6 @@ data "vault_kv_secret_v2" "harbor-api-token" {
 
 resource "github_repository_file" "pre-reqs-values-yaml" {
   count               = var.argo_enabled == true ? 1 : 0
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/pre-reqs-values.values"
@@ -95,10 +91,7 @@ resource "github_repository_file" "pre-reqs-values-yaml" {
 
 
 resource "github_repository_file" "crds-values-yaml" {
-<<<<<<< HEAD
-=======
   count               = var.argo_enabled == true ? 1 : 0
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/crds-values.values"
@@ -114,11 +107,7 @@ resource "github_repository_file" "crds-values-yaml" {
 }
 
 data "github_repository_file" "data-crds-values" {
-<<<<<<< HEAD
-=======
   count = var.argo_enabled == true ? 1 : 0
-
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   depends_on = [
     github_repository_file.crds-values-yaml
   ]
@@ -129,11 +118,8 @@ data "github_repository_file" "data-crds-values" {
 
 
 data "github_repository_file" "data-pre-reqs-values" {
-<<<<<<< HEAD
-=======
   count = var.argo_enabled == true ? 1 : 0
 
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   depends_on = [
     github_repository_file.pre-reqs-values-yaml
   ]
@@ -142,8 +128,6 @@ data "github_repository_file" "data-pre-reqs-values" {
   file       = var.argo_path == "." ? "helm/pre-reqs-values.values" : "${var.argo_path}/helm/pre-reqs-values.values"
 }
 
-<<<<<<< HEAD
-=======
 module "secrets-operator-setup" {
   depends_on = [
     module.cluster
@@ -226,18 +210,13 @@ EOF
   ]
 }
 
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 resource "helm_release" "ipa-crds" {
   depends_on = [
     module.cluster,
     kubernetes_secret.harbor-pull-secret,
     kubernetes_secret.issuer-secret,
-<<<<<<< HEAD
-    data.github_repository_file.data-crds-values
-=======
     data.github_repository_file.data-crds-values,
     module.secrets-operator-setup
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   ]
 
   verify           = false
@@ -276,11 +255,7 @@ resource "helm_release" "ipa-crds" {
 EOF
     ,
     <<EOT
-<<<<<<< HEAD
-${data.github_repository_file.data-crds-values.content}
-=======
 ${var.argo_enabled == true ? data.github_repository_file.data-crds-values[0].content : ""}
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 EOT
   ]
 }
@@ -757,11 +732,7 @@ metrics-server:
   EOF
     ,
     <<EOT
-<<<<<<< HEAD
-${data.github_repository_file.data-pre-reqs-values.content}
-=======
 ${var.argo_enabled == true ? data.github_repository_file.data-pre-reqs-values[0].content : ""}
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 EOT
   ]
 }
