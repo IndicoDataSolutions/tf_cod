@@ -747,7 +747,7 @@ variable "private_dns_zone" {
   default = false
   type    = bool
 }
-  
+
 variable "private_cluster_public_fqdn_enabled" {
   default = false
   type    = bool
@@ -761,16 +761,6 @@ variable "cluster_outbound_type" {
 variable "enable_external_dns" {
   default = true
   type    = bool
-}
-
-variable "enable_custom_cluster_issuer" {
-  default = false
-  type    = bool
-}
-
-variable "custom_cluster_issuer_spec" {
-  default = ""
-  type    = string
 }
 
 variable "private_dns_zone_id" {
