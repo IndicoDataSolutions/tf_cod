@@ -11,7 +11,11 @@ ipa_values = ""
 #name                 = "dop-832"
 #cluster_name         = "dop-832"
 #label                = "dop-832" # will be used for resource naming. should be unique within the AWS account
+<<<<<<< HEAD
+k8s_version = "1.27"
+=======
 k8s_version = "1.28"
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 node_groups = {
   gpu-workers = {
     min_size               = 0

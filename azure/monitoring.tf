@@ -148,10 +148,15 @@ EOT
   )
 }
 
+# Public DNS records
 resource "azurerm_dns_caa_record" "grafana-caa" {
+<<<<<<< HEAD
   count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
+=======
+  count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" && var.private_dns_zone != true ? 1 : 0
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   name                = lower("grafana.${local.dns_prefix}")
-  zone_name           = data.azurerm_dns_zone.domain.name
+  zone_name           = local.dns_zone.name
   resource_group_name = var.common_resource_group
   ttl                 = 300
   record {
@@ -163,9 +168,13 @@ resource "azurerm_dns_caa_record" "grafana-caa" {
 
 
 resource "azurerm_dns_caa_record" "prometheus-caa" {
+<<<<<<< HEAD
   count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
+=======
+  count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" && var.private_dns_zone != true ? 1 : 0
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   name                = lower("prometheus.${local.dns_prefix}")
-  zone_name           = data.azurerm_dns_zone.domain.name
+  zone_name           = local.dns_zone.name
   resource_group_name = var.common_resource_group
   ttl                 = 300
 
@@ -178,9 +187,13 @@ resource "azurerm_dns_caa_record" "prometheus-caa" {
 
 
 resource "azurerm_dns_caa_record" "alertmanager-caa" {
+<<<<<<< HEAD
   count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
+=======
+  count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" && var.private_dns_zone != true ? 1 : 0
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   name                = lower("alertmanager.${local.dns_prefix}")
-  zone_name           = data.azurerm_dns_zone.domain.name
+  zone_name           = local.dns_zone.name
   resource_group_name = var.common_resource_group
   ttl                 = 300
 

@@ -9,6 +9,9 @@ Terraform repo used for Clusters On Demand (COD)
 
 2. Install/Setup pre-commit
 
+<<<<<<< HEAD
+</table> 
+=======
    `pre-commit install`
 
 ## Smoketests
@@ -71,3 +74,4 @@ These values can then be used to validate the inputs against the generated infra
       ag_name = ag['AutoScalingGroupName']
       assert len(availability_zones) == az_count, f"Mismatching az_count for {ag_name}"
 ```
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017

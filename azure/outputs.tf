@@ -1,9 +1,13 @@
 output "workload_identity_client_id" {
+<<<<<<< HEAD
+  value = azuread_application.workload_identity.application_id
+=======
   value = var.use_workload_identity == true ? azuread_application.workload_identity.0.application_id : ""
 }
 
 output "cluster_name" {
   value = var.label
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 }
 
 output "cluster_region" {

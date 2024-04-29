@@ -311,7 +311,6 @@ module "cluster" {
   sentinel_workspace_resource_group_name = local.sentinel_workspace_resource_group_name
   sentinel_workspace_id                  = var.sentinel_workspace_id
 
-
   # this feature can be checked using:
   # az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/EnableWorkloadIdentityPreview')].{Name:name,State:properties.state}"
   # az provider register --namespace Microsoft.ContainerService

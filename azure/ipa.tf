@@ -67,6 +67,9 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
+<<<<<<< HEAD
+resource "github_repository_file" "pre-reqs-values-yaml" {
+=======
 data "vault_kv_secret_v2" "harbor-api-token" {
   count = var.argo_enabled == true ? 1 : 0
   mount = "tools/argo"
@@ -75,6 +78,7 @@ data "vault_kv_secret_v2" "harbor-api-token" {
 
 resource "github_repository_file" "pre-reqs-values-yaml" {
   count               = var.argo_enabled == true ? 1 : 0
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/pre-reqs-values.values"
@@ -91,7 +95,10 @@ resource "github_repository_file" "pre-reqs-values-yaml" {
 
 
 resource "github_repository_file" "crds-values-yaml" {
+<<<<<<< HEAD
+=======
   count               = var.argo_enabled == true ? 1 : 0
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/crds-values.values"
@@ -107,8 +114,11 @@ resource "github_repository_file" "crds-values-yaml" {
 }
 
 data "github_repository_file" "data-crds-values" {
+<<<<<<< HEAD
+=======
   count = var.argo_enabled == true ? 1 : 0
 
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   depends_on = [
     github_repository_file.crds-values-yaml
   ]
@@ -119,8 +129,11 @@ data "github_repository_file" "data-crds-values" {
 
 
 data "github_repository_file" "data-pre-reqs-values" {
+<<<<<<< HEAD
+=======
   count = var.argo_enabled == true ? 1 : 0
 
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   depends_on = [
     github_repository_file.pre-reqs-values-yaml
   ]
@@ -129,6 +142,8 @@ data "github_repository_file" "data-pre-reqs-values" {
   file       = var.argo_path == "." ? "helm/pre-reqs-values.values" : "${var.argo_path}/helm/pre-reqs-values.values"
 }
 
+<<<<<<< HEAD
+=======
 module "secrets-operator-setup" {
   depends_on = [
     module.cluster
@@ -211,13 +226,18 @@ EOF
   ]
 }
 
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 resource "helm_release" "ipa-crds" {
   depends_on = [
     module.cluster,
     kubernetes_secret.harbor-pull-secret,
     kubernetes_secret.issuer-secret,
+<<<<<<< HEAD
+    data.github_repository_file.data-crds-values
+=======
     data.github_repository_file.data-crds-values,
     module.secrets-operator-setup
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   ]
 
   verify           = false
@@ -239,7 +259,7 @@ resource "helm_release" "ipa-crds" {
 
   cert-manager:    
     #dns01RecursiveNameserversOnly: true
-    #dns01RecursiveNameservers: "$#{data.azurerm_dns_zone.domain.name_servers[0]}:53,$#{data.azurerm_dns_zone.domain.name_servers[1]}:53,$#{data.azurerm_dns_zone.domain.name_servers[2]}:53,$#{data.azurerm_dns_zone.domain.name_servers[3]}:53"
+    #dns01RecursiveNameservers: "$#{local.dns_zone.name_servers[0]}:53,$#{local.dns_zone.name_servers[1]}:53,$#{local.dns_zone.name_servers[2]}:53,$#{local.dns_zone.name_servers[3]}:53"
 
     nodeSelector:
       kubernetes.io/os: linux
@@ -256,7 +276,11 @@ resource "helm_release" "ipa-crds" {
 EOF
     ,
     <<EOT
+<<<<<<< HEAD
+${data.github_repository_file.data-crds-values.content}
+=======
 ${var.argo_enabled == true ? data.github_repository_file.data-crds-values[0].content : ""}
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 EOT
   ]
 }
@@ -431,7 +455,7 @@ resource "azurerm_role_assignment" "external_dns" {
   depends_on = [
     module.cluster
   ]
-  scope                            = data.azurerm_dns_zone.domain.id
+  scope                            = local.dns_zone.id
   role_definition_name             = "DNS Zone Contributor"
   principal_id                     = module.cluster.kubelet_identity.object_id
   skip_service_principal_aad_check = true
@@ -519,7 +543,7 @@ resource "kubectl_manifest" "custom-cluster-issuer" {
     kind: ClusterIssuer
     metadata:
       name: zerossl
-    spec: |
+    spec:
       ${indent(6, var.custom_cluster_issuer_spec)} 
   YAML
 }
@@ -591,7 +615,7 @@ clusterIssuer:
     - dns01:
         azureDNS:
           environment: AzurePublicCloud
-          hostedZoneName: ${data.azurerm_dns_zone.domain.name}
+          hostedZoneName: ${local.dns_zone.name}
           managedIdentity:
             clientID: ${module.cluster.kubelet_identity.client_id}
           resourceGroupName: ${var.common_resource_group}
@@ -606,7 +630,7 @@ apiModels:
     node_group: static-workers
 
 external-dns:
-  enabled: true
+  enabled: ${var.enable_external_dns}
   logLevel: debug
   policy: sync
   txtOwnerId: "${var.label}-${var.region}"
@@ -733,7 +757,11 @@ metrics-server:
   EOF
     ,
     <<EOT
+<<<<<<< HEAD
+${data.github_repository_file.data-pre-reqs-values.content}
+=======
 ${var.argo_enabled == true ? data.github_repository_file.data-pre-reqs-values[0].content : ""}
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 EOT
   ]
 }

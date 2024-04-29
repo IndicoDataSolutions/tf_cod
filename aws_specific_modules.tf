@@ -19,8 +19,13 @@ module "k8s_dashboard" {
 
   local_dns_name              = local.dns_name
   ipa_repo                    = var.ipa_repo
+<<<<<<< HEAD
+  keycloak_client_id          = module.keycloak.client_id
+  keycloak_client_secret      = module.keycloak.client_secret
+=======
   keycloak_client_id          = module.keycloak[0].client_id
   keycloak_client_secret      = module.keycloak[0].client_secret
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   use_static_ssl_certificates = var.use_static_ssl_certificates
   ssl_static_secret_name      = var.ssl_static_secret_name
 }

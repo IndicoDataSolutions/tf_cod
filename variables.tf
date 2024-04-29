@@ -629,12 +629,15 @@ variable "is_alternate_account_domain" {
   description = "domain name is controlled by a different aws account"
 }
 
+<<<<<<< HEAD
+=======
 variable "domain_suffix" {
   type        = string
   default     = "indico.io"
   description = "Domain suffix"
 }
 
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 variable "domain_host" {
   type        = string
   default     = ""
@@ -729,6 +732,9 @@ variable "ssl_static_secret_name" {
   type        = string
   default     = "indico-ssl-static-cert"
   description = "secret_name for static ssl certificate"
+<<<<<<< HEAD
+}
+=======
 }
 
 variable "local_registry_version" {
@@ -839,3 +845,4 @@ variable "enable_s3_backup" {
   default     = true
   description = "Allow backing up data bucket on s3"
 }
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
