@@ -20,11 +20,7 @@ locals {
 
 # Public DNS record
 resource "azurerm_dns_caa_record" "fqdn" {
-<<<<<<< HEAD
-  count = var.is_alternate_account_domain == "true" ? 0 : 1
-=======
   count               = var.is_alternate_account_domain == "true" && var.private_dns_zone != true ? 0 : 1
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   name                = local.dns_prefix
   zone_name           = local.dns_zone.name
   resource_group_name = var.common_resource_group
