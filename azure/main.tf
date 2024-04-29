@@ -252,15 +252,6 @@ module "networking" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-<<<<<<< HEAD
-  source              = "app.terraform.io/indico/indico-azure-network/mod"
-  version             = "3.0.5"
-  label               = var.label
-  vnet_cidr           = var.vnet_cidr
-  subnet_cidrs        = var.subnet_cidrs
-  resource_group_name = local.resource_group_name
-  region              = var.region
-=======
   source               = "app.terraform.io/indico/indico-azure-network/mod"
   network_type         = var.network_type
   version              = "4.0.1"
@@ -271,7 +262,6 @@ module "networking" {
   region               = var.region
   virtual_network_name = var.virtual_network_name
   virtual_subnet_name  = var.virtual_subnet_name
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 }
 
 module "storage" {
@@ -294,11 +284,7 @@ module "cluster" {
 
   source                     = "app.terraform.io/indico/indico-azure-cluster/mod"
   insights_retention_in_days = var.monitor_retention_in_days
-<<<<<<< HEAD
-  version                    = "3.1.4"
-=======
-  version                    = "4.0.1"
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
+  version                    = "4.0.3"
   label                      = var.label
   public_key                 = tls_private_key.pk.public_key_openssh
   region                     = var.region
@@ -312,17 +298,19 @@ module "cluster" {
   resource_group_name        = local.resource_group_name
   admin_group_name           = var.admin_group_name
   account                    = var.account
-<<<<<<< HEAD
-=======
-  network_plugin             = var.network_plugin
-  network_plugin_mode        = var.network_plugin_mode
+
+  network_plugin                      = var.network_plugin
+  network_plugin_mode                 = var.network_plugin_mode
+  private_cluster_public_fqdn_enabled = var.private_cluster_public_fqdn_enabled
+  cluster_outbound_type               = var.cluster_outbound_type
+  private_dns_zone_id                 = var.private_dns_zone_id
+  sku_tier                            = var.sku_tier
+
 
   sentinel_workspace_name                = local.sentinel_workspace_name
   sentinel_workspace_resource_group_name = local.sentinel_workspace_resource_group_name
   sentinel_workspace_id                  = var.sentinel_workspace_id
 
-
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   # this feature can be checked using:
   # az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/EnableWorkloadIdentityPreview')].{Name:name,State:properties.state}"
   # az provider register --namespace Microsoft.ContainerService

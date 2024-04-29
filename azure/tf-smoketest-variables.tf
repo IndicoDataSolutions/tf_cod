@@ -121,6 +121,10 @@ resource "kubernetes_config_map" "terraform-variables" {
     network_plugin_mode = "${jsonencode(var.network_plugin_mode)}"
     enable_custom_cluster_issuer = "${jsonencode(var.enable_custom_cluster_issuer)}"
     custom_cluster_issuer_spec = "${jsonencode(var.custom_cluster_issuer_spec)}"
+    private_cluster_public_fqdn_enabled = "${jsonencode(var.private_cluster_public_fqdn_enabled)}"
+    cluster_outbound_type = "${jsonencode(var.cluster_outbound_type)}"
+    private_dns_zone_id = "${jsonencode(var.private_dns_zone_id)}"
+    sku_tier = "${jsonencode(var.sku_tier)}"
 
     }
   }

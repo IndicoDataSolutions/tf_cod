@@ -747,6 +747,16 @@ variable "private_dns_zone" {
   default = false
   type    = bool
 }
+  
+variable "private_cluster_public_fqdn_enabled" {
+  default = false
+  type    = bool
+}
+
+variable "cluster_outbound_type" {
+  default = "loadBalancer"
+  type    = string
+}
 
 variable "enable_external_dns" {
   default = true
@@ -763,6 +773,13 @@ variable "custom_cluster_issuer_spec" {
   type    = string
 }
 
+variable "private_dns_zone_id" {
+  default = "System"
+  type    = string
+}
 
-
+variable "sku_tier" {
+  default = "Standard"
+  type    = string
+}
 
