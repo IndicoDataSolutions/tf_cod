@@ -754,7 +754,7 @@ variable "cluster_outbound_type" {
 }
 
 variable "private_dns_zone_id" {
-  default = "None"
+  default = "System"
   type    = string
 }
 
