@@ -1,0 +1,36 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Program",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "rake clean os3",
+      "type": "Ruby",
+      "request": "launch",
+      "program": "/Users/ericfontana/.rvm/gems/ruby-2.7.3/bin/rake",
+      "cwd": "${workspaceRoot}/azure/openshift",
+      "args": [
+        "clean",
+        "os3"
+      ]
+    },
+    {
+      "name": "Python: Argo migration",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceRoot}/transition_to_count_argo_registration.py",
+      "args": ["Indico-Dev-us-east-2-dev-ci"],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+  ]
+}

@@ -15,6 +15,12 @@ variable "is_aws" {
   default = false
 }
 
+variable "environment" {
+  type        = string
+  default     = "development"
+  description = "The environment of the cluster, determines which account readapi to use, options production/development"
+}
+
 # top level variable declarations
 variable "common_resource_group" {
   type        = string
@@ -42,7 +48,7 @@ variable "message" {
 
 variable "account" {
   type        = string
-  default     = "Azure-Dev"
+  default     = "indico-dev-azure"
   description = "The name of the subscription that this cluster falls under"
 }
 
@@ -104,7 +110,6 @@ variable "argo_namespace" {
   type    = string
   default = "argo"
 }
-
 
 variable "argo_repo" {
   description = "Argo Github Repository containing the IPA Application"
@@ -301,8 +306,14 @@ variable "monitoring_enabled" {
 
 variable "keda_version" {
   type        = string
-  default     = "2.11.2"
+  default     = "2.13.2"
   description = "Version of keda helm chart"
+}
+
+variable "external_secrets_version" {
+  type        = string
+  default     = "0.9.9"
+  description = "Version of external-secrets helm chart"
 }
 
 variable "opentelemetry-collector_version" {
@@ -365,7 +376,7 @@ variable "cod_snapshot_restore_version" {
 
 variable "vault_mount_path" {
   type    = string
-  default = "terraform"
+  default = null
 }
 
 variable "vault_username" {
@@ -394,11 +405,31 @@ variable "enable_readapi" {
   type    = bool
   default = true
 }
+variable "azure_readapi_client_id" {
+  type    = string
+  default = ""
+}
+variable "azure_readapi_client_secret" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+variable "azure_readapi_subscription_id" {
+  type    = string
+  default = ""
+}
+variable "azure_readapi_tenant_id" {
+  type    = string
+  default = ""
+}
+
+# Old provider configuration to remove orphaned readapi resources
 variable "azure_indico_io_client_id" {
   type = string
 }
 variable "azure_indico_io_client_secret" {
-  type = string
+  type      = string
+  sensitive = true
 }
 variable "azure_indico_io_subscription_id" {
   type = string
@@ -536,3 +567,202 @@ variable "monitor_retention_in_days" {
   default     = 30 # minimum value
   description = "Azure Monitor retention in days"
 }
+
+
+variable "local_registry_version" {
+  type    = string
+  default = "unused"
+}
+
+variable "local_registry_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "devops_tools_cluster_host" {
+  type    = string
+  default = "provided from the varset devops-tools-cluster"
+}
+
+variable "devops_tools_cluster_ca_certificate" {
+  type      = string
+  sensitive = true
+  default   = "provided from the varset devops-tools-cluster"
+}
+
+variable "thanos_grafana_admin_username" {
+  type    = string
+  default = "provided from the varset devops-tools-cluster"
+}
+
+variable "thanos_grafana_admin_password" {
+  type      = string
+  sensitive = true
+  default   = "provided from the varset thanos"
+}
+
+variable "thanos_cluster_ca_certificate" {
+  type      = string
+  sensitive = true
+  default   = "provided from the varset thanos"
+}
+
+variable "thanos_cluster_host" {
+  type    = string
+  default = "provided from the varset thanos"
+}
+
+variable "indico_devops_aws_access_key_id" {
+  type        = string
+  description = "The Indico-Devops account access key"
+  sensitive   = true
+}
+
+variable "indico_devops_aws_secret_access_key" {
+  type        = string
+  description = "The Indico-Devops account secret"
+  sensitive   = true
+}
+
+variable "indico_devops_aws_region" {
+  type        = string
+  description = "The Indico-Devops devops cluster region"
+}
+
+variable "thanos_cluster_name" {
+  type    = string
+  default = "thanos"
+}
+
+variable "thanos_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "harness_delegate" {
+  type    = bool
+  default = false
+}
+
+variable "harness_mount_path" {
+  type    = string
+  default = "harness"
+}
+
+variable "terraform_smoketests_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "resource_group_name" {
+  type    = string
+  default = null
+}
+
+variable "create_resource_group" {
+  type    = bool
+  default = true
+}
+
+variable "use_static_ssl_certificates" {
+  type    = bool
+  default = false
+}
+
+variable "ssl_static_secret_name" {
+  type        = string
+  default     = "indico-ssl-static-cert"
+  description = "secret_name for static ssl certificate"
+}
+
+# Log analytics
+
+variable "sentinel_workspace_name" {
+  type    = string
+  default = null # "${var.account}-sentinel-workspace"
+}
+
+variable "sentinel_workspace_resource_group_name" {
+  type    = string
+  default = null # "${var.account}-sentinel-group"
+}
+
+variable "sentinel_workspace_id" {
+  type    = string
+  default = null
+}
+
+### cluster manager variables
+variable "cluster_manager_vm_size" {
+  type        = string
+  default     = "Standard_Fs_v2"
+  description = "The cluster manager instance size"
+}
+
+variable "network_type" {
+  type    = string
+  default = "create"
+}
+
+variable "network_resource_group_name" {
+  type    = string
+  default = null
+}
+
+variable "virtual_network_name" {
+  default = null
+  type    = string
+}
+
+variable "virtual_subnet_name" {
+  default = null
+  type    = string
+}
+
+variable "keyvault_name" {
+  default = null
+  type    = string
+}
+
+variable "network_plugin" {
+  default = "kubenet"
+  type    = string
+}
+
+variable "network_plugin_mode" {
+  default = null
+  type    = string
+}
+variable "enable_custom_cluster_issuer" {
+  default = false
+  type    = bool
+}
+
+variable "custom_cluster_issuer_spec" {
+  default = ""
+  type    = string
+}
+
+variable "private_dns_zone" {
+  default = false
+  type    = bool
+}
+
+variable "enable_external_dns" {
+  default = true
+  type    = bool
+}
+
+variable "enable_custom_cluster_issuer" {
+  default = false
+  type    = bool
+}
+
+variable "custom_cluster_issuer_spec" {
+  default = ""
+  type    = string
+}
+
+
+
+

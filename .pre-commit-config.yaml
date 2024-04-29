@@ -1,0 +1,7 @@
+repos:
+  - repo: https://github.com/IndicoDataSolutions/tf_cod
+    rev: main
+    hooks:
+      - id: terraform-variables
+        args:
+          - --chart-search-root=.

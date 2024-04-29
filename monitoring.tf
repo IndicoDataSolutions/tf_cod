@@ -1,4 +1,17 @@
 locals {
+  thanos_config = var.thanos_enabled == true ? (<<EOT
+      thanos: # this is the one being used
+        blockSize: 5m
+        objectStorageConfig:
+          existingSecret:
+            name: thanos-storage
+            key: thanos_storage.yaml
+  EOT
+    ) : (<<EOT
+      thanos: {}
+  EOT
+  )
+
   alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
 noExtraConfigs: true
   EOT
@@ -25,6 +38,13 @@ EOT
   kube_prometheus_stack_values = var.use_static_ssl_certificates == true ? (<<EOT
   alertmanager:
     ingress:
+<<<<<<< HEAD
+=======
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
       enabled: true
       ingressClassName: nginx
       hosts:
@@ -36,11 +56,38 @@ EOT
           hosts:
             - alertmanager-${local.dns_name}
   prometheus:
+<<<<<<< HEAD
     prometheusSpec:
+=======
+    annotations:
+      reloader.stakater.com/auto: "true"
+
+    thanosServiceMonitor:
+      enabled: ${var.thanos_enabled}
+
+    thanosService:
+      enabled:  ${var.thanos_enabled}
+
+    prometheusSpec:
+      disableCompaction: ${var.thanos_enabled}
+      externalLabels:
+        clusterAccount: ${var.aws_account}
+        clusterRegion: ${var.region}
+        clusterName: ${var.label}
+        clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
+${local.thanos_config}
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
       nodeSelector:
         node_group: static-workers
     ingress:
       enabled: true
+<<<<<<< HEAD
+=======
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
       ingressClassName: nginx
       hosts:
         - prometheus-${local.dns_name}
@@ -52,6 +99,13 @@ EOT
             - prometheus-${local.dns_name}
   grafana:
     ingress:
+<<<<<<< HEAD
+=======
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
       enabled: true
       ingressClassName: nginx
       hosts:
@@ -67,20 +121,56 @@ EOT
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
+<<<<<<< HEAD
   prometheus:
     prometheusSpec:
+=======
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+
+  prometheus:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
+    thanosServiceMonitor:
+      enabled: ${var.thanos_enabled}
+
+    thanosService:
+      enabled: ${var.thanos_enabled}
+    
+    prometheusSpec:
+      disableCompaction: ${var.thanos_enabled}
+      externalLabels:
+        clusterAccount: ${var.aws_account}
+        clusterRegion: ${var.region}
+        clusterName: ${var.label}
+        clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
+${local.thanos_config}
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
       nodeSelector:
         node_group: static-workers
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
+<<<<<<< HEAD
+=======
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   grafana:
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
+<<<<<<< HEAD
+=======
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 EOT
   )
 }
+
+
 
 resource "aws_route53_record" "grafana-caa" {
   count   = var.monitoring_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
@@ -91,6 +181,7 @@ resource "aws_route53_record" "grafana-caa" {
   records = [
     "0 issue \"sectigo.com\""
   ]
+  provider = aws.dns-control
 }
 
 
@@ -103,8 +194,8 @@ resource "aws_route53_record" "prometheus-caa" {
   records = [
     "0 issue \"sectigo.com\""
   ]
+  provider = aws.dns-control
 }
-
 
 resource "aws_route53_record" "alertmanager-caa" {
   count   = var.monitoring_enabled == true && var.is_alternate_account_domain == "false"  ? 1 : 0
@@ -115,6 +206,7 @@ resource "aws_route53_record" "alertmanager-caa" {
   records = [
     "0 issue \"sectigo.com\""
   ]
+  provider = aws.dns-control
 }
 
 
@@ -138,10 +230,12 @@ resource "helm_release" "monitoring" {
   depends_on = [
     module.cluster,
     helm_release.ipa-pre-requisites,
+    helm_release.external-secrets,
     aws_route53_record.alertmanager-caa,
     aws_route53_record.grafana-caa,
     aws_route53_record.prometheus-caa,
-    time_sleep.wait_1_minutes_after_pre_reqs
+    time_sleep.wait_1_minutes_after_pre_reqs,
+    null_resource.update_storage_class
   ]
 
   verify           = false
@@ -178,13 +272,68 @@ authentication:
   ingressPassword: ${random_password.monitoring-password.result}
 
 ${local.alerting_configuration_values}
-
 kube-prometheus-stack:
 ${local.kube_prometheus_stack_values}
+<<<<<<< HEAD
   
 
+=======
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 EOF
   ]
+}
+
+
+resource "kubectl_manifest" "thanos-datasource-credentials" {
+  count     = var.thanos_enabled ? 1 : 0
+  provider  = kubectl.thanos-kubectl
+  yaml_body = <<YAML
+apiVersion: v1
+stringData:
+  admin-password: ${random_password.monitoring-password.result}
+kind: Secret
+metadata:
+  name: ${replace(local.dns_name, ".", "-")}
+  namespace: default
+type: Opaque
+  YAML
+}
+
+resource "kubectl_manifest" "thanos-datasource" {
+  count      = var.thanos_enabled ? 1 : 0
+  depends_on = [kubectl_manifest.thanos-datasource-credentials]
+  provider   = kubectl.thanos-kubectl
+  yaml_body  = <<YAML
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: ${replace(local.dns_name, ".", "-")}
+  namespace: default
+spec:
+  valuesFrom:
+    - targetPath: "secureJsonData.basicAuthPassword"
+      valueFrom:
+        secretKeyRef:
+          name: ${replace(local.dns_name, ".", "-")}
+          key: admin-password
+  datasource:
+    basicAuth: true
+    basicAuthUser: monitoring
+    editable: false
+    access: proxy
+    editable: true
+    jsonData:
+      timeInterval: 5s
+      tlsSkipVerify: true
+    name: ${local.dns_name}
+    secureJsonData:
+      basicAuthPassword: $${admin-password}
+    type: prometheus
+    url: https://prometheus.${local.dns_name}/prometheus
+  instanceSelector:
+    matchLabels:
+      dashboards: external-grafana
+  YAML
 }
 
 resource "helm_release" "keda-monitoring" {
@@ -203,6 +352,22 @@ resource "helm_release" "keda-monitoring" {
 
 
   values = [<<EOF
+    image:
+      metricsApiServer:
+        repository: harbor.devops.indico.io/ghcr.io/kedacore/keda-metrics-apiserver
+      webhooks:
+        repository: harbor.devops.indico.io/ghcr.io/kedacore/keda-admission-webhooks
+      keda:
+        repository: harbor.devops.indico.io/ghcr.io/kedacore/keda
+    imagePullSecrets:
+      - name: harbor-pull-secret
+    resources:
+      operator:
+        requests:
+          memory: 512Mi
+        limits:
+          memory: 4Gi
+        
     crds:
       install: true
     
@@ -246,6 +411,10 @@ resource "helm_release" "opentelemetry-collector" {
 
   values = [<<EOF
     enabled: true
+    imagePullSecrets:
+      - name: harbor-pull-secret
+    image:
+      repository: harbor.devops.indico.io/docker.io/otel/opentelemetry-collector-contrib
     fullnameOverride: "collector-collector"
     mode: deployment
     tolerations:

@@ -38,11 +38,27 @@ terraform {
     }
     vault = {
       source  = "hashicorp/vault"
+<<<<<<< HEAD
       version = "3.19.0"
     }
     snowflake = {
       source  = "Snowflake-Labs/snowflake"
       version = "~> 0.70"
+=======
+      version = "3.22.0"
+    }
+    snowflake = {
+      source  = "Snowflake-Labs/snowflake"
+      version = "0.73.0"
+    }
+    htpasswd = {
+      source  = "loafoe/htpasswd"
+      version = "1.0.4"
+    }
+    azurerm = {
+      source = "hashicorp/azurerm"
+      version = "3.95.0"
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
     }
   }
 }
@@ -50,7 +66,7 @@ terraform {
 provider "time" {}
 
 provider "keycloak" {
-  # these values are provided by the keycloak varset from terraform cloud
+  initial_login = false
 }
 
 provider "vault" {
@@ -70,6 +86,7 @@ provider "github" {
 
 provider "random" {}
 
+
 provider "aws" {
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
@@ -77,6 +94,28 @@ provider "aws" {
   default_tags {
     tags = var.default_tags
   }
+}
+
+
+provider "aws" {
+  access_key = var.is_alternate_account_domain == "true" ? var.indico_aws_access_key_id : var.aws_access_key
+  secret_key = var.is_alternate_account_domain == "true" ? var.indico_aws_secret_access_key : var.aws_secret_key
+  region     = var.region
+  alias      = "dns-control"
+  default_tags {
+    tags = var.default_tags
+  }
+}
+
+
+
+provider "azurerm" {
+  features {}
+  alias           = "readapi"
+  client_id       = var.azure_readapi_client_id
+  client_secret   = var.azure_readapi_client_secret
+  subscription_id = var.azure_readapi_subscription_id
+  tenant_id       = var.azure_readapi_tenant_id
 }
 
 provider "azurerm" {
@@ -100,6 +139,8 @@ provider "snowflake" {
   region      = var.snowflake_region
   private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
 }
+
+provider "htpasswd" {}
 
 data "aws_caller_identity" "current" {}
 
@@ -154,16 +195,25 @@ module "private_networking" {
 }
 
 module "sqs_sns" {
+<<<<<<< HEAD
   count   = var.sqs_sns == true ? 1 : 0
   source  = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
   version = "1.1.2"
   region  = var.region
   label   = var.label
+=======
+  count             = var.sqs_sns == true ? 1 : 0
+  source            = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
+  version           = "1.2.0"
+  region            = var.region
+  label             = var.label
+  kms_master_key_id = module.kms_key.key.id
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 }
 
 module "kms_key" {
   source           = "app.terraform.io/indico/indico-aws-kms/mod"
-  version          = "2.0.2"
+  version          = "2.1.0"
   label            = var.label
   additional_tags  = var.additional_tags
   existing_kms_key = var.existing_kms_key
@@ -180,13 +230,14 @@ module "security-group" {
 
 module "s3-storage" {
   source            = "app.terraform.io/indico/indico-aws-buckets/mod"
-  version           = "2.0.3"
+  version           = "3.2.0"
   force_destroy     = true # allows terraform to destroy non-empty buckets.
   label             = var.label
   kms_key_arn       = module.kms_key.key.arn
   submission_expiry = var.submission_expiry
   uploads_expiry    = var.uploads_expiry
   include_rox       = var.include_rox
+  enable_backup     = var.enable_s3_backup
 }
 
 
@@ -235,10 +286,22 @@ module "efs-storage" {
 
 }
 
+
+module "efs-storage-local-registry" {
+  count              = var.local_registry_enabled == true ? 1 : 0
+  source             = "app.terraform.io/indico/indico-aws-efs/mod"
+  version            = "0.0.1"
+  label              = "${var.label}-local-registry"
+  additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage-local-registry" })
+  security_groups    = [module.security-group.all_subnets_sg_id]
+  private_subnet_ids = flatten([local.network[0].private_subnet_ids])
+  kms_key_arn        = module.kms_key.key_arn
+}
+
 module "fsx-storage" {
   count                       = var.include_fsx == true ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-fsx/mod"
-  version                     = "1.4.1"
+  version                     = "1.4.2"
   label                       = var.label
   additional_tags             = var.additional_tags
   region                      = var.region
@@ -258,7 +321,11 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
+<<<<<<< HEAD
   version                    = "8.1.6"
+=======
+  version                    = "8.1.7"
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
@@ -282,35 +349,48 @@ module "cluster" {
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
 }
 
+<<<<<<< HEAD
 module "readapi" {
+=======
+module "readapi_queue" {
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   count = var.enable_readapi ? 1 : 0
   providers = {
-    azurerm = azurerm.indicoio
+    azurerm = azurerm.readapi
   }
-  source          = "app.terraform.io/indico/indico-azure-readapi/mod"
-  version         = "2.1.2"
-  readapi_name    = lower("${var.aws_account}-${var.label}")
-  client_id       = var.azure_indico_io_client_id
-  client_secret   = var.azure_indico_io_client_secret
-  subscription_id = var.azure_indico_io_subscription_id
-  tenant_id       = var.azure_indico_io_tenant_id
+  source       = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
+  version      = "1.0.0"
+  readapi_name = lower("${var.aws_account}-${var.label}-s")
+}
+
+locals {
+  readapi_secret_path = var.environment == "production" ? "prod-readapi" : "dev-readapi"
+}
+
+data "vault_kv_secret_v2" "readapi_secret" {
+  mount = "customer-${var.aws_account}"
+  name  = local.readapi_secret_path
 }
 
 resource "kubernetes_secret" "readapi" {
   count      = var.enable_readapi ? 1 : 0
-  depends_on = [module.cluster, module.readapi]
+  depends_on = [module.cluster]
   metadata {
-    name = "readapi-queue-auth"
+    name = "readapi-secret"
   }
 
   data = {
-    endpoint                   = module.readapi[0].endpoint
-    access_key                 = module.readapi[0].access_key
-    storage_account_name       = module.readapi[0].storage_account_name
-    storage_account_id         = module.readapi[0].storage_account_id
-    storage_account_access_key = module.readapi[0].storage_account_access_key
-    storage_queue_name         = module.readapi[0].storage_queue_name
-    storage_connection_string  = module.readapi[0].storage_connection_string
+    billing                       = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_url"]
+    apikey                        = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
+    READAPI_COMPUTER_VISION_HOST  = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_url"]
+    READAPI_COMPUTER_VISION_KEY   = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
+    READAPI_FORM_RECOGNITION_HOST = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_url"]
+    READAPI_FORM_RECOGNITION_KEY  = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_key"]
+    storage_account_name          = module.readapi_queue[0].storage_account_name
+    storage_account_id            = module.readapi_queue[0].storage_account_id
+    storage_account_access_key    = module.readapi_queue[0].storage_account_access_key
+    storage_queue_name            = module.readapi_queue[0].storage_queue_name
+    QUEUE_CONNECTION_STRING       = module.readapi_queue[0].storage_connection_string
   }
 }
 
@@ -330,6 +410,7 @@ module "snowflake" {
   aws_account_name      = var.aws_account
 }
 
+<<<<<<< HEAD
 resource "aws_security_group" "indico_allow_access" {
   name        = "${var.label}-allow-access"
   description = "Promethues, Grafana"
@@ -351,6 +432,9 @@ resource "aws_security_group" "indico_allow_access" {
 }
 
 # argo 
+=======
+# argo
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 provider "argocd" {
   server_addr = var.argo_host
   username    = var.argo_username
@@ -375,6 +459,32 @@ provider "kubectl" {
   token                  = "k8s-aws-v1.aHR0cHM6Ly9zdHMudXMtZWFzdC0yLmFtYXpvbmF3cy5jb20vP0FjdGlvbj1HZXRDYWxsZXJJZGVudGl0eSZWZXJzaW9uPTIwMTEtMDYtMTUmWC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBNTI3R01FMktHNzdSN0FIMyUyRjIwMjMxMDExJTJGdXMtZWFzdC0yJTJGc3RzJTJGYXdzNF9yZXF1ZXN0JlgtQW16LURhdGU9MjAyMzEwMTFUMjA1NzQ4WiZYLUFtei1FeHBpcmVzPTYwJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCUzQngtazhzLWF3cy1pZCZYLUFtei1TaWduYXR1cmU9N2Y3NTAyNTAyOTgwMDYxYjQzZjk5YTUxY2E1ODdmNGM3MmNlYTdjNTExMmJkMGVkNjE3OWFmNGNjZjQ2ZmM4Nw"
 }
 
+provider "aws" {
+  access_key = var.indico_devops_aws_access_key_id
+  secret_key = var.indico_devops_aws_secret_access_key
+  region     = var.indico_devops_aws_region
+  alias      = "aws-indico-devops"
+}
+
+data "aws_eks_cluster" "thanos" {
+  count    = var.thanos_enabled == true ? 1 : 0
+  name     = var.thanos_cluster_name
+  provider = aws.aws-indico-devops
+}
+
+data "aws_eks_cluster_auth" "thanos" {
+  count    = var.thanos_enabled == true ? 1 : 0
+  name     = var.thanos_cluster_name
+  provider = aws.aws-indico-devops
+}
+
+provider "kubectl" {
+  alias                  = "thanos-kubectl"
+  host                   = var.thanos_enabled == true ? data.aws_eks_cluster.thanos[0].endpoint : ""
+  cluster_ca_certificate = var.thanos_enabled == true ? base64decode(data.aws_eks_cluster.thanos[0].certificate_authority[0].data) : ""
+  token                  = var.thanos_enabled == true ? data.aws_eks_cluster_auth.thanos[0].token : ""
+  load_config_file       = false
+}
 
 provider "helm" {
   debug = true
@@ -386,6 +496,8 @@ provider "helm" {
 }
 
 module "argo-registration" {
+  count = var.argo_enabled == true ? 1 : 0
+
   depends_on = [
     module.cluster
   ]
@@ -394,8 +506,9 @@ module "argo-registration" {
     kubernetes = kubernetes,
     argocd     = argocd
   }
+
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
-  version                      = "1.1.16"
+  version                      = "1.2.1"
   cluster_name                 = var.label
   region                       = var.region
   argo_password                = var.argo_password
@@ -407,20 +520,27 @@ module "argo-registration" {
   argo_github_team_admin_group = var.argo_github_team_owner
   endpoint                     = module.cluster.kubernetes_host
   ca_data                      = module.cluster.kubernetes_cluster_ca_certificate
-
+  indico_dev_cluster           = var.aws_account == "Indico-Dev"
 }
 
 locals {
   security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
+<<<<<<< HEAD
   cluster_name      = var.label
   dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${var.aws_account}.indico.io") : var.domain_host
   dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
+=======
+  dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${var.aws_account}.${var.domain_suffix}") : var.domain_host
+  #dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 }
 
 
 data "aws_route53_zone" "primary" {
-  name = lower("${var.aws_account}.indico.io")
+  name     = var.is_alternate_account_domain == "false" ? lower("${var.aws_account}.${var.domain_suffix}") : lower(local.alternate_domain_root)
+  provider = aws.dns-control
 }
+
 
 resource "aws_route53_record" "ipa-app-caa" {
   count   = var.is_alternate_account_domain == "true" ? 0 : 1
@@ -435,6 +555,5 @@ resource "aws_route53_record" "ipa-app-caa" {
     "0 issue \"amazonaws.com\"",
     "0 issue \"awstrust.com\""
   ]
+  provider = aws.dns-control
 }
-
-

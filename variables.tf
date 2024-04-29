@@ -15,6 +15,12 @@ variable "label" {
   description = "The unique string to be prepended to resources names"
 }
 
+variable "environment" {
+  type        = string
+  default     = "development"
+  description = "The environment of the cluster, determines which account readapi to use, options production/development"
+}
+
 variable "message" {
   type        = string
   default     = "Managed by Terraform"
@@ -58,6 +64,20 @@ variable "aws_secret_key" {
   type        = string
   description = "The AWS secret key to use for deployment"
   sensitive   = true
+}
+
+variable "indico_aws_access_key_id" {
+  type        = string
+  description = "The AWS access key for controlling dns in an alternate account"
+  sensitive   = true
+  default     = ""
+}
+
+variable "indico_aws_secret_access_key" {
+  type        = string
+  description = "The AWS secret key for controlling dns in an alternate account"
+  sensitive   = true
+  default     = ""
 }
 
 variable "direct_connect" {
@@ -182,7 +202,7 @@ variable "node_disk_size" {
 
 variable "cluster_node_policies" {
   type        = list(any)
-  default     = []
+  default     = ["IAMReadOnlyAccess"]
   description = "Additonal IAM policies to add to the cluster IAM role"
 }
 
@@ -197,17 +217,41 @@ variable "enable_readapi" {
   type    = bool
   default = true
 }
+variable "azure_readapi_client_id" {
+  type    = string
+  default = ""
+}
+variable "azure_readapi_client_secret" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+variable "azure_readapi_subscription_id" {
+  type    = string
+  default = ""
+}
+variable "azure_readapi_tenant_id" {
+  type    = string
+  default = ""
+}
+
+# Old provider configuration to remove orphaned readapi resources
 variable "azure_indico_io_client_id" {
-  type = string
+  type    = string
+  default = ""
 }
 variable "azure_indico_io_client_secret" {
-  type = string
+  type      = string
+  sensitive = true
+  default   = ""
 }
 variable "azure_indico_io_subscription_id" {
-  type = string
+  type    = string
+  default = ""
 }
 variable "azure_indico_io_tenant_id" {
-  type = string
+  type    = string
+  default = ""
 }
 
 # IAM
@@ -276,6 +320,11 @@ variable "aws_account" {
   description = "The Name of the AWS Acccount this cluster lives in"
 }
 
+variable "argo_enabled" {
+  type    = bool
+  default = true
+}
+
 variable "argo_host" {
   type    = string
   default = "argo.devops.indico.io"
@@ -288,14 +337,17 @@ variable "argo_username" {
 
 variable "argo_password" {
   sensitive = true
+  default   = "not used"
 }
 
 variable "argo_repo" {
   description = "Argo Github Repository containing the IPA Application"
+  default     = ""
 }
 
 variable "argo_branch" {
   description = "Branch to use on argo_repo"
+  default     = ""
 }
 
 variable "argo_namespace" {
@@ -449,7 +501,13 @@ variable "hibernation_enabled" {
 }
 
 variable "keda_version" {
-  default = "2.11.2"
+  default = "2.13.2"
+}
+
+variable "external_secrets_version" {
+  type        = string
+  default     = "0.9.9"
+  description = "Version of external-secrets helm chart"
 }
 
 variable "opentelemetry-collector_version" {
@@ -502,10 +560,25 @@ variable "use_acm" {
   description = "create cluster that will use acm"
 }
 
+variable "enable_waf" {
+  type        = bool
+  default     = false
+  description = "enables aws alb controller for app-edge, also creates waf rules."
+}
+
+variable "vault_mount_path" {
+  type    = string
+  default = "terraform"
+}
 
 variable "terraform_vault_mount_path" {
   type    = string
   default = "terraform"
+}
+
+variable "snowflake_enabled" {
+  type    = bool
+  default = true
 }
 
 variable "snowflake_region" {
@@ -556,6 +629,15 @@ variable "is_alternate_account_domain" {
   description = "domain name is controlled by a different aws account"
 }
 
+<<<<<<< HEAD
+=======
+variable "domain_suffix" {
+  type        = string
+  default     = "indico.io"
+  description = "Domain suffix"
+}
+
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 variable "domain_host" {
   type        = string
   default     = ""
@@ -650,4 +732,117 @@ variable "ssl_static_secret_name" {
   type        = string
   default     = "indico-ssl-static-cert"
   description = "secret_name for static ssl certificate"
+<<<<<<< HEAD
 }
+=======
+}
+
+variable "local_registry_version" {
+  type    = string
+  default = "unused"
+}
+
+variable "local_registry_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "devops_tools_cluster_host" {
+  type    = string
+  default = "provided from the varset devops-tools-cluster"
+}
+
+variable "devops_tools_cluster_ca_certificate" {
+  type      = string
+  sensitive = true
+  default   = "provided from the varset devops-tools-cluster"
+}
+
+variable "thanos_grafana_admin_username" {
+  type    = string
+  default = "provided from the varset devops-tools-cluster"
+}
+
+variable "thanos_grafana_admin_password" {
+  type      = string
+  sensitive = true
+  default   = "provided from the varset thanos"
+}
+
+variable "thanos_cluster_ca_certificate" {
+  type      = string
+  sensitive = true
+  default   = "provided from the varset thanos"
+}
+
+variable "thanos_cluster_host" {
+  type    = string
+  default = "provided from the varset thanos"
+}
+
+
+variable "thanos_cluster_name" {
+  type    = string
+  default = "thanos"
+}
+
+variable "indico_devops_aws_access_key_id" {
+  type        = string
+  description = "The Indico-Devops account access key"
+  sensitive   = true
+  default     = ""
+}
+
+variable "indico_devops_aws_secret_access_key" {
+  type        = string
+  description = "The Indico-Devops account secret"
+  sensitive   = true
+  default     = ""
+}
+
+variable "indico_devops_aws_region" {
+  type        = string
+  description = "The Indico-Devops devops cluster region"
+  default     = ""
+}
+
+variable "thanos_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "keycloak_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "terraform_smoketests_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "on_prem_test" {
+  type    = bool
+  default = false
+}
+variable "harness_delegate" {
+  type    = bool
+  default = false
+}
+
+variable "harness_delegate_replicas" {
+  type    = number
+  default = 1
+}
+
+variable "harness_mount_path" {
+  type    = string
+  default = "harness"
+}
+
+variable "enable_s3_backup" {
+  type        = bool
+  default     = true
+  description = "Allow backing up data bucket on s3"
+}
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017

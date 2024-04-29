@@ -1,4 +1,17 @@
 locals {
+  thanos_config = var.thanos_enabled == true ? (<<EOT
+      thanos: # this is the one being used
+        blockSize: 5m
+        objectStorageConfig:
+          existingSecret:
+            name: thanos-storage
+            key: thanos_storage.yaml
+  EOT
+    ) : (<<EOT
+      thanos: {}
+  EOT
+  )
+
   alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
 noExtraConfigs: true
   EOT
@@ -22,11 +35,128 @@ alerting:
     integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
 EOT
   )
+
+
+  kube_prometheus_stack_values = var.use_static_ssl_certificates == true ? (<<EOT
+  alertmanager:
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - alertmanager-${local.dns_name}
+      paths:
+        - /
+      tls:
+        - secretName: ${var.ssl_static_secret_name}
+          hosts:
+            - alertmanager-${local.dns_name}
+  prometheus:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
+    thanosServiceMonitor:
+      enabled: ${var.thanos_enabled}
+
+    thanosService:
+      enabled:  ${var.thanos_enabled}
+
+    prometheusSpec:
+      disableCompaction: ${var.thanos_enabled}
+      externalLabels:
+        clusterAccount: ${var.account}
+        clusterRegion: ${var.region}
+        clusterName: ${var.label}
+        clusterFullName: ${lower("${var.account}-${var.region}-${var.name}")}
+${local.thanos_config}
+      nodeSelector:
+        node_group: static-workers
+    ingress:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+      ingressClassName: nginx
+      hosts:
+        - prometheus-${local.dns_name}
+      paths:
+        - /
+      tls:
+        - secretName: ${var.ssl_static_secret_name}
+          hosts:
+            - prometheus-${local.dns_name}
+  grafana:
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - grafana-${local.dns_name}
+      path: /
+      tls:
+        - secretName: ${var.ssl_static_secret_name}
+          hosts:
+            - grafana-${local.dns_name}
+  EOT
+    ) : (<<EOT
+  alertmanager:
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+
+  prometheus:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
+    thanosServiceMonitor:
+      enabled: ${var.thanos_enabled}
+
+    thanosService:
+      enabled: ${var.thanos_enabled}
+    
+    prometheusSpec:
+      disableCompaction: ${var.thanos_enabled}
+      externalLabels:
+        clusterAccount: ${var.account}
+        clusterRegion: ${var.region}
+        clusterName: ${var.label}
+        clusterFullName: ${lower("${var.account}-${var.region}-${var.name}")}
+${local.thanos_config}
+      nodeSelector:
+        node_group: static-workers
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+  grafana:
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: zerossl
+      labels:
+        acme.cert-manager.io/dns01-solver: "true"
+EOT
+  )
 }
+
+# Public DNS records
 resource "azurerm_dns_caa_record" "grafana-caa" {
+<<<<<<< HEAD
   count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
+=======
+  count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" && var.private_dns_zone != true ? 1 : 0
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   name                = lower("grafana.${local.dns_prefix}")
-  zone_name           = data.azurerm_dns_zone.domain.name
+  zone_name           = local.dns_zone.name
   resource_group_name = var.common_resource_group
   ttl                 = 300
   record {
@@ -38,9 +168,13 @@ resource "azurerm_dns_caa_record" "grafana-caa" {
 
 
 resource "azurerm_dns_caa_record" "prometheus-caa" {
+<<<<<<< HEAD
   count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
+=======
+  count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" && var.private_dns_zone != true ? 1 : 0
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   name                = lower("prometheus.${local.dns_prefix}")
-  zone_name           = data.azurerm_dns_zone.domain.name
+  zone_name           = local.dns_zone.name
   resource_group_name = var.common_resource_group
   ttl                 = 300
 
@@ -53,9 +187,13 @@ resource "azurerm_dns_caa_record" "prometheus-caa" {
 
 
 resource "azurerm_dns_caa_record" "alertmanager-caa" {
+<<<<<<< HEAD
   count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
+=======
+  count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" && var.private_dns_zone != true ? 1 : 0
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   name                = lower("alertmanager.${local.dns_prefix}")
-  zone_name           = data.azurerm_dns_zone.domain.name
+  zone_name           = local.dns_zone.name
   resource_group_name = var.common_resource_group
   ttl                 = 300
 
@@ -86,6 +224,7 @@ resource "helm_release" "monitoring" {
   count = var.monitoring_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
+    helm_release.external-secrets,
     helm_release.ipa-pre-requisites,
     azurerm_dns_caa_record.alertmanager-caa,
     azurerm_dns_caa_record.grafana-caa,
@@ -144,27 +283,64 @@ authentication:
   ingressPassword: ${random_password.monitoring-password.result}
 
 ${local.alerting_configuration_values}
-
 kube-prometheus-stack:
-  enabled: true
-  nodeExporter:
-    enabled: false
-
-  prometheus:
-    enabled: true
-    prometheusSpec:
-      nodeSelector:
-        node_group: static-workers
-      storageSpec:
-        volumeClaimTemplate:
-          spec:
-            storageClassName: default
-
-prometheus-adapter:
-  enabled: false
+${local.kube_prometheus_stack_values}
 EOF
   ]
 }
+
+resource "kubectl_manifest" "thanos-datasource-credentials" {
+  count     = var.thanos_enabled ? 1 : 0
+  provider  = kubectl.thanos-kubectl
+  yaml_body = <<YAML
+apiVersion: v1
+stringData:
+  admin-password: ${random_password.monitoring-password.result}
+kind: Secret
+metadata:
+  name: ${replace(local.dns_name, ".", "-")}
+  namespace: default
+type: Opaque
+  YAML
+}
+
+resource "kubectl_manifest" "thanos-datasource" {
+  count      = var.thanos_enabled ? 1 : 0
+  depends_on = [kubectl_manifest.thanos-datasource-credentials]
+  provider   = kubectl.thanos-kubectl
+  yaml_body  = <<YAML
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: ${replace(local.dns_name, ".", "-")}
+  namespace: default
+spec:
+  valuesFrom:
+    - targetPath: "secureJsonData.basicAuthPassword"
+      valueFrom:
+        secretKeyRef:
+          name: ${replace(local.dns_name, ".", "-")}
+          key: admin-password
+  datasource:
+    basicAuth: true
+    basicAuthUser: monitoring
+    editable: false
+    access: proxy
+    editable: true
+    jsonData:
+      timeInterval: 5s
+      tlsSkipVerify: true
+    name: ${local.dns_name}
+    secureJsonData:
+      basicAuthPassword: $${admin-password}
+    type: prometheus
+    url: https://prometheus.${local.dns_name}/prometheus
+  instanceSelector:
+    matchLabels:
+      dashboards: external-grafana
+  YAML
+}
+
 
 resource "helm_release" "keda-monitoring" {
   count = !var.is_openshift == true && var.monitoring_enabled == true ? 1 : 0
@@ -183,6 +359,23 @@ resource "helm_release" "keda-monitoring" {
 
 
   values = [<<EOF
+    image:
+      metricsApiServer:
+        repository: harbor.devops.indico.io/ghcr.io/kedacore/keda-metrics-apiserver
+      webhooks:
+        repository: harbor.devops.indico.io/ghcr.io/kedacore/keda-admission-webhooks
+      keda:
+        repository: harbor.devops.indico.io/ghcr.io/kedacore/keda
+    imagePullSecrets:
+      - name: harbor-pull-secret
+      
+    resources:
+      operator:
+        requests:
+          memory: 512Mi
+        limits:
+          memory: 4Gi
+
     crds:
       install: true
     
@@ -230,6 +423,10 @@ resource "helm_release" "opentelemetry-collector" {
 
   values = [<<EOF
     enabled: true
+    imagePullSecrets:
+      - name: harbor-pull-secret
+    image:
+      repository: harbor.devops.indico.io/docker.io/otel/opentelemetry-collector-contrib
     fullnameOverride: "collector-collector"
     mode: deployment
     tolerations:

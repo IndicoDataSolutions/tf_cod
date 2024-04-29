@@ -29,11 +29,6 @@ output "fsx-rox" {
   value       = var.include_rox ? module.fsx-storage[0].fsx-rox : ""
 }
 
-output "indico_allow_access" {
-  value       = aws_security_group.indico_allow_access.id
-  description = "The ID of the indico indico_allow_access security group used for configuring HAproxy."
-}
-
 output "key_pem" {
   value       = tls_private_key.pk.private_key_pem
   description = "Generated private key for key pair"
@@ -57,7 +52,11 @@ output "fsx_storage_fsx_rwx_subnet_id" {
 }
 
 output "cluster_name" {
-  value = local.cluster_name
+  value = var.label
+}
+
+output "cluster_region" {
+  value = var.region
 }
 
 output "dns_name" {
@@ -80,4 +79,28 @@ output "kube_ca_certificate" {
 output "kube_token" {
   sensitive = true
   value     = module.cluster.kubernetes_token
+}
+
+output "harness_delegate_name" {
+  value = var.harness_delegate == true && length(module.harness_delegate) > 0 ? module.harness_delegate[0].delegate_name : ""
+}
+
+output "ipa_version" {
+  value = var.ipa_version
+}
+
+output "argo_branch" {
+  value = var.argo_branch
+}
+
+output "argo_path" {
+  value = var.argo_path
+}
+
+output "argo_repo" {
+  value = var.argo_repo
+}
+
+output "monitoring_enabled" {
+  value = var.monitoring_enabled
 }

@@ -4,8 +4,8 @@ locals {
   "tenantId" : "${data.azurerm_client_config.current.tenant_id}",
   "subscriptionId" : "${split("/", data.azurerm_subscription.primary.id)[2]}",
   "resourceGroup" : "${var.common_resource_group}",
-  "aadClientId": "${azuread_application.workload_identity.application_id}",
-  "aadClientSecret": "${azuread_application_password.workload_identity.value}"
+  "aadClientId": "${var.use_workload_identity == true ? azuread_application.workload_identity.0.application_id : ""}",
+  "aadClientSecret": "${var.use_workload_identity == true ? azuread_application_password.workload_identity.0.value : ""}"
   }
   EOF
 
@@ -67,7 +67,18 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
+<<<<<<< HEAD
 resource "github_repository_file" "pre-reqs-values-yaml" {
+=======
+data "vault_kv_secret_v2" "harbor-api-token" {
+  count = var.argo_enabled == true ? 1 : 0
+  mount = "tools/argo"
+  name  = "harbor-api"
+}
+
+resource "github_repository_file" "pre-reqs-values-yaml" {
+  count               = var.argo_enabled == true ? 1 : 0
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/pre-reqs-values.values"
@@ -84,6 +95,10 @@ resource "github_repository_file" "pre-reqs-values-yaml" {
 
 
 resource "github_repository_file" "crds-values-yaml" {
+<<<<<<< HEAD
+=======
+  count               = var.argo_enabled == true ? 1 : 0
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/crds-values.values"
@@ -99,6 +114,11 @@ resource "github_repository_file" "crds-values-yaml" {
 }
 
 data "github_repository_file" "data-crds-values" {
+<<<<<<< HEAD
+=======
+  count = var.argo_enabled == true ? 1 : 0
+
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   depends_on = [
     github_repository_file.crds-values-yaml
   ]
@@ -109,6 +129,11 @@ data "github_repository_file" "data-crds-values" {
 
 
 data "github_repository_file" "data-pre-reqs-values" {
+<<<<<<< HEAD
+=======
+  count = var.argo_enabled == true ? 1 : 0
+
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   depends_on = [
     github_repository_file.pre-reqs-values-yaml
   ]
@@ -117,12 +142,102 @@ data "github_repository_file" "data-pre-reqs-values" {
   file       = var.argo_path == "." ? "helm/pre-reqs-values.values" : "${var.argo_path}/helm/pre-reqs-values.values"
 }
 
+<<<<<<< HEAD
+=======
+module "secrets-operator-setup" {
+  depends_on = [
+    module.cluster
+  ]
+  count           = var.argo_enabled == true ? 1 : 0
+  source          = "../modules/common/vault-secrets-operator-setup"
+  vault_address   = var.vault_address
+  account         = var.account
+  region          = var.region
+  name            = var.label
+  kubernetes_host = module.cluster.kubernetes_host
+}
+
+resource "helm_release" "ipa-vso" {
+  count = var.thanos_enabled == true ? 1 : 0
+  depends_on = [
+    module.cluster,
+    data.github_repository_file.data-crds-values,
+    module.secrets-operator-setup
+  ]
+
+  verify           = false
+  name             = "ipa-vso"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://helm.releases.hashicorp.com"
+  chart            = "vault-secrets-operator"
+  version          = "0.4.2"
+  wait             = true
+
+  values = [
+    <<EOF
+  controller: 
+    imagePullSecrets:
+      - name: harbor-pull-secret
+    kubeRbacProxy:
+      image:
+        repository: harbor.devops.indico.io/gcr.io/kubebuilder/kube-rbac-proxy
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1024Mi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+
+    manager:
+      image:
+        repository: harbor.devops.indico.io/docker.io/hashicorp/vault-secrets-operator
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1024Mi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+
+  defaultAuthMethod:
+    enabled: true
+    namespace: default
+    method: kubernetes
+    mount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+    kubernetes:
+      role: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+      tokenAudiences: ["vault"]
+      serviceAccount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+
+  defaultVaultConnection:
+    enabled: true
+    address: ${var.vault_address}
+    skipTLSVerify: false
+    spec:
+    template:
+      spec:
+        containers:
+        - name: manager
+          args:
+          - "--client-cache-persistence-model=direct-encrypted"
+EOF
+  ]
+}
+
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 resource "helm_release" "ipa-crds" {
   depends_on = [
     module.cluster,
     kubernetes_secret.harbor-pull-secret,
     kubernetes_secret.issuer-secret,
+<<<<<<< HEAD
     data.github_repository_file.data-crds-values
+=======
+    data.github_repository_file.data-crds-values,
+    module.secrets-operator-setup
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   ]
 
   verify           = false
@@ -132,7 +247,7 @@ resource "helm_release" "ipa-crds" {
   repository       = var.ipa_repo
   chart            = "ipa-crds"
   version          = var.ipa_crds_version
-  timeout          = "600" # 10 minutes
+  timeout          = "1800" # 30 minutes
   wait             = true
 
   values = [<<EOF
@@ -144,7 +259,7 @@ resource "helm_release" "ipa-crds" {
 
   cert-manager:    
     #dns01RecursiveNameserversOnly: true
-    #dns01RecursiveNameservers: "$#{data.azurerm_dns_zone.domain.name_servers[0]}:53,$#{data.azurerm_dns_zone.domain.name_servers[1]}:53,$#{data.azurerm_dns_zone.domain.name_servers[2]}:53,$#{data.azurerm_dns_zone.domain.name_servers[3]}:53"
+    #dns01RecursiveNameservers: "$#{local.dns_zone.name_servers[0]}:53,$#{local.dns_zone.name_servers[1]}:53,$#{local.dns_zone.name_servers[2]}:53,$#{local.dns_zone.name_servers[3]}:53"
 
     nodeSelector:
       kubernetes.io/os: linux
@@ -161,13 +276,14 @@ resource "helm_release" "ipa-crds" {
 EOF
     ,
     <<EOT
+<<<<<<< HEAD
 ${data.github_repository_file.data-crds-values.content}
+=======
+${var.argo_enabled == true ? data.github_repository_file.data-crds-values[0].content : ""}
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 EOT
   ]
 }
-
-
-
 
 resource "time_sleep" "wait_1_minutes_after_crds" {
   depends_on = [helm_release.ipa-crds]
@@ -175,7 +291,71 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
   create_duration = "1m"
 }
 
+data "external" "git_information" {
+  program = ["sh", "${path.module}/get_sha.sh"]
+}
 
+output "git_sha" {
+  value = data.external.git_information.result.sha
+}
+
+
+output "git_branch" {
+  value = data.external.git_information.result.branch
+}
+
+output "wait_command" {
+  value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+}
+
+resource "null_resource" "wait-for-tf-cod-chart-build" {
+  count = var.argo_enabled == true ? 1 : 0
+
+  depends_on = [
+    time_sleep.wait_1_minutes_after_pre_reqs
+  ]
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    environment = {
+      HARBOR_API_TOKEN = jsondecode(data.vault_kv_secret_v2.harbor-api-token[0].data_json)["bearer_token"]
+    }
+    command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+  }
+}
+
+resource "helm_release" "terraform-smoketests" {
+  depends_on = [
+    null_resource.wait-for-tf-cod-chart-build,
+    kubernetes_config_map.terraform-variables,
+    helm_release.monitoring
+  ]
+  count = var.terraform_smoketests_enabled == true ? 1 : 0
+
+  verify           = false
+  name             = "terraform-smoketests-${substr(data.external.git_information.result.sha, 0, 8)}"
+  namespace        = "default"
+  repository       = var.ipa_repo
+  chart            = "terraform-smoketests"
+  version          = "0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+  wait             = true
+  wait_for_jobs    = true
+  timeout          = "300" # 5 minutes
+  disable_webhooks = false
+  values = [<<EOF
+  cluster:
+    cloudProvider: azure
+    account: ${var.account}
+    region: ${var.region}
+    name: ${var.label}
+  image:
+    tag: "${substr(data.external.git_information.result.sha, 0, 8)}"
+  EOF
+  ]
+}
 
 # Install the Machinesets now
 resource "helm_release" "crunchy-postgres" {
@@ -275,7 +455,7 @@ resource "azurerm_role_assignment" "external_dns" {
   depends_on = [
     module.cluster
   ]
-  scope                            = data.azurerm_dns_zone.domain.id
+  scope                            = local.dns_zone.id
   role_definition_name             = "DNS Zone Contributor"
   principal_id                     = module.cluster.kubelet_identity.object_id
   skip_service_principal_aad_check = true
@@ -290,6 +470,7 @@ resource "kubernetes_secret" "azure_storage_key" {
   }
 
   data = {
+    AZURE_CLIENT_ID         = module.cluster.kubelet_identity.client_id
     azurestorageaccountname = module.storage.storage_account_name
     azurestorageaccountkey  = module.storage.storage_account_primary_access_key
     AZURE_ACCOUNT_NAME      = module.storage.storage_account_name
@@ -313,6 +494,60 @@ resource "kubernetes_config_map" "azure_dns_credentials" {
     "azure.json" = var.is_openshift ? local.openshift_dns_credentials : local.azure_dns_credentials
   }
 }
+
+
+resource "kubectl_manifest" "thanos-storage-secret" {
+  count      = var.thanos_enabled ? 1 : 0
+  depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
+  yaml_body  = <<YAML
+    apiVersion: "secrets.hashicorp.com/v1beta1"
+    kind: "VaultStaticSecret"
+    metadata:
+      name:  vault-thanos-storage
+      namespace: default
+    spec:
+      type: "kv-v2"
+      namespace: default
+      mount: customer-Indico-Devops
+      path: thanos-storage
+      refreshAfter: 60s
+      rolloutRestartTargets:
+        - name: prometheus-monitoring-kube-prometheus-prometheus
+          kind: StatefulSet
+      destination:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+        create: true
+        name: thanos-storage
+      vaultAuthRef: default
+  YAML
+}
+
+
+resource "kubectl_manifest" "custom-cluster-issuer" {
+  count = var.enable_custom_cluster_issuer == true ? 1 : 0
+  depends_on = [
+    time_sleep.wait_1_minutes_after_crds,
+    module.cluster,
+    module.storage,
+    helm_release.ipa-crds,
+    data.vault_kv_secret_v2.zerossl_data,
+    kubernetes_secret.azure_storage_key,
+    kubernetes_config_map.azure_dns_credentials,
+    kubernetes_service_account.workload_identity,
+    data.github_repository_file.data-pre-reqs-values
+  ]
+  yaml_body = <<YAML
+    apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    metadata:
+      name: zerossl
+    spec:
+      ${indent(6, var.custom_cluster_issuer_spec)} 
+  YAML
+}
+
 
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
@@ -341,6 +576,7 @@ resource "helm_release" "ipa-pre-requisites" {
   values = [<<EOF
 
 cluster:
+  cloudProvider: azure
   name: ${var.label}
   region: ${var.region}
   domain: ${var.domain_suffix}
@@ -369,7 +605,7 @@ secrets:
 
   clusterIssuer:
     zerossl:
-      create: true
+      create: ${var.enable_custom_cluster_issuer == false ? true : false}
       eabEmail: devops-sa@indico.io
       eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
@@ -379,7 +615,7 @@ clusterIssuer:
     - dns01:
         azureDNS:
           environment: AzurePublicCloud
-          hostedZoneName: ${data.azurerm_dns_zone.domain.name}
+          hostedZoneName: ${local.dns_zone.name}
           managedIdentity:
             clientID: ${module.cluster.kubelet_identity.client_id}
           resourceGroupName: ${var.common_resource_group}
@@ -394,7 +630,7 @@ apiModels:
     node_group: static-workers
 
 external-dns:
-  enabled: true
+  enabled: ${var.enable_external_dns}
   logLevel: debug
   policy: sync
   txtOwnerId: "${var.label}-${var.region}"
@@ -521,7 +757,11 @@ metrics-server:
   EOF
     ,
     <<EOT
+<<<<<<< HEAD
 ${data.github_repository_file.data-pre-reqs-values.content}
+=======
+${var.argo_enabled == true ? data.github_repository_file.data-pre-reqs-values[0].content : ""}
+>>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 EOT
   ]
 }
@@ -653,6 +893,11 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
+    retry:
+      limit: 8
+      backoff:
+        duration: 1m0s
+        factor: 2
   source:
     chart: ipa
     repoURL: ${var.ipa_repo}
@@ -701,7 +946,7 @@ EOT
 }
 
 data "vault_kv_secret_v2" "zerossl_data" {
-  mount = var.vault_mount_path
+  mount = local.default_mount_path
   name  = "zerossl"
 }
 
@@ -827,3 +1072,26 @@ spec:
 EOT
 }
 
+resource "helm_release" "external-secrets" {
+  depends_on = [
+    module.cluster,
+    data.github_repository_file.data-crds-values,
+    module.secrets-operator-setup
+  ]
+
+
+  verify           = false
+  name             = "external-secrets"
+  create_namespace = true
+  namespace        = "default"
+  repository       = "https://charts.external-secrets.io/"
+  chart            = "external-secrets"
+  version          = var.external_secrets_version
+  wait             = true
+
+  values = [<<EOF
+    image:
+      repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+  EOF
+  ]
+}
