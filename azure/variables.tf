@@ -750,13 +750,16 @@ variable "private_cluster_public_fqdn_enabled" {
 
 variable "cluster_outbound_type" {
   default = "loadBalancer"
-  type = string
+  type    = string
 }
-
 
 variable "private_dns_zone_id" {
   default = "None"
   type    = string
 }
 
+variable "sku_tier" {
+  default = "Standard"
+  type    = string
+}
 
