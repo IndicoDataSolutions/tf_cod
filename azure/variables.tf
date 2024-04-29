@@ -743,6 +743,20 @@ variable "custom_cluster_issuer_spec" {
   type    = string
 }
 
+variable "private_cluster_public_fqdn_enabled" {
+  default = false
+  type    = bool
+}
 
+variable "cluster_outbound_type" {
+  default = "loadBalancer"
+  type = string
+}
+
+
+variable "private_dns_zone_id" {
+  default = "None"
+  type    = string
+}
 
 

@@ -284,7 +284,7 @@ module "cluster" {
 
   source                     = "app.terraform.io/indico/indico-azure-cluster/mod"
   insights_retention_in_days = var.monitor_retention_in_days
-  version                    = "4.0.1"
+  version                    = "4.0.2"
   label                      = var.label
   public_key                 = tls_private_key.pk.public_key_openssh
   region                     = var.region
@@ -298,8 +298,13 @@ module "cluster" {
   resource_group_name        = local.resource_group_name
   admin_group_name           = var.admin_group_name
   account                    = var.account
-  network_plugin             = var.network_plugin
-  network_plugin_mode        = var.network_plugin_mode
+
+  network_plugin                      = var.network_plugin
+  network_plugin_mode                 = var.network_plugin_mode
+  private_cluster_public_fqdn_enabled = var.private_cluster_public_fqdn_enabled
+  cluster_outbound_type               = var.cluster_outbound_type
+  private_dns_zone_id                 = var.private_dns_zone_id
+
 
   sentinel_workspace_name                = local.sentinel_workspace_name
   sentinel_workspace_resource_group_name = local.sentinel_workspace_resource_group_name
