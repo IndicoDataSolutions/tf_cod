@@ -773,3 +773,14 @@ variable "sku_tier" {
   type    = string
 }
 
+
+variable "dns_service_ip" {
+  type    = string
+  default = null
+}
+
+variable "docker_bridge_cidr" {
+  type    = string
+  default = null
+}
+
