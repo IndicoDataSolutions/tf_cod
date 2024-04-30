@@ -4,11 +4,7 @@ output "acm_arn" {
 }
 
 resource "aws_acm_certificate" "alb" {
-<<<<<<< HEAD
-  count    = var.use_acm == true && var.is_alternate_account_domain == "false" ? 1 : 0
-=======
   count    = var.enable_waf == true ? 1 : 0
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   domain_name       = local.dns_name
   validation_method = "DNS"
   depends_on = [
