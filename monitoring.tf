@@ -38,13 +38,10 @@ EOT
   kube_prometheus_stack_values = var.use_static_ssl_certificates == true ? (<<EOT
   alertmanager:
     ingress:
-<<<<<<< HEAD
-=======
       annotations:
         cert-manager.io/cluster-issuer: zerossl
       labels:
         acme.cert-manager.io/dns01-solver: "true"
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
       enabled: true
       ingressClassName: nginx
       hosts:
@@ -56,9 +53,6 @@ EOT
           hosts:
             - alertmanager-${local.dns_name}
   prometheus:
-<<<<<<< HEAD
-    prometheusSpec:
-=======
     annotations:
       reloader.stakater.com/auto: "true"
 
@@ -76,18 +70,14 @@ EOT
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
 ${local.thanos_config}
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
       nodeSelector:
         node_group: static-workers
     ingress:
       enabled: true
-<<<<<<< HEAD
-=======
       annotations:
         cert-manager.io/cluster-issuer: zerossl
       labels:
         acme.cert-manager.io/dns01-solver: "true"
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
       ingressClassName: nginx
       hosts:
         - prometheus-${local.dns_name}
@@ -99,13 +89,10 @@ ${local.thanos_config}
             - prometheus-${local.dns_name}
   grafana:
     ingress:
-<<<<<<< HEAD
-=======
       annotations:
         cert-manager.io/cluster-issuer: zerossl
       labels:
         acme.cert-manager.io/dns01-solver: "true"
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
       enabled: true
       ingressClassName: nginx
       hosts:
@@ -121,10 +108,6 @@ ${local.thanos_config}
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
-<<<<<<< HEAD
-  prometheus:
-    prometheusSpec:
-=======
       labels:
         acme.cert-manager.io/dns01-solver: "true"
 
@@ -146,26 +129,19 @@ ${local.thanos_config}
         clusterName: ${var.label}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
 ${local.thanos_config}
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
       nodeSelector:
         node_group: static-workers
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
-<<<<<<< HEAD
-=======
       labels:
         acme.cert-manager.io/dns01-solver: "true"
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   grafana:
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
-<<<<<<< HEAD
-=======
       labels:
         acme.cert-manager.io/dns01-solver: "true"
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 EOT
   )
 }
@@ -274,11 +250,6 @@ authentication:
 ${local.alerting_configuration_values}
 kube-prometheus-stack:
 ${local.kube_prometheus_stack_values}
-<<<<<<< HEAD
-  
-
-=======
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 EOF
   ]
 }
