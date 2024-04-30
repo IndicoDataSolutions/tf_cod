@@ -946,3 +946,9 @@ variable "firewall_allow_list" {
   type = list(string)
   default = [".cognitiveservices.azure.com"]
 }
+
+variable "dns_zone_name" {
+  type = "string"
+  default = ""
+  description = "Name of the dns zone used to control DNS"
+}

@@ -640,15 +640,11 @@ external-dns:
     repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
   logLevel: debug
   policy: sync
-  txtOwnerId: "${var.label}-${var.region}"
+  txtOwnerId: "${local.dns_name}"
   domainFilters:
-    - ${local.dns_zone}.indico.io.
+    - ${local.dns_zone_name}
 
   provider: aws
-  extraArgs:
-    - "--aws-zone-type=${local.dns_zone_public}"
-    
-
   policy: sync
   sources:
     - service

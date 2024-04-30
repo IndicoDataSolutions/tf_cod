@@ -505,16 +505,14 @@ module "argo-registration" {
 
 locals {
   security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
-  dns_zone          = var.network_allow_public == true ? lower("${var.aws_account}") : lower("private-${var.aws_account}")
-  dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${local.dns_zone}.${var.domain_suffix}") : var.domain_host
-  dns_zone_public = var.network_allow_public == true ? "public" : "private"
+  dns_zone_name          = var.dns_zone_name == "" ? lower("${var.aws_account}.${var.domain_suffix}") : var.dns_zone_name
+  dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${local.dns_zone_name}") : var.domain_host
   #dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
 }
 
 
 data "aws_route53_zone" "primary" {
-  name     = var.is_alternate_account_domain == "false" ? lower("${local.dns_zone}.${var.domain_suffix}") : lower(local.alternate_domain_root)
-  private_zone = var.network_allow_public == true ? false : true
+  name     = var.is_alternate_account_domain == "false" ? local.dns_zone_name : lower(local.alternate_domain_root)
   provider = aws.dns-control
 }
 
