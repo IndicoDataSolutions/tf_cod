@@ -120,11 +120,7 @@ clusterIssuer:
         matchLabels:
           "acme.cert-manager.io/dns01-solver": "true"
 external-dns:
-<<<<<<< HEAD
-  enabled: false
-=======
   enabled: ${local.enable_external_dns}
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 alternate-external-dns:
   enabled: ${local.enable_external_dns}
   logLevel: debug
@@ -146,8 +142,6 @@ alternate-external-dns:
     - ingress
 EOT
   )
-<<<<<<< HEAD
-=======
   local_registry_tf_cod_values = var.local_registry_enabled == true ? (<<EOT
 global:
   imagePullSecrets: 
@@ -164,8 +158,6 @@ app-edge:
 # not using local_registry
   EOT
   )
-
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   runtime_scanner_ingress_values = var.use_static_ssl_certificates == true ? (<<EOT
 ingress:
   enabled: true
@@ -178,10 +170,6 @@ ingress:
   
   useDefaultResolver: true
   labels: {}
-<<<<<<< HEAD
-
-=======
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   hosts:
     - host: scan
       paths:
@@ -1268,14 +1256,8 @@ spec:
               authentication:
                 ingressUser: monitoring
                 ingressPassword: ${random_password.monitoring-password.result}
-<<<<<<< HEAD
-              ${indent(14, local.runtime_scanner_ingress_values)} 
-            ${indent(12, local.acm_ipa_values)}         
-=======
                 ${indent(14, local.runtime_scanner_ingress_values)} 
             ${indent(12, local.alb_ipa_values)}         
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
-
         - name: HELM_VALUES
           value: |
             ${base64decode(var.ipa_values)}    
