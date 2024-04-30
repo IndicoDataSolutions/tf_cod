@@ -95,11 +95,8 @@ app-edge:
     ) : (<<EOT
 app-edge:
   alternateDomain: ""
-<<<<<<< HEAD
-=======
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "harbor.devops.indico.io"}/indico
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 EOT
   )
   dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT
