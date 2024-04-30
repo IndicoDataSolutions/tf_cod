@@ -839,4 +839,3 @@ variable "enable_s3_backup" {
   default     = true
   description = "Allow backing up data bucket on s3"
 }
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
