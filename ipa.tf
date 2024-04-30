@@ -5,14 +5,8 @@ locals {
   the_tld               = local.the_splits[local.the_length - 1]
   the_domain            = local.the_splits[local.the_length - 2]
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
-<<<<<<< HEAD
   enable_external_dns =  var.use_static_ssl_certificates == false ? true : false
-=======
-
   storage_class = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
-
-  enable_external_dns = var.use_static_ssl_certificates == false ? true : false
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:
     enabled: false
