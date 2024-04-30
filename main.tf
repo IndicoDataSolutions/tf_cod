@@ -38,13 +38,6 @@ terraform {
     }
     vault = {
       source  = "hashicorp/vault"
-<<<<<<< HEAD
-      version = "3.19.0"
-    }
-    snowflake = {
-      source  = "Snowflake-Labs/snowflake"
-      version = "~> 0.70"
-=======
       version = "3.22.0"
     }
     snowflake = {
@@ -58,7 +51,6 @@ terraform {
     azurerm = {
       source = "hashicorp/azurerm"
       version = "3.95.0"
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
     }
   }
 }
@@ -195,20 +187,12 @@ module "private_networking" {
 }
 
 module "sqs_sns" {
-<<<<<<< HEAD
-  count   = var.sqs_sns == true ? 1 : 0
-  source  = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
-  version = "1.1.2"
-  region  = var.region
-  label   = var.label
-=======
   count             = var.sqs_sns == true ? 1 : 0
   source            = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
   version           = "1.2.0"
   region            = var.region
   label             = var.label
   kms_master_key_id = module.kms_key.key.id
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 }
 
 module "kms_key" {
@@ -321,11 +305,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-<<<<<<< HEAD
-  version                    = "8.1.6"
-=======
   version                    = "8.1.7"
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
@@ -349,11 +329,7 @@ module "cluster" {
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
 }
 
-<<<<<<< HEAD
-module "readapi" {
-=======
 module "readapi_queue" {
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   count = var.enable_readapi ? 1 : 0
   providers = {
     azurerm = azurerm.readapi
@@ -409,32 +385,7 @@ module "snowflake" {
   region                = var.region
   aws_account_name      = var.aws_account
 }
-
-<<<<<<< HEAD
-resource "aws_security_group" "indico_allow_access" {
-  name        = "${var.label}-allow-access"
-  description = "Promethues, Grafana"
-  vpc_id      = local.network[0].indico_vpc_id
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["35.174.218.89/32"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-# argo 
-=======
 # argo
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 provider "argocd" {
   server_addr = var.argo_host
   username    = var.argo_username
@@ -525,14 +476,8 @@ module "argo-registration" {
 
 locals {
   security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
-<<<<<<< HEAD
   cluster_name      = var.label
-  dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${var.aws_account}.indico.io") : var.domain_host
-  dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
-=======
   dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${var.aws_account}.${var.domain_suffix}") : var.domain_host
-  #dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 }
 
 
