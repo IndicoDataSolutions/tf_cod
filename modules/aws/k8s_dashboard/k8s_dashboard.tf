@@ -73,9 +73,6 @@ oauth2-proxy:
   extraArgs:
     insecure-oidc-allow-unverified-email: true
     email-domain: indico.io
-<<<<<<< HEAD
-=======
-
   redis:
     enabled: true
     replica:
@@ -169,8 +166,6 @@ kubernetes-dashboard:
     disableAccessDeniedNotifications: false
 
 ${local.ingress_values}
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
-
   redis:
     enabled: true
     replica:
