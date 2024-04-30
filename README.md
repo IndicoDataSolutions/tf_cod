@@ -9,9 +9,6 @@ Terraform repo used for Clusters On Demand (COD)
 
 2. Install/Setup pre-commit
 
-<<<<<<< HEAD
-</table> 
-=======
    `pre-commit install`
 
 ## Smoketests
