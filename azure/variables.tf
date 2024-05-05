@@ -773,3 +773,7 @@ variable "sku_tier" {
   type    = string
 }
 
+variable "cluster_service_cidr" {
+  type    = string
+  default = "10.0.0.0/16"
+}
