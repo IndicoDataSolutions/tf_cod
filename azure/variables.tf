@@ -773,7 +773,21 @@ variable "sku_tier" {
   type    = string
 }
 
+<<<<<<< HEAD
 variable "cluster_service_cidr" {
   type    = string
   default = "10.0.0.0/16"
 }
+=======
+
+variable "dns_service_ip" {
+  type    = string
+  default = null
+}
+
+variable "docker_bridge_cidr" {
+  type    = string
+  default = null
+}
+
+>>>>>>> 4709b49386a025b18e88818f0158df2725cf5fa6

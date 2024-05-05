@@ -306,6 +306,9 @@ module "cluster" {
   private_dns_zone_id                 = var.private_dns_zone_id
   sku_tier                            = var.sku_tier
   service_cidr                        = var.cluster_service_cidr
+  dns_service_ip                      = var.dns_service_ip
+  docker_bridge_cidr                  = var.docker_bridge_cidr
+
 
   sentinel_workspace_name                = local.sentinel_workspace_name
   sentinel_workspace_resource_group_name = local.sentinel_workspace_resource_group_name

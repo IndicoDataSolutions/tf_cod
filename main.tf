@@ -38,13 +38,6 @@ terraform {
     }
     vault = {
       source  = "hashicorp/vault"
-<<<<<<< HEAD
-      version = "3.19.0"
-    }
-    snowflake = {
-      source  = "Snowflake-Labs/snowflake"
-      version = "~> 0.70"
-=======
       version = "3.22.0"
     }
     snowflake = {
@@ -58,7 +51,6 @@ terraform {
     azurerm = {
       source = "hashicorp/azurerm"
       version = "3.95.0"
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
     }
   }
 }
@@ -195,20 +187,12 @@ module "private_networking" {
 }
 
 module "sqs_sns" {
-<<<<<<< HEAD
-  count   = var.sqs_sns == true ? 1 : 0
-  source  = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
-  version = "1.1.2"
-  region  = var.region
-  label   = var.label
-=======
   count             = var.sqs_sns == true ? 1 : 0
   source            = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
   version           = "1.2.0"
   region            = var.region
   label             = var.label
   kms_master_key_id = module.kms_key.key.id
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 }
 
 module "kms_key" {
@@ -321,11 +305,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-<<<<<<< HEAD
-  version                    = "8.1.6"
-=======
   version                    = "8.1.7"
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
@@ -349,11 +329,7 @@ module "cluster" {
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
 }
 
-<<<<<<< HEAD
-module "readapi" {
-=======
 module "readapi_queue" {
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
   count = var.enable_readapi ? 1 : 0
   providers = {
     azurerm = azurerm.readapi
@@ -409,32 +385,7 @@ module "snowflake" {
   region                = var.region
   aws_account_name      = var.aws_account
 }
-
-<<<<<<< HEAD
-resource "aws_security_group" "indico_allow_access" {
-  name        = "${var.label}-allow-access"
-  description = "Promethues, Grafana"
-  vpc_id      = local.network[0].indico_vpc_id
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["35.174.218.89/32"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-# argo 
-=======
 # argo
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 provider "argocd" {
   server_addr = var.argo_host
   username    = var.argo_username
@@ -442,22 +393,28 @@ provider "argocd" {
 }
 
 provider "kubernetes" {
-  host                   = "https://154B4187CA263677ED45CB66395E9BED.gr7.us-east-2.eks.amazonaws.com"
-  cluster_ca_certificate = base64decode("LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJTmgvV1k2SFZ5cGN3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TXpBNU1qWXhOek14TVRaYUZ3MHpNekE1TWpNeE56TXhNVFphTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUUM1WVE1TXdrVzRWbHJXOHJZWXFVRW1pS3g5VXJWdmZlOEtTeU4zZVRkdmYydkJxVHhoa0E5TGhYWjUKQ2E1ZkkvS2F6K2FZVlBnL1doYkc1SnpobzJIVXZyRExhMWdBT3VpU2NYYjVLOWs4dGlDUHFSSEFmbHlXYlNzYQphdDN3VnRUTjZ2d2p6L2NNZHJiS2ZJTmlWWWY5azd6QytLTmc5eWo0b09iMW1yZ3JWRXd3R2dQaHBGWUthcFhwCldYQXhydkZDbEpaQ2FRUGlZT0xvMnNyY2ltWXQzNUdSalZ6b0E0Wk5URW94bmRDbVlZMDJ1MUFCNjRVaW1PSmoKOGs5UndZc1RRUndCRjZJOEFyUEpVNmRydDlJK3JiVFA2Y2Z0aHpVcTRndjkrN0lpWVlXODlRME9WT200OXp2aQorQ1dOOWcxV1RqSGlETlVWczMrNE1oQVdQYjg1QWdNQkFBR2pXVEJYTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQCkJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJUK0Rjb0FlYjNEcFdrODlYWkZGcnZlZlhjaWpUQVYKQmdOVkhSRUVEakFNZ2dwcmRXSmxjbTVsZEdWek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQjh0NTRycDI2agptYVpOVDNGU2ppV203UEh1Z0lzZVlxZERjZitra0NLbDVWWHdoSnR4LzRIRndnejNJUmtaMzk0b0I3aHhXS0tMCkRnZjlib0FsdHArTEN0enkwYzA2dDdpWU56MHp6a1U0ZUlQU1RJQUl5YUlvNWtiSzN6ZGUzdHNzMDZiaHp6aTQKOVNyYjdBMTNlM0hvTmlQc0tjeGtubVo4M0VIaEI2OHM3ZzdUcmtHbVNKVnk1YnhLRTZ3OTFGbjJudkd5cVBHVApKVzN3RUZUWlNQODVRWmtjVk4rK2RiaUJsVVNwcmQ5aWVHVGJyNlgxMzgzU25EVTNVWHlGRFBWZDZnVWMwMkFGCjFjN2FKUGhqRVdHN1JpWXVlQ0lwazQ0eHRuY09vV0c5aTBnUnBEdEM3VEpXeUphUEYvNGpLanlMeEo2L3orUisKV3d5Z0Nja0pZcFlqCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K")
-  token                  = "k8s-aws-v1.aHR0cHM6Ly9zdHMudXMtZWFzdC0yLmFtYXpvbmF3cy5jb20vP0FjdGlvbj1HZXRDYWxsZXJJZGVudGl0eSZWZXJzaW9uPTIwMTEtMDYtMTUmWC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBNTI3R01FMktHNzdSN0FIMyUyRjIwMjMxMDExJTJGdXMtZWFzdC0yJTJGc3RzJTJGYXdzNF9yZXF1ZXN0JlgtQW16LURhdGU9MjAyMzEwMTFUMjA1NzQ4WiZYLUFtei1FeHBpcmVzPTYwJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCUzQngtazhzLWF3cy1pZCZYLUFtei1TaWduYXR1cmU9N2Y3NTAyNTAyOTgwMDYxYjQzZjk5YTUxY2E1ODdmNGM3MmNlYTdjNTExMmJkMGVkNjE3OWFmNGNjZjQ2ZmM4Nw"
+  host                   = module.cluster.kubernetes_host
+  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
   #token                  = module.cluster.kubernetes_token
-  #exec {
-  #  api_version = "client.authentication.k8s.io/v1beta1"
-  #  args        = ["eks", "get-token", "--cluster-name", var.label]
-  #  command     = "aws"
-  #}
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", var.label]
+    command     = "aws"
+  }
 }
 
 provider "kubectl" {
-  host                   = "https://154B4187CA263677ED45CB66395E9BED.gr7.us-east-2.eks.amazonaws.com"
-  cluster_ca_certificate = base64decode("LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJTmgvV1k2SFZ5cGN3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TXpBNU1qWXhOek14TVRaYUZ3MHpNekE1TWpNeE56TXhNVFphTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUUM1WVE1TXdrVzRWbHJXOHJZWXFVRW1pS3g5VXJWdmZlOEtTeU4zZVRkdmYydkJxVHhoa0E5TGhYWjUKQ2E1ZkkvS2F6K2FZVlBnL1doYkc1SnpobzJIVXZyRExhMWdBT3VpU2NYYjVLOWs4dGlDUHFSSEFmbHlXYlNzYQphdDN3VnRUTjZ2d2p6L2NNZHJiS2ZJTmlWWWY5azd6QytLTmc5eWo0b09iMW1yZ3JWRXd3R2dQaHBGWUthcFhwCldYQXhydkZDbEpaQ2FRUGlZT0xvMnNyY2ltWXQzNUdSalZ6b0E0Wk5URW94bmRDbVlZMDJ1MUFCNjRVaW1PSmoKOGs5UndZc1RRUndCRjZJOEFyUEpVNmRydDlJK3JiVFA2Y2Z0aHpVcTRndjkrN0lpWVlXODlRME9WT200OXp2aQorQ1dOOWcxV1RqSGlETlVWczMrNE1oQVdQYjg1QWdNQkFBR2pXVEJYTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQCkJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJUK0Rjb0FlYjNEcFdrODlYWkZGcnZlZlhjaWpUQVYKQmdOVkhSRUVEakFNZ2dwcmRXSmxjbTVsZEdWek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQjh0NTRycDI2agptYVpOVDNGU2ppV203UEh1Z0lzZVlxZERjZitra0NLbDVWWHdoSnR4LzRIRndnejNJUmtaMzk0b0I3aHhXS0tMCkRnZjlib0FsdHArTEN0enkwYzA2dDdpWU56MHp6a1U0ZUlQU1RJQUl5YUlvNWtiSzN6ZGUzdHNzMDZiaHp6aTQKOVNyYjdBMTNlM0hvTmlQc0tjeGtubVo4M0VIaEI2OHM3ZzdUcmtHbVNKVnk1YnhLRTZ3OTFGbjJudkd5cVBHVApKVzN3RUZUWlNQODVRWmtjVk4rK2RiaUJsVVNwcmQ5aWVHVGJyNlgxMzgzU25EVTNVWHlGRFBWZDZnVWMwMkFGCjFjN2FKUGhqRVdHN1JpWXVlQ0lwazQ0eHRuY09vV0c5aTBnUnBEdEM3VEpXeUphUEYvNGpLanlMeEo2L3orUisKV3d5Z0Nja0pZcFlqCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K")
-  token                  = "k8s-aws-v1.aHR0cHM6Ly9zdHMudXMtZWFzdC0yLmFtYXpvbmF3cy5jb20vP0FjdGlvbj1HZXRDYWxsZXJJZGVudGl0eSZWZXJzaW9uPTIwMTEtMDYtMTUmWC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBNTI3R01FMktHNzdSN0FIMyUyRjIwMjMxMDExJTJGdXMtZWFzdC0yJTJGc3RzJTJGYXdzNF9yZXF1ZXN0JlgtQW16LURhdGU9MjAyMzEwMTFUMjA1NzQ4WiZYLUFtei1FeHBpcmVzPTYwJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCUzQngtazhzLWF3cy1pZCZYLUFtei1TaWduYXR1cmU9N2Y3NTAyNTAyOTgwMDYxYjQzZjk5YTUxY2E1ODdmNGM3MmNlYTdjNTExMmJkMGVkNjE3OWFmNGNjZjQ2ZmM4Nw"
+  host                   = module.cluster.kubernetes_host
+  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+  #token                  = module.cluster.kubernetes_token
+  load_config_file = false
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", var.label]
+    command     = "aws"
+  }
 }
+
 
 provider "aws" {
   access_key = var.indico_devops_aws_access_key_id
@@ -489,9 +446,14 @@ provider "kubectl" {
 provider "helm" {
   debug = true
   kubernetes {
-    host                   = "https://154B4187CA263677ED45CB66395E9BED.gr7.us-east-2.eks.amazonaws.com"
-    cluster_ca_certificate = base64decode("LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJTmgvV1k2SFZ5cGN3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TXpBNU1qWXhOek14TVRaYUZ3MHpNekE1TWpNeE56TXhNVFphTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUUM1WVE1TXdrVzRWbHJXOHJZWXFVRW1pS3g5VXJWdmZlOEtTeU4zZVRkdmYydkJxVHhoa0E5TGhYWjUKQ2E1ZkkvS2F6K2FZVlBnL1doYkc1SnpobzJIVXZyRExhMWdBT3VpU2NYYjVLOWs4dGlDUHFSSEFmbHlXYlNzYQphdDN3VnRUTjZ2d2p6L2NNZHJiS2ZJTmlWWWY5azd6QytLTmc5eWo0b09iMW1yZ3JWRXd3R2dQaHBGWUthcFhwCldYQXhydkZDbEpaQ2FRUGlZT0xvMnNyY2ltWXQzNUdSalZ6b0E0Wk5URW94bmRDbVlZMDJ1MUFCNjRVaW1PSmoKOGs5UndZc1RRUndCRjZJOEFyUEpVNmRydDlJK3JiVFA2Y2Z0aHpVcTRndjkrN0lpWVlXODlRME9WT200OXp2aQorQ1dOOWcxV1RqSGlETlVWczMrNE1oQVdQYjg1QWdNQkFBR2pXVEJYTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQCkJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJUK0Rjb0FlYjNEcFdrODlYWkZGcnZlZlhjaWpUQVYKQmdOVkhSRUVEakFNZ2dwcmRXSmxjbTVsZEdWek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQjh0NTRycDI2agptYVpOVDNGU2ppV203UEh1Z0lzZVlxZERjZitra0NLbDVWWHdoSnR4LzRIRndnejNJUmtaMzk0b0I3aHhXS0tMCkRnZjlib0FsdHArTEN0enkwYzA2dDdpWU56MHp6a1U0ZUlQU1RJQUl5YUlvNWtiSzN6ZGUzdHNzMDZiaHp6aTQKOVNyYjdBMTNlM0hvTmlQc0tjeGtubVo4M0VIaEI2OHM3ZzdUcmtHbVNKVnk1YnhLRTZ3OTFGbjJudkd5cVBHVApKVzN3RUZUWlNQODVRWmtjVk4rK2RiaUJsVVNwcmQ5aWVHVGJyNlgxMzgzU25EVTNVWHlGRFBWZDZnVWMwMkFGCjFjN2FKUGhqRVdHN1JpWXVlQ0lwazQ0eHRuY09vV0c5aTBnUnBEdEM3VEpXeUphUEYvNGpLanlMeEo2L3orUisKV3d5Z0Nja0pZcFlqCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K")
-    token                  = "k8s-aws-v1.aHR0cHM6Ly9zdHMudXMtZWFzdC0yLmFtYXpvbmF3cy5jb20vP0FjdGlvbj1HZXRDYWxsZXJJZGVudGl0eSZWZXJzaW9uPTIwMTEtMDYtMTUmWC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBNTI3R01FMktHNzdSN0FIMyUyRjIwMjMxMDExJTJGdXMtZWFzdC0yJTJGc3RzJTJGYXdzNF9yZXF1ZXN0JlgtQW16LURhdGU9MjAyMzEwMTFUMjA1NzQ4WiZYLUFtei1FeHBpcmVzPTYwJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCUzQngtazhzLWF3cy1pZCZYLUFtei1TaWduYXR1cmU9N2Y3NTAyNTAyOTgwMDYxYjQzZjk5YTUxY2E1ODdmNGM3MmNlYTdjNTExMmJkMGVkNjE3OWFmNGNjZjQ2ZmM4Nw"
+    host                   = module.cluster.kubernetes_host
+    cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+    #token                  = module.cluster.kubernetes_token
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      args        = ["eks", "get-token", "--cluster-name", var.label]
+      command     = "aws"
+    }
   }
 }
 
@@ -525,14 +487,8 @@ module "argo-registration" {
 
 locals {
   security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
-<<<<<<< HEAD
   cluster_name      = var.label
-  dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${var.aws_account}.indico.io") : var.domain_host
-  dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
-=======
   dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${var.aws_account}.${var.domain_suffix}") : var.domain_host
-  #dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
->>>>>>> 6edf13be4639e314fc3bb3529c63d6b853edd017
 }
 
 
