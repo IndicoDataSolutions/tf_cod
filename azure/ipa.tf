@@ -1063,6 +1063,8 @@ resource "helm_release" "external-secrets" {
   values = [<<EOF
     image:
       repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+    certController:
+    webhook:
   EOF
   ]
 }
