@@ -1064,7 +1064,11 @@ resource "helm_release" "external-secrets" {
     image:
       repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
     certController:
+      image:
+        repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
     webhook:
+      image:
+        repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
   EOF
   ]
 }
