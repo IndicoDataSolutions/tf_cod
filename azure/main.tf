@@ -254,7 +254,7 @@ module "networking" {
   ]
   source               = "app.terraform.io/indico/indico-azure-network/mod"
   network_type         = var.network_type
-  version              = "4.0.1"
+  version              = "4.0.2"
   label                = var.label
   vnet_cidr            = var.vnet_cidr
   subnet_cidrs         = var.subnet_cidrs

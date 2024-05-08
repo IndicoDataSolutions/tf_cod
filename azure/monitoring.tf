@@ -1,4 +1,13 @@
 locals {
+  private_dns_config = var.private_dns_zone == true ? (<<EOT
+  ingress-nginx:
+    service:
+      annotations:
+        service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+        service.beta.kubernetes.io/azure-load-balancer-internal-subnet: ${module.networking.subnet_name}
+  EOT
+  ) : ""
+
   thanos_config = var.thanos_enabled == true ? (<<EOT
       thanos: # this is the one being used
         blockSize: 5m
@@ -274,6 +283,8 @@ ${local.alerting_configuration_values}
 kube-prometheus-stack:
 ${local.kube_prometheus_stack_values}
 EOF
+    ,
+    local.private_dns_config
   ]
 }
 
