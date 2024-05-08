@@ -285,7 +285,9 @@ kube-prometheus-stack:
 ${local.kube_prometheus_stack_values}
 EOF
     ,
-    local.private_dns_config
+    <<EOF
+${local.private_dns_config}
+    EOF
   ]
 }
 
