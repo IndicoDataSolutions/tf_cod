@@ -2,7 +2,7 @@ locals {
   private_dns_config = var.private_dns_zone == true ? (<<EOT
 
 ingress-nginx:
-  controller
+  controller:
     service:
       annotations:
         service.beta.kubernetes.io/azure-load-balancer-internal: "true"
