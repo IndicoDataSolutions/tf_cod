@@ -18,15 +18,15 @@ resource "azuread_service_principal" "workload_identity" {
 }
 
 resource "azurerm_role_assignment" "dns-zone-contributor" {
-  count                = var.use_workload_identity == true ? 1 : 0
-  scope                = local.dns_zone.id
+  count                = var.use_workload_identity == true && var.private_dns_zone != true ? 1 : 0
+  scope                = data.azurerm_dns_zone.domain.0.id
   role_definition_name = "Contributor"
   principal_id         = resource.azuread_service_principal.workload_identity.0.object_id
 }
 
 resource "azurerm_role_assignment" "dns-zone-dns-zone-contributor" {
-  count                = var.use_workload_identity == true ? 1 : 0
-  scope                = local.dns_zone.id
+  count                = var.use_workload_identity == true && var.private_dns_zone != true ? 1 : 0
+  scope                = data.azurerm_dns_zone.domain.0.id
   role_definition_name = "DNS Zone Contributor"
   principal_id         = resource.azuread_service_principal.workload_identity.0.object_id
 }

@@ -237,9 +237,6 @@ resource "helm_release" "ipa-crds" {
     enabled: false
 
   cert-manager:    
-    #dns01RecursiveNameserversOnly: true
-    #dns01RecursiveNameservers: "$#{local.dns_zone.name_servers[0]}:53,$#{local.dns_zone.name_servers[1]}:53,$#{local.dns_zone.name_servers[2]}:53,$#{local.dns_zone.name_servers[3]}:53"
-
     nodeSelector:
       kubernetes.io/os: linux
     webhook:
@@ -426,11 +423,11 @@ resource "helm_release" "crunchy-postgres" {
 }
 
 resource "azurerm_role_assignment" "external_dns" {
-  count = var.is_azure == true && var.is_openshift == false && var.include_external_dns == true ? 1 : 0
+  count = var.is_azure == true && var.is_openshift == false && var.private_dns_zone != true ? 1 : 0
   depends_on = [
     module.cluster
   ]
-  scope                            = local.dns_zone.id
+  scope                            = data.azurerm_dns_zone.domain.0.id
   role_definition_name             = "DNS Zone Contributor"
   principal_id                     = module.cluster.kubelet_identity.object_id
   skip_service_principal_aad_check = true
@@ -590,7 +587,7 @@ clusterIssuer:
     - dns01:
         azureDNS:
           environment: AzurePublicCloud
-          hostedZoneName: ${local.dns_zone.name}
+          hostedZoneName: ${local.base_domain}
           managedIdentity:
             clientID: ${module.cluster.kubelet_identity.client_id}
           resourceGroupName: ${var.common_resource_group}
