@@ -218,7 +218,7 @@ output "monitoring-password" {
   value     = random_password.monitoring-password.result
 }
 
-resource "azurerm_role_assignment" "example" {
+resource "azurerm_role_assignment" "private_dns_contributor" {
   count                = var.private_dns_zone ? 1 : 0
   scope                = module.networking.vnet_id
   role_definition_name = "Private DNS Zone Contributor"
@@ -235,7 +235,8 @@ resource "helm_release" "monitoring" {
     azurerm_dns_caa_record.alertmanager-caa,
     azurerm_dns_caa_record.grafana-caa,
     azurerm_dns_caa_record.prometheus-caa,
-    time_sleep.wait_1_minutes_after_pre_reqs
+    time_sleep.wait_1_minutes_after_pre_reqs,
+    azurerm_role_assignment.private_dns_contributor
   ]
 
   verify           = false
