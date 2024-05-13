@@ -221,7 +221,7 @@ output "monitoring-password" {
 resource "azurerm_role_assignment" "private_dns_contributor" {
   count                = var.private_dns_zone ? 1 : 0
   scope                = module.networking.vnet_id
-  role_definition_name = "Private DNS Zone Contributor"
+  role_definition_name = "Network Contributor"
   principal_id         = module.cluster.principal_id
 }
 
