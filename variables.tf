@@ -839,3 +839,9 @@ variable "enable_s3_backup" {
   default     = true
   description = "Allow backing up data bucket on s3"
 }
+
+variable "s3_endpoint_enabled" {
+  type        = bool
+  default     = false
+  description = "If set to true, an S3 VPC endpoint will be created. If this variable is set, the `region` variable must also be set"
+}

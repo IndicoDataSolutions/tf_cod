@@ -141,6 +141,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     harness_delegate_replicas = "${jsonencode(var.harness_delegate_replicas)}"
     harness_mount_path = "${jsonencode(var.harness_mount_path)}"
     enable_s3_backup = "${jsonencode(var.enable_s3_backup)}"
+    s3_endpoint_enabled = "${jsonencode(var.s3_endpoint_enabled)}"
 
     }
   }
