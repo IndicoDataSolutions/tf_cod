@@ -169,7 +169,7 @@ resource "aws_key_pair" "kp" {
 module "public_networking" {
   count                = var.direct_connect == true ? 0 : 1
   source               = "app.terraform.io/indico/indico-aws-network/mod"
-  version              = "1.2.1"
+  version              = "1.2.2"
   label                = var.label
   vpc_cidr             = var.vpc_cidr
   private_subnet_cidrs = var.private_subnet_cidrs
