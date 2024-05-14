@@ -49,7 +49,7 @@ terraform {
       version = "1.0.4"
     }
     azurerm = {
-      source = "hashicorp/azurerm"
+      source  = "hashicorp/azurerm"
       version = "3.95.0"
     }
   }
@@ -175,6 +175,8 @@ module "public_networking" {
   private_subnet_cidrs = var.private_subnet_cidrs
   public_subnet_cidrs  = var.public_subnet_cidrs
   subnet_az_zones      = var.subnet_az_zones
+  region               = var.region
+  s3_endpoint_enabled  = var.s3_endpoint_enabled
 }
 
 module "private_networking" {
