@@ -169,7 +169,7 @@ resource "aws_key_pair" "kp" {
 module "public_networking" {
   count                = var.direct_connect == true ? 0 : 1
   source               = "app.terraform.io/indico/indico-aws-network/mod"
-  version              = "1.2.0"
+  version              = "1.2.1"
   label                = var.label
   vpc_cidr             = var.vpc_cidr
   private_subnet_cidrs = var.private_subnet_cidrs
@@ -329,6 +329,7 @@ module "cluster" {
   cluster_version            = var.k8s_version
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
+  private_endpoint_enabled   = true
 }
 
 module "readapi_queue" {
