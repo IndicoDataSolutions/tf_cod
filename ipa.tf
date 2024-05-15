@@ -797,7 +797,7 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
 
 output "harbor-api-token" {
   sensitive = true
-  value     = jsondecode(data.vault_kv_secret_v2.harbor-api-token[0].data_json)["bearer_token"]
+  value     = var.argo_enabled ? jsondecode(data.vault_kv_secret_v2.harbor-api-token[0].data_json)["bearer_token"] : ""
 }
 
 output "smoketest_chart_version" {
