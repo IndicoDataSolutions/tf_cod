@@ -104,6 +104,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     aws_primary_dns_role_arn = "${jsonencode(var.aws_primary_dns_role_arn)}"
     is_alternate_account_domain = "${jsonencode(var.is_alternate_account_domain)}"
     domain_suffix = "${jsonencode(var.domain_suffix)}"
+    domain_suffixx = "${jsonencode(var.domain_suffixx)}"
     domain_host = "${jsonencode(var.domain_host)}"
     alerting_enabled = "${jsonencode(var.alerting_enabled)}"
     alerting_slack_enabled = "${jsonencode(var.alerting_slack_enabled)}"
