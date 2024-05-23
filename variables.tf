@@ -600,13 +600,6 @@ variable "domain_suffix" {
   description = "Domain suffix"
 }
 
-variable "domain_suffixx" {
-  type        = string
-  default     = "indico.io"
-  description = "Domain suffix"
-}
-
-
 variable "domain_host" {
   type        = string
   default     = ""
