@@ -200,7 +200,7 @@ variable "svp_client_secret" {
 
 variable "k8s_version" {
   type        = string
-  default     = "1.27.3"
+  default     = "1.29"
   description = "The version of the kubernetes cluster"
 }
 
@@ -306,7 +306,7 @@ variable "monitoring_enabled" {
 
 variable "keda_version" {
   type        = string
-  default     = "2.11.2"
+  default     = "2.13.2"
   description = "Version of keda helm chart"
 }
 
@@ -687,11 +687,65 @@ variable "sentinel_workspace_resource_group_name" {
   default = null # "${var.account}-sentinel-group"
 }
 
+
 variable "image_registry" {
   type = string
   default = "harbor.devops.indico.io"
   description = "docker image registry to use for pulling images."
 }
+
+variable "sentinel_workspace_id" {
+  type    = string
+  default = null
+}
+
+### cluster manager variables
+variable "cluster_manager_vm_size" {
+  type        = string
+  default     = "Standard_Fs_v2"
+  description = "The cluster manager instance size"
+}
+
+variable "network_type" {
+  type    = string
+  default = "create"
+}
+
+variable "network_resource_group_name" {
+  type    = string
+  default = null
+}
+
+variable "virtual_network_name" {
+  default = null
+  type    = string
+}
+
+variable "virtual_subnet_name" {
+  default = null
+  type    = string
+}
+
+variable "keyvault_name" {
+  default = null
+  type    = string
+}
+
+variable "network_plugin" {
+  default = "kubenet"
+  type    = string
+}
+
+variable "enable_custom_cluster_issuer" {
+  default = false
+  type    = bool
+}
+
+variable "custom_cluster_issuer_spec" {
+  default = ""
+  type    = string
+}
+
 
 variable "secrets_operator_enabled" {
   type = bool

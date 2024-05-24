@@ -153,12 +153,14 @@ resource "aws_key_pair" "kp" {
 module "public_networking" {
   count                = var.direct_connect == false && var.network_module == "public_networking" ? 1 : 0
   source               = "app.terraform.io/indico/indico-aws-network/mod"
-  version              = "1.2.0"
+  version              = "1.2.2"
   label                = var.label
   vpc_cidr             = var.vpc_cidr
   private_subnet_cidrs = var.private_subnet_cidrs
   public_subnet_cidrs  = var.public_subnet_cidrs
   subnet_az_zones      = var.subnet_az_zones
+  region               = var.region
+  s3_endpoint_enabled  = var.s3_endpoint_enabled
 }
 
 module "networking" {
@@ -306,7 +308,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "8.1.7"
+  version                    = "8.1.8"
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region

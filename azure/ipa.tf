@@ -500,6 +500,31 @@ resource "kubectl_manifest" "thanos-storage-secret" {
   YAML
 }
 
+
+resource "kubectl_manifest" "custom-cluster-issuer" {
+  count = var.enable_custom_cluster_issuer == true ? 1 : 0
+  depends_on = [
+    time_sleep.wait_1_minutes_after_crds,
+    module.cluster,
+    module.storage,
+    helm_release.ipa-crds,
+    data.vault_kv_secret_v2.zerossl_data,
+    kubernetes_secret.azure_storage_key,
+    kubernetes_config_map.azure_dns_credentials,
+    kubernetes_service_account.workload_identity,
+    data.github_repository_file.data-pre-reqs-values
+  ]
+  yaml_body = <<YAML
+    apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    metadata:
+      name: zerossl
+    spec: |
+      ${indent(6, var.custom_cluster_issuer_spec)} 
+  YAML
+}
+
+
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
     time_sleep.wait_1_minutes_after_crds,
@@ -556,7 +581,7 @@ secrets:
 
   clusterIssuer:
     zerossl:
-      create: true
+      create: ${var.enable_custom_cluster_issuer == false ? true : false}
       eabEmail: devops-sa@indico.io
       eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"

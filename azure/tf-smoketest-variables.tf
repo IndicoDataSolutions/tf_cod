@@ -112,7 +112,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     sentinel_workspace_resource_group_name = "${jsonencode(var.sentinel_workspace_resource_group_name)}"
     image_registry = "${jsonencode(var.image_registry)}"
     secrets_operator_enabled = "${jsonencode(var.secrets_operator_enabled)}"
-
     }
   }
   
