@@ -40,10 +40,6 @@ terraform {
       source  = "hashicorp/vault"
       version = "3.22.0"
     }
-    snowflake = {
-      source  = "Snowflake-Labs/snowflake"
-      version = "0.73.0"
-    }
     htpasswd = {
       source  = "loafoe/htpasswd"
       version = "1.0.4"
@@ -119,18 +115,6 @@ provider "azurerm" {
   tenant_id       = var.azure_indico_io_tenant_id
 }
 
-data "vault_kv_secret_v2" "terraform-snowflake" {
-  mount = var.terraform_vault_mount_path
-  name  = "snowflake"
-}
-
-provider "snowflake" {
-  role        = "ACCOUNTADMIN"
-  username    = var.snowflake_username
-  account     = var.snowflake_account
-  region      = var.snowflake_region
-  private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
-}
 
 provider "htpasswd" {}
 
@@ -386,22 +370,6 @@ resource "kubernetes_secret" "readapi" {
     storage_queue_name            = module.readapi_queue[0].storage_queue_name
     QUEUE_CONNECTION_STRING       = module.readapi_queue[0].storage_connection_string
   }
-}
-
-module "snowflake" {
-  count                 = var.enable_weather_station == true ? 1 : 0
-  version               = "2.2.0"
-  source                = "app.terraform.io/indico/indico-aws-snowflake/mod"
-  label                 = var.label
-  additional_tags       = var.additional_tags
-  snowflake_db_name     = var.snowflake_db_name
-  kms_key_arn           = module.kms_key.key_arn
-  s3_bucket_name        = module.s3-storage.data_s3_bucket_name
-  snowflake_private_key = jsondecode(data.vault_kv_secret_v2.terraform-snowflake.data_json)["snowflake_private_key"]
-  snowflake_account     = var.snowflake_account
-  snowflake_username    = var.snowflake_username
-  region                = var.region
-  aws_account_name      = var.aws_account
 }
 
 # argo
