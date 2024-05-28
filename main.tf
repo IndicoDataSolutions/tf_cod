@@ -348,7 +348,7 @@ locals {
 }
 
 data "vault_kv_secret_v2" "readapi_secret" {
-  mount = var.readapi_customer != null ? "customer-${var.aws_account}" : "customer-${var.readapi_customer}"
+  mount = var.readapi_customer != null ? "customer-${var.readapi_customer}" : "customer-${var.aws_account}"
   name  = local.readapi_secret_path
 }
 
