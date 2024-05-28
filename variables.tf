@@ -911,3 +911,9 @@ variable "dns_zone_name" {
   default = ""
   description = "Name of the dns zone used to control DNS"
 }
+
+variable "readapi_customer" {
+  type = string
+  default = null
+  description = "Name of the customer readapi is being deployed in behalf."
+}

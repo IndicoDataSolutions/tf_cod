@@ -152,6 +152,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     enable_firewall = "${jsonencode(var.enable_firewall)}"
     firewall_allow_list = "${jsonencode(var.firewall_allow_list)}"
     dns_zone_name = "${jsonencode(var.dns_zone_name)}"
+    readapi_customer = "${jsonencode(var.readapi_customer)}"
 
     }
   }
