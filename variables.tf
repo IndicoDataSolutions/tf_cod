@@ -907,7 +907,7 @@ variable "firewall_allow_list" {
 }
 
 variable "dns_zone_name" {
-  type = "string"
+  type = string
   default = ""
   description = "Name of the dns zone used to control DNS"
 }
