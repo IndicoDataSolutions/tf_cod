@@ -884,8 +884,8 @@ variable "image_registry" {
 }
 
 variable "secrets_operator_enabled" {
-  type = bool
-  default = true
+  type        = bool
+  default     = true
   description = "Use to enable the secrets operator which is used for maintaining thanos connection"
 }
 
@@ -896,24 +896,24 @@ variable "firewall_subnet_cidrs" {
 }
 
 variable "enable_firewall" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "If enabled this will create firewall and internet gateway"
 }
 
 variable "firewall_allow_list" {
-  type = list(string)
+  type    = list(string)
   default = [".cognitiveservices.azure.com"]
 }
 
 variable "dns_zone_name" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "Name of the dns zone used to control DNS"
 }
 
 variable "readapi_customer" {
-  type = string
-  default = null
+  type        = string
+  default     = null
   description = "Name of the customer readapi is being deployed in behalf."
 }

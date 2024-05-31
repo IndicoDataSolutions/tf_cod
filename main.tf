@@ -331,6 +331,7 @@ module "cluster" {
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
   private_endpoint_enabled   = var.network_allow_public == true ? false : true
+  public_endpoint_enabled    = var.network_allow_public == true ? true : false
 }
 
 module "readapi_queue" {
@@ -475,7 +476,7 @@ module "argo-registration" {
 
 locals {
   security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
-  dns_zone_name          = var.dns_zone_name == "" ? lower("${var.aws_account}.${var.domain_suffix}") : var.dns_zone_name
+  dns_zone_name     = var.dns_zone_name == "" ? lower("${var.aws_account}.${var.domain_suffix}") : var.dns_zone_name
   dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${local.dns_zone_name}") : var.domain_host
   #dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
 }

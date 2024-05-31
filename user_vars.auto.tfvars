@@ -106,5 +106,5 @@ include_rox                 = false
 include_fsx                 = false
 include_efs                 = true
 #cluster
-az_count = 2
+az_count            = 2
 s3_endpoint_enabled = true
