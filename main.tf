@@ -267,7 +267,7 @@ module "efs-storage" {
   version            = "0.0.1"
   label              = var.label
   additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage" })
-  security_groups    = [module.security-group.all_subnets_sg_id]
+  security_groups    = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
   private_subnet_ids = flatten([local.network[0].private_subnet_ids])
   kms_key_arn        = module.kms_key.key_arn
 
@@ -280,7 +280,7 @@ module "efs-storage-local-registry" {
   version            = "0.0.1"
   label              = "${var.label}-local-registry"
   additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage-local-registry" })
-  security_groups    = [module.security-group.all_subnets_sg_id]
+  security_groups    = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
   private_subnet_ids = flatten([local.network[0].private_subnet_ids])
   kms_key_arn        = module.kms_key.key_arn
 }
@@ -294,7 +294,7 @@ module "fsx-storage" {
   region                      = var.region
   storage_capacity            = var.storage_capacity
   subnet_id                   = local.network[0].private_subnet_ids[0]
-  security_group_id           = module.security-group.all_subnets_sg_id
+  security_group_id           = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
   data_bucket                 = module.s3-storage.data_s3_bucket_name
   api_models_bucket           = module.s3-storage.api_models_s3_bucket_name
   kms_key                     = module.kms_key.key
@@ -303,7 +303,6 @@ module "fsx-storage" {
 }
 
 module "cluster" {
-  depends_on                            = [module.security-group.all_subnets_sg_id]
   cod_snapshots_enabled                 = true
   allow_dns_management                  = true
   aws_account_name                      = var.aws_account
@@ -315,8 +314,8 @@ module "cluster" {
   region                                = var.region
   map_users                             = values(local.eks_users)
   vpc_id                                = local.network[0].indico_vpc_id
-  security_group_id                     = module.security-group.all_subnets_sg_id
-  cluster_additional_security_group_ids = [module.security-group.all_subnets_sg_id]
+  security_group_id                     = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  cluster_additional_security_group_ids = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
   subnet_ids                            = flatten([local.network[0].private_subnet_ids])
   node_groups                           = var.node_groups
   cluster_node_policies                 = var.cluster_node_policies
