@@ -203,7 +203,7 @@ module "kms_key" {
 
 module "security-group" {
   source       = "app.terraform.io/indico/indico-aws-security-group/mod"
-  version      = "2.0.0"
+  version      = var.network_module == "networking" ? "2.0.0" : "1.0.0"
   label        = var.label
   region       = var.region
   vpc_cidr     = var.vpc_cidr
@@ -303,35 +303,37 @@ module "fsx-storage" {
 }
 
 module "cluster" {
-  cod_snapshots_enabled      = true
-  allow_dns_management       = true
-  aws_account_name           = var.aws_account
-  oidc_enabled               = false
-  source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "8.1.8"
-  label                      = var.label
-  additional_tags            = var.additional_tags
-  region                     = var.region
-  map_users                  = values(local.eks_users)
-  vpc_id                     = local.network[0].indico_vpc_id
-  security_group_id          = module.security-group.all_subnets_sg_id
-  subnet_ids                 = flatten([local.network[0].private_subnet_ids])
-  node_groups                = var.node_groups
-  cluster_node_policies      = var.cluster_node_policies
-  eks_cluster_iam_role       = var.eks_cluster_iam_role
-  eks_cluster_nodes_iam_role = "${var.label}-${var.region}-node-role"
-  fsx_arns                   = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
-  kms_key_arn                = module.kms_key.key_arn
-  az_count                   = var.az_count
-  key_pair                   = aws_key_pair.kp.key_name
-  snapshot_id                = var.snapshot_id
-  default_tags               = var.default_tags
-  s3_buckets                 = [module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : ""]
-  cluster_version            = var.k8s_version
-  efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
-  aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
-  private_endpoint_enabled   = var.network_allow_public == true ? false : true
-  public_endpoint_enabled    = var.network_allow_public == true ? true : false
+  depends_on                            = [module.security-group.all_subnets_sg_id]
+  cod_snapshots_enabled                 = true
+  allow_dns_management                  = true
+  aws_account_name                      = var.aws_account
+  oidc_enabled                          = false
+  source                                = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
+  version                               = "8.1.8"
+  label                                 = var.label
+  additional_tags                       = var.additional_tags
+  region                                = var.region
+  map_users                             = values(local.eks_users)
+  vpc_id                                = local.network[0].indico_vpc_id
+  security_group_id                     = module.security-group.all_subnets_sg_id
+  cluster_additional_security_group_ids = [module.security-group.all_subnets_sg_id]
+  subnet_ids                            = flatten([local.network[0].private_subnet_ids])
+  node_groups                           = var.node_groups
+  cluster_node_policies                 = var.cluster_node_policies
+  eks_cluster_iam_role                  = var.eks_cluster_iam_role
+  eks_cluster_nodes_iam_role            = "${var.label}-${var.region}-node-role"
+  fsx_arns                              = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
+  kms_key_arn                           = module.kms_key.key_arn
+  az_count                              = var.az_count
+  key_pair                              = aws_key_pair.kp.key_name
+  snapshot_id                           = var.snapshot_id
+  default_tags                          = var.default_tags
+  s3_buckets                            = [module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : ""]
+  cluster_version                       = var.k8s_version
+  efs_filesystem_id                     = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
+  aws_primary_dns_role_arn              = var.aws_primary_dns_role_arn
+  private_endpoint_enabled              = var.network_allow_public == true ? false : true
+  public_endpoint_enabled               = var.network_allow_public == true ? true : false
 }
 
 module "readapi_queue" {
