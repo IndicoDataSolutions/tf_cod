@@ -203,7 +203,7 @@ module "kms_key" {
 
 module "security-group" {
   source       = "app.terraform.io/indico/indico-aws-security-group/mod"
-  version      = var.network_module == "networking" ? "2.0.0" : "1.0.0"
+  version      = "2.0.0"
   label        = var.label
   region       = var.region
   vpc_cidr     = var.vpc_cidr
