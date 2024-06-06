@@ -202,16 +202,11 @@ module "kms_key" {
 }
 
 module "security-group" {
-  source       = "app.terraform.io/indico/indico-aws-security-group/mod"
-  version      = "2.0.0"
-  label        = var.label
-  region       = var.region
-  vpc_cidr     = var.vpc_cidr
-  vpc_id       = local.network[0].indico_vpc_id
-  sg_type      = var.sg_type
-  sg_tag_name  = var.sg_tag_name
-  sg_tag_value = var.sg_tag_value
-
+  source   = "app.terraform.io/indico/indico-aws-security-group/mod"
+  version  = "1.0.0"
+  label    = var.label
+  vpc_cidr = var.vpc_cidr
+  vpc_id   = local.network[0].indico_vpc_id
 }
 
 

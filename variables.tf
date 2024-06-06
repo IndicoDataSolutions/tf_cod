@@ -825,16 +825,6 @@ variable "network_type" {
   }
 }
 
-variable "sg_type" {
-  type    = string
-  default = "load"
-
-  validation {
-    condition     = var.sg_type == "create" || var.sg_type == "load"
-    error_message = "${var.sg_type} not valid. Type must be either create or load"
-  }
-}
-
 variable "load_vpc_id" {
   type        = string
   default     = ""

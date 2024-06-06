@@ -137,7 +137,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     network_allow_public = "${jsonencode(var.network_allow_public)}"
     network_module = "${jsonencode(var.network_module)}"
     network_type = "${jsonencode(var.network_type)}"
-    sg_type = "${jsonencode(var.sg_type)}"
     load_vpc_id = "${jsonencode(var.load_vpc_id)}"
     private_subnet_tag_name = "${jsonencode(var.private_subnet_tag_name)}"
     private_subnet_tag_value = "${jsonencode(var.private_subnet_tag_value)}"
