@@ -310,7 +310,7 @@ module "cluster" {
   map_users                             = values(local.eks_users)
   vpc_id                                = local.network[0].indico_vpc_id
   security_group_id                     = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
-  cluster_additional_security_group_ids = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
+  cluster_additional_security_group_ids = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : []
   subnet_ids                            = flatten([local.network[0].private_subnet_ids])
   node_groups                           = var.node_groups
   cluster_node_policies                 = var.cluster_node_policies

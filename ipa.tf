@@ -1424,6 +1424,7 @@ spec:
                 ${indent(14, local.runtime_scanner_ingress_values)}
             celery-flower:
               image:
+              
                 repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/flower
             aws-node-termination:
               aws-node-termination-handler:
