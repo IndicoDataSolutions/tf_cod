@@ -115,7 +115,6 @@ provider "azurerm" {
   tenant_id       = var.azure_indico_io_tenant_id
 }
 
-
 provider "htpasswd" {}
 
 data "aws_caller_identity" "current" {}

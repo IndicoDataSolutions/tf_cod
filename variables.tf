@@ -576,6 +576,12 @@ variable "terraform_vault_mount_path" {
   default = "terraform"
 }
 
+variable "enable_weather_station" {
+  type        = bool
+  default     = false
+  description = "whether or not to enable the weather station internal metrics collection service"
+}
+
 variable "aws_primary_dns_role_arn" {
   type        = string
   default     = ""

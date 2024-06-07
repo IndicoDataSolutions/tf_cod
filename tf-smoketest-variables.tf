@@ -100,6 +100,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     enable_waf = "${jsonencode(var.enable_waf)}"
     vault_mount_path = "${jsonencode(var.vault_mount_path)}"
     terraform_vault_mount_path = "${jsonencode(var.terraform_vault_mount_path)}"
+    enable_weather_station = "${jsonencode(var.enable_weather_station)}"
     aws_primary_dns_role_arn = "${jsonencode(var.aws_primary_dns_role_arn)}"
     is_alternate_account_domain = "${jsonencode(var.is_alternate_account_domain)}"
     domain_suffix = "${jsonencode(var.domain_suffix)}"
