@@ -44,10 +44,6 @@ terraform {
       source  = "loafoe/htpasswd"
       version = "1.0.4"
     }
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "3.95.0"
-    }
   }
 }
 
@@ -93,26 +89,6 @@ provider "aws" {
   default_tags {
     tags = var.default_tags
   }
-}
-
-
-
-provider "azurerm" {
-  features {}
-  alias           = "readapi"
-  client_id       = var.azure_readapi_client_id
-  client_secret   = var.azure_readapi_client_secret
-  subscription_id = var.azure_readapi_subscription_id
-  tenant_id       = var.azure_readapi_tenant_id
-}
-
-provider "azurerm" {
-  features {}
-  alias           = "indicoio"
-  client_id       = var.azure_indico_io_client_id
-  client_secret   = var.azure_indico_io_client_secret
-  subscription_id = var.azure_indico_io_subscription_id
-  tenant_id       = var.azure_indico_io_tenant_id
 }
 
 provider "htpasswd" {}
@@ -329,16 +305,6 @@ module "cluster" {
   public_endpoint_enabled               = var.network_allow_public == true ? true : false
 }
 
-module "readapi_queue" {
-  count = var.enable_readapi ? 1 : 0
-  providers = {
-    azurerm = azurerm.readapi
-  }
-  source       = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
-  version      = "1.0.0"
-  readapi_name = lower("${var.aws_account}-${var.label}-s")
-}
-
 locals {
   readapi_secret_path = var.environment == "production" ? "prod-readapi" : "dev-readapi"
 }
@@ -362,11 +328,6 @@ resource "kubernetes_secret" "readapi" {
     READAPI_COMPUTER_VISION_KEY   = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
     READAPI_FORM_RECOGNITION_HOST = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_url"]
     READAPI_FORM_RECOGNITION_KEY  = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_key"]
-    storage_account_name          = module.readapi_queue[0].storage_account_name
-    storage_account_id            = module.readapi_queue[0].storage_account_id
-    storage_account_access_key    = module.readapi_queue[0].storage_account_access_key
-    storage_queue_name            = module.readapi_queue[0].storage_queue_name
-    QUEUE_CONNECTION_STRING       = module.readapi_queue[0].storage_connection_string
   }
 }
 
@@ -484,7 +445,7 @@ data "aws_route53_zone" "primary" {
 
 
 resource "aws_route53_record" "ipa-app-caa" {
-  count   = var.is_alternate_account_domain == "true" ? 0 : 1
+  count   = var.is_alternate_account_domain == "true" || var.use_static_ssl_certificates ? 0 : 1
   zone_id = data.aws_route53_zone.primary.zone_id
   name    = local.dns_name
   type    = "CAA"
