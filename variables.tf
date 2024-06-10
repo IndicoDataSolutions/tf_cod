@@ -805,6 +805,12 @@ variable "enable_s3_backup" {
   description = "Allow backing up data bucket on s3"
 }
 
+variable "cluster_api_endpoint_public" {
+  type        = bool
+  default     = true
+  description = "If enabled this allow public access to the cluster api endpoint."
+}
+
 variable "network_allow_public" {
   type        = bool
   default     = true

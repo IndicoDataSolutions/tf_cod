@@ -301,8 +301,8 @@ module "cluster" {
   cluster_version                       = var.k8s_version
   efs_filesystem_id                     = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
   aws_primary_dns_role_arn              = var.aws_primary_dns_role_arn
-  private_endpoint_enabled              = var.network_allow_public == true ? false : true
-  public_endpoint_enabled               = var.network_allow_public == true ? true : false
+  private_endpoint_enabled              = var.cluster_api_endpoint_public == true ? false : true
+  public_endpoint_enabled               = var.cluster_api_endpoint_public == true ? true : false
 }
 
 locals {
