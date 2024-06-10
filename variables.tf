@@ -919,3 +919,9 @@ variable "readapi_customer" {
   default     = null
   description = "Name of the customer readapi is being deployed in behalf."
 }
+
+variable "create_guardduty_vpc_endpoint" {
+  type = bool
+  default = true
+  description = "If true this will create a vpc endpoint for guardduty."
+}

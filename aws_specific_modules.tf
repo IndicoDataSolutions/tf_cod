@@ -35,6 +35,7 @@ data "aws_vpc_endpoint_service" "guardduty" {
 }
 
 resource "aws_vpc_endpoint" "eks_vpc_guardduty" {
+  count = var.create_guardduty_vpc_endpoint ? 1 : 0
   vpc_id            = local.network[0].indico_vpc_id
   service_name      = data.aws_vpc_endpoint_service.guardduty.service_name
   vpc_endpoint_type = "Interface"
