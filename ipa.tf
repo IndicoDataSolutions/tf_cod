@@ -242,7 +242,7 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 }
 
 output "ns" {
-  value = data.aws_route53_zone.primary[0].name_servers
+  value = var.use_static_ssl_certificates ? "no-hosted-zone" : data.aws_route53_zone.primary[0].name_servers
 }
 
 
