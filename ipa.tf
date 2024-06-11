@@ -105,6 +105,8 @@ app-edge:
   alternateDomain: ""
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}"}/indico
+    ingress:
+      useStaticCertificate: ${var.use_static_ssl_certificates}
 EOT
   )
   dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT
