@@ -439,6 +439,7 @@ locals {
 
 
 data "aws_route53_zone" "primary" {
+  count = var.use_static_ssl_certificates ? 0 : 1
   name     = var.is_alternate_account_domain == "false" ? local.dns_zone_name : lower(local.alternate_domain_root)
   provider = aws.dns-control
 }
@@ -446,7 +447,7 @@ data "aws_route53_zone" "primary" {
 
 resource "aws_route53_record" "ipa-app-caa" {
   count   = var.is_alternate_account_domain == "true" || var.use_static_ssl_certificates ? 0 : 1
-  zone_id = data.aws_route53_zone.primary.zone_id
+  zone_id = data.aws_route53_zone[0].primary.zone_id
   name    = local.dns_name
   type    = "CAA"
   ttl     = 300

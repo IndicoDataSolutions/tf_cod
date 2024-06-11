@@ -240,7 +240,7 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 }
 
 output "ns" {
-  value = data.aws_route53_zone.primary.name_servers
+  value = data.aws_route53_zone[0].primary.name_servers
 }
 
 

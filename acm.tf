@@ -27,7 +27,7 @@ resource "aws_route53_record" "alb" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.primary.zone_id
+  zone_id         = data.aws_route53_zone[0].primary.zone_id
   provider        = aws.dns-control
 }
 
