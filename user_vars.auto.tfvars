@@ -58,6 +58,15 @@ node_groups = {
     desired_capacity = "0"
     taints           = "--register-with-taints=indico.io/highmem=true:NoSchedule"
   },
+  readapi-servers = {
+    min_size         = 0
+    max_size         = 3
+    instance_types   = ["m5.2xlarge"]
+    type             = "cpu"
+    spot             = false
+    desired_capacity = "0"
+    taints           = "--register-with-taints=indico.io/readapi-server=true:NoSchedule"
+  },
   monitoring-workers = {
     min_size         = 1
     max_size         = 4
