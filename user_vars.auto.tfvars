@@ -65,7 +65,7 @@ node_groups = {
     type             = "cpu"
     spot             = false
     desired_capacity = "0"
-    taints           = "--register-with-taints=indico.io/readapi-server=true:NoSchedule"
+    taints           = "--register-with-taints=indico.io/readapiserver=true:NoSchedule"
   },
   monitoring-workers = {
     min_size         = 1
