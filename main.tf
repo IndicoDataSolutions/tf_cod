@@ -40,14 +40,9 @@ terraform {
       source  = "hashicorp/vault"
       version = "3.22.0"
     }
-
     htpasswd = {
       source  = "loafoe/htpasswd"
       version = "1.0.4"
-    }
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "3.95.0"
     }
   }
 }
@@ -96,33 +91,13 @@ provider "aws" {
   }
 }
 
-
-
-provider "azurerm" {
-  features {}
-  alias           = "readapi"
-  client_id       = var.azure_readapi_client_id
-  client_secret   = var.azure_readapi_client_secret
-  subscription_id = var.azure_readapi_subscription_id
-  tenant_id       = var.azure_readapi_tenant_id
-}
-
-provider "azurerm" {
-  features {}
-  alias           = "indicoio"
-  client_id       = var.azure_indico_io_client_id
-  client_secret   = var.azure_indico_io_client_secret
-  subscription_id = var.azure_indico_io_subscription_id
-  tenant_id       = var.azure_indico_io_tenant_id
-}
-
 provider "htpasswd" {}
 
 data "aws_caller_identity" "current" {}
 
 # define the networking module we're using locally
 locals {
-  network = var.direct_connect == true ? module.private_networking : module.public_networking
+  network = var.network_module == "public_networking" ? module.public_networking : module.networking
   aws_usernames = [
     "svc_jenkins",
     "terraform-sa"
@@ -151,7 +126,7 @@ resource "aws_key_pair" "kp" {
 }
 
 module "public_networking" {
-  count                = var.direct_connect == true ? 0 : 1
+  count                = var.direct_connect == false && var.network_module == "public_networking" ? 1 : 0
   source               = "app.terraform.io/indico/indico-aws-network/mod"
   version              = "1.2.2"
   label                = var.label
@@ -163,13 +138,25 @@ module "public_networking" {
   s3_endpoint_enabled  = var.s3_endpoint_enabled
 }
 
-module "private_networking" {
-  count                = var.direct_connect == true ? 1 : 0
-  source               = "app.terraform.io/indico/indico-aws-dc-network/mod"
-  version              = "1.0.0"
-  vpc_cidr             = var.vpc_cidr
-  private_subnet_cidrs = var.private_subnet_cidrs
-  subnet_az_zones      = var.subnet_az_zones
+module "networking" {
+  count                    = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
+  source                   = "app.terraform.io/indico/indico-aws-network/mod"
+  version                  = "2.0.0"
+  label                    = var.label
+  vpc_cidr                 = var.vpc_cidr
+  private_subnet_cidrs     = var.private_subnet_cidrs
+  public_subnet_cidrs      = var.public_subnet_cidrs
+  subnet_az_zones          = var.subnet_az_zones
+  region                   = var.region
+  allow_public             = var.network_allow_public
+  network_type             = var.network_type
+  load_vpc_id              = var.load_vpc_id
+  private_subnet_tag_name  = var.private_subnet_tag_name
+  private_subnet_tag_value = var.private_subnet_tag_value
+  public_subnet_tag_name   = var.public_subnet_tag_name
+  public_subnet_tag_value  = var.public_subnet_tag_value
+  sg_tag_name              = var.sg_tag_name
+  sg_tag_value             = var.sg_tag_value
 }
 
 module "sqs_sns" {
@@ -250,7 +237,7 @@ module "efs-storage" {
   version            = "0.0.1"
   label              = var.label
   additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage" })
-  security_groups    = [module.security-group.all_subnets_sg_id]
+  security_groups    = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
   private_subnet_ids = flatten([local.network[0].private_subnet_ids])
   kms_key_arn        = module.kms_key.key_arn
 
@@ -263,7 +250,7 @@ module "efs-storage-local-registry" {
   version            = "0.0.1"
   label              = "${var.label}-local-registry"
   additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage-local-registry" })
-  security_groups    = [module.security-group.all_subnets_sg_id]
+  security_groups    = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
   private_subnet_ids = flatten([local.network[0].private_subnet_ids])
   kms_key_arn        = module.kms_key.key_arn
 }
@@ -277,7 +264,7 @@ module "fsx-storage" {
   region                      = var.region
   storage_capacity            = var.storage_capacity
   subnet_id                   = local.network[0].private_subnet_ids[0]
-  security_group_id           = module.security-group.all_subnets_sg_id
+  security_group_id           = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
   data_bucket                 = module.s3-storage.data_s3_bucket_name
   api_models_bucket           = module.s3-storage.api_models_s3_bucket_name
   kms_key                     = module.kms_key.key
@@ -286,43 +273,36 @@ module "fsx-storage" {
 }
 
 module "cluster" {
-  cod_snapshots_enabled      = true
-  allow_dns_management       = true
-  aws_account_name           = var.aws_account
-  oidc_enabled               = false
-  source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "8.1.8"
-  label                      = var.label
-  additional_tags            = var.additional_tags
-  region                     = var.region
-  map_users                  = values(local.eks_users)
-  vpc_id                     = local.network[0].indico_vpc_id
-  security_group_id          = module.security-group.all_subnets_sg_id
-  subnet_ids                 = flatten([local.network[0].private_subnet_ids])
-  node_groups                = var.node_groups
-  cluster_node_policies      = var.cluster_node_policies
-  eks_cluster_iam_role       = var.eks_cluster_iam_role
-  eks_cluster_nodes_iam_role = "${var.label}-${var.region}-node-role"
-  fsx_arns                   = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
-  kms_key_arn                = module.kms_key.key_arn
-  az_count                   = var.az_count
-  key_pair                   = aws_key_pair.kp.key_name
-  snapshot_id                = var.snapshot_id
-  default_tags               = var.default_tags
-  s3_buckets                 = [module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : ""]
-  cluster_version            = var.k8s_version
-  efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
-  aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
-}
-
-module "readapi_queue" {
-  count = var.enable_readapi ? 1 : 0
-  providers = {
-    azurerm = azurerm.readapi
-  }
-  source       = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
-  version      = "1.0.0"
-  readapi_name = lower("${var.aws_account}-${var.label}-s")
+  cod_snapshots_enabled                 = true
+  allow_dns_management                  = true
+  aws_account_name                      = var.aws_account
+  oidc_enabled                          = false
+  source                                = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
+  version                               = "8.1.8"
+  label                                 = var.label
+  additional_tags                       = var.additional_tags
+  region                                = var.region
+  map_users                             = values(local.eks_users)
+  vpc_id                                = local.network[0].indico_vpc_id
+  security_group_id                     = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  cluster_additional_security_group_ids = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : []
+  subnet_ids                            = flatten([local.network[0].private_subnet_ids])
+  node_groups                           = var.node_groups
+  cluster_node_policies                 = var.cluster_node_policies
+  eks_cluster_iam_role                  = var.eks_cluster_iam_role
+  eks_cluster_nodes_iam_role            = "${var.label}-${var.region}-node-role"
+  fsx_arns                              = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
+  kms_key_arn                           = module.kms_key.key_arn
+  az_count                              = var.az_count
+  key_pair                              = aws_key_pair.kp.key_name
+  snapshot_id                           = var.snapshot_id
+  default_tags                          = var.default_tags
+  s3_buckets                            = [module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : ""]
+  cluster_version                       = var.k8s_version
+  efs_filesystem_id                     = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
+  aws_primary_dns_role_arn              = var.aws_primary_dns_role_arn
+  private_endpoint_enabled              = var.network_allow_public == true ? false : true
+  public_endpoint_enabled               = var.cluster_api_endpoint_public == true ? true : false
 }
 
 locals {
@@ -330,7 +310,7 @@ locals {
 }
 
 data "vault_kv_secret_v2" "readapi_secret" {
-  mount = "customer-${var.aws_account}"
+  mount = var.readapi_customer != null ? "customer-${var.readapi_customer}" : "customer-${var.aws_account}"
   name  = local.readapi_secret_path
 }
 
@@ -348,11 +328,6 @@ resource "kubernetes_secret" "readapi" {
     READAPI_COMPUTER_VISION_KEY   = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
     READAPI_FORM_RECOGNITION_HOST = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_url"]
     READAPI_FORM_RECOGNITION_KEY  = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_key"]
-    storage_account_name          = module.readapi_queue[0].storage_account_name
-    storage_account_id            = module.readapi_queue[0].storage_account_id
-    storage_account_access_key    = module.readapi_queue[0].storage_account_access_key
-    storage_queue_name            = module.readapi_queue[0].storage_queue_name
-    QUEUE_CONNECTION_STRING       = module.readapi_queue[0].storage_connection_string
   }
 }
 
@@ -457,20 +432,22 @@ module "argo-registration" {
 
 locals {
   security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
-  dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${var.aws_account}.${var.domain_suffix}") : var.domain_host
+  dns_zone_name     = var.dns_zone_name == "" ? lower("${var.aws_account}.${var.domain_suffix}") : var.dns_zone_name
+  dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${local.dns_zone_name}") : var.domain_host
   #dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
 }
 
 
 data "aws_route53_zone" "primary" {
-  name     = var.is_alternate_account_domain == "false" ? lower("${var.aws_account}.${var.domain_suffix}") : lower(local.alternate_domain_root)
+  count = var.use_static_ssl_certificates ? 0 : 1
+  name     = var.is_alternate_account_domain == "false" ? local.dns_zone_name : lower(local.alternate_domain_root)
   provider = aws.dns-control
 }
 
 
 resource "aws_route53_record" "ipa-app-caa" {
-  count   = var.is_alternate_account_domain == "true" ? 0 : 1
-  zone_id = data.aws_route53_zone.primary.zone_id
+  count   = var.is_alternate_account_domain == "true" || var.use_static_ssl_certificates ? 0 : 1
+  zone_id = data.aws_route53_zone.primary[0].zone_id
   name    = local.dns_name
   type    = "CAA"
   ttl     = 300

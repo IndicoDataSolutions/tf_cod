@@ -687,6 +687,13 @@ variable "sentinel_workspace_resource_group_name" {
   default = null # "${var.account}-sentinel-group"
 }
 
+
+variable "image_registry" {
+  type = string
+  default = "harbor.devops.indico.io"
+  description = "docker image registry to use for pulling images."
+}
+
 variable "sentinel_workspace_id" {
   type    = string
   default = null
@@ -740,5 +747,8 @@ variable "custom_cluster_issuer_spec" {
 }
 
 
-
-
+variable "secrets_operator_enabled" {
+  type = bool
+  default = true
+  description = "Use to enable the secrets operator which is used for maintaining thanos connection"
+}

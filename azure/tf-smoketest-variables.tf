@@ -110,6 +110,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     ssl_static_secret_name = "${jsonencode(var.ssl_static_secret_name)}"
     sentinel_workspace_name = "${jsonencode(var.sentinel_workspace_name)}"
     sentinel_workspace_resource_group_name = "${jsonencode(var.sentinel_workspace_resource_group_name)}"
+    image_registry = "${jsonencode(var.image_registry)}"
     sentinel_workspace_id = "${jsonencode(var.sentinel_workspace_id)}"
     cluster_manager_vm_size = "${jsonencode(var.cluster_manager_vm_size)}"
     network_type = "${jsonencode(var.network_type)}"
@@ -120,6 +121,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     network_plugin = "${jsonencode(var.network_plugin)}"
     enable_custom_cluster_issuer = "${jsonencode(var.enable_custom_cluster_issuer)}"
     custom_cluster_issuer_spec = "${jsonencode(var.custom_cluster_issuer_spec)}"
+    secrets_operator_enabled = "${jsonencode(var.secrets_operator_enabled)}"
 
     }
   }

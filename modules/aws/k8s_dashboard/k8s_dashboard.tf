@@ -1,12 +1,15 @@
 locals {
   ingress_values = var.use_static_ssl_certificates == false ? (<<EOT
 oauth2-proxy:
-  
+  image:
+    repository: "${var.image_registry}/quay.io/oauth2-proxy/oauth2-proxy"
   extraArgs:
     insecure-oidc-allow-unverified-email: true
     email-domain: indico.io
 
   redis:
+    global:
+      imageRegistry: "${var.image_registry}/docker.io"
     enabled: true
     replica:
       replicaCount: 1
@@ -69,12 +72,15 @@ oauth2-proxy:
   EOT
     ) : (<<EOT
 oauth2-proxy:
-  
+  image:
+    repository: "${var.image_registry}/quay.io/oauth2-proxy/oauth2-proxy"
   extraArgs:
     insecure-oidc-allow-unverified-email: true
     email-domain: indico.io
 
   redis:
+    global:
+      imageRegistry: "${var.image_registry}/docker.io"
     enabled: true
     replica:
       replicaCount: 1
@@ -150,6 +156,8 @@ resource "helm_release" "k8s-dashboard" {
   values = [
     <<EOF
 kubernetes-dashboard:
+  image:
+    repository: ${var.image_registry}/docker.io/kubernetesui/dashboard
   extraArgs:
   - --enable-insecure-login
   - --system-banner="Viewing ${var.local_dns_name}"

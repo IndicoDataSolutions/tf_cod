@@ -93,14 +93,14 @@ YAML
 
 
 data "local_file" "nfs_ip" {
-  count     = var.on_prem_test == true ? 1 : 0
-  filename = "${path.module}/nfs_server_ip.txt"
+  count      = var.on_prem_test == true ? 1 : 0
+  filename   = "${path.module}/nfs_server_ip.txt"
   depends_on = ["null_resource.get_nfs_server_ip"]
 }
 
 
 resource "null_resource" "get_nfs_server_ip" {
-  count     = var.on_prem_test == true ? 1 : 0
+  count = var.on_prem_test == true ? 1 : 0
   depends_on = [
     module.cluster,
     kubectl_manifest.nfs_server_service
@@ -124,7 +124,7 @@ resource "null_resource" "get_nfs_server_ip" {
   provisioner "local-exec" {
     command = "./kubectl get service nfs-service -o jsonpath='{.spec.clusterIP}' > ${path.module}/nfs_server_ip.txt"
   }
-  
+
   provisioner "local-exec" {
     command = "./kubectl get pods --no-headers | grep nfs-server | awk '{print $1}'| xargs -I {} sh -c './kubectl exec {} -- sh -c \"mkdir -p /exports/nfs-storage\"'"
   }
@@ -132,12 +132,12 @@ resource "null_resource" "get_nfs_server_ip" {
 }
 
 resource "helm_release" "nfs-provider" {
-  count     = var.on_prem_test == true ? 1 : 0
-  name = "nfs-subdir-external-provisioner"
-  repository       = "https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner"
-  chart            = "nfs-subdir-external-provisioner"
-  version          = "4.0.18"
-  namespace = "default"
+  count      = var.on_prem_test == true ? 1 : 0
+  name       = "nfs-subdir-external-provisioner"
+  repository = "https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner"
+  chart      = "nfs-subdir-external-provisioner"
+  version    = "4.0.18"
+  namespace  = "default"
   depends_on = [
     module.cluster,
     kubectl_manifest.nfs_server_service,
@@ -146,13 +146,13 @@ resource "helm_release" "nfs-provider" {
 
   // prometheus URL
   set {
-    name = "nfs.server"
-    value = "${data.local_file.nfs_ip[0].content}"
+    name  = "nfs.server"
+    value = data.local_file.nfs_ip[0].content
   }
 }
 
 resource "null_resource" "update_storage_class" {
-  count     = var.on_prem_test == true ? 1 : 0
+  count = var.on_prem_test == true ? 1 : 0
   depends_on = [
     helm_release.nfs-provider
   ]
