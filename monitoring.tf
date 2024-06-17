@@ -349,6 +349,7 @@ global:
 ingress-nginx:
   enabled: true
   controller:
+    service:
 ${local.loadbalancer_config}
     image:
       registry: ${var.image_registry}/registry.k8s.io
