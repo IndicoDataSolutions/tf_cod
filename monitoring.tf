@@ -12,7 +12,36 @@ locals {
       thanos: {}
   EOT
   )
-
+  loadbalancer_config = var.use_nlb == true ? (<<EOT
+      external:
+        enabled: ${var.network_allow_public}
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
+          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+      internal:
+        enabled: ${local.internal_elb}
+        annotations:
+          # Create internal NLB
+          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
+          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
+  EOT
+  ) : (<<EOT
+      external:
+        enabled: ${var.network_allow_public}
+      internal:
+        enabled: ${local.internal_elb}
+        annotations:
+          # Create internal ELB
+          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
+  EOT
+  )
   alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
 noExtraConfigs: true
   EOT
@@ -320,17 +349,7 @@ global:
 ingress-nginx:
   enabled: true
   controller:
-    service:
-      external:
-        enabled: ${var.network_allow_public}
-      internal:
-        enabled: ${local.internal_elb}
-        annotations:
-          # Create internal NLB
-          #service.beta.kubernetes.io/aws-load-balancer-scheme: "internal"
-          # Create internal ELB(Deprecated)
-          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
+${local.loadbalancer_config}
     image:
       registry: ${var.image_registry}/registry.k8s.io
       digest: ""

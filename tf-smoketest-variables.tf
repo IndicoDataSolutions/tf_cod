@@ -155,6 +155,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     dns_zone_name = "${jsonencode(var.dns_zone_name)}"
     readapi_customer = "${jsonencode(var.readapi_customer)}"
     create_guardduty_vpc_endpoint = "${jsonencode(var.create_guardduty_vpc_endpoint)}"
+    use_nlb = "${jsonencode(var.use_nlb)}"
 
     }
   }

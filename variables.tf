@@ -925,3 +925,9 @@ variable "create_guardduty_vpc_endpoint" {
   default = true
   description = "If true this will create a vpc endpoint for guardduty."
 }
+
+variable "use_nlb" {
+  type = bool
+  default = false
+  description = "If true this will create a NLB loadbalancer instead of a classic VPC ELB"
+}
