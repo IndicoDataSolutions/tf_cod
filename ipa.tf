@@ -66,7 +66,7 @@ locals {
   alb_ipa_values = var.enable_waf == true ? (<<EOT
 app-edge:
   image:
-    registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}"/indico
+    registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
   alternateDomain: ""
   service:
     type: "NodePort"
@@ -106,7 +106,7 @@ app-edge:
 app-edge:
   alternateDomain: ""
   image:
-    registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}"/indico
+    registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
     ingress:
       useStaticCertificate: ${var.use_static_ssl_certificates}
 EOT
