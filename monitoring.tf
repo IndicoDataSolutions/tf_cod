@@ -12,7 +12,7 @@ locals {
       thanos: {}
   EOT
   )
-  lb_config = var.acm_arn == "" ? acm_loadbalancer_config : loadbalancer_config
+  lb_config = var.acm_arn == "" ? local.acm_loadbalancer_config : local.loadbalancer_config
   loadbalancer_config = var.use_nlb == true ? (<<EOT
       external:
         enabled: ${var.network_allow_public}
