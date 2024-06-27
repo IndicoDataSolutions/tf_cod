@@ -60,6 +60,14 @@ variable "aws_access_key" {
   sensitive   = true
 }
 
+variable "aws_access_key" {
+  type        = string
+  description = "The AWS session token to use for deployment"
+  default = null
+  sensitive   = true
+}
+
+
 variable "aws_secret_key" {
   type        = string
   description = "The AWS secret key to use for deployment"
