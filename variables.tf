@@ -66,13 +66,6 @@ variable "aws_secret_key" {
   sensitive   = true
 }
 
-variable "aws_session_token" {
-  type        = string
-  description = "The AWS session token to use for deployment"
-  default = null
-  sensitive   = true
-}
-
 variable "indico_aws_access_key_id" {
   type        = string
   description = "The AWS access key for controlling dns in an alternate account"
