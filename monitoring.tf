@@ -136,7 +136,7 @@ EOT
         - alertmanager-${local.dns_name}
       paths:
         - /
-  ${local.alertmanager_tls}
+${local.alertmanager_tls}
   prometheusOperator:
     thanosImage:
       registry:  ${var.image_registry}/quay.io
@@ -186,7 +186,7 @@ ${local.thanos_config}
         - prometheus-${local.dns_name}
       paths:
         - /
-  ${local.prometheus_tls}
+${local.prometheus_tls}
   grafana:
     downloadDashboardsImage:
       registry: ${var.image_registry}/docker.io
@@ -204,7 +204,7 @@ ${local.thanos_config}
       hosts:
         - grafana-${local.dns_name}
       path: /
-  ${local.grafana_tls}
+${local.grafana_tls}
 sql-exporter:
   image:
     repository: '${var.image_registry}/dockerhub-proxy/burningalchemist/sql_exporter'
