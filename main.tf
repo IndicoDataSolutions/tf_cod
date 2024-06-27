@@ -85,7 +85,7 @@ provider "aws" {
   access_key = var.is_alternate_account_domain == "true" ? var.indico_aws_access_key_id : var.aws_access_key
   secret_key = var.is_alternate_account_domain == "true" ? var.indico_aws_secret_access_key : var.aws_secret_key
   region     = var.region
-  alias      = "dns-control"
+  alias      = "dns-control" 
   default_tags {
     tags = var.default_tags
   }
