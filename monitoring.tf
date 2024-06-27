@@ -12,6 +12,7 @@ locals {
       thanos: {}
   EOT
   )
+  lb_config = var.acm_arn == "" ? acm_loadbalancer_config : loadbalancer_config
   loadbalancer_config = var.use_nlb == true ? (<<EOT
       external:
         enabled: ${var.network_allow_public}
@@ -20,6 +21,7 @@ locals {
           service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
           service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
           service.beta.kubernetes.io/aws-load-balancer-type: nlb
+          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
       internal:
         enabled: ${local.internal_elb}
         annotations:
@@ -28,6 +30,8 @@ locals {
           service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
           service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
           service.beta.kubernetes.io/aws-load-balancer-type: nlb
+          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+          service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "${var.acm_arn}"
           service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
           service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
   EOT
@@ -38,6 +42,28 @@ locals {
         enabled: ${local.internal_elb}
         annotations:
           # Create internal ELB
+          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
+  EOT
+  )
+  acm_loadbalancer_config = (<<EOT
+      external:
+        enabled: ${var.network_allow_public}
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
+          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+      internal:
+        enabled: ${local.internal_elb}
+        annotations:
+          # Create internal NLB
+          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
+          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
           service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
           service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
   EOT
@@ -65,7 +91,37 @@ alerting:
     integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
 EOT
   )
-  kube_prometheus_stack_values = var.use_static_ssl_certificates == true ? (<<EOT
+  alertmanager_tls = var.acm_arn == "" ? (<<EOT
+      tls:
+        - secretName: ${var.ssl_static_secret_name}
+          hosts:
+            - alertmanager-${local.dns_name}
+  EOT
+  ) : (<<EOT
+      tls: []
+  EOT
+  )
+  grafana_tls = var.acm_arn == "" ? (<<EOT
+      tls:
+        - secretName: ${var.ssl_static_secret_name}
+          hosts:
+            - grafana-${local.dns_name}
+  EOT
+  ) : (<<EOT
+      tls: []
+  EOT
+  )
+  prometheus_tls = var.acm_arn == "" ? (<<EOT
+      tls:
+        - secretName: ${var.ssl_static_secret_name}
+          hosts:
+            - prometheus-${local.dns_name}
+  EOT
+  ) : (<<EOT
+      tls: []
+  EOT
+  )
+  kube_prometheus_stack_values = var.use_static_ssl_certificates == true || var.acm_arn != "" ? (<<EOT
   prometheus-node-exporter:
     image:
       registry: ${var.image_registry}/quay.io
@@ -74,20 +130,13 @@ EOT
       image:
         registry: ${var.image_registry}/quay.io
     ingress:
-      annotations:
-        cert-manager.io/cluster-issuer: zerossl
-      labels:
-        acme.cert-manager.io/dns01-solver: "true"
       enabled: true
       ingressClassName: nginx
       hosts:
         - alertmanager-${local.dns_name}
       paths:
         - /
-      tls:
-        - secretName: ${var.ssl_static_secret_name}
-          hosts:
-            - alertmanager-${local.dns_name}
+      ${local.alertmanager_tls}
   prometheusOperator:
     thanosImage:
       registry:  ${var.image_registry}/quay.io
@@ -132,19 +181,12 @@ ${local.thanos_config}
         node_group: static-workers
     ingress:
       enabled: true
-      annotations:
-        cert-manager.io/cluster-issuer: zerossl
-      labels:
-        acme.cert-manager.io/dns01-solver: "true"
       ingressClassName: nginx
       hosts:
         - prometheus-${local.dns_name}
       paths:
         - /
-      tls:
-        - secretName: ${var.ssl_static_secret_name}
-          hosts:
-            - prometheus-${local.dns_name}
+      ${local.prometheus_tls}
   grafana:
     downloadDashboardsImage:
       registry: ${var.image_registry}/docker.io
@@ -157,19 +199,12 @@ ${local.thanos_config}
       image:
         registry: ${var.image_registry}/quay.io
     ingress:
-      annotations:
-        cert-manager.io/cluster-issuer: zerossl
-      labels:
-        acme.cert-manager.io/dns01-solver: "true"
       enabled: true
       ingressClassName: nginx
       hosts:
         - grafana-${local.dns_name}
       path: /
-      tls:
-        - secretName: ${var.ssl_static_secret_name}
-          hosts:
-            - grafana-${local.dns_name}
+      ${local.grafana_tls}
 sql-exporter:
   image:
     repository: '${var.image_registry}/dockerhub-proxy/burningalchemist/sql_exporter'
@@ -350,7 +385,7 @@ ingress-nginx:
   enabled: true
   controller:
     service:
-${local.loadbalancer_config}
+${local.lb_config}
     image:
       registry: ${var.image_registry}/registry.k8s.io
       digest: ""

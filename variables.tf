@@ -560,6 +560,12 @@ variable "use_acm" {
   description = "create cluster that will use acm"
 }
 
+variable "acm_arn" {
+  type = string
+  default = ""
+  description = "arn of a pre-existing acm certificate"
+}
+
 variable "enable_waf" {
   type        = bool
   default     = false
