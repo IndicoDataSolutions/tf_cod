@@ -12,6 +12,7 @@ locals {
       thanos: {}
   EOT
   )
+  backend_port = var.acm_arn != "" ? "http" : "https"
   lb_config = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
   loadbalancer_config = var.use_nlb == true ? (<<EOT
       external:
@@ -58,7 +59,7 @@ locals {
         enabled: ${local.internal_elb}
         annotations:
           # Create internal NLB
-          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
           service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
           service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
           service.beta.kubernetes.io/aws-load-balancer-type: nlb
@@ -385,6 +386,8 @@ ingress-nginx:
   enabled: true
   controller:
     service:
+      targetPorts:
+        https: ${local.backend_port}
 ${local.lb_config}
     image:
       registry: ${var.image_registry}/registry.k8s.io
