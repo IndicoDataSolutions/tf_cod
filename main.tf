@@ -74,6 +74,7 @@ provider "random" {}
 provider "aws" {
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
+  token      = var.aws_session_token
   region     = var.region
   default_tags {
     tags = var.default_tags
@@ -84,8 +85,9 @@ provider "aws" {
 provider "aws" {
   access_key = var.is_alternate_account_domain == "true" ? var.indico_aws_access_key_id : var.aws_access_key
   secret_key = var.is_alternate_account_domain == "true" ? var.indico_aws_secret_access_key : var.aws_secret_key
+  token      = var.is_alternate_account_domain == "true" ? var.indico_aws_session_token : var.aws_session_token
   region     = var.region
-  alias      = "dns-control"
+  alias      = "dns-control" 
   default_tags {
     tags = var.default_tags
   }
@@ -362,8 +364,9 @@ provider "kubectl" {
 }
 
 provider "aws" {
-  access_key = var.indico_devops_aws_access_key_id
-  secret_key = var.indico_devops_aws_secret_access_key
+  access_key = var.thanos_enabled == true ? var.indico_devops_aws_access_key_id : var.aws_access_key
+  secret_key = var.thanos_enabled == true ? var.indico_devops_aws_secret_access_key : var.aws_secret_key
+  token      = var.thanos_enabled == true ? var.indico_devops_aws_session_token : var.aws_session_token
   region     = var.indico_devops_aws_region
   alias      = "aws-indico-devops"
 }

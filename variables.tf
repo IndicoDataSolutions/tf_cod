@@ -66,6 +66,13 @@ variable "aws_secret_key" {
   sensitive   = true
 }
 
+variable "aws_session_token" {
+  type        = string
+  description = "The AWS session token to use for deployment"
+  sensitive   = true
+  default     = null
+}
+
 variable "indico_aws_access_key_id" {
   type        = string
   description = "The AWS access key for controlling dns in an alternate account"
@@ -78,6 +85,13 @@ variable "indico_aws_secret_access_key" {
   description = "The AWS secret key for controlling dns in an alternate account"
   sensitive   = true
   default     = ""
+}
+
+variable "indico_aws_session_token" {
+  type        = string
+  description = "The AWS session token to use for deployment in an alternate account"
+  sensitive   = true
+  default     = null
 }
 
 variable "direct_connect" {
@@ -560,6 +574,12 @@ variable "use_acm" {
   description = "create cluster that will use acm"
 }
 
+variable "acm_arn" {
+  type = string
+  default = ""
+  description = "arn of a pre-existing acm certificate"
+}
+
 variable "enable_waf" {
   type        = bool
   default     = false
@@ -757,6 +777,13 @@ variable "indico_devops_aws_secret_access_key" {
   description = "The Indico-Devops account secret"
   sensitive   = true
   default     = ""
+}
+
+variable "indico_devops_aws_session_token" {
+  type        = string
+  description = "Indico-Devops account AWS session token to use for deployment"
+  sensitive   = true
+  default     = null
 }
 
 variable "indico_devops_aws_region" {
