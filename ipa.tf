@@ -15,6 +15,9 @@ locals {
   aws-efs-csi-driver:
     enabled: true
   storage:
+    volumeSetup:
+      image:
+        registry: "${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}"
     pvcSpec:
       volumeMode: Filesystem
       mountOptions: []
@@ -40,6 +43,9 @@ locals {
   aws-efs-csi-driver:
     enabled: ${var.local_registry_enabled} 
   storage:
+    volumeSetup:
+      image:
+        registry: "${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}"
     pvcSpec:
       csi:
         driver: fsx.csi.aws.com
@@ -59,6 +65,8 @@ locals {
   storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
   alb_ipa_values = var.enable_waf == true ? (<<EOT
 app-edge:
+  image:
+    registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
   alternateDomain: ""
   service:
     type: "NodePort"
@@ -98,7 +106,9 @@ app-edge:
 app-edge:
   alternateDomain: ""
   image:
-    registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "harbor.devops.indico.io"}/indico
+    registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
+    ingress:
+      useStaticCertificate: ${var.use_static_ssl_certificates}
 EOT
   )
   dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT
@@ -135,9 +145,6 @@ alternate-external-dns:
     - "--aws-assume-role=${var.aws_primary_dns_role_arn}"
 
   provider: aws
-  aws:
-    zoneType: public
-    region: ${var.region}
 
   policy: sync
   sources:
@@ -236,12 +243,8 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
-data "aws_route53_zone" "aws-zone" {
-  name = lower("${var.aws_account}.indico.io")
-}
-
 output "ns" {
-  value = data.aws_route53_zone.aws-zone.name_servers
+  value = var.use_static_ssl_certificates ? ["no-hosted-zone"] : data.aws_route53_zone.primary[0].name_servers
 }
 
 
@@ -303,7 +306,7 @@ module "secrets-operator-setup" {
   depends_on = [
     module.cluster
   ]
-  count           = var.argo_enabled == true ? 1 : 0
+  count           = var.secrets_operator_enabled == true ? 1 : 0
   source          = "./modules/common/vault-secrets-operator-setup"
   vault_address   = var.vault_address
   account         = var.aws_account
@@ -336,7 +339,7 @@ resource "helm_release" "ipa-vso" {
       - name: harbor-pull-secret
     kubeRbacProxy:
       image:
-        repository: harbor.devops.indico.io/gcr.io/kubebuilder/kube-rbac-proxy
+        repository: ${var.image_registry}/gcr.io/kubebuilder/kube-rbac-proxy
       resources:
         limits:
           cpu: 500m
@@ -346,7 +349,7 @@ resource "helm_release" "ipa-vso" {
           memory: 512Mi
     manager:
       image:
-        repository: harbor.devops.indico.io/docker.io/hashicorp/vault-secrets-operator
+        repository: ${var.image_registry}/docker.io/hashicorp/vault-secrets-operator
       resources:
         limits:
           cpu: 500m
@@ -359,11 +362,11 @@ resource "helm_release" "ipa-vso" {
     enabled: true
     namespace: default
     method: kubernetes
-    mount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+    mount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
     kubernetes:
-      role: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+      role: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
       tokenAudiences: ["vault"]
-      serviceAccount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+      serviceAccount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
 
   defaultVaultConnection:
     enabled: true
@@ -399,13 +402,13 @@ resource "helm_release" "external-secrets" {
 
   values = [<<EOF
     image:
-      repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+      repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
     webhook:
      image:
-        repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+        repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
     certController:
       image:
-        repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+        repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
 
   EOF
   ]
@@ -436,8 +439,76 @@ resource "helm_release" "ipa-crds" {
     enabled: true
     updateCRDs: 
       enabled: true
-
+    pgo: 
+      controllerImages:
+        cluster: ${var.image_registry}/registry.crunchydata.com/crunchydata/postgres-operator:ubi8-5.5.0-2
+      relatedImages:
+        postgres_16:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-16.1-2
+        postgres_16_gis_3.4:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.1-3.4-2
+        postgres_16_gis_3.3:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.1-3.3-2
+        postgres_15:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-15.5-2
+        postgres_15_gis_3.3:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-15.5-3.3-2
+        postgres_14:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.10-2
+        postgres_14_gis_3.1:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.10-3.1-2
+        postgres_14_gis_3.2:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.10-3.2-2
+        postgres_14_gis_3.3:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.10-3.3-2
+        postgres_13:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-13.13-2
+        postgres_13_gis_3.0:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.13-3.0-2
+        postgres_13_gis_3.1:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.13-3.1-2
+        pgadmin:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-4.30-21
+        pgbackrest:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.47-4
+        pgbouncer:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbouncer:ubi8-1.21-2
+        pgexporter:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi8-0.15.0-0
+        pgupgrade:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-upgrade:ubi8-5.5.0-2
+        standalone_pgadmin:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-7.8-2
+  migrations-operator:
+    image:
+      repository: ${var.image_registry}/indico/migrations-operator
+      tag: "3.0.13"
+    controllerImage:
+      repository: ${var.image_registry}/indico/migrations-controller
+      kubectlImage: ${var.image_registry}/indico/migrations-controller-kubectl
+      tag: "3.0.12"
   aws-ebs-csi-driver:
+    image:
+      repository: ${var.image_registry}/public.ecr.aws/ebs-csi-driver/aws-ebs-csi-driver
+    sidecars:
+      provisioner:
+        image:
+          repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
+      attacher:
+        image:
+          repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-attacher
+      snapshotter:
+        image:
+          repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-snapshotter/csi-snapshotter
+      livenessProbe:
+        image:
+          repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/livenessprobe
+      resizer:
+        image:
+          repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-resizer
+      nodeDriverRegistrar:
+        image:
+          repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
     controller:
       extraVolumeTags:
         ${indent(8, yamlencode(var.default_tags))}
@@ -451,6 +522,20 @@ resource "helm_release" "ipa-crds" {
     cainjector:
       nodeSelector:
         kubernetes.io/os: linux
+    image:
+      repository: ${var.image_registry}/quay.io/jetstack/cert-manager-controller
+    webhook:
+      image:
+        repository: ${var.image_registry}/quay.io/jetstack/cert-manager-webhook
+    cainjector:
+      image:
+        repository: ${var.image_registry}/quay.io/jetstack/cert-manager-cainjector
+    acmesolver:
+      image:
+        repository: ${var.image_registry}/quay.io/jetstack/cert-manager-acmesolver
+    startupapicheck:
+      image:
+        repository: ${var.image_registry}/quay.io/jetstack/cert-manager-ctl
     enabled: true
     installCRDs: true
 EOF
@@ -519,7 +604,9 @@ resource "helm_release" "ipa-pre-requisites" {
   disable_webhooks = false
 
   values = concat(local.storage_spec, [<<EOF
-
+global:
+  image:
+    registry: ${var.image_registry}
 cluster:
   cloudProvider: aws
   name: ${var.label}
@@ -548,36 +635,49 @@ secrets:
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
 
 ${local.dns_configuration_values}
+alternate-external-dns:
+  image:
+    repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
 external-dns:
   enabled: ${local.enable_external_dns}
+  image:
+    repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
   logLevel: debug
   policy: sync
-  txtOwnerId: "${var.label}-${var.region}"
+  txtOwnerId: "${local.dns_name}"
   domainFilters:
-    - ${lower(var.aws_account)}.indico.io.
+    - ${local.dns_zone_name}
 
   provider: aws
-  aws:
-    zoneType: public
-    region: ${var.region}
-
   policy: sync
   sources:
     - service
     - ingress
 aws-for-fluent-bit:
   enabled: true
+  image:
+    repository: ${var.image_registry}/public.ecr.aws/aws-observability/aws-for-fluent-bit
   cloudWatchLogs:
     region: ${var.region}
     logGroupName: "/aws/eks/fluentbit-cloudwatch/${var.label}/logs"
     logGroupTemplate: "/aws/eks/fluentbit-cloudwatch/${var.label}/workload/$kubernetes['namespace_name']"
+ipaConfig:
+  image:
+    registry: ${var.image_registry}
+rabbitmq:
+  rabbitmq:
+    image:
+      registry: ${var.image_registry}
 cluster-autoscaler:
   cluster-autoscaler:
     awsRegion: ${var.region}
     image:
+      repository: ${var.image_registry}/public-gcr-k8s-proxy/autoscaling/cluster-autoscaler
       tag: "v1.20.0"
     autoDiscovery:
       clusterName: "${var.label}"
+    extraArgs:
+      aws-use-static-instance-list: true
 crunchy-postgres:
   enabled: true
   postgres-data:
@@ -728,12 +828,72 @@ crunchy-postgres:
             memory: 3000Mi
     imagePullSecrets:
       - name: harbor-pull-secret
+reflector:
+  image:
+    repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
+apiModels:
+  image:
+    registry: ${var.image_registry}
+migrationsArtifactsInstall:
+  image:
+    registry: ${var.image_registry}
 aws-load-balancer-controller:
   enabled: ${var.use_acm}
   aws-load-balancer-controller:
     clusterName: ${var.label}
     vpcId: ${local.network[0].indico_vpc_id}
     region: ${var.region}
+aws-fsx-csi-driver:
+  image:  
+    repository: ${var.image_registry}/public.ecr.aws/fsx-csi-driver/aws-fsx-csi-driver
+    pullPolicy: IfNotPresent
+  imagePullSecrets:
+    - harbor-pull-secret
+  sidecars:
+    livenessProbe:
+      image:
+        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/livenessprobe
+    nodeDriverRegistrar:
+      image:
+        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
+    provisioner:
+      image:
+        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
+    resizer:
+      image:
+        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-resizer
+aws-efs-csi-driver:
+  image:
+    repository: ${var.image_registry}/docker.io/amazon/aws-efs-csi-driver
+  sidecars:
+    livenessProbe:
+      image:
+        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/livenessprobe
+    nodeDriverRegistrar:
+      image:
+        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
+    csiProvisioner:
+      image:
+        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
+metrics-server:
+  global:
+    imageRegistry: ${var.image_registry}/docker.io
+celery-backend:
+  redis:
+    global:
+      imageRegistry: ${var.image_registry}
+opentelemetry-operator:
+  testFramework:
+    image:
+      repository: ${var.image_registry}/docker.io/busybox
+  kubeRBACProxy:
+    image:
+      repository: ${var.image_registry}/quay.io/brancz/kube-rbac-proxy
+  manager:
+    image:
+      repository: ${var.image_registry}/ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator
+    collectorImage:
+      repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
 EOF
     ,
     <<EOT
@@ -838,6 +998,7 @@ resource "helm_release" "terraform-smoketests" {
     region: ${var.region}
     name: ${var.label}
   image:
+    repository: ${var.image_registry}/indico/terraform-smoketests
     tag: "${substr(data.external.git_information.result.sha, 0, 8)}"
   EOF
   ]
@@ -863,6 +1024,7 @@ data "vault_kv_secret_v2" "harbor-api-token" {
 }
 
 resource "kubernetes_namespace" "local-registry" {
+  count = var.local_registry_enabled == true ? 1 : 0
   metadata {
     name = "local-registry"
   }
@@ -1055,7 +1217,7 @@ docker-registry:
 
   proxy:
     enabled: true
-    remoteurl: https://harbor.devops.indico.io
+    remoteurl: https://${var.image_registry}
     secretRef: remote-access
   replicaCount: 3
   
@@ -1075,7 +1237,7 @@ metrics-server:
 proxyRegistryAccess:
   proxyPassword: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_password"] : ""}
   proxyPullSecretName: remote-access
-  proxyUrl: https://harbor.devops.indico.io
+  proxyUrl: https://${var.image_registry}
   proxyUsername: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_username"] : ""}
   
 registryUrl: local-registry.${local.dns_name}
@@ -1162,6 +1324,8 @@ spec:
               region: ${var.region}
               account: ${var.aws_account}
             host: ${local.dns_name}
+            image:
+              repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/integration_tests
             ${indent(12, base64decode(var.ipa_smoketest_values))}    
 EOT
 }
@@ -1252,14 +1416,46 @@ spec:
           value: |
             global:
               image:
-                registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "harbor.devops.indico.io"}/indico
+                registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
             ${indent(12, local.local_registry_tf_cod_values)}
             runtime-scanner:
               enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
+              image:
+                repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico-devops/runtime-scanner
               authentication:
                 ingressUser: monitoring
                 ingressPassword: ${random_password.monitoring-password.result}
-                ${indent(14, local.runtime_scanner_ingress_values)} 
+                ${indent(14, local.runtime_scanner_ingress_values)}
+            celery-flower:
+              image:
+              
+                repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/flower
+            aws-node-termination:
+              aws-node-termination-handler:
+                image:
+                  repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/aws-node-termination-handler
+            nvidia-device-plugin:
+              nvidia-device-plugin:
+                image:
+                  repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/public-nvcr-proxy/nvidia/k8s-device-plugin
+            reloader:
+              reloader:
+                reloader:
+                  deployment:
+                    image:
+                      name: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/stakater/reloader
+            kafka-strimzi:
+              strimzi-kafka-operator: 
+                defaultImageRegistry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/strimzi-proxy
+              kafkacat:
+                image:
+                  registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/confluentinc
+              schemaRegistry:
+                image:
+                  registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/confluentinc
+              kafkaConnect:
+                image:
+                  registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
             ${indent(12, local.alb_ipa_values)}         
 
         - name: HELM_VALUES

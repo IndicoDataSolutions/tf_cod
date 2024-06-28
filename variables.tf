@@ -805,8 +805,129 @@ variable "enable_s3_backup" {
   description = "Allow backing up data bucket on s3"
 }
 
+variable "cluster_api_endpoint_public" {
+  type        = bool
+  default     = true
+  description = "If enabled this allow public access to the cluster api endpoint."
+}
+
+variable "network_allow_public" {
+  type        = bool
+  default     = true
+  description = "If enabled this will create public subnets, IGW, and NAT gateway."
+}
+
+variable "network_module" {
+  type    = string
+  default = "networking"
+
+  validation {
+    condition     = var.network_module == "public_networking" || var.network_module == "networking"
+    error_message = "${var.network_module} not valid. Type must be either public_networking or networking"
+  }
+}
+
+variable "network_type" {
+  type    = string
+  default = "create"
+
+  validation {
+    condition     = var.network_type == "create" || var.network_type == "load"
+    error_message = "${var.network_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "load_vpc_id" {
+  type        = string
+  default     = ""
+  description = "This is required if loading a network rather than creating one."
+}
+
+variable "private_subnet_tag_name" {
+  type    = string
+  default = "Name"
+}
+
+variable "private_subnet_tag_value" {
+  type    = string
+  default = "*private*"
+}
+
+variable "public_subnet_tag_name" {
+  type    = string
+  default = "Name"
+}
+
+variable "public_subnet_tag_value" {
+  type    = string
+  default = "*public*"
+}
+
+variable "sg_tag_name" {
+  type    = string
+  default = "Name"
+}
+
+variable "sg_tag_value" {
+  type    = string
+  default = "*-allow-subnets"
+}
+
 variable "s3_endpoint_enabled" {
   type        = bool
   default     = false
   description = "If set to true, an S3 VPC endpoint will be created. If this variable is set, the `region` variable must also be set"
+}
+
+variable "image_registry" {
+  type        = string
+  default     = "harbor.devops.indico.io"
+  description = "docker image registry to use for pulling images."
+}
+
+variable "secrets_operator_enabled" {
+  type        = bool
+  default     = true
+  description = "Use to enable the secrets operator which is used for maintaining thanos connection"
+}
+
+variable "firewall_subnet_cidrs" {
+  type        = list(string)
+  default     = []
+  description = "CIDR ranges for the firewall subnets"
+}
+
+variable "enable_firewall" {
+  type        = bool
+  default     = false
+  description = "If enabled this will create firewall and internet gateway"
+}
+
+variable "firewall_allow_list" {
+  type    = list(string)
+  default = [".cognitiveservices.azure.com"]
+}
+
+variable "dns_zone_name" {
+  type        = string
+  default     = ""
+  description = "Name of the dns zone used to control DNS"
+}
+
+variable "readapi_customer" {
+  type        = string
+  default     = null
+  description = "Name of the customer readapi is being deployed in behalf."
+}
+
+variable "create_guardduty_vpc_endpoint" {
+  type = bool
+  default = true
+  description = "If true this will create a vpc endpoint for guardduty."
+}
+
+variable "use_nlb" {
+  type = bool
+  default = false
+  description = "If true this will create a NLB loadbalancer instead of a classic VPC ELB"
 }
