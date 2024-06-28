@@ -23,6 +23,7 @@ locals {
           service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
           service.beta.kubernetes.io/aws-load-balancer-type: nlb
           service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       internal:
         enabled: ${local.internal_elb}
         annotations:
@@ -34,6 +35,7 @@ locals {
           service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
           service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
           service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
+          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   EOT
   ) : (<<EOT
       external:
@@ -55,6 +57,7 @@ locals {
           service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
           service.beta.kubernetes.io/aws-load-balancer-type: nlb
           service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       internal:
         enabled: ${local.internal_elb}
         annotations:
@@ -67,6 +70,7 @@ locals {
           service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "${var.acm_arn}"
           service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
           service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
+          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   EOT
   )
   alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
