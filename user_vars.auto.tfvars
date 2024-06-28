@@ -76,6 +76,15 @@ node_groups = {
     desired_capacity = "1"
     taints           = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
   },
+  readapi-servers = {
+    min_size         = 0
+    max_size         = 3
+    instance_types   = ["m5.2xlarge"]
+    type             = "cpu"
+    spot             = false
+    desired_capacity = "0"
+    taints           = "--register-with-taints=indico.io/readapi-server=true:NoSchedule"
+  },
   readapi-azurite = {
     min_size         = 0
     max_size         = 1
@@ -106,5 +115,5 @@ include_rox                 = false
 include_fsx                 = false
 include_efs                 = true
 #cluster
-az_count            = 2
+az_count = 2
 s3_endpoint_enabled = true
