@@ -97,6 +97,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     k8s_dashboard_chart_version = "${jsonencode(var.k8s_dashboard_chart_version)}"
     enable_k8s_dashboard = "${jsonencode(var.enable_k8s_dashboard)}"
     use_acm = "${jsonencode(var.use_acm)}"
+    acm_arn = "${jsonencode(var.acm_arn)}"
     enable_waf = "${jsonencode(var.enable_waf)}"
     vault_mount_path = "${jsonencode(var.vault_mount_path)}"
     terraform_vault_mount_path = "${jsonencode(var.terraform_vault_mount_path)}"
