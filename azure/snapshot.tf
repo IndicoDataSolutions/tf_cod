@@ -37,7 +37,7 @@ resource "helm_release" "cod-snapshot-restore" {
 
   values = [<<EOF
 image:
-  repository: harbor.devops.indico.io/indico/cod-snapshot-azure
+  repository: ${var.image_registry}/indico/cod-snapshot-azure
 
 snapshot:
   labels:

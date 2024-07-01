@@ -1,4 +1,5 @@
 locals {
+  internal_elb = var.network_allow_public == false ? true : false
   thanos_config = var.thanos_enabled == true ? (<<EOT
       thanos: # this is the one being used
         blockSize: 5m
@@ -11,7 +12,63 @@ locals {
       thanos: {}
   EOT
   )
-
+  backend_port = var.acm_arn != "" ? "http" : "https"
+  lb_config = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
+  loadbalancer_config = var.use_nlb == true ? (<<EOT
+      external:
+        enabled: ${var.network_allow_public}
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
+          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+      internal:
+        enabled: ${local.internal_elb}
+        annotations:
+          # Create internal NLB
+          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
+          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
+  EOT
+  ) : (<<EOT
+      external:
+        enabled: ${var.network_allow_public}
+      internal:
+        enabled: ${local.internal_elb}
+        annotations:
+          # Create internal ELB
+          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
+  EOT
+  )
+  acm_loadbalancer_config = (<<EOT
+      external:
+        enabled: ${var.network_allow_public}
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
+          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+      internal:
+        enabled: ${local.internal_elb}
+        annotations:
+          # Create internal NLB
+          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
+          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+          service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "${var.acm_arn}"
+          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
+  EOT
+  )
   alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
 noExtraConfigs: true
   EOT
@@ -35,23 +92,72 @@ alerting:
     integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
 EOT
   )
-  kube_prometheus_stack_values = var.use_static_ssl_certificates == true ? (<<EOT
+  alertmanager_tls = var.acm_arn == "" ? (<<EOT
+      tls:
+        - secretName: ${var.ssl_static_secret_name}
+          hosts:
+            - alertmanager-${local.dns_name}
+  EOT
+  ) : (<<EOT
+      tls: []
+  EOT
+  )
+  grafana_tls = var.acm_arn == "" ? (<<EOT
+      tls:
+        - secretName: ${var.ssl_static_secret_name}
+          hosts:
+            - grafana-${local.dns_name}
+  EOT
+  ) : (<<EOT
+      tls: []
+  EOT
+  )
+  prometheus_tls = var.acm_arn == "" ? (<<EOT
+      tls:
+        - secretName: ${var.ssl_static_secret_name}
+          hosts:
+            - prometheus-${local.dns_name}
+  EOT
+  ) : (<<EOT
+      tls: []
+  EOT
+  )
+  kube_prometheus_stack_values = var.use_static_ssl_certificates == true || var.acm_arn != "" ? (<<EOT
+  prometheus-node-exporter:
+    image:
+      registry: ${var.image_registry}/quay.io
   alertmanager:
+    alertmanagerSpec:
+      image:
+        registry: ${var.image_registry}/quay.io
     ingress:
-      annotations:
-        cert-manager.io/cluster-issuer: zerossl
-      labels:
-        acme.cert-manager.io/dns01-solver: "true"
       enabled: true
       ingressClassName: nginx
       hosts:
         - alertmanager-${local.dns_name}
       paths:
         - /
-      tls:
-        - secretName: ${var.ssl_static_secret_name}
-          hosts:
-            - alertmanager-${local.dns_name}
+${local.alertmanager_tls}
+  prometheusOperator:
+    thanosImage:
+      registry:  ${var.image_registry}/quay.io
+
+    prometheusConfigReloader:
+      image:
+        registry: ${var.image_registry}/quay.io
+
+    prometheusDefaultBaseImageRegistry: ${var.image_registry}/quay.io 
+    alertmanagerDefaultBaseImageRegistry: ${var.image_registry}/quay.io 
+    image:
+      registry: ${var.image_registry}/quay.io
+
+    admissionWebhooks:
+      patch:
+        image:
+          registry: ${var.image_registry}/registry.k8s.io
+  kube-state-metrics:
+    image:
+      registry: ${var.image_registry}/registry.k8s.io
   prometheus:
     annotations:
       reloader.stakater.com/auto: "true"
@@ -63,6 +169,8 @@ EOT
       enabled:  ${var.thanos_enabled}
 
     prometheusSpec:
+      image:
+        registry: ${var.image_registry}/quay.io
       disableCompaction: ${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.aws_account}
@@ -74,43 +182,70 @@ ${local.thanos_config}
         node_group: static-workers
     ingress:
       enabled: true
-      annotations:
-        cert-manager.io/cluster-issuer: zerossl
-      labels:
-        acme.cert-manager.io/dns01-solver: "true"
       ingressClassName: nginx
       hosts:
         - prometheus-${local.dns_name}
       paths:
         - /
-      tls:
-        - secretName: ${var.ssl_static_secret_name}
-          hosts:
-            - prometheus-${local.dns_name}
+${local.prometheus_tls}
   grafana:
+    downloadDashboardsImage:
+      registry: ${var.image_registry}/docker.io
+    testFramework:
+      image:
+        registry: ${var.image_registry}/docker.io
+    image:
+      registry: ${var.image_registry}/docker.io
+    sidecar:
+      image:
+        registry: ${var.image_registry}/quay.io
     ingress:
-      annotations:
-        cert-manager.io/cluster-issuer: zerossl
-      labels:
-        acme.cert-manager.io/dns01-solver: "true"
       enabled: true
       ingressClassName: nginx
       hosts:
         - grafana-${local.dns_name}
       path: /
-      tls:
-        - secretName: ${var.ssl_static_secret_name}
-          hosts:
-            - grafana-${local.dns_name}
+${local.grafana_tls}
+sql-exporter:
+  image:
+    repository: '${var.image_registry}/dockerhub-proxy/burningalchemist/sql_exporter'
+tempo:
+  tempo:
+    repository: ${var.image_registry}/docker.io/grafana/tempo
   EOT
     ) : (<<EOT
+  prometheus-node-exporter:
+    image:
+      registry: ${var.image_registry}/quay.io
   alertmanager:
+    alertmanagerSpec:
+      image:
+        registry: ${var.image_registry}/quay.io
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
       labels:
         acme.cert-manager.io/dns01-solver: "true"
+  prometheusOperator:
+    thanosImage:
+      registry:  ${var.image_registry}/quay.io
 
+    prometheusConfigReloader:
+      image:
+        registry: ${var.image_registry}/quay.io
+
+    prometheusDefaultBaseImageRegistry: ${var.image_registry}/quay.io 
+    alertmanagerDefaultBaseImageRegistry: ${var.image_registry}/quay.io 
+    image:
+      registry: ${var.image_registry}/quay.io
+
+    admissionWebhooks:
+      patch:
+        image:
+          registry: ${var.image_registry}/registry.k8s.io
+  kube-state-metrics:
+    image:
+      registry: ${var.image_registry}/registry.k8s.io
   prometheus:
     annotations:
       reloader.stakater.com/auto: "true"
@@ -122,6 +257,8 @@ ${local.thanos_config}
       enabled: ${var.thanos_enabled}
     
     prometheusSpec:
+      image:
+        registry: ${var.image_registry}/quay.io
       disableCompaction: ${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.aws_account}
@@ -137,11 +274,27 @@ ${local.thanos_config}
       labels:
         acme.cert-manager.io/dns01-solver: "true"
   grafana:
+    downloadDashboardsImage:
+      registry: ${var.image_registry}/docker.io
+    testFramework:
+      image:
+        registry: ${var.image_registry}/docker.io
+    image:
+      registry: ${var.image_registry}/docker.io
+    sidecar:
+      image:
+        registry: ${var.image_registry}/quay.io
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
       labels:
         acme.cert-manager.io/dns01-solver: "true"
+sql-exporter:
+  image:
+    repository: '${var.image_registry}/dockerhub-proxy/burningalchemist/sql_exporter'
+tempo:
+  tempo:
+    repository: ${var.image_registry}/docker.io/grafana/tempo
 EOT
   )
 }
@@ -149,8 +302,8 @@ EOT
 
 
 resource "aws_route53_record" "grafana-caa" {
-  count   = var.monitoring_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
-  zone_id = data.aws_route53_zone.primary.zone_id
+  count   = var.monitoring_enabled == true && var.use_static_ssl_certificates == false ? 1 : 0
+  zone_id = data.aws_route53_zone.primary[0].zone_id
   name    = lower("grafana.${local.dns_name}")
   type    = "CAA"
   ttl     = 300
@@ -162,8 +315,8 @@ resource "aws_route53_record" "grafana-caa" {
 
 
 resource "aws_route53_record" "prometheus-caa" {
-  count   = var.monitoring_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
-  zone_id = data.aws_route53_zone.primary.zone_id
+  count   = var.monitoring_enabled == true && var.use_static_ssl_certificates == false ? 1 : 0
+  zone_id = data.aws_route53_zone.primary[0].zone_id
   name    = lower("prometheus.${local.dns_name}")
   type    = "CAA"
   ttl     = 300
@@ -174,8 +327,8 @@ resource "aws_route53_record" "prometheus-caa" {
 }
 
 resource "aws_route53_record" "alertmanager-caa" {
-  count   = var.monitoring_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
-  zone_id = data.aws_route53_zone.primary.zone_id
+  count   = var.monitoring_enabled == true && var.use_static_ssl_certificates == false ? 1 : 0
+  zone_id = data.aws_route53_zone.primary[0].zone_id
   name    = lower("alertmanager.${local.dns_name}")
   type    = "CAA"
   ttl     = 300
@@ -232,7 +385,19 @@ global:
 
 ingress-nginx:
   enabled: true
-
+  controller:
+    service:
+      targetPorts:
+        https: ${local.backend_port}
+${local.lb_config}
+    image:
+      registry: ${var.image_registry}/registry.k8s.io
+      digest: ""
+    admissionWebhooks:
+      patch:
+        image:
+          registry: ${var.image_registry}/registry.k8s.io
+          digest: ""
   rbac:
     create: true
 
@@ -242,6 +407,9 @@ ingress-nginx:
 
   defaultBackend:
     nodeSelector.beta.kubernetes.io/os: linux
+  service:
+    annotations:
+      service.beta.kubernetes.io/oci-load-balancer-internal: "${local.internal_elb}"
 
 authentication:
   ingressUsername: monitoring
@@ -325,11 +493,11 @@ resource "helm_release" "keda-monitoring" {
   values = [<<EOF
     image:
       metricsApiServer:
-        repository: harbor.devops.indico.io/ghcr.io/kedacore/keda-metrics-apiserver
+        repository: ${var.image_registry}/ghcr.io/kedacore/keda-metrics-apiserver
       webhooks:
-        repository: harbor.devops.indico.io/ghcr.io/kedacore/keda-admission-webhooks
+        repository: ${var.image_registry}/ghcr.io/kedacore/keda-admission-webhooks
       keda:
-        repository: harbor.devops.indico.io/ghcr.io/kedacore/keda
+        repository: ${var.image_registry}/ghcr.io/kedacore/keda
     imagePullSecrets:
       - name: harbor-pull-secret
     resources:
@@ -385,7 +553,7 @@ resource "helm_release" "opentelemetry-collector" {
     imagePullSecrets:
       - name: harbor-pull-secret
     image:
-      repository: harbor.devops.indico.io/docker.io/otel/opentelemetry-collector-contrib
+      repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
     fullnameOverride: "collector-collector"
     mode: deployment
     tolerations:

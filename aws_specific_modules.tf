@@ -23,6 +23,7 @@ module "k8s_dashboard" {
   keycloak_client_secret      = module.keycloak[0].client_secret
   use_static_ssl_certificates = var.use_static_ssl_certificates
   ssl_static_secret_name      = var.ssl_static_secret_name
+  image_registry              = var.image_registry
 }
 
 data "aws_vpc_endpoint_service" "guardduty" {
@@ -34,6 +35,7 @@ data "aws_vpc_endpoint_service" "guardduty" {
 }
 
 resource "aws_vpc_endpoint" "eks_vpc_guardduty" {
+  count = var.create_guardduty_vpc_endpoint ? 1 : 0
   vpc_id            = local.network[0].indico_vpc_id
   service_name      = data.aws_vpc_endpoint_service.guardduty.service_name
   vpc_endpoint_type = "Interface"
@@ -41,7 +43,7 @@ resource "aws_vpc_endpoint" "eks_vpc_guardduty" {
   policy = data.aws_iam_policy_document.eks_vpc_guardduty.json
 
   security_group_ids  = [aws_security_group.eks_vpc_endpoint_guardduty.id]
-  subnet_ids          = local.network[0].public_subnet_ids
+  subnet_ids          = local.network[0].private_subnet_ids
   private_dns_enabled = true
 }
 
@@ -110,7 +112,7 @@ resource "aws_eks_addon" "guardduty" {
 
   cluster_name      = var.label
   addon_name        = "aws-guardduty-agent"
-  addon_version     = "v1.2.0-eksbuild.1"
+  addon_version     = "v1.5.0-eksbuild.1"
   resolve_conflicts = "OVERWRITE"
 
   preserve = true

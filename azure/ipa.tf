@@ -132,7 +132,7 @@ module "secrets-operator-setup" {
   depends_on = [
     module.cluster
   ]
-  count           = var.argo_enabled == true ? 1 : 0
+  count           = var.secrets_operator_enabled == true ? 1 : 0
   source          = "../modules/common/vault-secrets-operator-setup"
   vault_address   = var.vault_address
   account         = var.account
@@ -165,7 +165,7 @@ resource "helm_release" "ipa-vso" {
       - name: harbor-pull-secret
     kubeRbacProxy:
       image:
-        repository: harbor.devops.indico.io/gcr.io/kubebuilder/kube-rbac-proxy
+        repository: ${var.image_registry}/gcr.io/kubebuilder/kube-rbac-proxy
       resources:
         limits:
           cpu: 500m
@@ -176,7 +176,7 @@ resource "helm_release" "ipa-vso" {
 
     manager:
       image:
-        repository: harbor.devops.indico.io/docker.io/hashicorp/vault-secrets-operator
+        repository: ${var.image_registry}/docker.io/hashicorp/vault-secrets-operator
       resources:
         limits:
           cpu: 500m
@@ -189,11 +189,11 @@ resource "helm_release" "ipa-vso" {
     enabled: true
     namespace: default
     method: kubernetes
-    mount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+    mount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
     kubernetes:
-      role: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+      role: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
       tokenAudiences: ["vault"]
-      serviceAccount: ${var.argo_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+      serviceAccount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
 
   defaultVaultConnection:
     enabled: true
@@ -1059,13 +1059,13 @@ resource "helm_release" "external-secrets" {
 
   values = [<<EOF
     image:
-      repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+      repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
     certController:
       image:
-        repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+        repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
     webhook:
       image:
-        repository: harbor.devops.indico.io/ghcr.io/external-secrets/external-secrets
+        repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
   EOF
   ]
 }
