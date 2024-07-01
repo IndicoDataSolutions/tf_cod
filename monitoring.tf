@@ -13,6 +13,7 @@ locals {
   EOT
   )
   backend_port = var.acm_arn != "" ? "http" : "https"
+  enableHttp = var.acm_arn != "" || var.use_nlb == true ? false : true
   lb_config = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
   loadbalancer_config = var.use_nlb == true ? (<<EOT
       external:
@@ -386,6 +387,7 @@ ingress-nginx:
   enabled: true
   controller:
     service:
+      enableHttp: ${local.enableHttp}
       targetPorts:
         https: ${local.backend_port}
 ${local.lb_config}
