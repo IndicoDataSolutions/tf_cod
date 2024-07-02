@@ -1,4 +1,15 @@
 locals {
+  private_dns_config = var.private_dns_zone == true ? (<<EOT
+
+ingress-nginx:
+  controller:
+    service:
+      annotations:
+        service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+        service.beta.kubernetes.io/azure-load-balancer-internal-subnet: ${module.networking.subnet_name}
+  EOT
+  ) : ""
+
   thanos_config = var.thanos_enabled == true ? (<<EOT
       thanos: # this is the one being used
         blockSize: 5m
@@ -148,10 +159,11 @@ EOT
   )
 }
 
+# Public DNS records
 resource "azurerm_dns_caa_record" "grafana-caa" {
-  count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
+  count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" && var.private_dns_zone != true ? 1 : 0
   name                = lower("grafana.${local.dns_prefix}")
-  zone_name           = data.azurerm_dns_zone.domain.name
+  zone_name           = local.base_domain
   resource_group_name = var.common_resource_group
   ttl                 = 300
   record {
@@ -163,9 +175,9 @@ resource "azurerm_dns_caa_record" "grafana-caa" {
 
 
 resource "azurerm_dns_caa_record" "prometheus-caa" {
-  count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
+  count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" && var.private_dns_zone != true ? 1 : 0
   name                = lower("prometheus.${local.dns_prefix}")
-  zone_name           = data.azurerm_dns_zone.domain.name
+  zone_name           = local.base_domain
   resource_group_name = var.common_resource_group
   ttl                 = 300
 
@@ -178,9 +190,9 @@ resource "azurerm_dns_caa_record" "prometheus-caa" {
 
 
 resource "azurerm_dns_caa_record" "alertmanager-caa" {
-  count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" ? 1 : 0
+  count               = var.monitoring_enabled == true && local.kube_prometheus_stack_enabled == true && var.is_alternate_account_domain == "false" && var.private_dns_zone != true ? 1 : 0
   name                = lower("alertmanager.${local.dns_prefix}")
-  zone_name           = data.azurerm_dns_zone.domain.name
+  zone_name           = local.base_domain
   resource_group_name = var.common_resource_group
   ttl                 = 300
 
@@ -206,6 +218,13 @@ output "monitoring-password" {
   value     = random_password.monitoring-password.result
 }
 
+resource "azurerm_role_assignment" "private_dns_contributor" {
+  count                = var.private_dns_zone ? 1 : 0
+  scope                = module.networking.vnet_id
+  role_definition_name = "Network Contributor"
+  principal_id         = module.cluster.principal_id
+}
+
 
 resource "helm_release" "monitoring" {
   count = var.monitoring_enabled == true ? 1 : 0
@@ -216,7 +235,8 @@ resource "helm_release" "monitoring" {
     azurerm_dns_caa_record.alertmanager-caa,
     azurerm_dns_caa_record.grafana-caa,
     azurerm_dns_caa_record.prometheus-caa,
-    time_sleep.wait_1_minutes_after_pre_reqs
+    time_sleep.wait_1_minutes_after_pre_reqs,
+    azurerm_role_assignment.private_dns_contributor
   ]
 
   verify           = false
@@ -273,6 +293,10 @@ ${local.alerting_configuration_values}
 kube-prometheus-stack:
 ${local.kube_prometheus_stack_values}
 EOF
+    ,
+    <<EOF
+${local.private_dns_config}
+    EOF
   ]
 }
 
