@@ -199,6 +199,8 @@ ingress:
     cert-manager.io/cluster-issuer: zerossl
 EOT
   )
+  dns01RecursiveNameserversOnly = var.network_allow_public == true ? false : true
+  dns01RecursiveNameservers = var.network_allow_public == true ? "" : "kube-dns.kube-system.svc.cluster.local:53"
 }
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
@@ -515,6 +517,8 @@ resource "helm_release" "ipa-crds" {
         ${indent(8, yamlencode(var.default_tags))}
 
   cert-manager:
+    dns01RecursiveNameservers: ${local.dns01RecursiveNameservers}
+    dns01RecursiveNameserversOnly: ${local.dns01RecursiveNameserversOnly}
     nodeSelector:
       kubernetes.io/os: linux
     webhook:
