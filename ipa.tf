@@ -890,7 +890,7 @@ celery-backend:
 opentelemetry-operator:
   testFramework:
     image:
-      repository: ${var.image_registry}/docker.io/busybox
+      repository: ${var.image_registry}/docker.io/library/busybox
   kubeRBACProxy:
     image:
       repository: ${var.image_registry}/quay.io/brancz/kube-rbac-proxy
@@ -1190,6 +1190,10 @@ ingress-nginx:
         enabled: true
 
 docker-registry:
+  image:
+    repository: ${var.image_registry}/docker.io/library/registry
+    imagePullSecrets:
+      - name: harbor-pull-secret
   service:
     annotations: 
       external-dns.alpha.kubernetes.io/hostname: "local-registry.${local.dns_name}"
