@@ -525,7 +525,7 @@ variable "external_secrets_version" {
 }
 
 variable "opentelemetry-collector_version" {
-  default = "0.30.0"
+  default = "0.97.1"
 }
 
 variable "include_fsx" {
@@ -560,7 +560,7 @@ variable "pre-reqs-values-yaml-b64" {
   default = "Cg=="
 }
 variable "k8s_dashboard_chart_version" {
-  default = "0.1.0"
+  default = "0.3.2"
 }
 
 variable "enable_k8s_dashboard" {
@@ -575,8 +575,8 @@ variable "use_acm" {
 }
 
 variable "acm_arn" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "arn of a pre-existing acm certificate"
 }
 
@@ -918,6 +918,11 @@ variable "secrets_operator_enabled" {
   description = "Use to enable the secrets operator which is used for maintaining thanos connection"
 }
 
+variable "vault_secrets_operator_version" {
+  type    = string
+  default = "0.7.0"
+}
+
 variable "firewall_subnet_cidrs" {
   type        = list(string)
   default     = []
@@ -948,13 +953,13 @@ variable "readapi_customer" {
 }
 
 variable "create_guardduty_vpc_endpoint" {
-  type = bool
-  default = true
+  type        = bool
+  default     = true
   description = "If true this will create a vpc endpoint for guardduty."
 }
 
 variable "use_nlb" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "If true this will create a NLB loadbalancer instead of a classic VPC ELB"
 }

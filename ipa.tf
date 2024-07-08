@@ -333,7 +333,7 @@ resource "helm_release" "ipa-vso" {
   namespace        = "default"
   repository       = "https://helm.releases.hashicorp.com"
   chart            = "vault-secrets-operator"
-  version          = "0.4.2"
+  version          = var.vault_secrets_operator_version
   wait             = true
   values = [
     <<EOF

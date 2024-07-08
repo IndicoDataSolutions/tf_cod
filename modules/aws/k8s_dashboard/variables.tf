@@ -2,7 +2,7 @@
 variable "local_dns_name" {}
 
 variable "k8s_dashboard_chart_version" {
-  default = "0.1.1"
+  default = "0.3.2"
 }
 
 variable "ipa_repo" {}
