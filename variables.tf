@@ -412,7 +412,7 @@ variable "ipa_smoketest_enabled" {
 
 variable "monitoring_version" {
   type    = string
-  default = "0.3.3"
+  default = "3.0.0"
 }
 
 variable "ipa_pre_reqs_version" {

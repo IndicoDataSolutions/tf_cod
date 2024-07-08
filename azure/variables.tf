@@ -144,7 +144,7 @@ variable "ipa_version" {
 
 variable "monitoring_version" {
   type    = string
-  default = "0.3.3"
+  default = "3.0.0"
 }
 
 variable "ipa_pre_reqs_version" {
