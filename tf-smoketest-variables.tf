@@ -94,7 +94,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     performance_bucket = "${jsonencode(var.performance_bucket)}"
     crds_values_yaml_b64 = "${jsonencode(var.crds-values-yaml-b64)}"
     pre_reqs_values_yaml_b64 = "${jsonencode(var.pre-reqs-values-yaml-b64)}"
-    k8s_dashboard_chart_version = "${jsonencode(var.k8s_dashboard_chart_version)}"
     enable_k8s_dashboard = "${jsonencode(var.enable_k8s_dashboard)}"
     use_acm = "${jsonencode(var.use_acm)}"
     acm_arn = "${jsonencode(var.acm_arn)}"

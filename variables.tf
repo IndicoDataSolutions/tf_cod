@@ -559,9 +559,6 @@ variable "crds-values-yaml-b64" {
 variable "pre-reqs-values-yaml-b64" {
   default = "Cg=="
 }
-variable "k8s_dashboard_chart_version" {
-  default = "0.3.2"
-}
 
 variable "enable_k8s_dashboard" {
   type    = bool
