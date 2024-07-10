@@ -9,7 +9,7 @@ locals {
   storage_class = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
 
   enable_external_dns = var.use_static_ssl_certificates == false ? true : false
-  acm_arn = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
+  acm_arn             = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:
     enabled: false
@@ -200,7 +200,7 @@ ingress:
 EOT
   )
   dns01RecursiveNameserversOnly = var.network_allow_public == true ? false : true
-  dns01RecursiveNameservers = var.network_allow_public == true ? "" : "kube-dns.kube-system.svc.cluster.local:53"
+  dns01RecursiveNameservers     = var.network_allow_public == true ? "" : "kube-dns.kube-system.svc.cluster.local:53"
 }
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
@@ -540,7 +540,7 @@ resource "helm_release" "ipa-crds" {
         repository: ${var.image_registry}/quay.io/jetstack/cert-manager-acmesolver
     startupapicheck:
       image:
-        repository: ${var.image_registry}/quay.io/jetstack/cert-manager-ctl
+        repository: ${var.image_registry}/quay.io/jetstack/cert-manager-startupapicheck
     enabled: true
     installCRDs: true
 EOF
