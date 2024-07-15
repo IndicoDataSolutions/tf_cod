@@ -122,6 +122,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     enable_custom_cluster_issuer = "${jsonencode(var.enable_custom_cluster_issuer)}"
     custom_cluster_issuer_spec = "${jsonencode(var.custom_cluster_issuer_spec)}"
     secrets_operator_enabled = "${jsonencode(var.secrets_operator_enabled)}"
+    vault_secrets_operator_version = "${jsonencode(var.vault_secrets_operator_version)}"
 
     }
   }
