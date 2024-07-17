@@ -3,7 +3,7 @@ Terraform repo used for Clusters On Demand (COD)
 
 ## pre-commit setup
 
-1. Make sure you install the python requirements for this repo.
+1. Make sure you install the python requirements for this repo. 
 
    `pip install -r smoketests/requirements.txt`
 
