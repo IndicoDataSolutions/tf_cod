@@ -842,3 +842,21 @@ variable "lambda_sns_forwarder_topic_arn" {
   default = ""
   description = "SNS topic to triger lambda forwarder."
 }
+
+variable "lambda_sns_forwarder_github_repository" {
+  type = string
+  default = ""
+  description = "The github repository containing the lambda_sns_forwarder code to use"
+}
+
+variable "lambda_sns_forwarder_github_branch" {
+  type = string
+  default = "main"
+  description = "The github branch / tag containing the lambda_sns_forwarder code to use"
+}
+
+variable "lambda_sns_forwarder_function_variables" {
+  type = map
+  default = {}
+  description = "A map of variables for the lambda_sns_forwarder code to use"
+}

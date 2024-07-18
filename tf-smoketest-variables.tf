@@ -141,6 +141,9 @@ resource "kubernetes_config_map" "terraform-variables" {
     lambda_sns_forwarder_enabled = "${jsonencode(var.lambda_sns_forwarder_enabled)}"
     lambda_sns_forwarder_destination_endpoint = "${jsonencode(var.lambda_sns_forwarder_destination_endpoint)}"
     lambda_sns_forwarder_topic_arn = "${jsonencode(var.lambda_sns_forwarder_topic_arn)}"
+    lambda_sns_forwarder_github_repository = "${jsonencode(var.lambda_sns_forwarder_github_repository)}"
+    lambda_sns_forwarder_github_branch = "${jsonencode(var.lambda_sns_forwarder_github_branch)}"
+    lambda_sns_forwarder_function_variables = "${jsonencode(var.lambda_sns_forwarder_function_variables)}"
 
     }
   }
