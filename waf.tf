@@ -1,5 +1,5 @@
 resource "aws_wafv2_web_acl" "wafv2-acl" {
-  count    = var.enable_waf == true ? 1 : 0
+  count       = var.enable_waf == true ? 1 : 0
   name        = "${var.label}-wafv2"
   description = "${var.label}-wafv2 managed rules."
   scope       = "REGIONAL"
@@ -51,7 +51,7 @@ resource "aws_wafv2_web_acl" "wafv2-acl" {
       sampled_requests_enabled   = true
     }
   }
-  
+
   rule {
     name     = "AWS-AWSManagedRulesAmazonIpReputationList"
     priority = 2
@@ -83,6 +83,6 @@ resource "aws_wafv2_web_acl" "wafv2-acl" {
 
 
 output "wafv2_arn" {
-    description = "arn of the wafv2 acl"
-    value       = var.enable_waf == true ? aws_wafv2_web_acl.wafv2-acl[0].arn : ""
+  description = "arn of the wafv2 acl"
+  value       = var.enable_waf == true ? aws_wafv2_web_acl.wafv2-acl[0].arn : ""
 }

@@ -144,7 +144,7 @@ variable "ipa_version" {
 
 variable "monitoring_version" {
   type    = string
-  default = "0.3.3"
+  default = "3.0.0"
 }
 
 variable "ipa_pre_reqs_version" {
@@ -200,7 +200,7 @@ variable "svp_client_secret" {
 
 variable "k8s_version" {
   type        = string
-  default     = "1.27.3"
+  default     = "1.29"
   description = "The version of the kubernetes cluster"
 }
 
@@ -306,7 +306,7 @@ variable "monitoring_enabled" {
 
 variable "keda_version" {
   type        = string
-  default     = "2.11.2"
+  default     = "2.13.2"
   description = "Version of keda helm chart"
 }
 
@@ -318,7 +318,7 @@ variable "external_secrets_version" {
 
 variable "opentelemetry-collector_version" {
   type        = string
-  default     = "0.30.0"
+  default     = "0.97.1"
   description = "Version of opentelemetry-collector helm chart"
 }
 
@@ -376,7 +376,7 @@ variable "cod_snapshot_restore_version" {
 
 variable "vault_mount_path" {
   type    = string
-  default = "terraform"
+  default = null
 }
 
 variable "vault_username" {
@@ -647,4 +647,113 @@ variable "harness_delegate" {
 variable "harness_mount_path" {
   type    = string
   default = "harness"
+}
+
+variable "terraform_smoketests_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "resource_group_name" {
+  type    = string
+  default = null
+}
+
+variable "create_resource_group" {
+  type    = bool
+  default = true
+}
+
+variable "use_static_ssl_certificates" {
+  type    = bool
+  default = false
+}
+
+variable "ssl_static_secret_name" {
+  type        = string
+  default     = "indico-ssl-static-cert"
+  description = "secret_name for static ssl certificate"
+}
+
+# Log analytics
+
+variable "sentinel_workspace_name" {
+  type    = string
+  default = null # "${var.account}-sentinel-workspace"
+}
+
+variable "sentinel_workspace_resource_group_name" {
+  type    = string
+  default = null # "${var.account}-sentinel-group"
+}
+
+
+variable "image_registry" {
+  type        = string
+  default     = "harbor.devops.indico.io"
+  description = "docker image registry to use for pulling images."
+}
+
+variable "sentinel_workspace_id" {
+  type    = string
+  default = null
+}
+
+### cluster manager variables
+variable "cluster_manager_vm_size" {
+  type        = string
+  default     = "Standard_Fs_v2"
+  description = "The cluster manager instance size"
+}
+
+variable "network_type" {
+  type    = string
+  default = "create"
+}
+
+variable "network_resource_group_name" {
+  type    = string
+  default = null
+}
+
+variable "virtual_network_name" {
+  default = null
+  type    = string
+}
+
+variable "virtual_subnet_name" {
+  default = null
+  type    = string
+}
+
+variable "keyvault_name" {
+  default = null
+  type    = string
+}
+
+variable "network_plugin" {
+  default = "kubenet"
+  type    = string
+}
+
+variable "enable_custom_cluster_issuer" {
+  default = false
+  type    = bool
+}
+
+variable "custom_cluster_issuer_spec" {
+  default = ""
+  type    = string
+}
+
+
+variable "secrets_operator_enabled" {
+  type        = bool
+  default     = true
+  description = "Use to enable the secrets operator which is used for maintaining thanos connection"
+}
+
+variable "vault_secrets_operator_version" {
+  type    = string
+  default = "0.7.0"
 }

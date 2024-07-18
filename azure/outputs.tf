@@ -1,5 +1,5 @@
 output "workload_identity_client_id" {
-  value = azuread_application.workload_identity.application_id
+  value = var.use_workload_identity == true ? azuread_application.workload_identity.0.application_id : ""
 }
 
 output "cluster_name" {
@@ -33,3 +33,9 @@ output "argo_repo" {
 output "harness_delegate_name" {
   value = var.harness_delegate == true && length(module.harness_delegate) > 0 ? module.harness_delegate[0].delegate_name : ""
 }
+
+# use this so Thanatos knows what resource group name to use for a destroy
+output "resource_group_name" {
+  value = local.resource_group_name
+}
+

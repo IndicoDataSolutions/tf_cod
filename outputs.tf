@@ -100,3 +100,7 @@ output "argo_path" {
 output "argo_repo" {
   value = var.argo_repo
 }
+
+output "monitoring_enabled" {
+  value = var.monitoring_enabled
+}

@@ -66,6 +66,13 @@ variable "aws_secret_key" {
   sensitive   = true
 }
 
+variable "aws_session_token" {
+  type        = string
+  description = "The AWS session token to use for deployment"
+  sensitive   = true
+  default     = null
+}
+
 variable "indico_aws_access_key_id" {
   type        = string
   description = "The AWS access key for controlling dns in an alternate account"
@@ -78,6 +85,13 @@ variable "indico_aws_secret_access_key" {
   description = "The AWS secret key for controlling dns in an alternate account"
   sensitive   = true
   default     = ""
+}
+
+variable "indico_aws_session_token" {
+  type        = string
+  description = "The AWS session token to use for deployment in an alternate account"
+  sensitive   = true
+  default     = null
 }
 
 variable "direct_connect" {
@@ -178,7 +192,7 @@ variable "cluster_name" {
 
 variable "k8s_version" {
   type        = string
-  default     = "1.27"
+  default     = "1.29"
   description = "The EKS version to use"
 }
 
@@ -398,7 +412,7 @@ variable "ipa_smoketest_enabled" {
 
 variable "monitoring_version" {
   type    = string
-  default = "0.3.3"
+  default = "3.0.0"
 }
 
 variable "ipa_pre_reqs_version" {
@@ -501,7 +515,7 @@ variable "hibernation_enabled" {
 }
 
 variable "keda_version" {
-  default = "2.11.2"
+  default = "2.13.2"
 }
 
 variable "external_secrets_version" {
@@ -511,7 +525,7 @@ variable "external_secrets_version" {
 }
 
 variable "opentelemetry-collector_version" {
-  default = "0.30.0"
+  default = "0.97.1"
 }
 
 variable "include_fsx" {
@@ -545,9 +559,6 @@ variable "crds-values-yaml-b64" {
 variable "pre-reqs-values-yaml-b64" {
   default = "Cg=="
 }
-variable "k8s_dashboard_chart_version" {
-  default = "0.1.0"
-}
 
 variable "enable_k8s_dashboard" {
   type    = bool
@@ -558,6 +569,12 @@ variable "use_acm" {
   type        = bool
   default     = false
   description = "create cluster that will use acm"
+}
+
+variable "acm_arn" {
+  type        = string
+  default     = ""
+  description = "arn of a pre-existing acm certificate"
 }
 
 variable "enable_waf" {
@@ -576,41 +593,6 @@ variable "terraform_vault_mount_path" {
   default = "terraform"
 }
 
-variable "snowflake_enabled" {
-  type    = bool
-  default = true
-}
-
-variable "snowflake_region" {
-  default     = "us-east-2.aws"
-  type        = string
-  description = "region the snowflake instance resides"
-}
-
-variable "snowflake_username" {
-  default     = "tf-snow"
-  type        = string
-  description = "snowflake master username"
-}
-
-variable "snowflake_account" {
-  default     = "ZL54998"
-  type        = string
-  description = "account identifier"
-}
-
-variable "snowflake_private_key" {
-  default     = null
-  type        = string
-  description = "Private Key for username+private-key snowflake auth"
-}
-
-variable "snowflake_db_name" {
-  type        = string
-  default     = "INDICO_DEV"
-  description = "the db name that snowflake resources will be connected with"
-}
-
 variable "enable_weather_station" {
   type        = bool
   default     = false
@@ -618,7 +600,7 @@ variable "enable_weather_station" {
 }
 
 variable "aws_primary_dns_role_arn" {
-  type        = string 
+  type        = string
   default     = ""
   description = "The AWS arn for the role needed to manage route53 DNS in a different account."
 }
@@ -794,6 +776,13 @@ variable "indico_devops_aws_secret_access_key" {
   default     = ""
 }
 
+variable "indico_devops_aws_session_token" {
+  type        = string
+  description = "Indico-Devops account AWS session token to use for deployment"
+  sensitive   = true
+  default     = null
+}
+
 variable "indico_devops_aws_region" {
   type        = string
   description = "The Indico-Devops devops cluster region"
@@ -815,9 +804,18 @@ variable "terraform_smoketests_enabled" {
   default = true
 }
 
+variable "on_prem_test" {
+  type    = bool
+  default = false
+}
 variable "harness_delegate" {
   type    = bool
   default = false
+}
+
+variable "harness_delegate_replicas" {
+  type    = number
+  default = 1
 }
 
 variable "harness_mount_path" {
@@ -859,4 +857,142 @@ variable "lambda_sns_forwarder_function_variables" {
   type = map
   default = {}
   description = "A map of variables for the lambda_sns_forwarder code to use"
+}
+
+variable "enable_s3_backup" {
+  type        = bool
+  default     = true
+  description = "Allow backing up data bucket on s3"
+}
+
+variable "cluster_api_endpoint_public" {
+  type        = bool
+  default     = true
+  description = "If enabled this allow public access to the cluster api endpoint."
+}
+
+variable "network_allow_public" {
+  type        = bool
+  default     = true
+  description = "If enabled this will create public subnets, IGW, and NAT gateway."
+}
+
+variable "network_module" {
+  type    = string
+  default = "networking"
+
+  validation {
+    condition     = var.network_module == "public_networking" || var.network_module == "networking"
+    error_message = "${var.network_module} not valid. Type must be either public_networking or networking"
+  }
+}
+
+variable "network_type" {
+  type    = string
+  default = "create"
+
+  validation {
+    condition     = var.network_type == "create" || var.network_type == "load"
+    error_message = "${var.network_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "load_vpc_id" {
+  type        = string
+  default     = ""
+  description = "This is required if loading a network rather than creating one."
+}
+
+variable "private_subnet_tag_name" {
+  type    = string
+  default = "Name"
+}
+
+variable "private_subnet_tag_value" {
+  type    = string
+  default = "*private*"
+}
+
+variable "public_subnet_tag_name" {
+  type    = string
+  default = "Name"
+}
+
+variable "public_subnet_tag_value" {
+  type    = string
+  default = "*public*"
+}
+
+variable "sg_tag_name" {
+  type    = string
+  default = "Name"
+}
+
+variable "sg_tag_value" {
+  type    = string
+  default = "*-allow-subnets"
+}
+
+variable "s3_endpoint_enabled" {
+  type        = bool
+  default     = false
+  description = "If set to true, an S3 VPC endpoint will be created. If this variable is set, the `region` variable must also be set"
+}
+
+variable "image_registry" {
+  type        = string
+  default     = "harbor.devops.indico.io"
+  description = "docker image registry to use for pulling images."
+}
+
+variable "secrets_operator_enabled" {
+  type        = bool
+  default     = true
+  description = "Use to enable the secrets operator which is used for maintaining thanos connection"
+}
+
+variable "vault_secrets_operator_version" {
+  type    = string
+  default = "0.7.0"
+}
+
+variable "firewall_subnet_cidrs" {
+  type        = list(string)
+  default     = []
+  description = "CIDR ranges for the firewall subnets"
+}
+
+variable "enable_firewall" {
+  type        = bool
+  default     = false
+  description = "If enabled this will create firewall and internet gateway"
+}
+
+variable "firewall_allow_list" {
+  type    = list(string)
+  default = [".cognitiveservices.azure.com"]
+}
+
+variable "dns_zone_name" {
+  type        = string
+  default     = ""
+  description = "Name of the dns zone used to control DNS"
+}
+
+variable "readapi_customer" {
+  type        = string
+  default     = null
+  description = "Name of the customer readapi is being deployed in behalf."
+}
+
+variable "create_guardduty_vpc_endpoint" {
+  type        = bool
+  default     = true
+  description = "If true this will create a vpc endpoint for guardduty."
+}
+
+variable "use_nlb" {
+  type        = bool
+  default     = false
+  description = "If true this will create a NLB loadbalancer instead of a classic VPC ELB"
 }
