@@ -188,7 +188,7 @@ module "lambda-sns-forwarder" {
   github_organization  = var.lambda_sns_forwarder_github_organization
   github_repository    = var.lambda_sns_forwarder_github_repository
   github_branch        = var.lambda_sns_forwarder_github_branch
-  git_zip_path         = var.lambda_sns_fowarder_github_zip_path
+  git_zip_path         = var.lambda_sns_forwarder_github_zip_path
   function_variables   = var.lambda_sns_forwarder_function_variables
 }
 
