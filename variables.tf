@@ -841,6 +841,12 @@ variable "lambda_sns_forwarder_topic_arn" {
   description = "SNS topic to triger lambda forwarder."
 }
 
+variable "lambda_sns_forwarder_github_organization" {
+  type = string
+  default = "IndicoDataSolutions"
+  description = "The github organization containing the lambda_sns_forwarder code to use"
+}
+
 variable "lambda_sns_forwarder_github_repository" {
   type = string
   default = ""
@@ -851,6 +857,12 @@ variable "lambda_sns_forwarder_github_branch" {
   type = string
   default = "main"
   description = "The github branch / tag containing the lambda_sns_forwarder code to use"
+}
+
+variable "lambda_sns_forwarder_github_zip_path" {
+  type      = string
+  default   = "zip/lambda.zip"
+  description = "Full path to the lambda zip file"
 }
 
 variable "lambda_sns_forwarder_function_variables" {

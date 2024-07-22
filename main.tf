@@ -185,8 +185,10 @@ module "lambda-sns-forwarder" {
   kms_key              = module.kms_key.key_arn
   sns_arn              = var.lambda_sns_forwarder_topic_arn == "" ? module.sqs_sns[0].indico_ipa_topic_arn : var.lambda_sns_forwarder_topic_arn
   destination_endpoint = var.lambda_sns_forwarder_destination_endpoint
+  github_organization  = var.lambda_sns_forwarder_github_organization
   github_repository    = var.lambda_sns_forwarder_github_repository
   github_branch        = var.lambda_sns_forwarder_github_branch
+  git_zip_path         = var.lambda_sns_fowarder_github_zip_path
   function_variables   = var.lambda_sns_forwarder_function_variables
 }
 
