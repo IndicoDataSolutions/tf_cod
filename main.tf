@@ -44,10 +44,6 @@ terraform {
       source  = "loafoe/htpasswd"
       version = "1.0.4"
     }
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "3.95.0"
-    }
   }
 }
 
