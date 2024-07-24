@@ -87,7 +87,7 @@ provider "aws" {
   secret_key = var.is_alternate_account_domain == "true" ? var.indico_aws_secret_access_key : var.aws_secret_key
   token      = var.is_alternate_account_domain == "true" ? var.indico_aws_session_token : var.aws_session_token
   region     = var.region
-  alias      = "dns-control" 
+  alias      = "dns-control"
   default_tags {
     tags = var.default_tags
   }
@@ -179,6 +179,7 @@ module "kms_key" {
 }
 
 module "security-group" {
+  count    = var.network_module == "networking" ? 0 : 1
   source   = "app.terraform.io/indico/indico-aws-security-group/mod"
   version  = "1.0.0"
   label    = var.label
@@ -239,7 +240,7 @@ module "efs-storage" {
   version            = "0.0.1"
   label              = var.label
   additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage" })
-  security_groups    = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
+  security_groups    = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group[0].all_subnets_sg_id]
   private_subnet_ids = flatten([local.network[0].private_subnet_ids])
   kms_key_arn        = module.kms_key.key_arn
 
@@ -252,7 +253,7 @@ module "efs-storage-local-registry" {
   version            = "0.0.1"
   label              = "${var.label}-local-registry"
   additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage-local-registry" })
-  security_groups    = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
+  security_groups    = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group[0].all_subnets_sg_id]
   private_subnet_ids = flatten([local.network[0].private_subnet_ids])
   kms_key_arn        = module.kms_key.key_arn
 }
@@ -266,7 +267,7 @@ module "fsx-storage" {
   region                      = var.region
   storage_capacity            = var.storage_capacity
   subnet_id                   = local.network[0].private_subnet_ids[0]
-  security_group_id           = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  security_group_id           = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group[0].all_subnets_sg_id
   data_bucket                 = module.s3-storage.data_s3_bucket_name
   api_models_bucket           = module.s3-storage.api_models_s3_bucket_name
   kms_key                     = module.kms_key.key
@@ -286,7 +287,7 @@ module "cluster" {
   region                                = var.region
   map_users                             = values(local.eks_users)
   vpc_id                                = local.network[0].indico_vpc_id
-  security_group_id                     = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  security_group_id                     = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group[0].all_subnets_sg_id
   cluster_additional_security_group_ids = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : []
   subnet_ids                            = flatten([local.network[0].private_subnet_ids])
   node_groups                           = var.node_groups
@@ -442,7 +443,7 @@ locals {
 
 
 data "aws_route53_zone" "primary" {
-  count = var.use_static_ssl_certificates ? 0 : 1
+  count    = var.use_static_ssl_certificates ? 0 : 1
   name     = var.is_alternate_account_domain == "false" ? local.dns_zone_name : lower(local.alternate_domain_root)
   provider = aws.dns-control
 }
