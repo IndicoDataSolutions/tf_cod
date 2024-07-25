@@ -447,41 +447,41 @@ resource "helm_release" "ipa-crds" {
         cluster: ${var.image_registry}/registry.crunchydata.com/crunchydata/postgres-operator:ubi8-5.5.0-2
       relatedImages:
         postgres_16:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-16.1-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-16.3-1
         postgres_16_gis_3.4:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.1-3.4-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.3-3.4-1
         postgres_16_gis_3.3:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.1-3.3-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.3-3.3-1
         postgres_15:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-15.5-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-15.7-1
         postgres_15_gis_3.3:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-15.5-3.3-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-15.7-3.3-1
         postgres_14:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.10-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.12-1
         postgres_14_gis_3.1:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.10-3.1-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.12-3.1-1
         postgres_14_gis_3.2:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.10-3.2-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.12-3.2-1
         postgres_14_gis_3.3:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.10-3.3-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.12-3.3-1
         postgres_13:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-13.13-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-13.15-1
         postgres_13_gis_3.0:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.13-3.0-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.15-3.0-1
         postgres_13_gis_3.1:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.13-3.1-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.15-3.1-1
         pgadmin:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-4.30-21
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-4.30-26
         pgbackrest:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.47-4
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.51-1
         pgbouncer:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbouncer:ubi8-1.21-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbouncer:ubi8-1.22-1
         pgexporter:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi8-0.15.0-0
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi8-0.15.0-7
         pgupgrade:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-upgrade:ubi8-5.5.0-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-upgrade:ubi8-5.6.0-0
         standalone_pgadmin:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-7.8-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-8.6-1
   migrations-operator:
     image:
       repository: ${var.image_registry}/indico/migrations-operator
