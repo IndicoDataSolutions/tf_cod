@@ -841,6 +841,12 @@ variable "network_allow_public" {
   description = "If enabled this will create public subnets, IGW, and NAT gateway."
 }
 
+variable "internal_elb_use_public_subnets" {
+  type        = bool
+  default     = true
+  description = "If enabled, this will use public subnets for the internal elb. Otherwise use the private subnets"
+}
+
 variable "network_module" {
   type    = string
   default = "networking"

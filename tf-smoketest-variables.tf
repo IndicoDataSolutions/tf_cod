@@ -137,6 +137,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     enable_s3_backup = "${jsonencode(var.enable_s3_backup)}"
     cluster_api_endpoint_public = "${jsonencode(var.cluster_api_endpoint_public)}"
     network_allow_public = "${jsonencode(var.network_allow_public)}"
+    internal_elb_use_public_subnets = "${jsonencode(var.internal_elb_use_public_subnets)}"
     network_module = "${jsonencode(var.network_module)}"
     network_type = "${jsonencode(var.network_type)}"
     load_vpc_id = "${jsonencode(var.load_vpc_id)}"
