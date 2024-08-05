@@ -158,7 +158,7 @@ global:
     - name: local-pull-secret
     - name: harbor-pull-secret
   image:
-    registry: local-registry.${local.dns_name}/indico
+    registry: local-registry.${local.dns_name}/indico/docker.io/library
 
 app-edge:
   image:
