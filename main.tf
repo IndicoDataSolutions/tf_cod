@@ -177,7 +177,7 @@ module "lambda-sns-forwarder" {
   region               = var.region
   label                = var.label
   subnet_ids           = flatten([local.network[0].private_subnet_ids])
-  security_group_id    = module.security-group.all_subnets_sg_id
+  security_group_id    = var.network_module == "networking" ? module.networking.all_subnets_sg_id : module.security-group.all_subnets_sg_id[0]
   kms_key              = module.kms_key.key_arn
   sns_arn              = var.lambda_sns_forwarder_topic_arn == "" ? module.sqs_sns[0].indico_ipa_topic_arn : var.lambda_sns_forwarder_topic_arn
   destination_endpoint = var.lambda_sns_forwarder_destination_endpoint
