@@ -198,12 +198,12 @@ module "kms_key" {
 }
 
 module "security-group" {
-  count    = var.network_module == "networking" ? 0 : 1
   source   = "app.terraform.io/indico/indico-aws-security-group/mod"
-  version  = "1.0.0"
+  version  = "3.0.0"
   label    = var.label
   vpc_cidr = var.vpc_cidr
   vpc_id   = local.network[0].indico_vpc_id
+  network_module = var.network_module
 }
 
 
