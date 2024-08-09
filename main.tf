@@ -203,6 +203,7 @@ module "security-group" {
   label    = var.label
   vpc_cidr = var.vpc_cidr
   vpc_id   = local.network[0].indico_vpc_id
+  network_module = var.network_module
 }
 
 
