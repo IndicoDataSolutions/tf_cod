@@ -177,7 +177,7 @@ module "lambda-sns-forwarder" {
   region               = var.region
   label                = var.label
   subnet_ids           = flatten([local.network[0].private_subnet_ids])
-  security_group_id    = var.network_module == "networking" ? module.networking.all_subnets_sg_id : module.security-group.all_subnets_sg_id[0]
+  security_group_id    = var.network_module == "networking" ? module.networking.all_subnets_sg_id : module.security-group.all_subnets_sg_id
   kms_key              = module.kms_key.key_arn
   sns_arn              = var.lambda_sns_forwarder_topic_arn == "" ? module.sqs_sns[0].indico_ipa_topic_arn : var.lambda_sns_forwarder_topic_arn
   destination_endpoint = var.lambda_sns_forwarder_destination_endpoint
@@ -198,12 +198,12 @@ module "kms_key" {
 }
 
 module "security-group" {
-  count    = var.network_module == "networking" ? 0 : 1
   source   = "app.terraform.io/indico/indico-aws-security-group/mod"
-  version  = "1.0.0"
+  version  = "3.0.0"
   label    = var.label
   vpc_cidr = var.vpc_cidr
   vpc_id   = local.network[0].indico_vpc_id
+  network_module = var.network_module
 }
 
 
@@ -259,7 +259,7 @@ module "efs-storage" {
   version            = "0.0.1"
   label              = var.label
   additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage" })
-  security_groups    = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group[0].all_subnets_sg_id]
+  security_groups    = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
   private_subnet_ids = flatten([local.network[0].private_subnet_ids])
   kms_key_arn        = module.kms_key.key_arn
 
@@ -272,7 +272,7 @@ module "efs-storage-local-registry" {
   version            = "0.0.1"
   label              = "${var.label}-local-registry"
   additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage-local-registry" })
-  security_groups    = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group[0].all_subnets_sg_id]
+  security_groups    = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
   private_subnet_ids = flatten([local.network[0].private_subnet_ids])
   kms_key_arn        = module.kms_key.key_arn
 }
@@ -286,7 +286,7 @@ module "fsx-storage" {
   region                      = var.region
   storage_capacity            = var.storage_capacity
   subnet_id                   = local.network[0].private_subnet_ids[0]
-  security_group_id           = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group[0].all_subnets_sg_id
+  security_group_id           = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
   data_bucket                 = module.s3-storage.data_s3_bucket_name
   api_models_bucket           = module.s3-storage.api_models_s3_bucket_name
   kms_key                     = module.kms_key.key
@@ -306,7 +306,7 @@ module "cluster" {
   region                                = var.region
   map_users                             = values(local.eks_users)
   vpc_id                                = local.network[0].indico_vpc_id
-  security_group_id                     = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group[0].all_subnets_sg_id
+  security_group_id                     = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
   cluster_additional_security_group_ids = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : []
   subnet_ids                            = flatten([local.network[0].private_subnet_ids])
   node_groups                           = var.node_groups
