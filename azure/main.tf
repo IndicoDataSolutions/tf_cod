@@ -284,7 +284,7 @@ module "cluster" {
 
   source                     = "app.terraform.io/indico/indico-azure-cluster/mod"
   insights_retention_in_days = var.monitor_retention_in_days
-  version                    = "4.0.0"
+  version                    = "4.1.0"
   label                      = var.label
   public_key                 = tls_private_key.pk.public_key_openssh
   region                     = var.region
@@ -303,6 +303,8 @@ module "cluster" {
   sentinel_workspace_name                = local.sentinel_workspace_name
   sentinel_workspace_resource_group_name = local.sentinel_workspace_resource_group_name
   sentinel_workspace_id                  = var.sentinel_workspace_id
+
+  aks_storage_account_name = var.aks_storage_account_name
 
 
   # this feature can be checked using:

@@ -757,3 +757,9 @@ variable "vault_secrets_operator_version" {
   type    = string
   default = "0.7.0"
 }
+
+variable "aks_storage_account_name" {
+  type        = string
+  default     = ""
+  description = "specifies the storage account name for the cluster if we don't want it generated automatically"
+}
