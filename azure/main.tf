@@ -337,7 +337,6 @@ module "readapi_queue" {
 
 locals {
   readapi_secret_path       = var.environment == "production" ? "prod-readapi" : "dev-readapi"
-  default_mount_path        = coalesce(var.vault_mount_path, "terraform")
   customer_vault_mount_path = "customer-${coalesce(var.vault_mount_path, var.account)}"
 }
 
