@@ -144,7 +144,7 @@ variable "ipa_version" {
 
 variable "monitoring_version" {
   type    = string
-  default = "0.3.3"
+  default = "3.0.0"
 }
 
 variable "ipa_pre_reqs_version" {
@@ -318,7 +318,7 @@ variable "external_secrets_version" {
 
 variable "opentelemetry-collector_version" {
   type        = string
-  default     = "0.30.0"
+  default     = "0.97.1"
   description = "Version of opentelemetry-collector helm chart"
 }
 
@@ -689,8 +689,8 @@ variable "sentinel_workspace_resource_group_name" {
 
 
 variable "image_registry" {
-  type = string
-  default = "harbor.devops.indico.io"
+  type        = string
+  default     = "harbor.devops.indico.io"
   description = "docker image registry to use for pulling images."
 }
 
@@ -796,7 +796,12 @@ variable "docker_bridge_cidr" {
 }
 
 variable "secrets_operator_enabled" {
-  type = bool
-  default = true
+  type        = bool
+  default     = true
   description = "Use to enable the secrets operator which is used for maintaining thanos connection"
+}
+
+variable "vault_secrets_operator_version" {
+  type    = string
+  default = "0.7.0"
 }

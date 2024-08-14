@@ -9,7 +9,7 @@ locals {
   storage_class = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
 
   enable_external_dns = var.use_static_ssl_certificates == false ? true : false
-  acm_arn = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
+  acm_arn             = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:
     enabled: false
@@ -158,7 +158,7 @@ global:
     - name: local-pull-secret
     - name: harbor-pull-secret
   image:
-    registry: local-registry.${local.dns_name}/indico
+    registry: local-registry.${local.dns_name}/docker.io/library
 
 app-edge:
   image:
@@ -198,6 +198,8 @@ ingress:
     cert-manager.io/cluster-issuer: zerossl
 EOT
   )
+  dns01RecursiveNameserversOnly = var.network_allow_public == true ? false : true
+  dns01RecursiveNameservers     = var.network_allow_public == true ? "" : "kube-dns.kube-system.svc.cluster.local:53"
 }
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
@@ -330,7 +332,7 @@ resource "helm_release" "ipa-vso" {
   namespace        = "default"
   repository       = "https://helm.releases.hashicorp.com"
   chart            = "vault-secrets-operator"
-  version          = "0.4.2"
+  version          = var.vault_secrets_operator_version
   wait             = true
   values = [
     <<EOF
@@ -444,41 +446,41 @@ resource "helm_release" "ipa-crds" {
         cluster: ${var.image_registry}/registry.crunchydata.com/crunchydata/postgres-operator:ubi8-5.5.0-2
       relatedImages:
         postgres_16:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-16.1-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-16.3-1
         postgres_16_gis_3.4:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.1-3.4-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.3-3.4-1
         postgres_16_gis_3.3:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.1-3.3-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.3-3.3-1
         postgres_15:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-15.5-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-15.7-1
         postgres_15_gis_3.3:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-15.5-3.3-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-15.7-3.3-1
         postgres_14:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.10-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.12-1
         postgres_14_gis_3.1:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.10-3.1-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.12-3.1-1
         postgres_14_gis_3.2:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.10-3.2-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.12-3.2-1
         postgres_14_gis_3.3:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.10-3.3-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.12-3.3-1
         postgres_13:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-13.13-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-13.15-1
         postgres_13_gis_3.0:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.13-3.0-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.15-3.0-1
         postgres_13_gis_3.1:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.13-3.1-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.15-3.1-1
         pgadmin:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-4.30-21
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-4.30-26
         pgbackrest:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.47-4
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.51-1
         pgbouncer:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbouncer:ubi8-1.21-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbouncer:ubi8-1.22-1
         pgexporter:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi8-0.15.0-0
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi8-0.15.0-7
         pgupgrade:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-upgrade:ubi8-5.5.0-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-upgrade:ubi8-5.6.0-0
         standalone_pgadmin:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-7.8-2
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-8.6-1
   migrations-operator:
     image:
       repository: ${var.image_registry}/indico/migrations-operator
@@ -514,6 +516,8 @@ resource "helm_release" "ipa-crds" {
         ${indent(8, yamlencode(var.default_tags))}
 
   cert-manager:
+    dns01RecursiveNameservers: ${local.dns01RecursiveNameservers}
+    dns01RecursiveNameserversOnly: ${local.dns01RecursiveNameserversOnly}
     nodeSelector:
       kubernetes.io/os: linux
     webhook:
@@ -535,7 +539,7 @@ resource "helm_release" "ipa-crds" {
         repository: ${var.image_registry}/quay.io/jetstack/cert-manager-acmesolver
     startupapicheck:
       image:
-        repository: ${var.image_registry}/quay.io/jetstack/cert-manager-ctl
+        repository: ${var.image_registry}/quay.io/jetstack/cert-manager-startupapicheck
     enabled: true
     installCRDs: true
 EOF
@@ -885,7 +889,7 @@ celery-backend:
 opentelemetry-operator:
   testFramework:
     image:
-      repository: ${var.image_registry}/docker.io/busybox
+      repository: ${var.image_registry}/docker.io/library/busybox
   kubeRBACProxy:
     image:
       repository: ${var.image_registry}/quay.io/brancz/kube-rbac-proxy
@@ -1185,6 +1189,10 @@ ingress-nginx:
         enabled: true
 
 docker-registry:
+  image:
+    repository: ${var.image_registry}/docker.io/library/registry
+    imagePullSecrets:
+      - name: harbor-pull-secret
   service:
     annotations: 
       external-dns.alpha.kubernetes.io/hostname: "local-registry.${local.dns_name}"

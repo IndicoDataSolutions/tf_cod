@@ -131,6 +131,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     dns_service_ip = "${jsonencode(var.dns_service_ip)}"
     docker_bridge_cidr = "${jsonencode(var.docker_bridge_cidr)}"
     secrets_operator_enabled = "${jsonencode(var.secrets_operator_enabled)}"
+    vault_secrets_operator_version = "${jsonencode(var.vault_secrets_operator_version)}"
 
     }
   }

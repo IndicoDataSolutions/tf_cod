@@ -412,7 +412,7 @@ variable "ipa_smoketest_enabled" {
 
 variable "monitoring_version" {
   type    = string
-  default = "0.3.3"
+  default = "3.0.0"
 }
 
 variable "ipa_pre_reqs_version" {
@@ -525,7 +525,7 @@ variable "external_secrets_version" {
 }
 
 variable "opentelemetry-collector_version" {
-  default = "0.30.0"
+  default = "0.97.1"
 }
 
 variable "include_fsx" {
@@ -559,9 +559,6 @@ variable "crds-values-yaml-b64" {
 variable "pre-reqs-values-yaml-b64" {
   default = "Cg=="
 }
-variable "k8s_dashboard_chart_version" {
-  default = "0.1.0"
-}
 
 variable "enable_k8s_dashboard" {
   type    = bool
@@ -575,8 +572,8 @@ variable "use_acm" {
 }
 
 variable "acm_arn" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "arn of a pre-existing acm certificate"
 }
 
@@ -826,6 +823,54 @@ variable "harness_mount_path" {
   default = "harness"
 }
 
+variable "lambda_sns_forwarder_enabled" {
+  type = bool
+  default = false
+  description = "If enabled a lamda will be provisioned to forward sns messages to an external endpoint."
+}
+
+variable "lambda_sns_forwarder_destination_endpoint" {
+  type = string
+  default = ""
+  description = "destination URL for the lambda sns forwarder"
+}
+
+variable "lambda_sns_forwarder_topic_arn" {
+  type = string
+  default = ""
+  description = "SNS topic to triger lambda forwarder."
+}
+
+variable "lambda_sns_forwarder_github_organization" {
+  type = string
+  default = "IndicoDataSolutions"
+  description = "The github organization containing the lambda_sns_forwarder code to use"
+}
+
+variable "lambda_sns_forwarder_github_repository" {
+  type = string
+  default = ""
+  description = "The github repository containing the lambda_sns_forwarder code to use"
+}
+
+variable "lambda_sns_forwarder_github_branch" {
+  type = string
+  default = "main"
+  description = "The github branch / tag containing the lambda_sns_forwarder code to use"
+}
+
+variable "lambda_sns_forwarder_github_zip_path" {
+  type      = string
+  default   = "zip/lambda.zip"
+  description = "Full path to the lambda zip file"
+}
+
+variable "lambda_sns_forwarder_function_variables" {
+  type = map
+  default = {}
+  description = "A map of variables for the lambda_sns_forwarder code to use"
+}
+
 variable "enable_s3_backup" {
   type        = bool
   default     = true
@@ -842,6 +887,12 @@ variable "network_allow_public" {
   type        = bool
   default     = true
   description = "If enabled this will create public subnets, IGW, and NAT gateway."
+}
+
+variable "internal_elb_use_public_subnets" {
+  type        = bool
+  default     = true
+  description = "If enabled, this will use public subnets for the internal elb. Otherwise use the private subnets"
 }
 
 variable "network_module" {
@@ -918,6 +969,11 @@ variable "secrets_operator_enabled" {
   description = "Use to enable the secrets operator which is used for maintaining thanos connection"
 }
 
+variable "vault_secrets_operator_version" {
+  type    = string
+  default = "0.7.0"
+}
+
 variable "firewall_subnet_cidrs" {
   type        = list(string)
   default     = []
@@ -948,13 +1004,13 @@ variable "readapi_customer" {
 }
 
 variable "create_guardduty_vpc_endpoint" {
-  type = bool
-  default = true
+  type        = bool
+  default     = true
   description = "If true this will create a vpc endpoint for guardduty."
 }
 
 variable "use_nlb" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "If true this will create a NLB loadbalancer instead of a classic VPC ELB"
 }

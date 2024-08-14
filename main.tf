@@ -87,7 +87,7 @@ provider "aws" {
   secret_key = var.is_alternate_account_domain == "true" ? var.indico_aws_secret_access_key : var.aws_secret_key
   token      = var.is_alternate_account_domain == "true" ? var.indico_aws_session_token : var.aws_session_token
   region     = var.region
-  alias      = "dns-control" 
+  alias      = "dns-control"
   default_tags {
     tags = var.default_tags
   }
@@ -170,6 +170,25 @@ module "sqs_sns" {
   kms_master_key_id = module.kms_key.key.id
 }
 
+module "lambda-sns-forwarder" {
+  count                = var.lambda_sns_forwarder_enabled == true ? 1 : 0
+  source               = "app.terraform.io/indico/indico-lambda-sns-forwarder/mod"
+  version              = "2.0.0"
+  region               = var.region
+  label                = var.label
+  subnet_ids           = flatten([local.network[0].private_subnet_ids])
+  security_group_id    = var.network_module == "networking" ? module.networking.all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  kms_key              = module.kms_key.key_arn
+  sns_arn              = var.lambda_sns_forwarder_topic_arn == "" ? module.sqs_sns[0].indico_ipa_topic_arn : var.lambda_sns_forwarder_topic_arn
+  destination_endpoint = var.lambda_sns_forwarder_destination_endpoint
+  github_organization  = var.lambda_sns_forwarder_github_organization
+  github_repository    = var.lambda_sns_forwarder_github_repository
+  github_branch        = var.lambda_sns_forwarder_github_branch
+  git_zip_path         = var.lambda_sns_forwarder_github_zip_path
+  git_pat              = var.git_pat
+  function_variables   = var.lambda_sns_forwarder_function_variables
+}
+
 module "kms_key" {
   source           = "app.terraform.io/indico/indico-aws-kms/mod"
   version          = "2.1.0"
@@ -180,10 +199,11 @@ module "kms_key" {
 
 module "security-group" {
   source   = "app.terraform.io/indico/indico-aws-security-group/mod"
-  version  = "1.0.0"
+  version  = "3.0.0"
   label    = var.label
   vpc_cidr = var.vpc_cidr
   vpc_id   = local.network[0].indico_vpc_id
+  network_module = var.network_module
 }
 
 
@@ -443,7 +463,7 @@ locals {
 
 
 data "aws_route53_zone" "primary" {
-  count = var.use_static_ssl_certificates ? 0 : 1
+  count    = var.use_static_ssl_certificates ? 0 : 1
   name     = var.is_alternate_account_domain == "false" ? local.dns_zone_name : lower(local.alternate_domain_root)
   provider = aws.dns-control
 }

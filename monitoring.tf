@@ -13,6 +13,7 @@ locals {
   EOT
   )
   backend_port = var.acm_arn != "" ? "http" : "https"
+  enableHttp = var.acm_arn != "" || var.use_nlb == true ? false : true
   lb_config = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
   loadbalancer_config = var.use_nlb == true ? (<<EOT
       external:
@@ -33,7 +34,7 @@ locals {
           service.beta.kubernetes.io/aws-load-balancer-type: nlb
           service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
           service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
   EOT
   ) : (<<EOT
       external:
@@ -43,7 +44,7 @@ locals {
         annotations:
           # Create internal ELB
           service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
   EOT
   )
   acm_loadbalancer_config = (<<EOT
@@ -66,7 +67,7 @@ locals {
           service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
           service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "${var.acm_arn}"
           service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
   EOT
   )
   alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
@@ -387,6 +388,7 @@ ingress-nginx:
   enabled: true
   controller:
     service:
+      enableHttp: ${local.enableHttp}
       targetPorts:
         https: ${local.backend_port}
 ${local.lb_config}
