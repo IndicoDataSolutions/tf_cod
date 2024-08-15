@@ -5,7 +5,7 @@ locals {
   the_tld               = local.the_splits[local.the_length - 1]
   the_domain            = local.the_splits[local.the_length - 2]
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
-
+  enable_external_dns =  var.use_static_ssl_certificates == false ? true : false
   storage_class = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
 
   enable_external_dns = var.use_static_ssl_certificates == false ? true : false
@@ -135,7 +135,7 @@ clusterIssuer:
 external-dns:
   enabled: ${local.enable_external_dns}
 alternate-external-dns:
-  enabled: true
+  enabled: ${local.enable_external_dns}
   logLevel: debug
   policy: sync
   txtOwnerId: "${local.dns_name}-${var.label}-${var.region}"
@@ -168,7 +168,6 @@ app-edge:
 # not using local_registry
   EOT
   )
-
   runtime_scanner_ingress_values = var.use_static_ssl_certificates == true ? (<<EOT
 ingress:
   enabled: true
@@ -1466,7 +1465,6 @@ spec:
                 image:
                   registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
             ${indent(12, local.alb_ipa_values)}         
-
         - name: HELM_VALUES
           value: |
             ${base64decode(var.ipa_values)}    

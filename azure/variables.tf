@@ -736,6 +736,10 @@ variable "network_plugin" {
   type    = string
 }
 
+variable "network_plugin_mode" {
+  default = null
+  type    = string
+}
 variable "enable_custom_cluster_issuer" {
   default = false
   type    = bool
@@ -746,6 +750,50 @@ variable "custom_cluster_issuer_spec" {
   type    = string
 }
 
+variable "private_dns_zone" {
+  default = false
+  type    = bool
+}
+
+variable "private_cluster_public_fqdn_enabled" {
+  default = false
+  type    = bool
+}
+
+variable "cluster_outbound_type" {
+  default = "loadBalancer"
+  type    = string
+}
+
+variable "enable_external_dns" {
+  default = true
+  type    = bool
+}
+
+variable "private_dns_zone_id" {
+  default = "System"
+  type    = string
+}
+
+variable "sku_tier" {
+  default = "Standard"
+  type    = string
+}
+
+variable "cluster_service_cidr" {
+  type    = string
+  default = null
+}
+
+variable "dns_service_ip" {
+  type    = string
+  default = null
+}
+
+variable "docker_bridge_cidr" {
+  type    = string
+  default = null
+}
 
 variable "secrets_operator_enabled" {
   type        = bool

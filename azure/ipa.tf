@@ -108,7 +108,6 @@ resource "github_repository_file" "crds-values-yaml" {
 
 data "github_repository_file" "data-crds-values" {
   count = var.argo_enabled == true ? 1 : 0
-
   depends_on = [
     github_repository_file.crds-values-yaml
   ]
@@ -238,9 +237,6 @@ resource "helm_release" "ipa-crds" {
     enabled: false
 
   cert-manager:    
-    #dns01RecursiveNameserversOnly: true
-    #dns01RecursiveNameservers: "$#{data.azurerm_dns_zone.domain.name_servers[0]}:53,$#{data.azurerm_dns_zone.domain.name_servers[1]}:53,$#{data.azurerm_dns_zone.domain.name_servers[2]}:53,$#{data.azurerm_dns_zone.domain.name_servers[3]}:53"
-
     nodeSelector:
       kubernetes.io/os: linux
     webhook:
@@ -427,11 +423,11 @@ resource "helm_release" "crunchy-postgres" {
 }
 
 resource "azurerm_role_assignment" "external_dns" {
-  count = var.is_azure == true && var.is_openshift == false && var.include_external_dns == true ? 1 : 0
+  count = var.is_azure == true && var.is_openshift == false && var.private_dns_zone != true ? 1 : 0
   depends_on = [
     module.cluster
   ]
-  scope                            = data.azurerm_dns_zone.domain.id
+  scope                            = data.azurerm_dns_zone.domain.0.id
   role_definition_name             = "DNS Zone Contributor"
   principal_id                     = module.cluster.kubelet_identity.object_id
   skip_service_principal_aad_check = true
@@ -519,7 +515,7 @@ resource "kubectl_manifest" "custom-cluster-issuer" {
     kind: ClusterIssuer
     metadata:
       name: zerossl
-    spec: |
+    spec:
       ${indent(6, var.custom_cluster_issuer_spec)} 
   YAML
 }
@@ -591,7 +587,7 @@ clusterIssuer:
     - dns01:
         azureDNS:
           environment: AzurePublicCloud
-          hostedZoneName: ${data.azurerm_dns_zone.domain.name}
+          hostedZoneName: ${local.base_domain}
           managedIdentity:
             clientID: ${module.cluster.kubelet_identity.client_id}
           resourceGroupName: ${var.common_resource_group}
@@ -606,7 +602,7 @@ apiModels:
     node_group: static-workers
 
 external-dns:
-  enabled: true
+  enabled: ${var.enable_external_dns}
   logLevel: debug
   policy: sync
   txtOwnerId: "${var.label}-${var.region}"
@@ -1064,6 +1060,12 @@ resource "helm_release" "external-secrets" {
   values = [<<EOF
     image:
       repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+    certController:
+      image:
+        repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+    webhook:
+      image:
+        repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
   EOF
   ]
 }

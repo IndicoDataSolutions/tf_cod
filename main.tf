@@ -10,7 +10,7 @@ terraform {
     }
     keycloak = {
       source  = "mrparkers/keycloak"
-      version = "4.0.1"
+      version = "4.3.1"
     }
     argocd = {
       source  = "oboukili/argocd"
@@ -383,6 +383,7 @@ provider "kubectl" {
   }
 }
 
+
 provider "aws" {
   access_key = var.thanos_enabled == true ? var.indico_devops_aws_access_key_id : var.aws_access_key
   secret_key = var.thanos_enabled == true ? var.indico_devops_aws_secret_access_key : var.aws_secret_key
@@ -455,9 +456,9 @@ module "argo-registration" {
 
 locals {
   security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
+  cluster_name      = var.label
   dns_zone_name     = var.dns_zone_name == "" ? lower("${var.aws_account}.${var.domain_suffix}") : var.dns_zone_name
   dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${local.dns_zone_name}") : var.domain_host
-  #dns_suffix        = lower("${var.region}.${var.aws_account}.indico.io")
 }
 
 

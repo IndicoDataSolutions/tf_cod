@@ -383,6 +383,7 @@ resource "helm_release" "monitoring" {
 global:
   host: "${local.dns_name}"
 
+
 ingress-nginx:
   enabled: true
   controller:
