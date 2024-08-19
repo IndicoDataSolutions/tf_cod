@@ -7,8 +7,6 @@ locals {
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
   enable_external_dns =  var.use_static_ssl_certificates == false ? true : false
   storage_class = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
-
-  enable_external_dns = var.use_static_ssl_certificates == false ? true : false
   acm_arn             = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:

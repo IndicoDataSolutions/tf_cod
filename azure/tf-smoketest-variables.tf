@@ -128,6 +128,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     enable_external_dns = "${jsonencode(var.enable_external_dns)}"
     private_dns_zone_id = "${jsonencode(var.private_dns_zone_id)}"
     sku_tier = "${jsonencode(var.sku_tier)}"
+    cluster_service_cidr = "${jsonencode(var.cluster_service_cidr)}"
     dns_service_ip = "${jsonencode(var.dns_service_ip)}"
     docker_bridge_cidr = "${jsonencode(var.docker_bridge_cidr)}"
     secrets_operator_enabled = "${jsonencode(var.secrets_operator_enabled)}"
