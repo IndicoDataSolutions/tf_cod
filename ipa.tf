@@ -485,11 +485,9 @@ resource "helm_release" "ipa-crds" {
   migrations-operator:
     image:
       repository: ${var.image_registry}/indico/migrations-operator
-      tag: "3.0.13"
     controllerImage:
       repository: ${var.image_registry}/indico/migrations-controller
       kubectlImage: ${var.image_registry}/indico/migrations-controller-kubectl
-      tag: "3.0.12"
   aws-ebs-csi-driver:
     image:
       repository: ${var.image_registry}/public.ecr.aws/ebs-csi-driver/aws-ebs-csi-driver
