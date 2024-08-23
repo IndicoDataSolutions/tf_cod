@@ -301,6 +301,7 @@ module "cluster" {
   resource_group_name        = local.resource_group_name
   admin_group_name           = var.admin_group_name
   account                    = var.account
+  network_plugin             = var.network_plugin
 
   network_plugin                      = var.network_plugin
   network_plugin_mode                 = var.network_plugin_mode
