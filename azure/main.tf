@@ -324,8 +324,8 @@ module "cluster" {
   service_cidr                        = var.cluster_service_cidr
   dns_service_ip                      = var.dns_service_ip
   docker_bridge_cidr                  = var.docker_bridge_cidr
-  
-  identity_ids                        = [ azurerm_user_assigned_identity.cluster_dns.principal_id ]
+
+  identity_ids                        = [ azurerm_user_assigned_identity.cluster_dns.id ]
 
   aks_storage_account_name = var.aks_storage_account_name
 
