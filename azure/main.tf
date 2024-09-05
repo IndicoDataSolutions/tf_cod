@@ -281,6 +281,7 @@ module "storage" {
 }
 
 resource "azurerm_user_assigned_identity" "cluster_dns" {
+  count                = var.private_dns_zone_id == "System" ? 0 : 1
   name                = "cluster_dns-identity"
   resource_group_name = local.resource_group_name
   location            = var.region
@@ -290,7 +291,7 @@ resource "azurerm_role_assignment" "example" {
   count                = var.private_dns_zone_id == "System" ? 0 : 1
   scope                = var.private_dns_zone_id
   role_definition_name = "Private DNS Zone Contributor"
-  principal_id         = azurerm_user_assigned_identity.cluster_dns.principal_id
+  principal_id         = azurerm_user_assigned_identity.cluster_dns[0].principal_id
 }
 
 module "cluster" {
@@ -300,7 +301,7 @@ module "cluster" {
 
   source                     = "app.terraform.io/indico/indico-azure-cluster/mod"
   insights_retention_in_days = var.monitor_retention_in_days
-  version                    = "4.2.2"
+  version                    = "4.2.3"
   label                      = var.label
   public_key                 = tls_private_key.pk.public_key_openssh
   region                     = var.region
@@ -325,7 +326,7 @@ module "cluster" {
   dns_service_ip                      = var.dns_service_ip
   docker_bridge_cidr                  = var.docker_bridge_cidr
 
-  identity_ids                        = [ azurerm_user_assigned_identity.cluster_dns.id ]
+  identity_ids                        = var.private_dns_zone_id == "System" ? [] : [ azurerm_user_assigned_identity.cluster_dns[0].id ]
 
   aks_storage_account_name = var.aks_storage_account_name
 
