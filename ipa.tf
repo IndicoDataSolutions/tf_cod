@@ -834,9 +834,6 @@ reflector:
 apiModels:
   image:
     registry: ${var.image_registry}
-migrationsArtifactsInstall:
-  image:
-    registry: ${var.image_registry}
 aws-load-balancer-controller:
   enabled: ${var.use_acm}
   aws-load-balancer-controller:
@@ -894,6 +891,9 @@ opentelemetry-operator:
       repository: ${var.image_registry}/ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator
     collectorImage:
       repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
+migrations:
+  vaultSecretsOperator:
+    updateCRDs: ${var.secrets_operator_enabled}
 EOF
     ,
     <<EOT
