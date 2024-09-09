@@ -284,7 +284,8 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
   count = var.argo_enabled == true ? 1 : 0
 
   depends_on = [
-    time_sleep.wait_1_minutes_after_pre_reqs
+    time_sleep.wait_1_minutes_after_pre_reqs,
+    helm_release.ipa-pre-requisites
   ]
 
   triggers = {
