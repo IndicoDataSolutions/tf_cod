@@ -5,9 +5,9 @@ locals {
   the_tld               = local.the_splits[local.the_length - 1]
   the_domain            = local.the_splits[local.the_length - 2]
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
-  enable_external_dns =  var.use_static_ssl_certificates == false ? true : false
-  storage_class = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
-  acm_arn             = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
+  enable_external_dns   = var.use_static_ssl_certificates == false ? true : false
+  storage_class         = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
+  acm_arn               = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:
     enabled: false
@@ -946,7 +946,8 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
   count = var.argo_enabled == true ? 1 : 0
 
   depends_on = [
-    time_sleep.wait_1_minutes_after_pre_reqs
+    time_sleep.wait_1_minutes_after_pre_reqs,
+    helm_release.ipa-pre-requisites
   ]
 
   triggers = {
@@ -957,7 +958,7 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
     environment = {
       HARBOR_API_TOKEN = jsondecode(data.vault_kv_secret_v2.harbor-api-token[0].data_json)["bearer_token"]
     }
-    command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+    command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
   }
 }
 
