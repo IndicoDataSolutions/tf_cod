@@ -188,6 +188,12 @@ variable "private_cluster_enabled" {
   description = "If enabled, the cluster will be launched as a private cluster"
 }
 
+variable "private_cluster_dns_override" {
+  type        = bool
+  default     = false
+  description = "If enabled, the cluster will use dns_prefix instead of dns_prefix_private_cluster even if private_cluster_enabled is set to true"
+}
+
 variable "svp_client_id" {
   type        = string
   description = "The client ID of the service principal to use"
