@@ -281,7 +281,7 @@ module "storage" {
 }
 
 resource "azurerm_user_assigned_identity" "cluster_dns" {
-  count                = var.private_dns_zone_id == "System" ? 0 : 1
+  count               = var.private_dns_zone_id == "System" ? 0 : 1
   name                = "cluster_dns-identity"
   resource_group_name = local.resource_group_name
   location            = var.region
@@ -299,22 +299,23 @@ module "cluster" {
     azurerm_resource_group.cod-cluster
   ]
 
-  source                     = "app.terraform.io/indico/indico-azure-cluster/mod"
-  insights_retention_in_days = var.monitor_retention_in_days
-  version                    = "4.2.3"
-  label                      = var.label
-  public_key                 = tls_private_key.pk.public_key_openssh
-  region                     = var.region
-  svp_client_id              = var.svp_client_id
-  svp_client_secret          = var.svp_client_secret
-  default_node_pool          = var.default_node_pool
-  additional_node_pools      = var.additional_node_pools
-  vnet_subnet_id             = module.networking.subnet_id
-  k8s_version                = var.k8s_version
-  private_cluster_enabled    = var.private_cluster_enabled
-  resource_group_name        = local.resource_group_name
-  admin_group_name           = var.admin_group_name
-  account                    = var.account
+  source                       = "app.terraform.io/indico/indico-azure-cluster/mod"
+  insights_retention_in_days   = var.monitor_retention_in_days
+  version                      = "4.2.4"
+  label                        = var.label
+  public_key                   = tls_private_key.pk.public_key_openssh
+  region                       = var.region
+  svp_client_id                = var.svp_client_id
+  svp_client_secret            = var.svp_client_secret
+  default_node_pool            = var.default_node_pool
+  additional_node_pools        = var.additional_node_pools
+  vnet_subnet_id               = module.networking.subnet_id
+  k8s_version                  = var.k8s_version
+  private_cluster_enabled      = var.private_cluster_enabled
+  private_cluster_dns_override = var.private_cluster_dns_override
+  resource_group_name          = local.resource_group_name
+  admin_group_name             = var.admin_group_name
+  account                      = var.account
 
   network_plugin                      = var.network_plugin
   network_plugin_mode                 = var.network_plugin_mode
@@ -326,7 +327,7 @@ module "cluster" {
   dns_service_ip                      = var.dns_service_ip
   docker_bridge_cidr                  = var.docker_bridge_cidr
 
-  identity_ids                        = var.private_dns_zone_id == "System" ? [] : [ azurerm_user_assigned_identity.cluster_dns[0].id ]
+  identity_ids = var.private_dns_zone_id == "System" ? [] : [azurerm_user_assigned_identity.cluster_dns[0].id]
 
   aks_storage_account_name = var.aks_storage_account_name
 
