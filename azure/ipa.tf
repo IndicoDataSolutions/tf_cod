@@ -277,7 +277,7 @@ output "git_branch" {
 }
 
 output "wait_command" {
-  value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+  value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
 }
 
 resource "null_resource" "wait-for-tf-cod-chart-build" {
@@ -313,7 +313,7 @@ resource "helm_release" "terraform-smoketests" {
   namespace        = "default"
   repository       = var.ipa_repo
   chart            = "terraform-smoketests"
-  version          = "0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+  version          = "0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
   wait             = true
   wait_for_jobs    = true
   timeout          = "300" # 5 minutes
