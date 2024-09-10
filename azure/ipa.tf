@@ -727,6 +727,9 @@ aws-fsx-csi-driver:
   enabled: false
 metrics-server:
   enabled: false
+migrations:
+  vaultSecretsOperator:
+    updateCRDs: ${var.secrets_operator_enabled}
   EOF
     ,
     <<EOT

@@ -538,6 +538,11 @@ resource "helm_release" "ipa-crds" {
         repository: ${var.image_registry}/quay.io/jetstack/cert-manager-startupapicheck
     enabled: true
     installCRDs: true
+  migrations:
+    vaultSecretsOperator:
+      updateCRDs: ${var.secrets_operator_enabled}
+    opentelemetryOperator:
+      updateCRDs: ${var.monitoring_enabled}
 EOF
     ,
     <<EOT
@@ -832,9 +837,6 @@ reflector:
   image:
     repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
 apiModels:
-  image:
-    registry: ${var.image_registry}
-migrationsArtifactsInstall:
   image:
     registry: ${var.image_registry}
 aws-load-balancer-controller:
