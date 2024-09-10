@@ -988,7 +988,7 @@ resource "helm_release" "terraform-smoketests" {
   namespace        = "default"
   repository       = var.ipa_repo
   chart            = "terraform-smoketests"
-  version          = "0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+  version          = "0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
   wait             = true
   wait_for_jobs    = true
   timeout          = "300" # 5 minutes
