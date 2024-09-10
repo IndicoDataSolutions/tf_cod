@@ -37,6 +37,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     crds_values_yaml_b64 = "${jsonencode(var.crds-values-yaml-b64)}"
     pre_reqs_values_yaml_b64 = "${jsonencode(var.pre-reqs-values-yaml-b64)}"
     private_cluster_enabled = "${jsonencode(var.private_cluster_enabled)}"
+    private_cluster_dns_override = "${jsonencode(var.private_cluster_dns_override)}"
     svp_client_id = "${jsonencode(var.svp_client_id)}"
     svp_client_secret = "${jsonencode(var.svp_client_secret)}"
     k8s_version = "${jsonencode(var.k8s_version)}"
