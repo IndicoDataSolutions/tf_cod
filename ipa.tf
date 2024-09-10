@@ -538,6 +538,11 @@ resource "helm_release" "ipa-crds" {
         repository: ${var.image_registry}/quay.io/jetstack/cert-manager-startupapicheck
     enabled: true
     installCRDs: true
+  migrations:
+    vaultSecretsOperator:
+      updateCRDs: ${var.secrets_operator_enabled}
+    opentelemetryOperator:
+      updateCRDs: ${var.monitoring_enabled}
 EOF
     ,
     <<EOT
@@ -891,9 +896,6 @@ opentelemetry-operator:
       repository: ${var.image_registry}/ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator
     collectorImage:
       repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
-migrations:
-  vaultSecretsOperator:
-    updateCRDs: ${var.secrets_operator_enabled}
 EOF
     ,
     <<EOT
