@@ -969,7 +969,7 @@ output "harbor-api-token" {
 }
 
 output "smoketest_chart_version" {
-  value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.0-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+  value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
 }
 
 resource "helm_release" "terraform-smoketests" {
