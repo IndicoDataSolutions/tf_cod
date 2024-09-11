@@ -198,11 +198,11 @@ module "kms_key" {
 }
 
 module "security-group" {
-  source   = "app.terraform.io/indico/indico-aws-security-group/mod"
-  version  = "3.0.0"
-  label    = var.label
-  vpc_cidr = var.vpc_cidr
-  vpc_id   = local.network[0].indico_vpc_id
+  source         = "app.terraform.io/indico/indico-aws-security-group/mod"
+  version        = "3.0.0"
+  label          = var.label
+  vpc_cidr       = var.vpc_cidr
+  vpc_id         = local.network[0].indico_vpc_id
   network_module = var.network_module
 }
 
@@ -300,7 +300,7 @@ module "cluster" {
   aws_account_name                      = var.aws_account
   oidc_enabled                          = false
   source                                = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                               = "8.1.8"
+  version                               = "8.2.1"
   label                                 = var.label
   additional_tags                       = var.additional_tags
   region                                = var.region
