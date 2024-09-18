@@ -198,18 +198,18 @@ module "kms_key" {
 }
 
 module "security-group" {
-  source   = "app.terraform.io/indico/indico-aws-security-group/mod"
-  version  = "3.0.0"
-  label    = var.label
-  vpc_cidr = var.vpc_cidr
-  vpc_id   = local.network[0].indico_vpc_id
+  source         = "app.terraform.io/indico/indico-aws-security-group/mod"
+  version        = "3.0.0"
+  label          = var.label
+  vpc_cidr       = var.vpc_cidr
+  vpc_id         = local.network[0].indico_vpc_id
   network_module = var.network_module
 }
 
 
 module "s3-storage" {
   source                = "app.terraform.io/indico/indico-aws-buckets/mod"
-  version               = "3.2.0"
+  version               = "3.3.0"
   force_destroy         = true # allows terraform to destroy non-empty buckets.
   label                 = var.label
   kms_key_arn           = module.kms_key.key.arn
