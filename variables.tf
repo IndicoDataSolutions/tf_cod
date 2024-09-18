@@ -1014,3 +1014,9 @@ variable "use_nlb" {
   default     = false
   description = "If true this will create a NLB loadbalancer instead of a classic VPC ELB"
 }
+
+variable "enable_s3_access_logging" {
+  type        = bool
+  default     = false
+  description = "If true this will enable access logging on the s3 buckets"
+}
