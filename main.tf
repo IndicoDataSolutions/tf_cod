@@ -143,7 +143,7 @@ module "public_networking" {
 module "networking" {
   count                    = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
   source                   = "app.terraform.io/indico/indico-aws-network/mod"
-  version                  = "2.0.0"
+  version                  = "2.1.0"
   label                    = var.label
   vpc_cidr                 = var.vpc_cidr
   private_subnet_cidrs     = var.private_subnet_cidrs
@@ -198,11 +198,11 @@ module "kms_key" {
 }
 
 module "security-group" {
-  source   = "app.terraform.io/indico/indico-aws-security-group/mod"
-  version  = "3.0.0"
-  label    = var.label
-  vpc_cidr = var.vpc_cidr
-  vpc_id   = local.network[0].indico_vpc_id
+  source         = "app.terraform.io/indico/indico-aws-security-group/mod"
+  version        = "3.0.0"
+  label          = var.label
+  vpc_cidr       = var.vpc_cidr
+  vpc_id         = local.network[0].indico_vpc_id
   network_module = var.network_module
 }
 
