@@ -166,6 +166,11 @@ resource "kubernetes_config_map" "terraform-variables" {
     readapi_customer = "${jsonencode(var.readapi_customer)}"
     create_guardduty_vpc_endpoint = "${jsonencode(var.create_guardduty_vpc_endpoint)}"
     use_nlb = "${jsonencode(var.use_nlb)}"
+    use_existing_s3_buckets = "${jsonencode(var.use_existing_s3_buckets)}"
+    efs_filesystem_id = "${jsonencode(var.efs_filesystem_id)}"
+    s3_data_bucket_name = "${jsonencode(var.s3_data_bucket_name)}"
+    pgbackup_s3_bucket_name = "${jsonencode(var.pgbackup_s3_bucket_name)}"
+    api_models_s3_bucket_name = "${jsonencode(var.api_models_s3_bucket_name)}"
 
     }
   }

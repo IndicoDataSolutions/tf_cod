@@ -22,14 +22,14 @@ locals {
       mountOptions: []
       csi:
         driver: efs.csi.aws.com
-        volumeHandle: ${module.efs-storage[0].efs_filesystem_id}
+        volumeHandle: "${var.efs_filesystem_id} != "" ? ${var.efs_filesystem_id} : ${module.efs-storage[0].efs_filesystem_id}"
     indicoStorageClass:
       enabled: true
       name: indico-sc
       provisioner: efs.csi.aws.com
       parameters:
         provisioningMode: efs-ap
-        fileSystemId: ${module.efs-storage[0].efs_filesystem_id}
+        fileSystemId: "${var.efs_filesystem_id} != "" ? ${var.efs_filesystem_id} : ${module.efs-storage[0].efs_filesystem_id}"
         directoryPerms: "700"
         gidRangeStart: "1000" # optional
         gidRangeEnd: "2000" # optional

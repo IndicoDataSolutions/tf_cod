@@ -1014,3 +1014,33 @@ variable "use_nlb" {
   default     = false
   description = "If true this will create a NLB loadbalancer instead of a classic VPC ELB"
 }
+
+variable "use_existing_s3_buckets" {
+  type        = bool
+  default     = false
+  description = "If true this will create a NLB loadbalancer instead of a classic VPC ELB"
+}
+
+variable "efs_filesystem_id" {
+  type        = string
+  default     = ""
+  description = "The filesystem id of an existing efs instance"
+}
+
+variable "s3_data_bucket_name" {
+  type        = string
+  default     = ""
+  description = "The s3_data_bucket_name"
+}
+
+variable "pgbackup_s3_bucket_name" {
+  type        = string
+  default     = ""
+  description = "the pgbackup_s3_bucket_name"
+}
+
+variable "api_models_s3_bucket_name" {
+  type        = string
+  default     = ""
+  description = "The api_models_s3_bucket_name"
+}

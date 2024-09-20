@@ -208,6 +208,7 @@ module "security-group" {
 
 
 module "s3-storage" {
+  count             = var.use_existing_s3_buckets ? 0 : 1
   source            = "app.terraform.io/indico/indico-aws-buckets/mod"
   version           = "3.2.0"
   force_destroy     = true # allows terraform to destroy non-empty buckets.
@@ -222,6 +223,7 @@ module "s3-storage" {
 
 # This empties the buckets upon delete so terraform doesn't take forever.
 resource "null_resource" "s3-delete-data-bucket" {
+  count             = var.use_existing_s3_buckets ? 0 : 1
   depends_on = [
     module.s3-storage
   ]
@@ -237,7 +239,7 @@ resource "null_resource" "s3-delete-data-bucket" {
 }
 
 resource "null_resource" "s3-delete-data-pgbackup-bucket" {
-  count = var.include_pgbackup == true ? 1 : 0
+  count = var.include_pgbackup == true && var.use_existing_s3_buckets == false ? 1 : 0
 
   depends_on = [
     module.s3-storage
@@ -254,7 +256,7 @@ resource "null_resource" "s3-delete-data-pgbackup-bucket" {
 }
 
 module "efs-storage" {
-  count              = var.include_efs == true ? 1 : 0
+  count              = var.include_efs == true && var.efs_filesystem_id != "" ? 1 : 0
   source             = "app.terraform.io/indico/indico-aws-efs/mod"
   version            = "0.0.1"
   label              = var.label
@@ -319,9 +321,9 @@ module "cluster" {
   key_pair                              = aws_key_pair.kp.key_name
   snapshot_id                           = var.snapshot_id
   default_tags                          = var.default_tags
-  s3_buckets                            = [module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : ""]
+  s3_buckets                            = var.use_existing_s3_buckets ? [ var.s3_data_bucket_name, var.pgbackup_s3_bucket_name, var.api_models_s3_bucket_name, lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "" ] : [module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : ""]
   cluster_version                       = var.k8s_version
-  efs_filesystem_id                     = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
+  efs_filesystem_id                     = [var.include_efs == true && var.efs_filesystem_id != "" ? module.efs-storage[0].efs_filesystem_id : var.efs_filesystem_id ]
   aws_primary_dns_role_arn              = var.aws_primary_dns_role_arn
   private_endpoint_enabled              = var.network_allow_public == true ? false : true
   public_endpoint_enabled               = var.cluster_api_endpoint_public == true ? true : false
