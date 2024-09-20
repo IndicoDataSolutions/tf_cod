@@ -9,6 +9,7 @@ locals {
   storage_class         = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
   acm_arn               = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
   pgbackup_s3_bucket_name = var.use_existing_s3_buckets ? var.pgbackup_s3_bucket_name : module.s3-storage[0].pgbackup_s3_bucket_name
+  efs_filesystem_id       = var.efs_filesystem_id != "" ? var.efs_filesystem_id : var.include_efs ? module.efs-storage[0].efs_filesystem_id : ""
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:
     enabled: false
@@ -23,14 +24,14 @@ locals {
       mountOptions: []
       csi:
         driver: efs.csi.aws.com
-        volumeHandle: "${var.efs_filesystem_id} != "" ? ${var.efs_filesystem_id} : ${module.efs-storage[0].efs_filesystem_id}"
+        volumeHandle: "${local.efs_filesystem_id}"
     indicoStorageClass:
       enabled: true
       name: indico-sc
       provisioner: efs.csi.aws.com
       parameters:
         provisioningMode: efs-ap
-        fileSystemId: "${var.efs_filesystem_id} != "" ? ${var.efs_filesystem_id} : ${module.efs-storage[0].efs_filesystem_id}"
+        fileSystemId: "${local.efs_filesystem_id}"
         directoryPerms: "700"
         gidRangeStart: "1000" # optional
         gidRangeEnd: "2000" # optional
