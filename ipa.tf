@@ -746,7 +746,7 @@ crunchy-postgres:
       repos:
       - name: repo1
         s3:
-          bucket: ${module.s3-storage.pgbackup_s3_bucket_name}
+          bucket: ${module.s3-storage[0].pgbackup_s3_bucket_name}
           endpoint: s3.${var.region}.amazonaws.com
           region: ${var.region}
         schedules:
@@ -820,7 +820,7 @@ crunchy-postgres:
       repos:
       - name: repo1
         s3:
-          bucket: ${module.s3-storage.pgbackup_s3_bucket_name}
+          bucket: ${module.s3-storage[0].pgbackup_s3_bucket_name}
           endpoint: s3.${var.region}.amazonaws.com
           region: ${var.region}
         schedules:
