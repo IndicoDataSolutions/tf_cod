@@ -229,7 +229,7 @@ resource "null_resource" "s3-delete-data-bucket" {
   ]
 
   triggers = {
-    data_bucket_name = module.s3-storage.data_s3_bucket_name
+    data_bucket_name = module.s3-storage[0].data_s3_bucket_name
   }
 
   provisioner "local-exec" {
@@ -246,7 +246,7 @@ resource "null_resource" "s3-delete-data-pgbackup-bucket" {
   ]
 
   triggers = {
-    pg_backup_bucket_name = module.s3-storage.pgbackup_s3_bucket_name
+    pg_backup_bucket_name = module.s3-storage[0].pgbackup_s3_bucket_name
   }
 
   provisioner "local-exec" {
@@ -289,8 +289,8 @@ module "fsx-storage" {
   storage_capacity            = var.storage_capacity
   subnet_id                   = local.network[0].private_subnet_ids[0]
   security_group_id           = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
-  data_bucket                 = module.s3-storage.data_s3_bucket_name
-  api_models_bucket           = module.s3-storage.api_models_s3_bucket_name
+  data_bucket                 = module.s3-storage[0].data_s3_bucket_name
+  api_models_bucket           = module.s3-storage[0].api_models_s3_bucket_name
   kms_key                     = module.kms_key.key
   per_unit_storage_throughput = var.per_unit_storage_throughput
   include_rox                 = var.include_rox
@@ -321,7 +321,7 @@ module "cluster" {
   key_pair                              = aws_key_pair.kp.key_name
   snapshot_id                           = var.snapshot_id
   default_tags                          = var.default_tags
-  s3_buckets                            = var.use_existing_s3_buckets ? [ var.s3_data_bucket_name, var.pgbackup_s3_bucket_name, var.api_models_s3_bucket_name, lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "" ] : [module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : ""]
+  s3_buckets                            = var.use_existing_s3_buckets ? [ var.s3_data_bucket_name, var.pgbackup_s3_bucket_name, var.api_models_s3_bucket_name, lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "" ] : [module.s3-storage[0].data_s3_bucket_name, var.include_pgbackup ? module.s3-storage[0].pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage[0].api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : ""]
   cluster_version                       = var.k8s_version
   efs_filesystem_id                     = [var.include_efs == true && var.efs_filesystem_id != "" ? module.efs-storage[0].efs_filesystem_id : var.efs_filesystem_id ]
   aws_primary_dns_role_arn              = var.aws_primary_dns_role_arn
