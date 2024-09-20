@@ -1021,6 +1021,12 @@ variable "use_existing_s3_buckets" {
   description = "If true this will create a NLB loadbalancer instead of a classic VPC ELB"
 }
 
+variable "crunchy_enabled" {
+  type        = bool
+  default     = true
+  description = "If true this will create a crunchy database instance"
+}
+
 variable "efs_filesystem_id" {
   type        = string
   default     = ""

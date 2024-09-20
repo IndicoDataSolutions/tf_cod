@@ -684,7 +684,7 @@ cluster-autoscaler:
     extraArgs:
       aws-use-static-instance-list: true
 crunchy-postgres:
-  enabled: true
+  enabled: ${var.crunchy_enabled}
   postgres-data:
     enabled: true
     metadata:

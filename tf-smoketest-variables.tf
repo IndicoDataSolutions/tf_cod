@@ -167,6 +167,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     create_guardduty_vpc_endpoint = "${jsonencode(var.create_guardduty_vpc_endpoint)}"
     use_nlb = "${jsonencode(var.use_nlb)}"
     use_existing_s3_buckets = "${jsonencode(var.use_existing_s3_buckets)}"
+    crunchy_enabled = "${jsonencode(var.crunchy_enabled)}"
     efs_filesystem_id = "${jsonencode(var.efs_filesystem_id)}"
     s3_data_bucket_name = "${jsonencode(var.s3_data_bucket_name)}"
     pgbackup_s3_bucket_name = "${jsonencode(var.pgbackup_s3_bucket_name)}"
