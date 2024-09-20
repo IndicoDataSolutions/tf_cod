@@ -1017,6 +1017,6 @@ variable "use_nlb" {
 
 variable "enable_s3_access_logging" {
   type        = bool
-  default     = false
+  default     = true
   description = "If true this will enable access logging on the s3 buckets"
 }
