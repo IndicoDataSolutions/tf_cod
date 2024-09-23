@@ -160,7 +160,7 @@ module "networking" {
   sg_tag_name                = var.sg_tag_name
   sg_tag_value               = var.sg_tag_value
   enable_vpc_flow_logs       = var.enable_vpc_flow_logs
-  vpc_flow_logs_iam_user_arn = var.vpc_flow_logs_iam_user_arn
+  vpc_flow_logs_iam_role_arn = var.vpc_flow_logs_iam_role_arn
 }
 
 module "sqs_sns" {
