@@ -1024,5 +1024,5 @@ variable "enable_vpc_flow_logs" {
 variable "vpc_flow_logs_iam_role_arn" {
   type        = string
   default     = ""
-  description = "The IAM user that will be used to create the flow logs, if not set an user will be created"
+  description = "The IAM role to use for the flow logs"
 }
