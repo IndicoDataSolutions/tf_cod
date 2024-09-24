@@ -104,3 +104,18 @@ output "argo_repo" {
 output "monitoring_enabled" {
   value = var.monitoring_enabled
 }
+
+output "public_subnet_ids" {
+  description = "IDs of the public subnets"
+  value       = [local.network[0].public_subnet_ids]
+}
+
+output "private_subnet_ids" {
+  description = "IDs of the private subnets"
+  value       = [local.network[0].private_subnet_ids]
+}
+
+output "security_group" {
+  description = "IDs of all subnets sg"
+  value       = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
+}
