@@ -1019,4 +1019,15 @@ variable "enable_s3_access_logging" {
   type        = bool
   default     = true
   description = "If true this will enable access logging on the s3 buckets"
+
+variable "enable_vpc_flow_logs" {
+  type        = bool
+  default     = true
+  description = "If enabled this will create flow logs for the VPC"
+}
+
+variable "vpc_flow_logs_iam_role_arn" {
+  type        = string
+  default     = ""
+  description = "The IAM role to use for the flow logs"
 }

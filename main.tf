@@ -26,7 +26,7 @@ terraform {
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.11.0"
+      version = ">= 2.15.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -141,24 +141,26 @@ module "public_networking" {
 }
 
 module "networking" {
-  count                    = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
-  source                   = "app.terraform.io/indico/indico-aws-network/mod"
-  version                  = "2.0.0"
-  label                    = var.label
-  vpc_cidr                 = var.vpc_cidr
-  private_subnet_cidrs     = var.private_subnet_cidrs
-  public_subnet_cidrs      = var.public_subnet_cidrs
-  subnet_az_zones          = var.subnet_az_zones
-  region                   = var.region
-  allow_public             = var.network_allow_public
-  network_type             = var.network_type
-  load_vpc_id              = var.load_vpc_id
-  private_subnet_tag_name  = var.private_subnet_tag_name
-  private_subnet_tag_value = var.private_subnet_tag_value
-  public_subnet_tag_name   = var.public_subnet_tag_name
-  public_subnet_tag_value  = var.public_subnet_tag_value
-  sg_tag_name              = var.sg_tag_name
-  sg_tag_value             = var.sg_tag_value
+  count                      = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
+  source                     = "app.terraform.io/indico/indico-aws-network/mod"
+  version                    = "2.1.0"
+  label                      = var.label
+  vpc_cidr                   = var.vpc_cidr
+  private_subnet_cidrs       = var.private_subnet_cidrs
+  public_subnet_cidrs        = var.public_subnet_cidrs
+  subnet_az_zones            = var.subnet_az_zones
+  region                     = var.region
+  allow_public               = var.network_allow_public
+  network_type               = var.network_type
+  load_vpc_id                = var.load_vpc_id
+  private_subnet_tag_name    = var.private_subnet_tag_name
+  private_subnet_tag_value   = var.private_subnet_tag_value
+  public_subnet_tag_name     = var.public_subnet_tag_name
+  public_subnet_tag_value    = var.public_subnet_tag_value
+  sg_tag_name                = var.sg_tag_name
+  sg_tag_value               = var.sg_tag_value
+  enable_vpc_flow_logs       = var.enable_vpc_flow_logs
+  vpc_flow_logs_iam_role_arn = var.vpc_flow_logs_iam_role_arn
 }
 
 module "sqs_sns" {
