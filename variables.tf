@@ -1014,3 +1014,15 @@ variable "use_nlb" {
   default     = false
   description = "If true this will create a NLB loadbalancer instead of a classic VPC ELB"
 }
+
+variable "enable_vpc_flow_logs" {
+  type        = bool
+  default     = true
+  description = "If enabled this will create flow logs for the VPC"
+}
+
+variable "vpc_flow_logs_iam_role_arn" {
+  type        = string
+  default     = ""
+  description = "The IAM role to use for the flow logs"
+}
