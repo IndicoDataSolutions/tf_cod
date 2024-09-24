@@ -39,6 +39,8 @@ locals {
   ) : (<<EOT
       external:
         enabled: ${var.network_allow_public}
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
       internal:
         enabled: ${local.internal_elb}
         annotations:
