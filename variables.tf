@@ -1019,6 +1019,7 @@ variable "enable_s3_access_logging" {
   type        = bool
   default     = true
   description = "If true this will enable access logging on the s3 buckets"
+}
 
 variable "enable_vpc_flow_logs" {
   type        = bool
