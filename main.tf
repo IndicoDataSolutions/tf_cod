@@ -328,6 +328,8 @@ module "cluster" {
   aws_primary_dns_role_arn              = var.aws_primary_dns_role_arn
   private_endpoint_enabled              = var.network_allow_public == true ? false : true
   public_endpoint_enabled               = var.cluster_api_endpoint_public == true ? true : false
+  instance_volume_size                  = var.instance_volume_size
+  instance_volume_type                  = var.instance_volume_type
 }
 
 locals {
