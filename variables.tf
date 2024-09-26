@@ -1032,3 +1032,14 @@ variable "vpc_flow_logs_iam_role_arn" {
   default     = ""
   description = "The IAM role to use for the flow logs"
 }
+variable "instance_volume_size" {
+  type        = number
+  default     = 40
+  description = "The size of EBS volume to attach to the cluster nodes"
+}
+
+variable "instance_volume_type" {
+  type        = string
+  default     = "gp2"
+  description = "The type of EBS volume to attach to the cluster nodes"
+}

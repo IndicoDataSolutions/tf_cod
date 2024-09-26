@@ -303,7 +303,7 @@ module "cluster" {
   aws_account_name                      = var.aws_account
   oidc_enabled                          = false
   source                                = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                               = "8.1.8"
+  version                               = "8.1.9"
   label                                 = var.label
   additional_tags                       = var.additional_tags
   region                                = var.region
@@ -328,6 +328,8 @@ module "cluster" {
   aws_primary_dns_role_arn              = var.aws_primary_dns_role_arn
   private_endpoint_enabled              = var.network_allow_public == true ? false : true
   public_endpoint_enabled               = var.cluster_api_endpoint_public == true ? true : false
+  instance_volume_size                  = var.instance_volume_size
+  instance_volume_type                  = var.instance_volume_type
 }
 
 locals {
