@@ -18,12 +18,12 @@ locals {
   loadbalancer_config = var.use_nlb == true ? (<<EOT
       external:
         enabled: ${var.network_allow_public}
-        annotations:
-          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
-          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
-          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
-          service.beta.kubernetes.io/aws-load-balancer-type: nlb
-          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+        service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
+        service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+        service.beta.kubernetes.io/aws-load-balancer-type: nlb
+        service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
       internal:
         enabled: ${local.internal_elb}
         annotations:
@@ -39,8 +39,8 @@ locals {
   ) : (<<EOT
       external:
         enabled: ${var.network_allow_public}
-        annotations:
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-subnets: "${join(", ", local.network[0].public_subnet_ids)}"
       internal:
         enabled: ${local.internal_elb}
         annotations:
@@ -52,12 +52,12 @@ locals {
   acm_loadbalancer_config = (<<EOT
       external:
         enabled: ${var.network_allow_public}
-        annotations:
-          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
-          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
-          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
-          service.beta.kubernetes.io/aws-load-balancer-type: nlb
-          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+        service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
+        service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+        service.beta.kubernetes.io/aws-load-balancer-type: nlb
+        service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
       internal:
         enabled: ${local.internal_elb}
         annotations:
