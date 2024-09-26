@@ -172,6 +172,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     s3_data_bucket_name = "${jsonencode(var.s3_data_bucket_name)}"
     pgbackup_s3_bucket_name = "${jsonencode(var.pgbackup_s3_bucket_name)}"
     api_models_s3_bucket_name = "${jsonencode(var.api_models_s3_bucket_name)}"
+    enable_internal_ingress_controller_elb = "${jsonencode(var.enable_internal_ingress_controller_elb)}"
 
     }
   }

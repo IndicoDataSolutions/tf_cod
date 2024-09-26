@@ -1,5 +1,5 @@
 locals {
-  internal_elb = var.network_allow_public == false ? true : false
+  internal_elb = var.network_allow_public == false || var.enable_internal_ingress_controller_elb ? true : false
   thanos_config = var.thanos_enabled == true ? (<<EOT
       thanos: # this is the one being used
         blockSize: 5m

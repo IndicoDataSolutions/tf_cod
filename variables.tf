@@ -1050,3 +1050,9 @@ variable "api_models_s3_bucket_name" {
   default     = ""
   description = "The api_models_s3_bucket_name"
 }
+
+variable "enable_internal_ingress_controller_elb" {
+  type    = bool
+  default = false
+  description = "use to enable an internal ingress controller"
+}
