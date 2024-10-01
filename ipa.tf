@@ -568,6 +568,9 @@ resource "helm_release" "ipa-crds" {
         repository: ${var.image_registry}/quay.io/jetstack/cert-manager-startupapicheck
     enabled: true
     installCRDs: true
+    extraEnv:
+      - name: AWS_REGION
+        value: 'aws-global'
   migrations:
     vaultSecretsOperator:
       updateCRDs: ${var.secrets_operator_enabled}
