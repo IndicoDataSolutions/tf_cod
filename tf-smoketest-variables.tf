@@ -166,6 +166,11 @@ resource "kubernetes_config_map" "terraform-variables" {
     readapi_customer = "${jsonencode(var.readapi_customer)}"
     create_guardduty_vpc_endpoint = "${jsonencode(var.create_guardduty_vpc_endpoint)}"
     use_nlb = "${jsonencode(var.use_nlb)}"
+    enable_s3_access_logging = "${jsonencode(var.enable_s3_access_logging)}"
+    enable_vpc_flow_logs = "${jsonencode(var.enable_vpc_flow_logs)}"
+    vpc_flow_logs_iam_role_arn = "${jsonencode(var.vpc_flow_logs_iam_role_arn)}"
+    instance_volume_size = "${jsonencode(var.instance_volume_size)}"
+    instance_volume_type = "${jsonencode(var.instance_volume_type)}"
 
     }
   }
