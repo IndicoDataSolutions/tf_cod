@@ -122,5 +122,5 @@ output "security_group" {
 
 output "kms_key_id" {
   description = "IDs kms key"
-  value       = var.existing_kms_key == "" ? module.kms_key.key : var.existing_kms_key
+  value       = module.kms_key.key
 }
