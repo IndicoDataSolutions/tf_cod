@@ -1,12 +1,12 @@
 
 output "api_models_s3_bucket_name" {
   description = "Name of the api-models s3 bucket"
-  value       = var.use_existing_s3_buckets ? var.api_models_s3_bucket_name : module.s3-storage.api_models_s3_bucket_name
+  value       = var.use_existing_s3_buckets ? var.api_models_s3_bucket_name : module.s3-storage[0].api_models_s3_bucket_name
 }
 
 output "data_s3_bucket_name" {
   description = "Name of the data s3 bucket"
-  value       = var.use_existing_s3_buckets ? var.s3_data_bucket_name : module.s3-storage.data_s3_bucket_name
+  value       = var.use_existing_s3_buckets ? var.s3_data_bucket_name : module.s3-storage[0].data_s3_bucket_name
 }
 
 output "s3_role_id" {
@@ -17,7 +17,7 @@ output "s3_role_id" {
 
 output "efs_filesystem_id" {
   description = "ID of the EFS filesystem"
-  value       = var.include_efs == true ? module.efs-storage.efs_filesystem_id[0] : ""
+  value       = var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""
 }
 output "fsx-rwx" {
   description = "Read write filesystem"

@@ -256,7 +256,7 @@ resource "null_resource" "s3-delete-data-pgbackup-bucket" {
 }
 
 module "efs-storage" {
-  count              = var.include_efs == true && var.efs_filesystem_id != "" ? 1 : 0
+  count              = var.include_efs == true && var.efs_filesystem_id == "" ? 1 : 0
   source             = "app.terraform.io/indico/indico-aws-efs/mod"
   version            = "0.0.1"
   label              = var.label
