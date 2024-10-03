@@ -119,3 +119,8 @@ output "security_group" {
   description = "IDs of all subnets sg"
   value       = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
 }
+
+output "kms_key_id" {
+  description = "IDs kms key"
+  value       = var.existing_kms_key == "" ? module.kms_key.key : var.existing_kms_key
+}
