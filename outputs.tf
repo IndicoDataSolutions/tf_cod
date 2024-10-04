@@ -17,7 +17,7 @@ output "s3_role_id" {
 
 output "efs_filesystem_id" {
   description = "ID of the EFS filesystem"
-  value       = var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""
+  value       = var.include_efs == true && var.efs_filesystem_id == "" ? module.efs-storage[0].efs_filesystem_id : var.efs_filesystem_id
 }
 output "fsx-rwx" {
   description = "Read write filesystem"

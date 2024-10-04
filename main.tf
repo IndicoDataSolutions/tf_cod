@@ -323,7 +323,7 @@ module "cluster" {
   default_tags                          = var.default_tags
   s3_buckets                            = var.use_existing_s3_buckets ? [ var.s3_data_bucket_name, var.pgbackup_s3_bucket_name, var.api_models_s3_bucket_name, lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "" ] : [module.s3-storage[0].data_s3_bucket_name, var.include_pgbackup ? module.s3-storage[0].pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage[0].api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : ""]
   cluster_version                       = var.k8s_version
-  efs_filesystem_id                     = [var.include_efs == true && var.efs_filesystem_id != "" ? module.efs-storage[0].efs_filesystem_id : var.efs_filesystem_id ]
+  efs_filesystem_id                     = [var.include_efs == true && var.efs_filesystem_id == "" ? module.efs-storage[0].efs_filesystem_id : var.efs_filesystem_id ]
   aws_primary_dns_role_arn              = var.aws_primary_dns_role_arn
   private_endpoint_enabled              = var.network_allow_public == true ? false : true
   public_endpoint_enabled               = var.cluster_api_endpoint_public == true ? true : false
