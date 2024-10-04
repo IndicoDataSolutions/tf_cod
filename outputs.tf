@@ -124,3 +124,8 @@ output "kms_key_id" {
   description = "IDs kms key"
   value       = module.kms_key.key
 }
+
+output "vpc_id" {
+  description = "ID of vpc"
+  value       = local.network[0].indico_vpc_id
+}
