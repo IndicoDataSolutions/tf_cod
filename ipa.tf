@@ -487,6 +487,7 @@ resource "helm_release" "ipa-crds" {
     controllerImage:
       repository: ${var.image_registry}/indico/migrations-controller
       kubectlImage: ${var.image_registry}/indico/migrations-controller-kubectl
+      tag: "f679758"
   aws-ebs-csi-driver:
     image:
       repository: ${var.image_registry}/public.ecr.aws/ebs-csi-driver/aws-ebs-csi-driver
