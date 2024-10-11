@@ -236,7 +236,10 @@ resource "helm_release" "ipa-crds" {
   aws-ebs-csi-driver:
     enabled: false
 
-  cert-manager:    
+  cert-manager: 
+    enabled: true
+    crds:
+      enabled: true   
     nodeSelector:
       kubernetes.io/os: linux
     webhook:
@@ -245,8 +248,6 @@ resource "helm_release" "ipa-crds" {
     cainjector:
       nodeSelector:
         kubernetes.io/os: linux
-    enabled: true
-    installCRDs: true
   aws-ebs-csi-driver:
     enabled: false
 EOF
