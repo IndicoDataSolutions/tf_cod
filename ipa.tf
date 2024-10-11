@@ -542,6 +542,9 @@ resource "helm_release" "ipa-crds" {
         ${indent(8, yamlencode(var.default_tags))}
 
   cert-manager:
+    enabled: true
+    crds:
+      enabled: true
     dns01RecursiveNameservers: ${local.dns01RecursiveNameservers}
     dns01RecursiveNameserversOnly: ${local.dns01RecursiveNameserversOnly}
     nodeSelector:
@@ -566,12 +569,12 @@ resource "helm_release" "ipa-crds" {
     startupapicheck:
       image:
         repository: ${var.image_registry}/quay.io/jetstack/cert-manager-startupapicheck
-    enabled: true
-    installCRDs: true
     extraEnv:
       - name: AWS_REGION
         value: 'aws-global'
   migrations:
+    image:
+      registry: ${var.image_registry}
     vaultSecretsOperator:
       updateCRDs: ${var.secrets_operator_enabled}
     opentelemetryOperator:
