@@ -1014,3 +1014,32 @@ variable "use_nlb" {
   default     = false
   description = "If true this will create a NLB loadbalancer instead of a classic VPC ELB"
 }
+
+variable "enable_s3_access_logging" {
+  type        = bool
+  default     = true
+  description = "If true this will enable access logging on the s3 buckets"
+}
+
+variable "enable_vpc_flow_logs" {
+  type        = bool
+  default     = true
+  description = "If enabled this will create flow logs for the VPC"
+}
+
+variable "vpc_flow_logs_iam_role_arn" {
+  type        = string
+  default     = ""
+  description = "The IAM role to use for the flow logs"
+}
+variable "instance_volume_size" {
+  type        = number
+  default     = 40
+  description = "The size of EBS volume to attach to the cluster nodes"
+}
+
+variable "instance_volume_type" {
+  type        = string
+  default     = "gp2"
+  description = "The type of EBS volume to attach to the cluster nodes"
+}

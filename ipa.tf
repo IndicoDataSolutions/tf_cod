@@ -119,6 +119,21 @@ clusterIssuer:
       selector:
         matchLabels:
           "acme.cert-manager.io/dns01-solver": "true"
+external-dns:
+  enabled: ${local.enable_external_dns}
+  image:
+    repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
+  logLevel: debug
+  policy: sync
+  txtOwnerId: "${local.dns_name}"
+  domainFilters:
+    - ${local.dns_zone_name}
+
+  provider: aws
+  policy: sync
+  sources:
+    - service
+    - ingress
   EOT
     ) : (<<EOT
 clusterIssuer:
@@ -132,8 +147,23 @@ clusterIssuer:
           "acme.cert-manager.io/dns01-solver": "true"
 external-dns:
   enabled: ${local.enable_external_dns}
+  image:
+    repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
+  logLevel: debug
+  policy: sync
+  txtOwnerId: "${local.dns_name}"
+  domainFilters:
+    - ${local.dns_zone_name}
+
+  provider: aws
+  policy: sync
+  sources:
+    - service
+    - ingress
 alternate-external-dns:
   enabled: ${local.enable_external_dns}
+  image:
+    repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
   logLevel: debug
   policy: sync
   txtOwnerId: "${local.dns_name}-${var.label}-${var.region}"
@@ -512,6 +542,9 @@ resource "helm_release" "ipa-crds" {
         ${indent(8, yamlencode(var.default_tags))}
 
   cert-manager:
+    enabled: true
+    crds:
+      enabled: true
     dns01RecursiveNameservers: ${local.dns01RecursiveNameservers}
     dns01RecursiveNameserversOnly: ${local.dns01RecursiveNameserversOnly}
     nodeSelector:
@@ -536,9 +569,12 @@ resource "helm_release" "ipa-crds" {
     startupapicheck:
       image:
         repository: ${var.image_registry}/quay.io/jetstack/cert-manager-startupapicheck
-    enabled: true
-    installCRDs: true
+    extraEnv:
+      - name: AWS_REGION
+        value: 'aws-global'
   migrations:
+    image:
+      registry: ${var.image_registry}
     vaultSecretsOperator:
       updateCRDs: ${var.secrets_operator_enabled}
     opentelemetryOperator:
@@ -640,24 +676,6 @@ secrets:
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
 
 ${local.dns_configuration_values}
-alternate-external-dns:
-  image:
-    repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
-external-dns:
-  enabled: ${local.enable_external_dns}
-  image:
-    repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
-  logLevel: debug
-  policy: sync
-  txtOwnerId: "${local.dns_name}"
-  domainFilters:
-    - ${local.dns_zone_name}
-
-  provider: aws
-  policy: sync
-  sources:
-    - service
-    - ingress
 aws-for-fluent-bit:
   enabled: true
   image:

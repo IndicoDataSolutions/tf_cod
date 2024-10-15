@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.14.0"
+      version = "5.68.0"
     }
     time = {
       source  = "hashicorp/time"
@@ -26,7 +26,7 @@ terraform {
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.11.0"
+      version = ">= 2.15.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -141,24 +141,26 @@ module "public_networking" {
 }
 
 module "networking" {
-  count                    = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
-  source                   = "app.terraform.io/indico/indico-aws-network/mod"
-  version                  = "2.0.0"
-  label                    = var.label
-  vpc_cidr                 = var.vpc_cidr
-  private_subnet_cidrs     = var.private_subnet_cidrs
-  public_subnet_cidrs      = var.public_subnet_cidrs
-  subnet_az_zones          = var.subnet_az_zones
-  region                   = var.region
-  allow_public             = var.network_allow_public
-  network_type             = var.network_type
-  load_vpc_id              = var.load_vpc_id
-  private_subnet_tag_name  = var.private_subnet_tag_name
-  private_subnet_tag_value = var.private_subnet_tag_value
-  public_subnet_tag_name   = var.public_subnet_tag_name
-  public_subnet_tag_value  = var.public_subnet_tag_value
-  sg_tag_name              = var.sg_tag_name
-  sg_tag_value             = var.sg_tag_value
+  count                      = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
+  source                     = "app.terraform.io/indico/indico-aws-network/mod"
+  version                    = "2.1.0"
+  label                      = var.label
+  vpc_cidr                   = var.vpc_cidr
+  private_subnet_cidrs       = var.private_subnet_cidrs
+  public_subnet_cidrs        = var.public_subnet_cidrs
+  subnet_az_zones            = var.subnet_az_zones
+  region                     = var.region
+  allow_public               = var.network_allow_public
+  network_type               = var.network_type
+  load_vpc_id                = var.load_vpc_id
+  private_subnet_tag_name    = var.private_subnet_tag_name
+  private_subnet_tag_value   = var.private_subnet_tag_value
+  public_subnet_tag_name     = var.public_subnet_tag_name
+  public_subnet_tag_value    = var.public_subnet_tag_value
+  sg_tag_name                = var.sg_tag_name
+  sg_tag_value               = var.sg_tag_value
+  enable_vpc_flow_logs       = var.enable_vpc_flow_logs
+  vpc_flow_logs_iam_role_arn = var.vpc_flow_logs_iam_role_arn
 }
 
 module "sqs_sns" {
@@ -191,7 +193,7 @@ module "lambda-sns-forwarder" {
 
 module "kms_key" {
   source           = "app.terraform.io/indico/indico-aws-kms/mod"
-  version          = "2.1.0"
+  version          = "2.1.2"
   label            = var.label
   additional_tags  = var.additional_tags
   existing_kms_key = var.existing_kms_key
@@ -208,15 +210,16 @@ module "security-group" {
 
 
 module "s3-storage" {
-  source            = "app.terraform.io/indico/indico-aws-buckets/mod"
-  version           = "3.2.0"
-  force_destroy     = true # allows terraform to destroy non-empty buckets.
-  label             = var.label
-  kms_key_arn       = module.kms_key.key.arn
-  submission_expiry = var.submission_expiry
-  uploads_expiry    = var.uploads_expiry
-  include_rox       = var.include_rox
-  enable_backup     = var.enable_s3_backup
+  source                = "app.terraform.io/indico/indico-aws-buckets/mod"
+  version               = "3.3.1"
+  force_destroy         = true # allows terraform to destroy non-empty buckets.
+  label                 = var.label
+  kms_key_arn           = module.kms_key.key.arn
+  submission_expiry     = var.submission_expiry
+  uploads_expiry        = var.uploads_expiry
+  include_rox           = var.include_rox
+  enable_backup         = var.enable_s3_backup
+  enable_access_logging = var.enable_s3_access_logging
 }
 
 
@@ -325,6 +328,8 @@ module "cluster" {
   aws_primary_dns_role_arn              = var.aws_primary_dns_role_arn
   private_endpoint_enabled              = var.network_allow_public == true ? false : true
   public_endpoint_enabled               = var.cluster_api_endpoint_public == true ? true : false
+  instance_volume_size                  = var.instance_volume_size
+  instance_volume_type                  = var.instance_volume_type
 }
 
 locals {
