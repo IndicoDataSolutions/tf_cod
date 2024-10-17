@@ -1058,6 +1058,16 @@ variable "aws_account_name" {
   default = ""
 }
 
+variable "access_key" {
+  type    = string
+  default = ""
+}
+
+variable "secret_key" {
+  type    = string
+  default = ""
+}
+
 variable "cluster_type" {
   type    = string
   default = "EKS"
