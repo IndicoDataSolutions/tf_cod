@@ -72,6 +72,7 @@ pipeline:
             spec:
               connectorRef: account.cicdharness
               namespace: harness
+              automountServiceAccountToken: true
               nodeSelector: {}
               os: Linux
           execution:
@@ -90,5 +91,5 @@ pipeline:
                     context: smoketests
                     resources:
                       limits:
-                        memory: 2G
-                        cpu: "1"
+                        memory: 5G
+                        cpu: "2"
