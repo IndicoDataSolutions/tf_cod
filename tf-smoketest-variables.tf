@@ -174,6 +174,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     additional_users = "${jsonencode(var.additional_users)}"
     aws_account_name = "${jsonencode(var.aws_account_name)}"
     cluster_type = "${jsonencode(var.cluster_type)}"
+    argo_bcrypt_password = "${jsonencode(var.argo_bcrypt_password)}"
 
     }
   }

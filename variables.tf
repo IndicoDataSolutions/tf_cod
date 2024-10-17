@@ -1062,3 +1062,10 @@ variable "cluster_type" {
   type    = string
   default = "EKS"
 }
+
+variable "argo_bcrypt_password" {
+  type    = string
+  default = ""
+}
+
+
