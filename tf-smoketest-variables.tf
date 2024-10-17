@@ -172,6 +172,8 @@ resource "kubernetes_config_map" "terraform-variables" {
     instance_volume_size = "${jsonencode(var.instance_volume_size)}"
     instance_volume_type = "${jsonencode(var.instance_volume_type)}"
     additional_users = "${jsonencode(var.additional_users)}"
+    aws_account_name = "${jsonencode(var.aws_account_name)}"
+    cluster_type = "${jsonencode(var.cluster_type)}"
 
     }
   }

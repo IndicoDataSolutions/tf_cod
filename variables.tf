@@ -824,50 +824,50 @@ variable "harness_mount_path" {
 }
 
 variable "lambda_sns_forwarder_enabled" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "If enabled a lamda will be provisioned to forward sns messages to an external endpoint."
 }
 
 variable "lambda_sns_forwarder_destination_endpoint" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "destination URL for the lambda sns forwarder"
 }
 
 variable "lambda_sns_forwarder_topic_arn" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "SNS topic to triger lambda forwarder."
 }
 
 variable "lambda_sns_forwarder_github_organization" {
-  type = string
-  default = "IndicoDataSolutions"
+  type        = string
+  default     = "IndicoDataSolutions"
   description = "The github organization containing the lambda_sns_forwarder code to use"
 }
 
 variable "lambda_sns_forwarder_github_repository" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "The github repository containing the lambda_sns_forwarder code to use"
 }
 
 variable "lambda_sns_forwarder_github_branch" {
-  type = string
-  default = "main"
+  type        = string
+  default     = "main"
   description = "The github branch / tag containing the lambda_sns_forwarder code to use"
 }
 
 variable "lambda_sns_forwarder_github_zip_path" {
-  type      = string
-  default   = "zip/lambda.zip"
+  type        = string
+  default     = "zip/lambda.zip"
   description = "Full path to the lambda zip file"
 }
 
 variable "lambda_sns_forwarder_function_variables" {
-  type = map
-  default = {}
+  type        = map(any)
+  default     = {}
   description = "A map of variables for the lambda_sns_forwarder code to use"
 }
 
@@ -1048,4 +1048,17 @@ variable "additional_users" {
   type        = list(string)
   default     = []
   description = "The names of additional AWS users to provide admin access to the cluster"
+}
+
+
+## Unused variables
+
+variable "aws_account_name" {
+  type    = string
+  default = ""
+}
+
+variable "cluster_type" {
+  type    = string
+  default = "EKS"
 }
