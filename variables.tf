@@ -953,7 +953,7 @@ variable "sg_tag_value" {
 
 variable "s3_endpoint_enabled" {
   type        = bool
-  default     = false
+  default     = true
   description = "If set to true, an S3 VPC endpoint will be created. If this variable is set, the `region` variable must also be set"
 }
 
@@ -1027,10 +1027,32 @@ variable "crunchy_enabled" {
   description = "If true this will create a crunchy database instance"
 }
 
-variable "efs_filesystem_id" {
+variable "efs_filesystem_name" {
   type        = string
   default     = ""
-  description = "The filesystem id of an existing efs instance"
+  description = "The filesystem name of an existing efs instance"
+}
+
+variable "efs_type" {
+  type    = string
+  default = "create"
+
+  validation {
+    condition     = var.efs_type == "create" || var.efs_type == "load"
+    error_message = "${var.efs_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "crunchy_efs_backed" {
+  type = bool
+  default = false
+  description = "Determine if crunchy should be efs backed."
+}
+
+variable "strimzi_efs_backed" {
+  type = bool
+  default = false
+  description = "Determine if strimzi should be efs backed."
 }
 
 variable "s3_data_bucket_name" {

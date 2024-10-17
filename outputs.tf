@@ -17,8 +17,24 @@ output "s3_role_id" {
 
 output "efs_filesystem_id" {
   description = "ID of the EFS filesystem"
-  value       = var.include_efs == true && var.efs_filesystem_id == "" ? module.efs-storage[0].efs_filesystem_id : var.efs_filesystem_id
+  value       = var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""
 }
+
+output "efs_filesystem_ap_pgha1_id" {
+  description = "ID of the EFS pgha1 ap id"
+  value       = var.include_efs == true ? module.efs-storage[0].efs_filesystem_ap_pgha1_id : ""
+}
+
+output "efs_filesystem_ap_pgha2_id" {
+  description = "ID of the EFS pgha2 ap id"
+  value       = var.include_efs == true ? module.efs-storage[0].efs_filesystem_ap_pgha2_id : ""
+}
+
+output "efs_pgha_aps" {
+  description = "Full object containing both found access points"
+  value       = var.include_efs == true ? module.efs-storage[0].efs_pgha_aps : {}
+}
+
 output "fsx-rwx" {
   description = "Read write filesystem"
   value       = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx : null

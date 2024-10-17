@@ -9,13 +9,58 @@ locals {
   storage_class         = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
   acm_arn               = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
   pgbackup_s3_bucket_name = var.use_existing_s3_buckets ? var.pgbackup_s3_bucket_name : module.s3-storage[0].pgbackup_s3_bucket_name
-  efs_filesystem_id       = var.efs_filesystem_id != "" ? var.efs_filesystem_id : var.include_efs ? module.efs-storage[0].efs_filesystem_id : ""
+  crunchy_dataclaim_spec_pgha1 = var.crunchy_efs_backed == true ? [<<EOF
+      dataVolumeClaimSpec:
+        storageClassName: "pg-sc"
+        volumeName: indico-postgres-pgha1
+        accessModes:
+        - ReadWriteMany
+        resources:
+          requests:
+            storage: 200Gi
+  EOF
+  ] : [<<EOF
+      dataVolumeClaimSpec:
+        storageClassName: ${local.storage_class}
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 200Gi
+  EOF
+  ]
+  crunchy_dataclaim_spec_pgha2 = var.crunchy_efs_backed == true ? [<<EOF
+      dataVolumeClaimSpec:
+        storageClassName: "pg-sc"
+        volumeName: indico-postgres-pgha2
+        accessModes:
+        - ReadWriteMany
+        resources:
+          requests:
+            storage: 200Gi
+  EOF
+  ] : [<<EOF
+      dataVolumeClaimSpec:
+        storageClassName: ${local.storage_class}
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 200Gi
+  EOF
+  ]
+  efs_filesystem_id       = module.efs-storage[0].efs_filesystem_id
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:
     enabled: false
   aws-efs-csi-driver:
     enabled: true
   storage:
+    crunchy:
+      efsBacked: "${var.crunchy_efs_backed}"
+      efs_filesystem_id: "${local.efs_filesystem_id}"
+      efs_pgha1_ap_id: "${module.efs-storage[0].efs_filesystem_ap_pgha1_id}"
+      efs_pgha2_ap_id: "${module.efs-storage[0].efs_filesystem_ap_pgha2_id}"
     volumeSetup:
       image:
         registry: "${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}"
@@ -712,24 +757,47 @@ crunchy-postgres:
                 operator: In
                 values:
                 - postgres-data
-              - key: postgres-operator.crunchydata.com/instance-set
-                operator: In
-                values:
-                - pgha1
             topologyKey: kubernetes.io/hostname
       metadata:
         annotations:
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      dataVolumeClaimSpec:
-        storageClassName: ${local.storage_class}
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 200Gi
+      ${local.crunchy_dataclaim_spec_pgha1}
       name: pgha1
-      replicas: ${var.az_count}
+      replicas: 1
+      resources:
+        requests:
+          cpu: 1000m
+          memory: 3000Mi
+      tolerations:
+        - effect: NoSchedule
+          key: indico.io/crunchy
+          operator: Exists
+    - affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node_group
+                operator: In
+                values:
+                - pgo-workers
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: postgres-operator.crunchydata.com/cluster
+                operator: In
+                values:
+                - postgres-data
+            topologyKey: kubernetes.io/hostname
+      metadata:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      ${local.crunchy_dataclaim_spec_pgha2}
+      name: pgha2
+      replicas: 1
       resources:
         requests:
           cpu: 1000m
@@ -1455,6 +1523,12 @@ spec:
                     image:
                       name: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/stakater/reloader
             kafka-strimzi:
+              efsBacked: ${var.strimzi_efs_backed}
+              efsVolumeId: ${local.efs_filesystem_id}
+              zookeeper:
+                volumeClass: ${var.strimzi_efs_backed ? "indico-sc" : "" }
+              kafka:
+                volumeClass: ${var.strimzi_efs_backed ? "indico-sc" : "" }
               strimzi-kafka-operator: 
                 defaultImageRegistry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/strimzi-proxy
               kafkacat:

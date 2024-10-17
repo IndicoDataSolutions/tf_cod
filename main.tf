@@ -159,6 +159,7 @@ module "networking" {
   public_subnet_tag_value  = var.public_subnet_tag_value
   sg_tag_name              = var.sg_tag_name
   sg_tag_value             = var.sg_tag_value
+  s3_endpoint_enabled  = var.s3_endpoint_enabled
 }
 
 module "sqs_sns" {
@@ -256,10 +257,11 @@ resource "null_resource" "s3-delete-data-pgbackup-bucket" {
 }
 
 module "efs-storage" {
-  count              = var.include_efs == true && var.efs_filesystem_id == "" ? 1 : 0
+  count              = var.include_efs == true ? 1 : 0
   source             = "app.terraform.io/indico/indico-aws-efs/mod"
-  version            = "0.0.1"
-  label              = var.label
+  version            = "2.0.0"
+  label              = var.efs_filesystem_name == "" ? var.label : var.efs_filesystem_name
+  efs_type           = var.efs_type
   additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage" })
   security_groups    = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
   private_subnet_ids = flatten([local.network[0].private_subnet_ids])
