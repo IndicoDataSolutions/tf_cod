@@ -171,6 +171,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     vpc_flow_logs_iam_role_arn = "${jsonencode(var.vpc_flow_logs_iam_role_arn)}"
     instance_volume_size = "${jsonencode(var.instance_volume_size)}"
     instance_volume_type = "${jsonencode(var.instance_volume_type)}"
+    additional_users = "${jsonencode(var.additional_users)}"
 
     }
   }

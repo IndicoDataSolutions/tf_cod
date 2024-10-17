@@ -1043,3 +1043,9 @@ variable "instance_volume_type" {
   default     = "gp2"
   description = "The type of EBS volume to attach to the cluster nodes"
 }
+
+variable "additional_users" {
+  type        = list(string)
+  default     = []
+  description = "The names of additional AWS users to provide admin access to the cluster"
+}

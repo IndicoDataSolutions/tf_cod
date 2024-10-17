@@ -100,17 +100,6 @@ data "aws_caller_identity" "current" {}
 # define the networking module we're using locally
 locals {
   network = var.network_module == "public_networking" ? module.public_networking : module.networking
-  aws_usernames = [
-    "svc_jenkins",
-    "terraform-sa"
-  ]
-  eks_users = {
-    for user in local.aws_usernames : user => {
-      userarn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${user}"
-      username = user
-      groups   = ["system:masters"]
-    }
-  }
 
   argo_app_name           = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
   argo_smoketest_app_name = lower("${var.aws_account}.${var.region}.${var.label}-smoketest")
@@ -307,7 +296,7 @@ module "cluster" {
   label                                 = var.label
   additional_tags                       = var.additional_tags
   region                                = var.region
-  map_users                             = values(local.eks_users)
+  additional_users                      = var.additional_users
   vpc_id                                = local.network[0].indico_vpc_id
   security_group_id                     = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
   cluster_additional_security_group_ids = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : []
