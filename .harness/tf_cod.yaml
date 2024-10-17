@@ -47,7 +47,7 @@ pipeline:
                       helm repo add --username $USERNAME --password $PASSWORD harborprod https://harbor.devops.indico.io/chartrepo/indico-charts
                       cd smoketests
                       export DRONE_TAG=<+<+codebase.tag>?<+codebase.tag>:"">
-                      ./upload_helm_charts.sh "<+<+codebase.branch>?<+codebase.branch>:<+codebase.tag>>-<+codebase.commitSha.substring(0,8)>"
+                      ./upload-charts.sh "<+<+codebase.branch>?<+codebase.branch>:<+codebase.tag>>-<+codebase.commitSha.substring(0,8)>"
                     envVariables:
                       PASSWORD: <+secrets.getValue("account.hashicorpvault://vaulttoolsdrone/harbor-push-token#password")>
                       USERNAME: <+secrets.getValue("account.hashicorpvault://vaulttoolsdrone/harbor-push-token#username")>
