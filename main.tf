@@ -315,7 +315,7 @@ module "cluster" {
   node_groups                           = var.node_groups
   cluster_node_policies                 = var.cluster_node_policies
   eks_cluster_iam_role                  = var.eks_cluster_iam_role
-  eks_cluster_nodes_iam_role            = "${var.label}-${var.region}-cluster-node-role"
+  eks_cluster_nodes_iam_role            = "${var.label}-${var.region}-node-role"
   fsx_arns                              = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
   kms_key_arn                           = module.kms_key.key_arn
   az_count                              = var.az_count
