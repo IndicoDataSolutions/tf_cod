@@ -56,6 +56,10 @@ pipeline:
                       PYTHONUNBUFFERED: "1"
                       DRONE_BRANCH: <+codebase.branch>
                       HELM_EXPERIMENTAL_OCI: "1"
+                    resources:
+                      limits:
+                        memory: 10G
+                        cpu: "2"
     - stage:
         name: tf-smoketest-container
         identifier: tfsmoketestcontainer
