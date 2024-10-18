@@ -1079,11 +1079,21 @@ variable "argo_bcrypt_password" {
 }
 
 variable "harbor_admin_password" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "azure_indico_io_client_secret_id" {
-  type = string
+  type    = string
   default = ""
+}
+
+variable "az_readapi_subscription_id" {
+  type    = string
+  default = ""
+}
+
+variable "aws_account_ids" {
+  type    = list(string)
+  default = []
 }
