@@ -9,7 +9,7 @@ locals {
   storage_class         = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
   acm_arn               = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
   pgbackup_s3_bucket_name = var.use_existing_s3_buckets ? var.pgbackup_s3_bucket_name : module.s3-storage[0].pgbackup_s3_bucket_name
-  crunchy_dataclaim_spec_pgha1 = var.crunchy_efs_backed == true ? [<<EOF
+  crunchy_dataclaim_spec_pgha1 = var.crunchy_efs_backed == true ? (<<EOF
       dataVolumeClaimSpec:
         storageClassName: "pg-sc"
         volumeName: indico-postgres-pgha1
@@ -17,9 +17,10 @@ locals {
         - ReadWriteMany
         resources:
           requests:
-            storage: 200Gi
+            storage: 200Gi          
+
   EOF
-  ] : [<<EOF
+  ) : (<<EOF
       dataVolumeClaimSpec:
         storageClassName: ${local.storage_class}
         accessModes:
@@ -28,8 +29,8 @@ locals {
           requests:
             storage: 200Gi
   EOF
-  ]
-  crunchy_dataclaim_spec_pgha2 = var.crunchy_efs_backed == true ? [<<EOF
+  )
+  crunchy_dataclaim_spec_pgha2 = var.crunchy_efs_backed == true ? (<<EOF
       dataVolumeClaimSpec:
         storageClassName: "pg-sc"
         volumeName: indico-postgres-pgha2
@@ -38,8 +39,9 @@ locals {
         resources:
           requests:
             storage: 200Gi
+  
   EOF
-  ] : [<<EOF
+  ) : (<<EOF
       dataVolumeClaimSpec:
         storageClassName: ${local.storage_class}
         accessModes:
@@ -48,7 +50,7 @@ locals {
           requests:
             storage: 200Gi
   EOF
-  ]
+  )
   efs_filesystem_id       = module.efs-storage[0].efs_filesystem_id
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:
