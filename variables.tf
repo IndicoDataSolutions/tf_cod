@@ -1078,4 +1078,12 @@ variable "argo_bcrypt_password" {
   default = ""
 }
 
+variable "harbor_admin_password" {
+  type = string
+  default = ""
+}
 
+variable "azure_indico_io_client_secret_id" {
+  type = string
+  default = ""
+}

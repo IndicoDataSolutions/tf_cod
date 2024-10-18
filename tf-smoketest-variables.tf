@@ -177,6 +177,8 @@ resource "kubernetes_config_map" "terraform-variables" {
     secret_key = "${jsonencode(var.secret_key)}"
     cluster_type = "${jsonencode(var.cluster_type)}"
     argo_bcrypt_password = "${jsonencode(var.argo_bcrypt_password)}"
+    harbor_admin_password = "${jsonencode(var.harbor_admin_password)}"
+    azure_indico_io_client_secret_id = "${jsonencode(var.azure_indico_io_client_secret_id)}"
 
     }
   }
