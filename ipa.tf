@@ -762,7 +762,7 @@ crunchy-postgres:
         annotations:
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      ${local.crunchy_dataclaim_spec_pgha1}
+${local.crunchy_dataclaim_spec_pgha1}
       name: pgha1
       replicas: 1
       resources:
@@ -795,7 +795,7 @@ crunchy-postgres:
         annotations:
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      ${local.crunchy_dataclaim_spec_pgha2}
+${local.crunchy_dataclaim_spec_pgha2}
       name: pgha2
       replicas: 1
       resources:
