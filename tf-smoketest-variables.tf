@@ -180,7 +180,9 @@ resource "kubernetes_config_map" "terraform-variables" {
     harbor_admin_password = "${jsonencode(var.harbor_admin_password)}"
     azure_indico_io_client_secret_id = "${jsonencode(var.azure_indico_io_client_secret_id)}"
     az_readapi_subscription_id = "${jsonencode(var.az_readapi_subscription_id)}"
+    az_readapi_client_secret_id = "${jsonencode(var.az_readapi_client_secret_id)}"
     aws_account_ids = "${jsonencode(var.aws_account_ids)}"
+    ipa_smoketest_cronjob_enabled = "${jsonencode(var.ipa_smoketest_cronjob_enabled)}"
 
     }
   }

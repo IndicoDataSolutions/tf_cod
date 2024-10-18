@@ -1093,7 +1093,17 @@ variable "az_readapi_subscription_id" {
   default = ""
 }
 
+variable "az_readapi_client_secret_id" {
+  type    = string
+  default = ""
+}
+
 variable "aws_account_ids" {
   type    = list(string)
   default = []
+}
+
+variable "ipa_smoketest_cronjob_enabled" {
+  type    = bool
+  default = false
 }
