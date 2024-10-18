@@ -1093,6 +1093,11 @@ variable "az_readapi_subscription_id" {
   default = ""
 }
 
+variable "az_readapi_client_id" {
+  type    = string
+  default = ""
+}
+
 variable "az_readapi_client_secret_id" {
   type    = string
   default = ""
@@ -1106,4 +1111,9 @@ variable "aws_account_ids" {
 variable "ipa_smoketest_cronjob_enabled" {
   type    = bool
   default = false
+}
+
+variable "local_registry_harbor_robot_account_name" {
+  type    = string
+  default = ""
 }
