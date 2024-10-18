@@ -1,0 +1,14 @@
+inputSet:
+  name: branch_trigger
+  identifier: branch_trigger
+  orgIdentifier: default
+  projectIdentifier: Devops
+  pipeline:
+    identifier: tf_cod
+    properties:
+      ci:
+        codebase:
+          build:
+            type: branch
+            spec:
+              branch: <+trigger.branch>
