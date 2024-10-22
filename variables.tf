@@ -791,7 +791,7 @@ variable "indico_devops_aws_region" {
 
 variable "thanos_enabled" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "keycloak_enabled" {
