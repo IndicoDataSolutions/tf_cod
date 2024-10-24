@@ -389,33 +389,33 @@ provider "kubectl" {
 }
 
 
-provider "aws" {
-  access_key = var.thanos_enabled == true ? var.indico_devops_aws_access_key_id : var.aws_access_key
-  secret_key = var.thanos_enabled == true ? var.indico_devops_aws_secret_access_key : var.aws_secret_key
-  token      = var.thanos_enabled == true ? var.indico_devops_aws_session_token : var.aws_session_token
-  region     = var.indico_devops_aws_region
-  alias      = "aws-indico-devops"
-}
+# provider "aws" {
+#   access_key = var.thanos_enabled == true ? var.indico_devops_aws_access_key_id : var.aws_access_key
+#   secret_key = var.thanos_enabled == true ? var.indico_devops_aws_secret_access_key : var.aws_secret_key
+#   token      = var.thanos_enabled == true ? var.indico_devops_aws_session_token : var.aws_session_token
+#   region     = var.indico_devops_aws_region
+#   alias      = "aws-indico-devops"
+# }
 
-data "aws_eks_cluster" "thanos" {
-  count    = var.thanos_enabled == true ? 1 : 0
-  name     = var.thanos_cluster_name
-  provider = aws.aws-indico-devops
-}
+# data "aws_eks_cluster" "thanos" {
+#   count    = var.thanos_enabled == true ? 1 : 0
+#   name     = var.thanos_cluster_name
+#   provider = aws.aws-indico-devops
+# }
 
-data "aws_eks_cluster_auth" "thanos" {
-  count    = var.thanos_enabled == true ? 1 : 0
-  name     = var.thanos_cluster_name
-  provider = aws.aws-indico-devops
-}
+# data "aws_eks_cluster_auth" "thanos" {
+#   count    = var.thanos_enabled == true ? 1 : 0
+#   name     = var.thanos_cluster_name
+#   provider = aws.aws-indico-devops
+# }
 
-provider "kubectl" {
-  alias                  = "thanos-kubectl"
-  host                   = var.thanos_enabled == true ? data.aws_eks_cluster.thanos[0].endpoint : ""
-  cluster_ca_certificate = var.thanos_enabled == true ? base64decode(data.aws_eks_cluster.thanos[0].certificate_authority[0].data) : ""
-  token                  = var.thanos_enabled == true ? data.aws_eks_cluster_auth.thanos[0].token : ""
-  load_config_file       = false
-}
+# provider "kubectl" {
+#   alias                  = "thanos-kubectl"
+#   host                   = var.thanos_enabled == true ? data.aws_eks_cluster.thanos[0].endpoint : ""
+#   cluster_ca_certificate = var.thanos_enabled == true ? base64decode(data.aws_eks_cluster.thanos[0].certificate_authority[0].data) : ""
+#   token                  = var.thanos_enabled == true ? data.aws_eks_cluster_auth.thanos[0].token : ""
+#   load_config_file       = false
+# }
 
 provider "helm" {
   debug = true

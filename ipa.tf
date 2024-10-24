@@ -346,72 +346,72 @@ module "secrets-operator-setup" {
 }
 
 
-resource "helm_release" "ipa-vso" {
-  count = var.thanos_enabled == true ? 1 : 0
-  depends_on = [
-    module.cluster,
-    data.github_repository_file.data-crds-values,
-    module.secrets-operator-setup
-  ]
+# resource "helm_release" "ipa-vso" {
+#   count = var.thanos_enabled == true ? 1 : 0
+#   depends_on = [
+#     module.cluster,
+#     data.github_repository_file.data-crds-values,
+#     module.secrets-operator-setup
+#   ]
 
-  verify           = false
-  name             = "ipa-vso"
-  create_namespace = true
-  namespace        = "default"
-  repository       = "https://helm.releases.hashicorp.com"
-  chart            = "vault-secrets-operator"
-  version          = var.vault_secrets_operator_version
-  wait             = true
-  values = [
-    <<EOF
-  controller: 
-    imagePullSecrets:
-      - name: harbor-pull-secret
-    kubeRbacProxy:
-      image:
-        repository: ${var.image_registry}/gcr.io/kubebuilder/kube-rbac-proxy
-      resources:
-        limits:
-          cpu: 500m
-          memory: 1024Mi
-        requests:
-          cpu: 500m
-          memory: 512Mi
-    manager:
-      image:
-        repository: ${var.image_registry}/docker.io/hashicorp/vault-secrets-operator
-      resources:
-        limits:
-          cpu: 500m
-          memory: 1024Mi
-        requests:
-          cpu: 500m
-          memory: 512Mi
+#   verify           = false
+#   name             = "ipa-vso"
+#   create_namespace = true
+#   namespace        = "default"
+#   repository       = "https://helm.releases.hashicorp.com"
+#   chart            = "vault-secrets-operator"
+#   version          = var.vault_secrets_operator_version
+#   wait             = true
+#   values = [
+#     <<EOF
+#   controller: 
+#     imagePullSecrets:
+#       - name: harbor-pull-secret
+#     kubeRbacProxy:
+#       image:
+#         repository: ${var.image_registry}/gcr.io/kubebuilder/kube-rbac-proxy
+#       resources:
+#         limits:
+#           cpu: 500m
+#           memory: 1024Mi
+#         requests:
+#           cpu: 500m
+#           memory: 512Mi
+#     manager:
+#       image:
+#         repository: ${var.image_registry}/docker.io/hashicorp/vault-secrets-operator
+#       resources:
+#         limits:
+#           cpu: 500m
+#           memory: 1024Mi
+#         requests:
+#           cpu: 500m
+#           memory: 512Mi
 
-  defaultAuthMethod:
-    enabled: true
-    namespace: default
-    method: kubernetes
-    mount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
-    kubernetes:
-      role: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
-      tokenAudiences: ["vault"]
-      serviceAccount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+#   defaultAuthMethod:
+#     enabled: true
+#     namespace: default
+#     method: kubernetes
+#     mount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+#     kubernetes:
+#       role: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+#       tokenAudiences: ["vault"]
+#       serviceAccount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
 
-  defaultVaultConnection:
-    enabled: true
-    address: ${var.vault_address}
-    skipTLSVerify: false
-    spec:
-    template:
-      spec:
-        containers:
-        - name: manager
-          args:
-          - "--client-cache-persistence-model=direct-encrypted"
-EOF
-  ]
-}
+#   defaultVaultConnection:
+#     enabled: true
+#     address: ${var.vault_address}
+#     skipTLSVerify: false
+#     spec:
+#     template:
+#       spec:
+#         containers:
+#         - name: manager
+#           args:
+#           - "--client-cache-persistence-model=direct-encrypted"
+# EOF
+#   ]
+# }
 
 resource "helm_release" "external-secrets" {
   depends_on = [
@@ -594,33 +594,33 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
   create_duration = "1m"
 }
 
-resource "kubectl_manifest" "thanos-storage-secret" {
-  count      = var.thanos_enabled ? 1 : 0
-  depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
-  yaml_body  = <<YAML
-    apiVersion: "secrets.hashicorp.com/v1beta1"
-    kind: "VaultStaticSecret"
-    metadata:
-      name:  vault-thanos-storage
-      namespace: default
-    spec:
-      type: "kv-v2"
-      namespace: default
-      mount: customer-Indico-Devops
-      path: thanos-storage
-      refreshAfter: 60s
-      rolloutRestartTargets:
-        - name: prometheus-monitoring-kube-prometheus-prometheus
-          kind: StatefulSet
-      destination:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-        create: true
-        name: thanos-storage
-      vaultAuthRef: default
-  YAML
-}
+# resource "kubectl_manifest" "thanos-storage-secret" {
+#   count      = var.thanos_enabled ? 1 : 0
+#   depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
+#   yaml_body  = <<YAML
+#     apiVersion: "secrets.hashicorp.com/v1beta1"
+#     kind: "VaultStaticSecret"
+#     metadata:
+#       name:  vault-thanos-storage
+#       namespace: default
+#     spec:
+#       type: "kv-v2"
+#       namespace: default
+#       mount: customer-Indico-Devops
+#       path: thanos-storage
+#       refreshAfter: 60s
+#       rolloutRestartTargets:
+#         - name: prometheus-monitoring-kube-prometheus-prometheus
+#           kind: StatefulSet
+#       destination:
+#         annotations:
+#           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+#           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+#         create: true
+#         name: thanos-storage
+#       vaultAuthRef: default
+#   YAML
+# }
 
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
