@@ -220,6 +220,7 @@ module "s3-storage" {
   include_rox           = var.include_rox
   enable_backup         = var.enable_s3_backup
   enable_access_logging = var.enable_s3_access_logging
+  bucket_type           = var.bucket_type
 }
 
 

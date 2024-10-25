@@ -824,50 +824,50 @@ variable "harness_mount_path" {
 }
 
 variable "lambda_sns_forwarder_enabled" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "If enabled a lamda will be provisioned to forward sns messages to an external endpoint."
 }
 
 variable "lambda_sns_forwarder_destination_endpoint" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "destination URL for the lambda sns forwarder"
 }
 
 variable "lambda_sns_forwarder_topic_arn" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "SNS topic to triger lambda forwarder."
 }
 
 variable "lambda_sns_forwarder_github_organization" {
-  type = string
-  default = "IndicoDataSolutions"
+  type        = string
+  default     = "IndicoDataSolutions"
   description = "The github organization containing the lambda_sns_forwarder code to use"
 }
 
 variable "lambda_sns_forwarder_github_repository" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "The github repository containing the lambda_sns_forwarder code to use"
 }
 
 variable "lambda_sns_forwarder_github_branch" {
-  type = string
-  default = "main"
+  type        = string
+  default     = "main"
   description = "The github branch / tag containing the lambda_sns_forwarder code to use"
 }
 
 variable "lambda_sns_forwarder_github_zip_path" {
-  type      = string
-  default   = "zip/lambda.zip"
+  type        = string
+  default     = "zip/lambda.zip"
   description = "Full path to the lambda zip file"
 }
 
 variable "lambda_sns_forwarder_function_variables" {
-  type = map
-  default = {}
+  type        = map(any)
+  default     = {}
   description = "A map of variables for the lambda_sns_forwarder code to use"
 }
 
@@ -1042,4 +1042,31 @@ variable "instance_volume_type" {
   type        = string
   default     = "gp2"
   description = "The type of EBS volume to attach to the cluster nodes"
+}
+
+variable "bucket_type" {
+  type    = string
+  default = "create"
+  validation {
+    condition     = var.bucket_type == "create" || var.bucket_type == "load"
+    error_message = "${var.bucket_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "data_s3_bucket_name" {
+  type        = string
+  default     = ""
+  description = "The name of the existing S3 bucket to be loaded and used as the data bucket"
+}
+
+variable "api_models_s3_bucket_name" {
+  type        = string
+  default     = ""
+  description = "The name of the existing S3 bucket to be loaded and used as the API model bucket"
+}
+
+variable "pgbackup_s3_bucket_name" {
+  type        = string
+  default     = ""
+  description = "The name of the existing S3 bucket to be loaded and used as the postgres backup bucket"
 }
