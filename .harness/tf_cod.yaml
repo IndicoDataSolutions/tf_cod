@@ -86,7 +86,7 @@ pipeline:
                     repo: harbor.devops.indico.io/indico/terraform-smoketests
                     tags:
                       - <+<+codebase.tag>?<+codebase.tag>:"latest">
-                      - <+codebase.shortCommitSha>
+                      - <+codebase.commitSha.substring(0,8)>
                     dockerfile: smoketests/Dockerfile
                     context: smoketests
                     resources:
