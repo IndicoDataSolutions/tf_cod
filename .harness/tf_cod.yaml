@@ -93,3 +93,4 @@ pipeline:
                       limits:
                         memory: 5G
                         cpu: "2"
+  allowStageExecutions: true
