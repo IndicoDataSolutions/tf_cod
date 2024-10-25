@@ -434,57 +434,57 @@ EOF
 }
 
 
-resource "kubectl_manifest" "thanos-datasource-credentials" {
-  count     = var.thanos_enabled ? 1 : 0
-  provider  = kubectl.thanos-kubectl
-  yaml_body = <<YAML
-apiVersion: v1
-stringData:
-  admin-password: ${random_password.monitoring-password.result}
-kind: Secret
-metadata:
-  name: ${replace(local.dns_name, ".", "-")}
-  namespace: default
-type: Opaque
-  YAML
-}
+# resource "kubectl_manifest" "thanos-datasource-credentials" {
+#   count     = var.thanos_enabled ? 1 : 0
+#   provider  = kubectl.thanos-kubectl
+#   yaml_body = <<YAML
+# apiVersion: v1
+# stringData:
+#   admin-password: ${random_password.monitoring-password.result}
+# kind: Secret
+# metadata:
+#   name: ${replace(local.dns_name, ".", "-")}
+#   namespace: default
+# type: Opaque
+#   YAML
+# }
 
-resource "kubectl_manifest" "thanos-datasource" {
-  count      = var.thanos_enabled ? 1 : 0
-  depends_on = [kubectl_manifest.thanos-datasource-credentials]
-  provider   = kubectl.thanos-kubectl
-  yaml_body  = <<YAML
-apiVersion: grafana.integreatly.org/v1beta1
-kind: GrafanaDatasource
-metadata:
-  name: ${replace(local.dns_name, ".", "-")}
-  namespace: default
-spec:
-  valuesFrom:
-    - targetPath: "secureJsonData.basicAuthPassword"
-      valueFrom:
-        secretKeyRef:
-          name: ${replace(local.dns_name, ".", "-")}
-          key: admin-password
-  datasource:
-    basicAuth: true
-    basicAuthUser: monitoring
-    editable: false
-    access: proxy
-    editable: true
-    jsonData:
-      timeInterval: 5s
-      tlsSkipVerify: true
-    name: ${local.dns_name}
-    secureJsonData:
-      basicAuthPassword: $${admin-password}
-    type: prometheus
-    url: https://prometheus.${local.dns_name}/prometheus
-  instanceSelector:
-    matchLabels:
-      dashboards: external-grafana
-  YAML
-}
+# resource "kubectl_manifest" "thanos-datasource" {
+#   count      = var.thanos_enabled ? 1 : 0
+#   depends_on = [kubectl_manifest.thanos-datasource-credentials]
+#   provider   = kubectl.thanos-kubectl
+#   yaml_body  = <<YAML
+# apiVersion: grafana.integreatly.org/v1beta1
+# kind: GrafanaDatasource
+# metadata:
+#   name: ${replace(local.dns_name, ".", "-")}
+#   namespace: default
+# spec:
+#   valuesFrom:
+#     - targetPath: "secureJsonData.basicAuthPassword"
+#       valueFrom:
+#         secretKeyRef:
+#           name: ${replace(local.dns_name, ".", "-")}
+#           key: admin-password
+#   datasource:
+#     basicAuth: true
+#     basicAuthUser: monitoring
+#     editable: false
+#     access: proxy
+#     editable: true
+#     jsonData:
+#       timeInterval: 5s
+#       tlsSkipVerify: true
+#     name: ${local.dns_name}
+#     secureJsonData:
+#       basicAuthPassword: $${admin-password}
+#     type: prometheus
+#     url: https://prometheus.${local.dns_name}/prometheus
+#   instanceSelector:
+#     matchLabels:
+#       dashboards: external-grafana
+#   YAML
+# }
 
 resource "helm_release" "keda-monitoring" {
   count = var.monitoring_enabled == true ? 1 : 0
