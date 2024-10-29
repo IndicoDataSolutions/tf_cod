@@ -470,33 +470,33 @@ resource "kubernetes_config_map" "azure_dns_credentials" {
 }
 
 
-resource "kubectl_manifest" "thanos-storage-secret" {
-  count      = var.thanos_enabled ? 1 : 0
-  depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
-  yaml_body  = <<YAML
-    apiVersion: "secrets.hashicorp.com/v1beta1"
-    kind: "VaultStaticSecret"
-    metadata:
-      name:  vault-thanos-storage
-      namespace: default
-    spec:
-      type: "kv-v2"
-      namespace: default
-      mount: customer-Indico-Devops
-      path: thanos-storage
-      refreshAfter: 60s
-      rolloutRestartTargets:
-        - name: prometheus-monitoring-kube-prometheus-prometheus
-          kind: StatefulSet
-      destination:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-        create: true
-        name: thanos-storage
-      vaultAuthRef: default
-  YAML
-}
+# resource "kubectl_manifest" "thanos-storage-secret" {
+#   count      = var.thanos_enabled ? 1 : 0
+#   depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
+#   yaml_body  = <<YAML
+#     apiVersion: "secrets.hashicorp.com/v1beta1"
+#     kind: "VaultStaticSecret"
+#     metadata:
+#       name:  vault-thanos-storage
+#       namespace: default
+#     spec:
+#       type: "kv-v2"
+#       namespace: default
+#       mount: customer-Indico-Devops
+#       path: thanos-storage
+#       refreshAfter: 60s
+#       rolloutRestartTargets:
+#         - name: prometheus-monitoring-kube-prometheus-prometheus
+#           kind: StatefulSet
+#       destination:
+#         annotations:
+#           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+#           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+#         create: true
+#         name: thanos-storage
+#       vaultAuthRef: default
+#   YAML
+#}
 
 
 resource "kubectl_manifest" "custom-cluster-issuer" {
