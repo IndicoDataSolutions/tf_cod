@@ -642,7 +642,7 @@ variable "thanos_cluster_name" {
 
 variable "thanos_enabled" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "harness_delegate" {
