@@ -1,12 +1,19 @@
 locals {
   internal_elb = var.network_allow_public == false ? true : false
+  # thanos_config = var.thanos_enabled == true ? (<<EOT
+  #     thanos: # this is the one being used
+  #       blockSize: 5m
+  #       objectStorageConfig:
+  #         existingSecret:
+  #           name: thanos-storage
+  #           key: thanos_storage.yaml
+  # EOT
+  #   ) : (<<EOT
+  #     thanos: {}
+  # EOT
+  # )
   thanos_config = var.thanos_enabled == true ? (<<EOT
-      thanos: # this is the one being used
-        blockSize: 5m
-        objectStorageConfig:
-          existingSecret:
-            name: thanos-storage
-            key: thanos_storage.yaml
+      thanos: {}
   EOT
     ) : (<<EOT
       thanos: {}
@@ -165,15 +172,15 @@ ${local.alertmanager_tls}
       reloader.stakater.com/auto: "true"
 
     thanosServiceMonitor:
-      enabled: ${var.thanos_enabled}
+      enabled: false #${var.thanos_enabled}
 
     thanosService:
-      enabled:  ${var.thanos_enabled}
+      enabled:  false #${var.thanos_enabled}
 
     prometheusSpec:
       image:
         registry: ${var.image_registry}/quay.io
-      disableCompaction: ${var.thanos_enabled}
+      disableCompaction: false #${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
@@ -253,15 +260,15 @@ tempo:
       reloader.stakater.com/auto: "true"
 
     thanosServiceMonitor:
-      enabled: ${var.thanos_enabled}
+      enabled: false #${var.thanos_enabled}
 
     thanosService:
-      enabled: ${var.thanos_enabled}
+      enabled: false #${var.thanos_enabled}
     
     prometheusSpec:
       image:
         registry: ${var.image_registry}/quay.io
-      disableCompaction: ${var.thanos_enabled}
+      disableCompaction: false #${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
@@ -426,57 +433,57 @@ EOF
 }
 
 
-resource "kubectl_manifest" "thanos-datasource-credentials" {
-  count     = var.thanos_enabled ? 1 : 0
-  provider  = kubectl.thanos-kubectl
-  yaml_body = <<YAML
-apiVersion: v1
-stringData:
-  admin-password: ${random_password.monitoring-password.result}
-kind: Secret
-metadata:
-  name: ${replace(local.dns_name, ".", "-")}
-  namespace: default
-type: Opaque
-  YAML
-}
+# resource "kubectl_manifest" "thanos-datasource-credentials" {
+#   count     = var.thanos_enabled ? 1 : 0
+#   provider  = kubectl.thanos-kubectl
+#   yaml_body = <<YAML
+# apiVersion: v1
+# stringData:
+#   admin-password: ${random_password.monitoring-password.result}
+# kind: Secret
+# metadata:
+#   name: ${replace(local.dns_name, ".", "-")}
+#   namespace: default
+# type: Opaque
+#   YAML
+# }
 
-resource "kubectl_manifest" "thanos-datasource" {
-  count      = var.thanos_enabled ? 1 : 0
-  depends_on = [kubectl_manifest.thanos-datasource-credentials]
-  provider   = kubectl.thanos-kubectl
-  yaml_body  = <<YAML
-apiVersion: grafana.integreatly.org/v1beta1
-kind: GrafanaDatasource
-metadata:
-  name: ${replace(local.dns_name, ".", "-")}
-  namespace: default
-spec:
-  valuesFrom:
-    - targetPath: "secureJsonData.basicAuthPassword"
-      valueFrom:
-        secretKeyRef:
-          name: ${replace(local.dns_name, ".", "-")}
-          key: admin-password
-  datasource:
-    basicAuth: true
-    basicAuthUser: monitoring
-    editable: false
-    access: proxy
-    editable: true
-    jsonData:
-      timeInterval: 5s
-      tlsSkipVerify: true
-    name: ${local.dns_name}
-    secureJsonData:
-      basicAuthPassword: $${admin-password}
-    type: prometheus
-    url: https://prometheus.${local.dns_name}/prometheus
-  instanceSelector:
-    matchLabels:
-      dashboards: external-grafana
-  YAML
-}
+# resource "kubectl_manifest" "thanos-datasource" {
+#   count      = var.thanos_enabled ? 1 : 0
+#   depends_on = [kubectl_manifest.thanos-datasource-credentials]
+#   provider   = kubectl.thanos-kubectl
+#   yaml_body  = <<YAML
+# apiVersion: grafana.integreatly.org/v1beta1
+# kind: GrafanaDatasource
+# metadata:
+#   name: ${replace(local.dns_name, ".", "-")}
+#   namespace: default
+# spec:
+#   valuesFrom:
+#     - targetPath: "secureJsonData.basicAuthPassword"
+#       valueFrom:
+#         secretKeyRef:
+#           name: ${replace(local.dns_name, ".", "-")}
+#           key: admin-password
+#   datasource:
+#     basicAuth: true
+#     basicAuthUser: monitoring
+#     editable: false
+#     access: proxy
+#     editable: true
+#     jsonData:
+#       timeInterval: 5s
+#       tlsSkipVerify: true
+#     name: ${local.dns_name}
+#     secureJsonData:
+#       basicAuthPassword: $${admin-password}
+#     type: prometheus
+#     url: https://prometheus.${local.dns_name}/prometheus
+#   instanceSelector:
+#     matchLabels:
+#       dashboards: external-grafana
+#   YAML
+# }
 
 resource "helm_release" "keda-monitoring" {
   count = var.monitoring_enabled == true ? 1 : 0
