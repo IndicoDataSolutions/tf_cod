@@ -366,10 +366,12 @@ provider "argocd" {
 }
 
 data "aws_eks_cluster" "local" {
+  depends_on = [ module.cluster.kubernetes_host ]
   name     = var.label
 }
 
 data "aws_eks_cluster_auth" "local" {
+  depends_on = [ module.cluster.kubernetes_host ]
   name     = var.label
 }
 
