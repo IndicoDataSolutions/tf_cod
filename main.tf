@@ -259,7 +259,7 @@ resource "null_resource" "s3-delete-data-pgbackup-bucket" {
 module "efs-storage" {
   count              = var.include_efs == true ? 1 : 0
   source             = "app.terraform.io/indico/indico-aws-efs/mod"
-  version            = "0.0.1"
+  version            = "2.0.0"
   label              = var.label
   additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage" })
   security_groups    = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
@@ -366,10 +366,12 @@ provider "argocd" {
 }
 
 data "aws_eks_cluster" "local" {
+  depends_on = [ module.cluster.kubernetes_host ]
   name     = var.label
 }
 
 data "aws_eks_cluster_auth" "local" {
+  depends_on = [ module.cluster.kubernetes_host ]
   name     = var.label
 }
 
