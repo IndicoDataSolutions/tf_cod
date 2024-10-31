@@ -1043,3 +1043,18 @@ variable "instance_volume_type" {
   default     = "gp2"
   description = "The type of EBS volume to attach to the cluster nodes"
 }
+
+variable "sqs_sns_type" {
+  type    = string
+  default = "create"
+  validation {
+    condition     = var.sqs_sns_type == "create" || var.sqs_sns_type == "load"
+    error_message = "${var.sqs_sns_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "ipa_sns_topic_name" {
+  type        = string
+  description = "Full name of the SNS topic"
+  default     = null
+}

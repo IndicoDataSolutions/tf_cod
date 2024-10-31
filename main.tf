@@ -164,12 +164,14 @@ module "networking" {
 }
 
 module "sqs_sns" {
-  count             = var.sqs_sns == true ? 1 : 0
-  source            = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
-  version           = "1.2.0"
-  region            = var.region
-  label             = var.label
-  kms_master_key_id = module.kms_key.key.id
+  count              = var.sqs_sns == true ? 1 : 0
+  source             = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
+  version            = "2.0.0"
+  region             = var.region
+  label              = var.label
+  kms_master_key_id  = module.kms_key.key.id
+  sqs_sns_type       = var.sqs_sns_type
+  ipa_sns_topic_name = var.ipa_sns_topic_name
 }
 
 module "lambda-sns-forwarder" {
