@@ -501,16 +501,16 @@ resource "helm_release" "keda-monitoring" {
 
 
   values = [<<EOF
+    global:
+      image:
+        registry: ${var.image_registry}/ghcr.io
     image:
       metricsApiServer:
-        registry: ${var.image_registry}
-        repository: ghcr.io/kedacore/keda-metrics-apiserver
+        repository: kedacore/keda-metrics-apiserver
       webhooks:
-        registry: ${var.image_registry}
-        repository: ghcr.io/kedacore/keda-admission-webhooks
+        repository: kedacore/keda-admission-webhooks
       keda:
-        registry: ${var.image_registry}
-        repository: ghcr.io/kedacore/keda
+        repository: kedacore/keda
     imagePullSecrets:
       - name: harbor-pull-secret
     resources:
