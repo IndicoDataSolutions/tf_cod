@@ -515,17 +515,17 @@ variable "hibernation_enabled" {
 }
 
 variable "keda_version" {
-  default = "2.13.2"
+  default = "2.15.2"
 }
 
 variable "external_secrets_version" {
   type        = string
-  default     = "0.9.9"
+  default     = "0.10.5"
   description = "Version of external-secrets helm chart"
 }
 
 variable "opentelemetry-collector_version" {
-  default = "0.97.1"
+  default = "0.108.0"
 }
 
 variable "include_fsx" {
