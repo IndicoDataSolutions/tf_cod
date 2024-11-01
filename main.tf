@@ -18,7 +18,7 @@ terraform {
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.23.0"
+      version = ">= 2.33.0"
     }
     kubectl = {
       source  = "gavinbunney/kubectl"
@@ -365,6 +365,16 @@ provider "argocd" {
   password    = var.argo_password
 }
 
+data "aws_eks_cluster" "local" {
+  depends_on = [ module.cluster.kubernetes_host ]
+  name     = var.label
+}
+
+data "aws_eks_cluster_auth" "local" {
+  depends_on = [ module.cluster.kubernetes_host ]
+  name     = var.label
+}
+
 provider "kubernetes" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
@@ -379,13 +389,8 @@ provider "kubernetes" {
 provider "kubectl" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  #token                  = module.cluster.kubernetes_token
-  load_config_file = false
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--cluster-name", var.label]
-    command     = "aws"
-  }
+  token                  = data.aws_eks_cluster_auth.local.token
+  load_config_file       = false
 }
 
 
