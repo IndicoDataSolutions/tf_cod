@@ -1058,3 +1058,13 @@ variable "ipa_sns_topic_name" {
   description = "Full name of the SNS topic"
   default     = null
 }
+
+variable "ipa_sqs_queue_name" {
+  type        = string
+  description = "Full name of the SQS queue"
+}
+
+variable "indico_sqs_sns_policy_name" {
+  type        = string
+  description = "Full name of the SQS SNS policy"
+}
