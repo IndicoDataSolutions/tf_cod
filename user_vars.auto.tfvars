@@ -110,7 +110,7 @@ uploads_expiry    = 30 # days
 deletion_protection_enabled = false
 skip_final_snapshot         = true
 #fsx
-per_unit_storage_throughput = 50
+per_unit_storage_throughput = 150
 include_rox                 = false
 include_fsx                 = false
 include_efs                 = true
