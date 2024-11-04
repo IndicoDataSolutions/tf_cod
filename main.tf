@@ -283,7 +283,7 @@ module "efs-storage-local-registry" {
 module "fsx-storage" {
   count                       = var.include_fsx == true ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-fsx/mod"
-  version                     = "1.4.2"
+  version                     = "2.0.0"
   label                       = var.label
   additional_tags             = var.additional_tags
   region                      = var.region
@@ -295,6 +295,9 @@ module "fsx-storage" {
   kms_key                     = module.kms_key.key
   per_unit_storage_throughput = var.per_unit_storage_throughput
   include_rox                 = var.include_rox
+  fsx_type                    = var.fsx_type
+  fsx_rwx_name                = var.fsx_rwx_name
+  fsx_rox_name                = var.fsx_rox_name
 }
 
 module "cluster" {

@@ -1043,3 +1043,24 @@ variable "instance_volume_type" {
   default     = "gp2"
   description = "The type of EBS volume to attach to the cluster nodes"
 }
+
+variable "fsx_type" {
+  type    = string
+  default = "create"
+  validation {
+    condition     = var.fsx_type == "create" || var.fsx_type == "load"
+    error_message = "${var.fsx_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "fsx_rwx_name" {
+  type        = string
+  description = "The name of the read write filesystem"
+  default     = null
+}
+
+variable "fsx_rox_name" {
+  type        = string
+  description = "The name of the read only filesystem"
+  default     = null
+}
