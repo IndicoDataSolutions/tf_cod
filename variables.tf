@@ -1056,6 +1056,7 @@ variable "fsx_type" {
 variable "fsx_rwx_id" {
   description = "ID of the existing FSx Lustre file system for RWX"
   type        = string
+  default     = null
 }
 
 variable "fsx_rwx_subnet_ids" {
