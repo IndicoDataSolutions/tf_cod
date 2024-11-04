@@ -302,7 +302,7 @@ variable "skip_final_snapshot" {
 
 variable "per_unit_storage_throughput" {
   type        = number
-  default     = 150
+  default     = 125
   description = "Throughput for each 1 TiB or storage (max 200) for RWX FSx"
 }
 
