@@ -296,8 +296,8 @@ module "fsx-storage" {
   per_unit_storage_throughput = var.per_unit_storage_throughput
   include_rox                 = var.include_rox
   fsx_type                    = var.fsx_type
-  fsx_rwx_name                = var.fsx_rwx_name
-  fsx_rox_name                = var.fsx_rox_name
+  fsx_rwx_id                  = var.fsx_rwx_id
+  fsx_rox_id                  = var.fsx_rox_id
 }
 
 module "cluster" {

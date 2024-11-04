@@ -1053,14 +1053,13 @@ variable "fsx_type" {
   }
 }
 
-variable "fsx_rwx_name" {
+variable "fsx_rwx_id" {
+  description = "ID of the existing FSx Lustre file system for RWX"
   type        = string
-  description = "The name of the read write filesystem"
-  default     = null
 }
 
-variable "fsx_rox_name" {
+variable "fsx_rox_id" {
+  description = "ID of the existing FSx Lustre file system for ROX"
   type        = string
-  description = "The name of the read only filesystem"
   default     = null
 }
