@@ -1058,8 +1058,44 @@ variable "fsx_rwx_id" {
   type        = string
 }
 
+variable "fsx_rwx_subnet_ids" {
+  description = "Subnet IDs for the RWX FSx Lustre file system"
+  type        = list(string)
+  default     = []
+}
+
+variable "fsx_rwx_security_group_ids" {
+  description = "Security group IDs for the RWX FSx Lustre file system"
+  type        = list(string)
+  default     = []
+}
+
+variable "fsx_rwx_dns_name" {
+  description = "DNS name for the RWX FSx Lustre file system"
+  type        = string
+  default     = null
+}
+
+variable "fsx_rwx_mount_name" {
+  description = "Mount name for the RWX FSx Lustre file system"
+  type        = string
+  default     = null
+}
+
+variable "fsx_rwx_arn" {
+  description = "ARN of the RWX FSx Lustre file system"
+  type        = string
+  default     = null
+}
+
 variable "fsx_rox_id" {
   description = "ID of the existing FSx Lustre file system for ROX"
+  type        = string
+  default     = null
+}
+
+variable "fsx_rox_arn" {
+  description = "ARN of the ROX FSx Lustre file system"
   type        = string
   default     = null
 }

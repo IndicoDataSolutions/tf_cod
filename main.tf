@@ -297,7 +297,13 @@ module "fsx-storage" {
   include_rox                 = var.include_rox
   fsx_type                    = var.fsx_type
   fsx_rwx_id                  = var.fsx_rwx_id
+  fsx_rwx_subnet_ids          = var.fsx_rwx_subnet_ids
+  fsx_rwx_security_group_ids  = var.fsx_rwx_security_group_ids
+  fsx_rwx_dns_name            = var.fsx_rwx_dns_name
+  fsx_rwx_mount_name          = var.fsx_rwx_mount_name
+  fsx_rwx_arn                 = var.fsx_rwx_arn
   fsx_rox_id                  = var.fsx_rox_id
+  fsx_rox_arn                 = var.fsx_rox_arn
 }
 
 module "cluster" {
@@ -319,7 +325,7 @@ module "cluster" {
   cluster_node_policies                 = var.cluster_node_policies
   eks_cluster_iam_role                  = var.eks_cluster_iam_role
   eks_cluster_nodes_iam_role            = "${var.label}-${var.region}-node-role"
-  fsx_arns                              = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
+  fsx_arns                              = [var.include_rox ? module.fsx-storage[0].fsx_rox_arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx_rwx_arn : ""]
   kms_key_arn                           = module.kms_key.key_arn
   az_count                              = var.az_count
   key_pair                              = aws_key_pair.kp.key_name
@@ -468,7 +474,7 @@ module "argo-registration" {
 }
 
 locals {
-  security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
+  security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx_rwx_security_group_ids)[0] : ""
   cluster_name      = var.label
   dns_zone_name     = var.dns_zone_name == "" ? lower("${var.aws_account}.${var.domain_suffix}") : var.dns_zone_name
   dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${local.dns_zone_name}") : var.domain_host
