@@ -435,7 +435,7 @@ resource "helm_release" "external-secrets" {
       image:
         repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
       webhook:
-      image:
+        image:
           repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
       certController:
         image:
