@@ -115,6 +115,9 @@ locals {
   argo_app_name           = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
   argo_smoketest_app_name = lower("${var.aws_account}.${var.region}.${var.label}-smoketest")
   argo_cluster_name       = "${var.aws_account}.${var.region}.${var.label}"
+  
+  chart_version_parts = split("-", var.ipa_version)
+  chart_suffix = trimprefix(var.ipa_version, local.chart_version_parts[0])
 }
 
 resource "tls_private_key" "pk" {
