@@ -425,20 +425,21 @@ resource "helm_release" "external-secrets" {
   name             = "external-secrets"
   create_namespace = true
   namespace        = "default"
-  repository       = "https://charts.external-secrets.io/"
+  repository       = var.ipa_repo
   chart            = "external-secrets"
   version          = var.external_secrets_version
   wait             = true
 
   values = [<<EOF
-    image:
-      repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
-    webhook:
-     image:
-        repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
-    certController:
+    external-secrets:
       image:
         repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+      webhook:
+      image:
+          repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+      certController:
+        image:
+          repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
 
   EOF
   ]

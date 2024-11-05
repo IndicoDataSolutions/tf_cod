@@ -495,53 +495,54 @@ resource "helm_release" "keda-monitoring" {
   name             = "keda"
   create_namespace = true
   namespace        = "default"
-  repository       = "https://kedacore.github.io/charts"
+  repository       = var.ipa_repo
   chart            = "keda"
   version          = var.keda_version
 
 
   values = [<<EOF
-    global:
+    keda:
+      global:
+        image:
+          registry: ${var.image_registry}/ghcr.io
       image:
-        registry: ${var.image_registry}/ghcr.io
-    image:
-      metricsApiServer:
-        repository: kedacore/keda-metrics-apiserver
-      webhooks:
-        repository: kedacore/keda-admission-webhooks
-      keda:
-        repository: kedacore/keda
-    imagePullSecrets:
-      - name: harbor-pull-secret
-    resources:
-      operator:
-        requests:
-          memory: 512Mi
-        limits:
-          memory: 4Gi
-        
-    crds:
-      install: true
-    
-    podAnnotations:
-      keda:
-        prometheus.io/scrape: "true"
-        prometheus.io/path: "/metrics"
-        prometheus.io/port: "8080"
-      metricsAdapter: 
-        prometheus.io/scrape: "true"
-        prometheus.io/path: "/metrics"
-        prometheus.io/port: "9022"
+        metricsApiServer:
+          repository: kedacore/keda-metrics-apiserver
+        webhooks:
+          repository: kedacore/keda-admission-webhooks
+        keda:
+          repository: kedacore/keda
+      imagePullSecrets:
+        - name: harbor-pull-secret
+      resources:
+        operator:
+          requests:
+            memory: 512Mi
+          limits:
+            memory: 4Gi
+          
+      crds:
+        install: true
+      
+      podAnnotations:
+        keda:
+          prometheus.io/scrape: "true"
+          prometheus.io/path: "/metrics"
+          prometheus.io/port: "8080"
+        metricsAdapter: 
+          prometheus.io/scrape: "true"
+          prometheus.io/path: "/metrics"
+          prometheus.io/port: "9022"
 
-    prometheus:
-      metricServer:
-        enabled: true
-        podMonitor:
+      prometheus:
+        metricServer:
           enabled: true
-      operator:
-        enabled: true
-        podMonitor:
+          podMonitor:
+            enabled: true
+        operator:
           enabled: true
+          podMonitor:
+            enabled: true
  EOF
   ]
 }
@@ -556,56 +557,57 @@ resource "helm_release" "opentelemetry-collector" {
   name             = "opentelemetry-collector"
   create_namespace = true
   namespace        = "default"
-  repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
+  repository       = var.ipa_repo
   chart            = "opentelemetry-collector"
   version          = var.opentelemetry-collector_version
 
 
   values = [<<EOF
-    enabled: true
-    imagePullSecrets:
-      - name: harbor-pull-secret
-    image:
-      repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
-    fullnameOverride: "collector-collector"
-    mode: deployment
-    tolerations:
-    - effect: NoSchedule
-      key: indico.io/monitoring
-      operator: Exists
-    nodeSelector:
-      node_group: monitoring-workers
-    ports:
-      jaeger-compact:
-        enabled: false
-      jaeger-thrift:
-        enabled: false
-      jaeger-grpc:
-        enabled: false
-      zipkin:
-        enabled: false
+    opentelemetry-collector:
+      enabled: true
+      imagePullSecrets:
+        - name: harbor-pull-secret
+      image:
+        repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
+      fullnameOverride: "collector-collector"
+      mode: deployment
+      tolerations:
+      - effect: NoSchedule
+        key: indico.io/monitoring
+        operator: Exists
+      nodeSelector:
+        node_group: monitoring-workers
+      ports:
+        jaeger-compact:
+          enabled: false
+        jaeger-thrift:
+          enabled: false
+        jaeger-grpc:
+          enabled: false
+        zipkin:
+          enabled: false
 
-    config:
-      receivers:
-        jaeger: null
-        prometheus: null
-        zipkin: null
-      exporters:
-        otlp:
-          endpoint: monitoring-tempo.monitoring.svc:4317
-          tls:
-            insecure: true
-      service:
-        pipelines:
-          traces:
-            receivers:
-              - otlp
-            processors:
-              - batch
-            exporters:
-              - otlp
-          metrics: null
-          logs: null
+      config:
+        receivers:
+          jaeger: null
+          prometheus: null
+          zipkin: null
+        exporters:
+          otlp:
+            endpoint: monitoring-tempo.monitoring.svc:4317
+            tls:
+              insecure: true
+        service:
+          pipelines:
+            traces:
+              receivers:
+                - otlp
+              processors:
+                - batch
+              exporters:
+                - otlp
+            metrics: null
+            logs: null
  EOF
   ]
 }
