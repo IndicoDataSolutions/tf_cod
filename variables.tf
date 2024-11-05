@@ -1062,9 +1062,11 @@ variable "ipa_sns_topic_name" {
 variable "ipa_sqs_queue_name" {
   type        = string
   description = "Full name of the SQS queue"
+  default     = null
 }
 
 variable "indico_sqs_sns_policy_name" {
   type        = string
   description = "Full name of the SQS SNS policy"
+  default     = null
 }
