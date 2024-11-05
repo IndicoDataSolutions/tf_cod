@@ -45,7 +45,7 @@ spec:
     spec:
       containers:
       - name: nfs-server
-        image: k8s.gcr.io/volume-nfs:0.8
+        image: ${var.image_registry}/k8s.gcr.io/volume-nfs:0.8
         ports:
         - name: nfs
           containerPort: 2049
@@ -144,11 +144,20 @@ resource "helm_release" "nfs-provider" {
     data.local_file.nfs_ip
   ]
 
-  // prometheus URL
-  set {
-    name  = "nfs-subdir-external-provisioner.nfs.server"
-    value = data.local_file.nfs_ip[0].content
-  }
+  # // prometheus URL
+  # set {
+  #   name  = "nfs-subdir-external-provisioner.nfs.server"
+  #   value = data.local_file.nfs_ip[0].content
+  # }
+
+  values = [<<EOF
+    nfs-subdir-external-provisioner:
+      nfs:
+        server: ${data.local_file.nfs_ip[0].content}
+      image:
+        repository: ${var.image_registry}/registry.k8s.io/sig-storage/nfs-subdir-external-provisioner
+  EOF
+  ]
 }
 
 resource "null_resource" "update_storage_class" {
