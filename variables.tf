@@ -302,7 +302,7 @@ variable "skip_final_snapshot" {
 
 variable "per_unit_storage_throughput" {
   type        = number
-  default     = 125
+  default     = 100
   description = "Throughput for each 1 TiB or storage (max 200) for RWX FSx"
 }
 
@@ -1042,6 +1042,12 @@ variable "instance_volume_type" {
   type        = string
   default     = "gp2"
   description = "The type of EBS volume to attach to the cluster nodes"
+}
+
+variable "fsx_deployment_type" {
+  type        = string
+  default     = "PERSISTENT_1"
+  description = "The deployment type to launch"
 }
 
 variable "fsx_type" {

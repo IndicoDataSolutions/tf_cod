@@ -294,6 +294,7 @@ module "fsx-storage" {
   api_models_bucket           = module.s3-storage.api_models_s3_bucket_name
   kms_key                     = module.kms_key.key
   per_unit_storage_throughput = var.per_unit_storage_throughput
+  deployment_type             = var.fsx_deployment_type
   include_rox                 = var.include_rox
   fsx_type                    = var.fsx_type
   fsx_rwx_id                  = var.fsx_rwx_id
