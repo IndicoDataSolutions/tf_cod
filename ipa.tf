@@ -587,6 +587,21 @@ EOT
   ]
 }
 
+resource "kubectl_manifest" "gp2-storageclass" {
+  yaml_body = <<YAML
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp2
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+parameters:
+  fsType: ext4
+  type: gp2
+provisioner: kubernetes.io/aws-ebs
+volumeBindingMode: WaitForFirstConsumer
+YAML
+}
 
 resource "time_sleep" "wait_1_minutes_after_crds" {
   depends_on = [helm_release.ipa-crds]
