@@ -591,10 +591,10 @@ resource "kubectl_manifest" "gp2-storageclass" {
   yaml_body = <<YAML
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
-annotations:
-  storageclass.kubernetes.io/is-default-class: "true"
 metadata:
   name: gp2
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
 parameters:
   fsType: ext4
   type: gp2
