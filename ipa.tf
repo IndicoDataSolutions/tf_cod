@@ -587,7 +587,7 @@ EOT
   ]
 }
 
-resource "kubectl_manifest" "gp2-storage-class" {
+resource "kubectl_manifest" "gp2-storageclass" {
   yaml_body = <<YAML
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
