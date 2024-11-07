@@ -516,6 +516,8 @@ resource "helm_release" "ipa-crds" {
       repository: ${var.image_registry}/indico/migrations-controller
       kubectlImage: ${var.image_registry}/indico/migrations-controller-kubectl
   aws-ebs-csi-driver:
+    defaultStorageClass:
+      enabled: true
     image:
       repository: ${var.image_registry}/public.ecr.aws/ebs-csi-driver/aws-ebs-csi-driver
     sidecars:
