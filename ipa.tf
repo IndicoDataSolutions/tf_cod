@@ -516,8 +516,6 @@ resource "helm_release" "ipa-crds" {
       repository: ${var.image_registry}/indico/migrations-controller
       kubectlImage: ${var.image_registry}/indico/migrations-controller-kubectl
   aws-ebs-csi-driver:
-    defaultStorageClass:
-      enabled: true
     image:
       repository: ${var.image_registry}/public.ecr.aws/ebs-csi-driver/aws-ebs-csi-driver
     sidecars:
@@ -589,6 +587,21 @@ EOT
   ]
 }
 
+resource "kubectl_manifest" "gp2-storage-class" {
+  yaml_body = <<YAML
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+annotations:
+  storageclass.kubernetes.io/is-default-class: "true"
+metadata:
+  name: gp2
+parameters:
+  fsType: ext4
+  type: gp2
+provisioner: kubernetes.io/aws-ebs
+volumeBindingMode: WaitForFirstConsumer
+YAML
+}
 
 resource "time_sleep" "wait_1_minutes_after_crds" {
   depends_on = [helm_release.ipa-crds]
