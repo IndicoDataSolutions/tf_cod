@@ -425,20 +425,21 @@ resource "helm_release" "external-secrets" {
   name             = "external-secrets"
   create_namespace = true
   namespace        = "default"
-  repository       = "https://charts.external-secrets.io/"
+  repository       = var.ipa_repo
   chart            = "external-secrets"
   version          = var.external_secrets_version
   wait             = true
 
   values = [<<EOF
-    image:
-      repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
-    webhook:
-     image:
-        repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
-    certController:
+    external-secrets:
       image:
         repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+      webhook:
+        image:
+          repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+      certController:
+        image:
+          repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
 
   EOF
   ]
@@ -488,19 +489,19 @@ resource "helm_release" "ipa-crds" {
         postgres_15_gis_3.3:
           image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-15.8-3.3-2
         postgres_14:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.12-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.13-2
         postgres_14_gis_3.1:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.12-3.1-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.13-3.1-2
         postgres_14_gis_3.2:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.12-3.2-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.13-3.2-2
         postgres_14_gis_3.3:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.12-3.3-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.13-3.3-2
         postgres_13:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-13.15-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-13.16-2
         postgres_13_gis_3.0:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.15-3.0-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.16-3.0-2
         postgres_13_gis_3.1:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.15-3.1-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.16-3.1-2
         pgadmin:
           image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-4.30-31
         pgbackrest:
