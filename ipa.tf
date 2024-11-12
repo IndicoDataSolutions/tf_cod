@@ -427,7 +427,7 @@ resource "helm_release" "external-secrets" {
   namespace        = "default"
   repository       = var.ipa_repo
   chart            = "external-secrets"
-  version          = format("%s%s",var.external_secrets_version, local.chart_suffix)
+  version          = var.external_secrets_version
   wait             = true
 
   values = [<<EOF

@@ -497,7 +497,7 @@ resource "helm_release" "keda-monitoring" {
   namespace        = "default"
   repository       = var.ipa_repo
   chart            = "keda"
-  version          = format("%s%s",var.keda_version, local.chart_suffix)
+  version          = var.keda_version
 
 
   values = [<<EOF
@@ -552,7 +552,7 @@ resource "helm_release" "opentelemetry-collector" {
   namespace        = "default"
   repository       = var.ipa_repo
   chart            = "opentelemetry-collector"
-  version          = format("%s%s",var.opentelemetry-collector_version, local.chart_suffix)
+  version          = var.opentelemetry_collector_version
 
 
   values = [<<EOF

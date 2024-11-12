@@ -136,7 +136,7 @@ resource "helm_release" "nfs-provider" {
   name       = "nfs-subdir-external-provisioner"
   repository = var.ipa_repo
   chart      = "nfs-subdir-external-provisioner"
-  version    = format("%s%s","4.0.18", local.chart_suffix)
+  version    = var.nfs_subdir_external_provisioner_version
   namespace  = "default"
   depends_on = [
     module.cluster,
