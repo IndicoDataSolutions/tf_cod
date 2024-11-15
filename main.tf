@@ -323,7 +323,7 @@ module "iam" {
 
 module "cluster" {
   source                                = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                               = "9.0.25"
+  version                               = "9.0.26"
   label                                 = var.label
   region                                = var.region
   cluster_version                       = var.k8s_version
