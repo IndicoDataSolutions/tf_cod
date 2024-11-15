@@ -294,7 +294,7 @@ module "fsx-storage" {
 
 module "iam" {
   source  = "app.terraform.io/indico/indico-aws-iam/mod"
-  version = "0.0.7"
+  version = "0.0.8"
 
   # EKS node role
   create_node_role           = var.create_node_role
