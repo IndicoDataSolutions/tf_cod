@@ -313,10 +313,10 @@ module "iam" {
   include_rox = var.include_rox
   api_models_bucket_name = var.api_models_bucket_name_override == null ? "indico-api-models-${var.label}" : var.api_models_bucket_name_override
   # s3 replication
-  enable_s3_replication = var.enable_s3_replicationq
+  enable_s3_replication = var.enable_s3_replication
   create_s3_replication_role = var.create_s3_replication_role
   s3_replication_role_name = var.s3_replication_role_name_override == null ? "s3-bucket-replication-${var.label}" : var.s3_replication_role_name_override 
-  s3_replication_destination_kms_key_arn = var.desination_kms_key_arn
+  s3_replication_destination_kms_key_arn = var.destination_kms_key_arn
   s3_replication_data_destination_bucket_name = var.data_destination_bucket
   s3_replication_api_model_destination_bucket_name = var.api_model_destination_bucket
 }

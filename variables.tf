@@ -1135,20 +1135,68 @@ variable "bucket_type" {
   }
 }
 
-variable "data_s3_bucket_name" {
+variable "data_s3_bucket_name_override" {
   type        = string
-  default     = ""
-  description = "The name of the existing S3 bucket to be loaded and used as the data bucket"
+  default     = null
+  description = "The name of the existing S3 bucket to be created/loaded and used as the data bucket"
 }
 
-variable "api_models_s3_bucket_name" {
+variable "api_models_s3_bucket_name_override" {
   type        = string
-  default     = ""
-  description = "The name of the existing S3 bucket to be loaded and used as the API model bucket"
+  default     = null
+  description = "The name of the existing S3 bucket to be created/loaded and used as the API model bucket"
 }
 
-variable "pgbackup_s3_bucket_name" {
+variable "pgbackup_s3_bucket_name_override" {
   type        = string
-  default     = ""
-  description = "The name of the existing S3 bucket to be loaded and used as the postgres backup bucket"
+  default     = null
+  description = "The name of the existing S3 bucket to be created/loaded and used as the postgres backup bucket"
 }
+
+# Additional variables
+variable "enable_s3_replication" {
+  type = bool
+  default = false
+  description = "Flag to enable s3 replication"
+}
+
+variable "create_s3_replication_role" {
+  type = bool
+  default = true
+  description = "Flag to create or load s3 replication role"
+}
+
+variable "s3_replication_role_name_override" {
+  type = string
+  default = null
+  description = "Name override for s3 replication role"
+}
+
+variable "destination_kms_key_arn" {
+  type = string
+  default = ""
+  description = "arn of kms key used to encrypt s3 replication destination buckets"
+}
+
+variable ""
+
+variable "api_model_destination_bucket" {
+  type    = string
+  default = null
+  description = "s3 replication api model destination bucket"
+}
+
+# Node role
+variable "create_node_role" {
+  type = bool
+  default = true
+  description = "Flag to create or load node role"
+}
+
+variable "node_role_name_override" {
+  type = string
+  default = null
+  description = "Name override for node role"
+}
+
+
