@@ -202,7 +202,7 @@ module "security-group" {
 
 module "s3-storage" {
   source                    = "app.terraform.io/indico/indico-aws-buckets/mod"
-  version                   = "4.1.0"
+  version                   = "4.1.1"
   force_destroy             = true # allows terraform to destroy non-empty buckets.
   label                     = var.label
   kms_key_arn               = module.kms_key.key.arn
