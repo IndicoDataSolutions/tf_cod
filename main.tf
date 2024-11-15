@@ -214,7 +214,7 @@ module "s3-storage" {
   bucket_type               = var.bucket_type
   data_s3_bucket_name_override       = var.data_s3_bucket_name_override
   api_models_s3_bucket_name_override = var.api_models_s3_bucket_name_override
-  pgbackup_s3_bucket_name_override   = var.pgbackup_s3_bucket_name_override
+  pgbackup_s3_bucket_name_override   = var.pgbackup_s3_bucket_name_override 
 }
 
 
