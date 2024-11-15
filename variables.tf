@@ -1125,3 +1125,30 @@ variable "local_registry_harbor_robot_account_name" {
   type    = string
   default = ""
 }
+
+variable "bucket_type" {
+  type    = string
+  default = "create"
+  validation {
+    condition     = var.bucket_type == "create" || var.bucket_type == "load"
+    error_message = "${var.bucket_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "data_s3_bucket_name" {
+  type        = string
+  default     = ""
+  description = "The name of the existing S3 bucket to be loaded and used as the data bucket"
+}
+
+variable "api_models_s3_bucket_name" {
+  type        = string
+  default     = ""
+  description = "The name of the existing S3 bucket to be loaded and used as the API model bucket"
+}
+
+variable "pgbackup_s3_bucket_name" {
+  type        = string
+  default     = ""
+  description = "The name of the existing S3 bucket to be loaded and used as the postgres backup bucket"
+}

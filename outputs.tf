@@ -9,11 +9,15 @@ output "data_s3_bucket_name" {
   value       = module.s3-storage.data_s3_bucket_name
 }
 
+output "pgbackup_s3_bucket_name" {
+  description = "Name of the pgbackup s3 bucket"
+  value       = module.s3-storage.pgbackup_s3_bucket_name
+}
+
 output "s3_role_id" {
   description = "ID of the S3 role"
   value       = module.cluster.s3_role_id
 }
-
 
 output "efs_filesystem_id" {
   description = "ID of the EFS filesystem"
