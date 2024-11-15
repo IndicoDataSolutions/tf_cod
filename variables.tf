@@ -1178,11 +1178,15 @@ variable "destination_kms_key_arn" {
   description = "arn of kms key used to encrypt s3 replication destination buckets"
 }
 
-variable ""
+variable "data_destination_bucket" {
+  type = string
+  default = ""
+  description = "s3 replication data destination bucket"
+}
 
 variable "api_model_destination_bucket" {
   type    = string
-  default = null
+  default = ""
   description = "s3 replication api model destination bucket"
 }
 

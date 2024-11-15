@@ -186,6 +186,18 @@ resource "kubernetes_config_map" "terraform-variables" {
     aws_account_ids = "${jsonencode(var.aws_account_ids)}"
     ipa_smoketest_cronjob_enabled = "${jsonencode(var.ipa_smoketest_cronjob_enabled)}"
     local_registry_harbor_robot_account_name = "${jsonencode(var.local_registry_harbor_robot_account_name)}"
+    bucket_type = "${jsonencode(var.bucket_type)}"
+    data_s3_bucket_name_override = "${jsonencode(var.data_s3_bucket_name_override)}"
+    api_models_s3_bucket_name_override = "${jsonencode(var.api_models_s3_bucket_name_override)}"
+    pgbackup_s3_bucket_name_override = "${jsonencode(var.pgbackup_s3_bucket_name_override)}"
+    enable_s3_replication = "${jsonencode(var.enable_s3_replication)}"
+    create_s3_replication_role = "${jsonencode(var.create_s3_replication_role)}"
+    s3_replication_role_name_override = "${jsonencode(var.s3_replication_role_name_override)}"
+    destination_kms_key_arn = "${jsonencode(var.destination_kms_key_arn)}"
+    data_destination_bucket = "${jsonencode(var.data_destination_bucket)}"
+    api_model_destination_bucket = "${jsonencode(var.api_model_destination_bucket)}"
+    create_node_role = "${jsonencode(var.create_node_role)}"
+    node_role_name_override = "${jsonencode(var.node_role_name_override)}"
 
     }
   }
