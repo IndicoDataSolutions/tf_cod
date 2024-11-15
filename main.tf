@@ -309,9 +309,9 @@ module "iam" {
   kms_key_arn = module.kms_key.key_arn
   # Buckets 
   create_bucket = var.bucket_type == "create" 
-  data_bucket_name = var.bucket_name_override == null ? "indico-data-${var.label}" : var.bucket_name_override
+  data_bucket_name = var.data_s3_bucket_name_override == null ? "indico-data-${var.label}" : var.data_s3_bucket_name_override
   include_rox = var.include_rox
-  api_models_bucket_name = var.api_models_bucket_name_override == null ? "indico-api-models-${var.label}" : var.api_models_bucket_name_override
+  api_models_bucket_name = var.api_models_s3_bucket_name_override == null ? "indico-api-models-${var.label}" : var.api_models_s3_bucket_name_override
   # s3 replication
   enable_s3_replication = var.enable_s3_replication
   create_s3_replication_role = var.create_s3_replication_role
