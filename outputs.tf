@@ -14,11 +14,6 @@ output "pgbackup_s3_bucket_name" {
   value       = module.s3-storage.pgbackup_s3_bucket_name
 }
 
-output "s3_role_id" {
-  description = "ID of the S3 role"
-  value       = module.cluster.s3_role_id
-}
-
 output "efs_filesystem_id" {
   description = "ID of the EFS filesystem"
   value       = var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""
