@@ -202,7 +202,7 @@ module "security-group" {
 
 module "s3-storage" {
   source                    = "app.terraform.io/indico/indico-aws-buckets/mod"
-  version                   = "4.0.0"
+  version                   = "4.1.0"
   force_destroy             = true # allows terraform to destroy non-empty buckets.
   label                     = var.label
   kms_key_arn               = module.kms_key.key.arn
@@ -212,9 +212,9 @@ module "s3-storage" {
   enable_backup             = var.enable_s3_backup
   enable_access_logging     = var.enable_s3_access_logging
   bucket_type               = var.bucket_type
-  data_s3_bucket_name       = var.data_s3_bucket_name_override
-  api_models_s3_bucket_name = var.api_models_s3_bucket_name_override
-  pgbackup_s3_bucket_name   = var.pgbackup_s3_bucket_name_override
+  data_s3_bucket_name_override       = var.data_s3_bucket_name_override
+  api_models_s3_bucket_name_override = var.api_models_s3_bucket_name_override
+  pgbackup_s3_bucket_name_override   = var.pgbackup_s3_bucket_name_override
 }
 
 
