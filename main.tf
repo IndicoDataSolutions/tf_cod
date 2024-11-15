@@ -212,9 +212,9 @@ module "s3-storage" {
   enable_backup             = var.enable_s3_backup
   enable_access_logging     = var.enable_s3_access_logging
   bucket_type               = var.bucket_type
-  data_s3_bucket_name       = var.data_s3_bucket_name
-  api_models_s3_bucket_name = var.api_models_s3_bucket_name
-  pgbackup_s3_bucket_name   = var.pgbackup_s3_bucket_name
+  data_s3_bucket_name       = var.data_s3_bucket_name_override
+  api_models_s3_bucket_name = var.api_models_s3_bucket_name_override
+  pgbackup_s3_bucket_name   = var.pgbackup_s3_bucket_name_override
 }
 
 
