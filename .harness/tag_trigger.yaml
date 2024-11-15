@@ -1,0 +1,14 @@
+inputSet:
+  name: tag_trigger
+  identifier: tag_trigger
+  orgIdentifier: default
+  projectIdentifier: Devops
+  pipeline:
+    identifier: tf_cod
+    properties:
+      ci:
+        codebase:
+          build:
+            type: tag
+            spec:
+              tag: <+trigger.tag>

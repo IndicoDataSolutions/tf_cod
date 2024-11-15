@@ -192,7 +192,7 @@ variable "cluster_name" {
 
 variable "k8s_version" {
   type        = string
-  default     = "1.29"
+  default     = "1.31"
   description = "The EKS version to use"
 }
 
@@ -515,17 +515,25 @@ variable "hibernation_enabled" {
 }
 
 variable "keda_version" {
-  default = "2.13.2"
+  type    = string
+  default = "2.15.2"
 }
 
 variable "external_secrets_version" {
   type        = string
-  default     = "0.9.9"
+  default     = "0.10.5"
   description = "Version of external-secrets helm chart"
 }
 
-variable "opentelemetry-collector_version" {
-  default = "0.97.1"
+variable "opentelemetry_collector_version" {
+  type    = string
+  default = "0.108.0"
+}
+
+variable "nfs_subdir_external_provisioner_version" {
+  type        = string
+  default     = "4.0.18"
+  description = "Version of nfs_subdir_external_provisioner_version helm chart"
 }
 
 variable "include_fsx" {
@@ -1034,7 +1042,7 @@ variable "vpc_flow_logs_iam_role_arn" {
 }
 variable "instance_volume_size" {
   type        = number
-  default     = 40
+  default     = 60
   description = "The size of EBS volume to attach to the cluster nodes"
 }
 

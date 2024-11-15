@@ -1,0 +1,96 @@
+pipeline:
+  name: tf_cod
+  identifier: tf_cod
+  projectIdentifier: Devops
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.Indico
+        repoName: tf_cod
+        build: <+input>
+  stages:
+    - stage:
+        name: push helm charts
+        identifier: push_helm_charts
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: account.cicdharness
+              namespace: harness
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: push helm charts
+                  identifier: push_helm_charts
+                  spec:
+                    connectorRef: account.dockerhubproxy
+                    image: alpine/helm:3.10.2
+                    shell: Sh
+                    command: |-
+                      echo https://dl-cdn.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories
+                      apk update
+                      apk add yq jq bash curl wget parallel git
+                      wget -c https://github.com/shteou/helm-dependency-fetch/releases/download/v1.1.3/helm-dependency-fetch_1.1.3_Linux_x86_64.tar.gz -O - | tar -xz
+                      export PATH=${CWD}:${PATH}
+                      helm version
+                      helm plugin install https://github.com/chartmuseum/helm-push --version 0
+                      helm repo add --username $USERNAME --password $PASSWORD harborprod https://harbor.devops.indico.io/chartrepo/indico-charts
+                      cd smoketests
+                      export DRONE_TAG=<+<+codebase.tag>?<+codebase.tag>:"">
+                      ./upload-charts.sh "<+<+codebase.branch>?<+codebase.branch>:<+codebase.tag>>-<+codebase.commitSha.substring(0,8)>"
+                    envVariables:
+                      PASSWORD: <+secrets.getValue("account.hashicorpvault://vaulttoolsdrone/harbor-push-token#password")>
+                      USERNAME: <+secrets.getValue("account.hashicorpvault://vaulttoolsdrone/harbor-push-token#username")>
+                      CM_PASSWORD: <+secrets.getValue("account.hashicorpvault://vaulttoolsdrone/cm#password")>
+                      CM_USERNAME: <+secrets.getValue("account.hashicorpvault://vaulttoolsdrone/cm#username")>
+                      PYTHONUNBUFFERED: "1"
+                      DRONE_BRANCH: <+codebase.branch>
+                      HELM_EXPERIMENTAL_OCI: "1"
+                    resources:
+                      limits:
+                        memory: 10G
+                        cpu: "2"
+    - stage:
+        name: tf-smoketest-container
+        identifier: tfsmoketestcontainer
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: account.cicdharness
+              namespace: harness
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
+          execution:
+            steps:
+              - step:
+                  type: BuildAndPushDockerRegistry
+                  name: build and push
+                  identifier: build_and_push
+                  spec:
+                    connectorRef: account.harbor
+                    repo: harbor.devops.indico.io/indico/terraform-smoketests
+                    tags:
+                      - <+<+codebase.tag>?<+codebase.tag>:"latest">
+                      - <+codebase.commitSha.substring(0,8)>
+                    dockerfile: smoketests/Dockerfile
+                    context: smoketests
+                    resources:
+                      limits:
+                        memory: 5G
+                        cpu: "2"
+  allowStageExecutions: true

@@ -425,20 +425,21 @@ resource "helm_release" "external-secrets" {
   name             = "external-secrets"
   create_namespace = true
   namespace        = "default"
-  repository       = "https://charts.external-secrets.io/"
+  repository       = var.ipa_repo
   chart            = "external-secrets"
   version          = var.external_secrets_version
   wait             = true
 
   values = [<<EOF
-    image:
-      repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
-    webhook:
-     image:
-        repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
-    certController:
+    external-secrets:
       image:
         repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+      webhook:
+        image:
+          repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+      certController:
+        image:
+          repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
 
   EOF
   ]
@@ -471,44 +472,48 @@ resource "helm_release" "ipa-crds" {
       enabled: true
     pgo: 
       controllerImages:
-        cluster: ${var.image_registry}/registry.crunchydata.com/crunchydata/postgres-operator:ubi8-5.5.0-2
+        cluster: ${var.image_registry}/registry.crunchydata.com/crunchydata/postgres-operator:ubi8-5.7.0-0
       relatedImages:
+        postgres_17:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-17.0-0
+        postgres_17_gis_3.4:
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-17.0-3.4-0
         postgres_16:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-16.3-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-16.4-2
         postgres_16_gis_3.4:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.3-3.4-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.4-3.4-2
         postgres_16_gis_3.3:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.3-3.3-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.4-3.3-2
         postgres_15:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-15.7-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-15.8-2
         postgres_15_gis_3.3:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-15.7-3.3-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-15.8-3.3-2
         postgres_14:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.12-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.13-2
         postgres_14_gis_3.1:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.12-3.1-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.13-3.1-2
         postgres_14_gis_3.2:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.12-3.2-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.13-3.2-2
         postgres_14_gis_3.3:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.12-3.3-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.13-3.3-2
         postgres_13:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-13.15-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-13.16-2
         postgres_13_gis_3.0:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.15-3.0-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.16-3.0-2
         postgres_13_gis_3.1:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.15-3.1-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.16-3.1-2
         pgadmin:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-4.30-26
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-4.30-31
         pgbackrest:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.51-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.53.1-0
         pgbouncer:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbouncer:ubi8-1.22-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbouncer:ubi8-1.23-0
         pgexporter:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi8-0.15.0-7
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi8-0.15.0-12
         pgupgrade:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-upgrade:ubi8-5.6.0-0
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-upgrade:ubi8-5.7.0-0
         standalone_pgadmin:
-          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-8.6-1
+          image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-8.12-0
   migrations-operator:
     image:
       repository: ${var.image_registry}/indico/migrations-operator
@@ -587,6 +592,21 @@ EOT
   ]
 }
 
+resource "kubectl_manifest" "gp2-storageclass" {
+  yaml_body = <<YAML
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp2
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+parameters:
+  fsType: ext4
+  type: gp2
+provisioner: kubernetes.io/aws-ebs
+volumeBindingMode: WaitForFirstConsumer
+YAML
+}
 
 resource "time_sleep" "wait_1_minutes_after_crds" {
   depends_on = [helm_release.ipa-crds]
@@ -594,33 +614,33 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
   create_duration = "1m"
 }
 
-resource "kubectl_manifest" "thanos-storage-secret" {
-  count      = var.thanos_enabled ? 1 : 0
-  depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
-  yaml_body  = <<YAML
-    apiVersion: "secrets.hashicorp.com/v1beta1"
-    kind: "VaultStaticSecret"
-    metadata:
-      name:  vault-thanos-storage
-      namespace: default
-    spec:
-      type: "kv-v2"
-      namespace: default
-      mount: customer-Indico-Devops
-      path: thanos-storage
-      refreshAfter: 60s
-      rolloutRestartTargets:
-        - name: prometheus-monitoring-kube-prometheus-prometheus
-          kind: StatefulSet
-      destination:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-        create: true
-        name: thanos-storage
-      vaultAuthRef: default
-  YAML
-}
+# resource "kubectl_manifest" "thanos-storage-secret" {
+#   count      = var.thanos_enabled ? 1 : 0
+#   depends_on = [helm_release.ipa-crds, module.secrets-operator-setup]
+#   yaml_body  = <<YAML
+#     apiVersion: "secrets.hashicorp.com/v1beta1"
+#     kind: "VaultStaticSecret"
+#     metadata:
+#       name:  vault-thanos-storage
+#       namespace: default
+#     spec:
+#       type: "kv-v2"
+#       namespace: default
+#       mount: customer-Indico-Devops
+#       path: thanos-storage
+#       refreshAfter: 60s
+#       rolloutRestartTargets:
+#         - name: prometheus-monitoring-kube-prometheus-prometheus
+#           kind: StatefulSet
+#       destination:
+#         annotations:
+#           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+#           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+#         create: true
+#         name: thanos-storage
+#       vaultAuthRef: default
+#   YAML
+# }
 
 resource "helm_release" "ipa-pre-requisites" {
   depends_on = [

@@ -18,7 +18,7 @@ terraform {
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.23.0"
+      version = ">= 2.33.0"
     }
     kubectl = {
       source  = "gavinbunney/kubectl"
@@ -104,6 +104,9 @@ locals {
   argo_app_name           = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
   argo_smoketest_app_name = lower("${var.aws_account}.${var.region}.${var.label}-smoketest")
   argo_cluster_name       = "${var.aws_account}.${var.region}.${var.label}"
+  
+  chart_version_parts = split("-", var.ipa_version)
+  chart_suffix = trimprefix(var.ipa_version, local.chart_version_parts[0])
 }
 
 resource "tls_private_key" "pk" {
@@ -168,7 +171,7 @@ module "lambda-sns-forwarder" {
   region               = var.region
   label                = var.label
   subnet_ids           = flatten([local.network[0].private_subnet_ids])
-  security_group_id    = var.network_module == "networking" ? module.networking.all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  security_group_id    = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
   kms_key              = module.kms_key.key_arn
   sns_arn              = var.lambda_sns_forwarder_topic_arn == "" ? module.sqs_sns[0].indico_ipa_topic_arn : var.lambda_sns_forwarder_topic_arn
   destination_endpoint = var.lambda_sns_forwarder_destination_endpoint
@@ -376,6 +379,16 @@ provider "argocd" {
   password    = var.argo_password
 }
 
+data "aws_eks_cluster" "local" {
+  depends_on = [ module.cluster.kubernetes_host ]
+  name     = var.label
+}
+
+data "aws_eks_cluster_auth" "local" {
+  depends_on = [ module.cluster.kubernetes_host ]
+  name     = var.label
+}
+
 provider "kubernetes" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
@@ -390,13 +403,8 @@ provider "kubernetes" {
 provider "kubectl" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  #token                  = module.cluster.kubernetes_token
-  load_config_file = false
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--cluster-name", var.label]
-    command     = "aws"
-  }
+  token                  = data.aws_eks_cluster_auth.local.token
+  load_config_file       = false
 }
 
 

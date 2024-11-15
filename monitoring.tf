@@ -1,17 +1,25 @@
 locals {
   internal_elb = var.network_allow_public == false ? true : false
+  # thanos_config = var.thanos_enabled == true ? (<<EOT
+  #     thanos: # this is the one being used
+  #       blockSize: 5m
+  #       objectStorageConfig:
+  #         existingSecret:
+  #           name: thanos-storage
+  #           key: thanos_storage.yaml
+  # EOT
+  #   ) : (<<EOT
+  #     thanos: {}
+  # EOT
+  # )
   thanos_config = var.thanos_enabled == true ? (<<EOT
-      thanos: # this is the one being used
-        blockSize: 5m
-        objectStorageConfig:
-          existingSecret:
-            name: thanos-storage
-            key: thanos_storage.yaml
+      thanos: {}
   EOT
     ) : (<<EOT
       thanos: {}
   EOT
   )
+
   backend_port = var.acm_arn != "" ? "http" : "https"
   enableHttp = var.acm_arn != "" || var.use_nlb == true ? false : true
   lb_config = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
@@ -164,15 +172,15 @@ ${local.alertmanager_tls}
       reloader.stakater.com/auto: "true"
 
     thanosServiceMonitor:
-      enabled: ${var.thanos_enabled}
+      enabled: false #${var.thanos_enabled}
 
     thanosService:
-      enabled:  ${var.thanos_enabled}
+      enabled:  false #${var.thanos_enabled}
 
     prometheusSpec:
       image:
         registry: ${var.image_registry}/quay.io
-      disableCompaction: ${var.thanos_enabled}
+      disableCompaction: false #${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
@@ -252,15 +260,15 @@ tempo:
       reloader.stakater.com/auto: "true"
 
     thanosServiceMonitor:
-      enabled: ${var.thanos_enabled}
+      enabled: false #${var.thanos_enabled}
 
     thanosService:
-      enabled: ${var.thanos_enabled}
+      enabled: false #${var.thanos_enabled}
     
     prometheusSpec:
       image:
         registry: ${var.image_registry}/quay.io
-      disableCompaction: ${var.thanos_enabled}
+      disableCompaction: false #${var.thanos_enabled}
       externalLabels:
         clusterAccount: ${var.aws_account}
         clusterRegion: ${var.region}
@@ -425,57 +433,57 @@ EOF
 }
 
 
-resource "kubectl_manifest" "thanos-datasource-credentials" {
-  count     = var.thanos_enabled ? 1 : 0
-  provider  = kubectl.thanos-kubectl
-  yaml_body = <<YAML
-apiVersion: v1
-stringData:
-  admin-password: ${random_password.monitoring-password.result}
-kind: Secret
-metadata:
-  name: ${replace(local.dns_name, ".", "-")}
-  namespace: default
-type: Opaque
-  YAML
-}
+# resource "kubectl_manifest" "thanos-datasource-credentials" {
+#   count     = var.thanos_enabled ? 1 : 0
+#   provider  = kubectl.thanos-kubectl
+#   yaml_body = <<YAML
+# apiVersion: v1
+# stringData:
+#   admin-password: ${random_password.monitoring-password.result}
+# kind: Secret
+# metadata:
+#   name: ${replace(local.dns_name, ".", "-")}
+#   namespace: default
+# type: Opaque
+#   YAML
+# }
 
-resource "kubectl_manifest" "thanos-datasource" {
-  count      = var.thanos_enabled ? 1 : 0
-  depends_on = [kubectl_manifest.thanos-datasource-credentials]
-  provider   = kubectl.thanos-kubectl
-  yaml_body  = <<YAML
-apiVersion: grafana.integreatly.org/v1beta1
-kind: GrafanaDatasource
-metadata:
-  name: ${replace(local.dns_name, ".", "-")}
-  namespace: default
-spec:
-  valuesFrom:
-    - targetPath: "secureJsonData.basicAuthPassword"
-      valueFrom:
-        secretKeyRef:
-          name: ${replace(local.dns_name, ".", "-")}
-          key: admin-password
-  datasource:
-    basicAuth: true
-    basicAuthUser: monitoring
-    editable: false
-    access: proxy
-    editable: true
-    jsonData:
-      timeInterval: 5s
-      tlsSkipVerify: true
-    name: ${local.dns_name}
-    secureJsonData:
-      basicAuthPassword: $${admin-password}
-    type: prometheus
-    url: https://prometheus.${local.dns_name}/prometheus
-  instanceSelector:
-    matchLabels:
-      dashboards: external-grafana
-  YAML
-}
+# resource "kubectl_manifest" "thanos-datasource" {
+#   count      = var.thanos_enabled ? 1 : 0
+#   depends_on = [kubectl_manifest.thanos-datasource-credentials]
+#   provider   = kubectl.thanos-kubectl
+#   yaml_body  = <<YAML
+# apiVersion: grafana.integreatly.org/v1beta1
+# kind: GrafanaDatasource
+# metadata:
+#   name: ${replace(local.dns_name, ".", "-")}
+#   namespace: default
+# spec:
+#   valuesFrom:
+#     - targetPath: "secureJsonData.basicAuthPassword"
+#       valueFrom:
+#         secretKeyRef:
+#           name: ${replace(local.dns_name, ".", "-")}
+#           key: admin-password
+#   datasource:
+#     basicAuth: true
+#     basicAuthUser: monitoring
+#     editable: false
+#     access: proxy
+#     editable: true
+#     jsonData:
+#       timeInterval: 5s
+#       tlsSkipVerify: true
+#     name: ${local.dns_name}
+#     secureJsonData:
+#       basicAuthPassword: $${admin-password}
+#     type: prometheus
+#     url: https://prometheus.${local.dns_name}/prometheus
+#   instanceSelector:
+#     matchLabels:
+#       dashboards: external-grafana
+#   YAML
+# }
 
 resource "helm_release" "keda-monitoring" {
   count = var.monitoring_enabled == true ? 1 : 0
@@ -487,50 +495,47 @@ resource "helm_release" "keda-monitoring" {
   name             = "keda"
   create_namespace = true
   namespace        = "default"
-  repository       = "https://kedacore.github.io/charts"
+  repository       = var.ipa_repo
   chart            = "keda"
   version          = var.keda_version
 
 
   values = [<<EOF
-    image:
-      metricsApiServer:
-        repository: ${var.image_registry}/ghcr.io/kedacore/keda-metrics-apiserver
-      webhooks:
-        repository: ${var.image_registry}/ghcr.io/kedacore/keda-admission-webhooks
-      keda:
-        repository: ${var.image_registry}/ghcr.io/kedacore/keda
-    imagePullSecrets:
-      - name: harbor-pull-secret
-    resources:
-      operator:
-        requests:
-          memory: 512Mi
-        limits:
-          memory: 4Gi
-        
-    crds:
-      install: true
-    
-    podAnnotations:
-      keda:
-        prometheus.io/scrape: "true"
-        prometheus.io/path: "/metrics"
-        prometheus.io/port: "8080"
-      metricsAdapter: 
-        prometheus.io/scrape: "true"
-        prometheus.io/path: "/metrics"
-        prometheus.io/port: "9022"
+    keda:
+      global:
+        image:
+          registry: ${var.image_registry}/ghcr.io
+      imagePullSecrets:
+        - name: harbor-pull-secret
+      resources:
+        operator:
+          requests:
+            memory: 512Mi
+          limits:
+            memory: 4Gi
+          
+      crds:
+        install: true
+      
+      podAnnotations:
+        keda:
+          prometheus.io/scrape: "true"
+          prometheus.io/path: "/metrics"
+          prometheus.io/port: "8080"
+        metricsAdapter: 
+          prometheus.io/scrape: "true"
+          prometheus.io/path: "/metrics"
+          prometheus.io/port: "9022"
 
-    prometheus:
-      metricServer:
-        enabled: true
-        podMonitor:
+      prometheus:
+        metricServer:
           enabled: true
-      operator:
-        enabled: true
-        podMonitor:
+          podMonitor:
+            enabled: true
+        operator:
           enabled: true
+          podMonitor:
+            enabled: true
  EOF
   ]
 }
@@ -545,56 +550,57 @@ resource "helm_release" "opentelemetry-collector" {
   name             = "opentelemetry-collector"
   create_namespace = true
   namespace        = "default"
-  repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
+  repository       = var.ipa_repo
   chart            = "opentelemetry-collector"
-  version          = var.opentelemetry-collector_version
+  version          = var.opentelemetry_collector_version
 
 
   values = [<<EOF
-    enabled: true
-    imagePullSecrets:
-      - name: harbor-pull-secret
-    image:
-      repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
-    fullnameOverride: "collector-collector"
-    mode: deployment
-    tolerations:
-    - effect: NoSchedule
-      key: indico.io/monitoring
-      operator: Exists
-    nodeSelector:
-      node_group: monitoring-workers
-    ports:
-      jaeger-compact:
-        enabled: false
-      jaeger-thrift:
-        enabled: false
-      jaeger-grpc:
-        enabled: false
-      zipkin:
-        enabled: false
+    opentelemetry-collector:
+      enabled: true
+      imagePullSecrets:
+        - name: harbor-pull-secret
+      image:
+        repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
+      fullnameOverride: "collector-collector"
+      mode: deployment
+      tolerations:
+      - effect: NoSchedule
+        key: indico.io/monitoring
+        operator: Exists
+      nodeSelector:
+        node_group: monitoring-workers
+      ports:
+        jaeger-compact:
+          enabled: false
+        jaeger-thrift:
+          enabled: false
+        jaeger-grpc:
+          enabled: false
+        zipkin:
+          enabled: false
 
-    config:
-      receivers:
-        jaeger: null
-        prometheus: null
-        zipkin: null
-      exporters:
-        otlp:
-          endpoint: monitoring-tempo.monitoring.svc:4317
-          tls:
-            insecure: true
-      service:
-        pipelines:
-          traces:
-            receivers:
-              - otlp
-            processors:
-              - batch
-            exporters:
-              - otlp
-          metrics: null
-          logs: null
+      config:
+        receivers:
+          jaeger: null
+          prometheus: null
+          zipkin: null
+        exporters:
+          otlp:
+            endpoint: monitoring-tempo.monitoring.svc:4317
+            tls:
+              insecure: true
+        service:
+          pipelines:
+            traces:
+              receivers:
+                - otlp
+              processors:
+                - batch
+              exporters:
+                - otlp
+            metrics: null
+            logs: null
  EOF
   ]
 }
