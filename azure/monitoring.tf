@@ -435,7 +435,7 @@ resource "helm_release" "opentelemetry-collector" {
   namespace        = "default"
   repository       = var.ipa_repo
   chart            = "opentelemetry-collector"
-  version          = var.opentelemetry-collector_version
+  version          = var.opentelemetry_collector_version
 
 
   values = [<<EOF

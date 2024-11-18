@@ -49,7 +49,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     monitoring_enabled = "${jsonencode(var.monitoring_enabled)}"
     keda_version = "${jsonencode(var.keda_version)}"
     external_secrets_version = "${jsonencode(var.external_secrets_version)}"
-    opentelemetry_collector_version = "${jsonencode(var.opentelemetry-collector_version)}"
+    opentelemetry_collector_version = "${jsonencode(var.opentelemetry_collector_version)}"
     ipa_smoketest_values = "${jsonencode(var.ipa_smoketest_values)}"
     ipa_smoketest_repo = "${jsonencode(var.ipa_smoketest_repo)}"
     ipa_smoketest_version = "${jsonencode(var.ipa_smoketest_version)}"
