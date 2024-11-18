@@ -369,7 +369,7 @@ resource "helm_release" "keda-monitoring" {
   name             = "keda"
   create_namespace = true
   namespace        = "default"
-  repository       = "https://kedacore.github.io/charts"
+  repository       = var.ipa_repo
   chart            = "keda"
   version          = var.keda_version
   wait             = true
@@ -433,7 +433,7 @@ resource "helm_release" "opentelemetry-collector" {
   name             = "opentelemetry-collector"
   create_namespace = true
   namespace        = "default"
-  repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
+  repository       = var.ipa_repo
   chart            = "opentelemetry-collector"
   version          = var.opentelemetry-collector_version
 
