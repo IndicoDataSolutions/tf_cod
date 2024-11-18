@@ -28,7 +28,7 @@ ingress-nginx:
     ) : (<<EOT
       thanos: {}
   EOT
-  # )
+   )
   alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
 noExtraConfigs: true
   EOT
