@@ -322,7 +322,7 @@ variable "external_secrets_version" {
   description = "Version of external-secrets helm chart"
 }
 
-variable "opentelemetry-collector_version" {
+variable "opentelemetry_collector_version" {
   type        = string
   default     = "0.97.1"
   description = "Version of opentelemetry-collector helm chart"
