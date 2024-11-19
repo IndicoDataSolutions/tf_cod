@@ -451,7 +451,8 @@ resource "helm_release" "ipa-crds" {
       nodeSelector:
         kubernetes.io/os: linux
     enabled: true
-    installCRDs: true
+    crds:
+      enabled: true
 EOF
     ,
     <<EOT
