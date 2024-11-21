@@ -213,18 +213,18 @@ module "security-group" {
 
 
 module "s3-storage" {
-  source                = "app.terraform.io/indico/indico-aws-buckets/mod"
-  version               = "4.2.0"
-  force_destroy         = true # allows terraform to destroy non-empty buckets.
-  label                 = var.label
-  kms_key_arn           = module.kms_key.key.arn
-  submission_expiry     = var.submission_expiry
-  uploads_expiry        = var.uploads_expiry
-  include_rox           = var.include_rox
-  enable_backup         = var.enable_s3_backup
-  enable_access_logging = var.enable_s3_access_logging
-  include_miniobkp      = var.include_miniobkp
-  miniobkp_bucket_name  = var.miniobkp_bucket_name
+  source                  = "app.terraform.io/indico/indico-aws-buckets/mod"
+  version                 = "4.2.0"
+  force_destroy           = true # allows terraform to destroy non-empty buckets.
+  label                   = var.label
+  kms_key_arn             = module.kms_key.key.arn
+  submission_expiry       = var.submission_expiry
+  uploads_expiry          = var.uploads_expiry
+  include_rox             = var.include_rox
+  enable_backup           = var.enable_s3_backup
+  enable_access_logging   = var.enable_s3_access_logging
+  include_miniobkp        = var.include_miniobkp
+  miniobkp_s3_bucket_name = var.miniobkp_s3_bucket_name
 }
 
 
