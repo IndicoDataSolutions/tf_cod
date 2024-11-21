@@ -1129,3 +1129,14 @@ variable "enable_external_secrets" {
   type    = string
   default = true
 }
+variable "include_miniobkp" {
+  type        = string
+  default     = false
+  description = "If true this will create a miniobkp bucket"
+}
+
+variable "miniobkp_bucket_name" {
+  type        = string
+  default     = ""
+  description = "The name of the existing S3 bucket to be loaded and used as the minio backup bucket"
+}
