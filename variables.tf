@@ -1051,3 +1051,66 @@ variable "instance_volume_type" {
   default     = "gp2"
   description = "The type of EBS volume to attach to the cluster nodes"
 }
+
+variable "fsx_deployment_type" {
+  type        = string
+  default     = "PERSISTENT_1"
+  description = "The deployment type to launch"
+}
+
+variable "fsx_type" {
+  type    = string
+  default = "create"
+  validation {
+    condition     = var.fsx_type == "create" || var.fsx_type == "load"
+    error_message = "${var.fsx_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "fsx_rwx_id" {
+  description = "ID of the existing FSx Lustre file system for RWX"
+  type        = string
+  default     = null
+}
+
+variable "fsx_rwx_subnet_ids" {
+  description = "Subnet IDs for the RWX FSx Lustre file system"
+  type        = list(string)
+  default     = []
+}
+
+variable "fsx_rwx_security_group_ids" {
+  description = "Security group IDs for the RWX FSx Lustre file system"
+  type        = list(string)
+  default     = []
+}
+
+variable "fsx_rwx_dns_name" {
+  description = "DNS name for the RWX FSx Lustre file system"
+  type        = string
+  default     = null
+}
+
+variable "fsx_rwx_mount_name" {
+  description = "Mount name for the RWX FSx Lustre file system"
+  type        = string
+  default     = null
+}
+
+variable "fsx_rwx_arn" {
+  description = "ARN of the RWX FSx Lustre file system"
+  type        = string
+  default     = null
+}
+
+variable "fsx_rox_id" {
+  description = "ID of the existing FSx Lustre file system for ROX"
+  type        = string
+  default     = null
+}
+
+variable "fsx_rox_arn" {
+  description = "ARN of the ROX FSx Lustre file system"
+  type        = string
+  default     = null
+}
