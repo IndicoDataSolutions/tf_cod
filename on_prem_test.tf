@@ -133,11 +133,10 @@ resource "null_resource" "get_nfs_server_ip" {
 
 resource "helm_release" "nfs-provider" {
   count      = var.on_prem_test == true ? 1 : 0
-  name       = "csi-driver-nfs"
+  name       = "nfs-subdir-external-provisioner"
   repository = var.ipa_repo
-  chart      = "csi-driver-nfs"
-  version    = var.csi-driver-nfs
-  #harborprod/harborprod/csi-driver-nfs:v4.9.0-dev-12562-263e3932
+  chart      = "nfs-subdir-external-provisioner"
+  version    = var.nfs_subdir_external_provisioner_version
   namespace  = "default"
   depends_on = [
     module.cluster,
@@ -151,20 +150,13 @@ resource "helm_release" "nfs-provider" {
   #   value = data.local_file.nfs_ip[0].content
   # }
 
-
   values = [<<EOF
-    csi-driver-nfs:
+    nfs-subdir-external-provisioner:
       nfs:
         server: ${data.local_file.nfs_ip[0].content}
+        path: /exports
       image:
-        baseRepo: ${var.image_registry}
-      storageClass:
-        create: true
-        name: nfs-client
-        parameters:
-          server: ${data.local_file.nfs_ip[0].content}
-          share: /exports
-
+        repository: ${var.image_registry}/registry.k8s.io/sig-storage/nfs-subdir-external-provisioner
   EOF
   ]
 }
