@@ -275,6 +275,7 @@ tempo:
       enabled: false #${var.thanos_enabled}
     
     prometheusSpec:
+${local.on_prem_prometheus_config}
       image:
         registry: ${var.image_registry}/quay.io
       disableCompaction: false #${var.thanos_enabled}
