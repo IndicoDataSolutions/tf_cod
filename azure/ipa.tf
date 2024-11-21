@@ -790,6 +790,7 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
   source:
     chart: cod-smoketests
     repoURL: ${var.ipa_smoketest_repo}
@@ -866,6 +867,7 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
     retry:
       limit: 8
       backoff:
