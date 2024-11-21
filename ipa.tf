@@ -1628,6 +1628,7 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=${each.value.createNamespace}
+      - ServerSideApply=true
   source:
     chart: ${each.value.chart}
     repoURL: ${each.value.repo}
