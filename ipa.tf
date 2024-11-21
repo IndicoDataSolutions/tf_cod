@@ -1620,7 +1620,6 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   annotations:
      avp.kubernetes.io/path: ${each.value.vaultPath}
-     argocd.argoproj.io/compare-options: ServerSideDiff=true
   labels:
     app: ${each.value.name}
     region: ${var.region}
