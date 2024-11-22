@@ -1348,6 +1348,7 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
 
   source:
     chart: cod-smoketests
@@ -1444,6 +1445,7 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
   source:
     chart: ipa
     repoURL: ${var.ipa_repo}
@@ -1628,6 +1630,7 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=${each.value.createNamespace}
+      - ServerSideApply=true
   source:
     chart: ${each.value.chart}
     repoURL: ${each.value.repo}
