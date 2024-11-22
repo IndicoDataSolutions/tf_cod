@@ -1338,6 +1338,7 @@ metadata:
   annotations:
     avp.kubernetes.io/path: tools/argo/data/ipa-deploy
     argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/compare-options: ServerSideDiff=true
 spec:
   destination:
     server: ${module.cluster.kubernetes_host}
@@ -1430,6 +1431,7 @@ metadata:
   annotations:
     avp.kubernetes.io/path: tools/argo/data/ipa-deploy
     argocd.argoproj.io/sync-wave: "-2"
+    argocd.argoproj.io/compare-options: ServerSideDiff=true
 spec:
   ignoreDifferences:
     - group: apps
@@ -1615,6 +1617,7 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   annotations:
      avp.kubernetes.io/path: ${each.value.vaultPath}
+     argocd.argoproj.io/compare-options: ServerSideDiff=true
   labels:
     app: ${each.value.name}
     region: ${var.region}
