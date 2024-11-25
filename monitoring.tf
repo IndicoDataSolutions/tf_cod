@@ -19,15 +19,7 @@ locals {
       thanos: {}
   EOT
   )
-  on_prem_prometheus_config = var.on_prem_test == true ? (<<EOT
-      retentionSize: "10GB"
-      storageSpec:
-        emptyDir:
-          sizeLimit: 10Gi
-  EOT
-    ) : (<<EOT
-  EOT
-  )
+  
   backend_port = var.acm_arn != "" ? "http" : "https"
   enableHttp = var.acm_arn != "" || var.use_nlb == true ? false : true
   lb_config = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
@@ -186,7 +178,6 @@ ${local.alertmanager_tls}
       enabled:  false #${var.thanos_enabled}
 
     prometheusSpec:
-${local.on_prem_prometheus_config}
       image:
         registry: ${var.image_registry}/quay.io
       disableCompaction: false #${var.thanos_enabled}
@@ -275,7 +266,6 @@ tempo:
       enabled: false #${var.thanos_enabled}
     
     prometheusSpec:
-${local.on_prem_prometheus_config}
       image:
         registry: ${var.image_registry}/quay.io
       disableCompaction: false #${var.thanos_enabled}
