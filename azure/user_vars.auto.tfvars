@@ -19,7 +19,7 @@ default_node_pool = {
   labels = {
     "node_group" : "default-workers"
   }
-  cluster_auto_scaling           = false
+  cluster_auto_scaling           = true
   cluster_auto_scaling_min_count = null
   cluster_auto_scaling_max_count = null
 }
