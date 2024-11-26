@@ -536,6 +536,12 @@ variable "nfs_subdir_external_provisioner_version" {
   description = "Version of nfs_subdir_external_provisioner_version helm chart"
 }
 
+variable "csi_driver_nfs_version" {
+  type        = string
+  default     = "v4.0.9"
+  description = "Version of csi-driver-nfs helm chart"
+}
+
 variable "include_fsx" {
   type        = bool
   default     = false

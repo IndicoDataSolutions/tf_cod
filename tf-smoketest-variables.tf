@@ -89,6 +89,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     external_secrets_version = "${jsonencode(var.external_secrets_version)}"
     opentelemetry_collector_version = "${jsonencode(var.opentelemetry_collector_version)}"
     nfs_subdir_external_provisioner_version = "${jsonencode(var.nfs_subdir_external_provisioner_version)}"
+    csi_driver_nfs_version = "${jsonencode(var.csi_driver_nfs_version)}"
     include_fsx = "${jsonencode(var.include_fsx)}"
     include_pgbackup = "${jsonencode(var.include_pgbackup)}"
     include_efs = "${jsonencode(var.include_efs)}"
