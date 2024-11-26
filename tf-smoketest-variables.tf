@@ -89,6 +89,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     external_secrets_version = "${jsonencode(var.external_secrets_version)}"
     opentelemetry_collector_version = "${jsonencode(var.opentelemetry_collector_version)}"
     nfs_subdir_external_provisioner_version = "${jsonencode(var.nfs_subdir_external_provisioner_version)}"
+    csi_driver_nfs_version = "${jsonencode(var.csi_driver_nfs_version)}"
     include_fsx = "${jsonencode(var.include_fsx)}"
     include_pgbackup = "${jsonencode(var.include_pgbackup)}"
     include_efs = "${jsonencode(var.include_efs)}"
@@ -172,6 +173,16 @@ resource "kubernetes_config_map" "terraform-variables" {
     vpc_flow_logs_iam_role_arn = "${jsonencode(var.vpc_flow_logs_iam_role_arn)}"
     instance_volume_size = "${jsonencode(var.instance_volume_size)}"
     instance_volume_type = "${jsonencode(var.instance_volume_type)}"
+    fsx_deployment_type = "${jsonencode(var.fsx_deployment_type)}"
+    fsx_type = "${jsonencode(var.fsx_type)}"
+    fsx_rwx_id = "${jsonencode(var.fsx_rwx_id)}"
+    fsx_rwx_subnet_ids = "${jsonencode(var.fsx_rwx_subnet_ids)}"
+    fsx_rwx_security_group_ids = "${jsonencode(var.fsx_rwx_security_group_ids)}"
+    fsx_rwx_dns_name = "${jsonencode(var.fsx_rwx_dns_name)}"
+    fsx_rwx_mount_name = "${jsonencode(var.fsx_rwx_mount_name)}"
+    fsx_rwx_arn = "${jsonencode(var.fsx_rwx_arn)}"
+    fsx_rox_id = "${jsonencode(var.fsx_rox_id)}"
+    fsx_rox_arn = "${jsonencode(var.fsx_rox_arn)}"
 
     }
   }

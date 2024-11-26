@@ -61,7 +61,22 @@ locals {
         subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}
  EOF
   ] : []
-  storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
+  on_prem_values = var.on_prem_test == true ? [<<EOF
+  storage:
+    indicoStorageClass:
+      enabled: false
+    existingPVC:
+      name: read-write
+      namespace: default
+    onprem:
+      enabled: true
+      storageClass: nfs-client
+      size: 100Gi
+  EOF
+  ] : []
+  #storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
+  storage_spec = var.on_prem_test == true ? local.on_prem_values : var.include_fsx == true ? local.fsx_values : local.efs_values
+  
   alb_ipa_values = var.enable_waf == true ? (<<EOT
 app-edge:
   image:

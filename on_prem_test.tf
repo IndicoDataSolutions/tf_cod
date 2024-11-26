@@ -57,7 +57,7 @@ spec:
           privileged: true
         volumeMounts:
         - name: storage
-          mountPath: /nfs-storage
+          mountPath: /exports
         resources:
           requests:
             cpu: 450m
@@ -133,15 +133,14 @@ resource "null_resource" "get_nfs_server_ip" {
 
 resource "helm_release" "nfs-provider" {
   count      = var.on_prem_test == true ? 1 : 0
-  name       = "nfs-subdir-external-provisioner"
+  name       = "csi-driver-nfs"
   repository = var.ipa_repo
-  chart      = "nfs-subdir-external-provisioner"
-  version    = var.nfs_subdir_external_provisioner_version
+  chart      = "csi-driver-nfs"
+  version    = var.csi_driver_nfs_version
   namespace  = "default"
   depends_on = [
     module.cluster,
-    kubectl_manifest.nfs_server_service,
-    data.local_file.nfs_ip
+    kubectl_manifest.nfs_server_service
   ]
 
   # // prometheus URL
@@ -151,11 +150,18 @@ resource "helm_release" "nfs-provider" {
   # }
 
   values = [<<EOF
-    nfs-subdir-external-provisioner:
-      nfs:
-        server: ${data.local_file.nfs_ip[0].content}
+    csi-driver-nfs:
+      enabled: true
+      feature:
+        enableFSGroupPolicy: true
       image:
-        repository: ${var.image_registry}/registry.k8s.io/sig-storage/nfs-subdir-external-provisioner
+        baseRepo: ${var.image_registry}
+      storageClass:
+        create: true
+        name: nfs-client
+        parameters:
+          server: nfs-service.default.svc.cluster.local
+          share: /nfs-storage
   EOF
   ]
 }

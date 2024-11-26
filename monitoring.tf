@@ -19,7 +19,7 @@ locals {
       thanos: {}
   EOT
   )
-
+  
   backend_port = var.acm_arn != "" ? "http" : "https"
   enableHttp = var.acm_arn != "" || var.use_nlb == true ? false : true
   lb_config = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
