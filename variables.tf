@@ -536,6 +536,12 @@ variable "nfs_subdir_external_provisioner_version" {
   description = "Version of nfs_subdir_external_provisioner_version helm chart"
 }
 
+variable "csi_driver_nfs_version" {
+  type        = string
+  default     = "v4.0.9"
+  description = "Version of csi-driver-nfs helm chart"
+}
+
 variable "include_fsx" {
   type        = bool
   default     = false
@@ -1228,4 +1234,67 @@ variable "node_role_name_override" {
   type = string
   default = null
   description = "Name override for node role"
+}
+
+variable "fsx_deployment_type" {
+  type        = string
+  default     = "PERSISTENT_1"
+  description = "The deployment type to launch"
+}
+
+variable "fsx_type" {
+  type    = string
+  default = "create"
+  validation {
+    condition     = var.fsx_type == "create" || var.fsx_type == "load"
+    error_message = "${var.fsx_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "fsx_rwx_id" {
+  description = "ID of the existing FSx Lustre file system for RWX"
+  type        = string
+  default     = null
+}
+
+variable "fsx_rwx_subnet_ids" {
+  description = "Subnet IDs for the RWX FSx Lustre file system"
+  type        = list(string)
+  default     = []
+}
+
+variable "fsx_rwx_security_group_ids" {
+  description = "Security group IDs for the RWX FSx Lustre file system"
+  type        = list(string)
+  default     = []
+}
+
+variable "fsx_rwx_dns_name" {
+  description = "DNS name for the RWX FSx Lustre file system"
+  type        = string
+  default     = null
+}
+
+variable "fsx_rwx_mount_name" {
+  description = "Mount name for the RWX FSx Lustre file system"
+  type        = string
+  default     = null
+}
+
+variable "fsx_rwx_arn" {
+  description = "ARN of the RWX FSx Lustre file system"
+  type        = string
+  default     = null
+}
+
+variable "fsx_rox_id" {
+  description = "ID of the existing FSx Lustre file system for ROX"
+  type        = string
+  default     = null
+}
+
+variable "fsx_rox_arn" {
+  description = "ARN of the ROX FSx Lustre file system"
+  type        = string
+  default     = null
 }

@@ -790,6 +790,7 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
   source:
     chart: cod-smoketests
     repoURL: ${var.ipa_smoketest_repo}
@@ -866,6 +867,7 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
     retry:
       limit: 8
       backoff:
@@ -1013,6 +1015,7 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   annotations:
      avp.kubernetes.io/path: ${each.value.vaultPath}
+     argocd.argoproj.io/compare-options: ServerSideDiff=true
   labels:
     app: ${each.value.name}
     region: ${var.region}
@@ -1028,6 +1031,7 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=${each.value.createNamespace}
+      - ServerSideApply=true
   source:
     chart: ${each.value.chart}
     repoURL: ${each.value.repo}
@@ -1057,7 +1061,7 @@ resource "helm_release" "external-secrets" {
   name             = "external-secrets"
   create_namespace = true
   namespace        = "default"
-  repository       = "https://charts.external-secrets.io/"
+  repository       = var.ipa_repo
   chart            = "external-secrets"
   version          = var.external_secrets_version
   wait             = true

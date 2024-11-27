@@ -49,19 +49,34 @@ locals {
       csi:
         driver: fsx.csi.aws.com
         volumeAttributes:
-          dnsname: ${module.fsx-storage[0].fsx-rwx.dns_name}
-          mountname: ${module.fsx-storage[0].fsx-rwx.mount_name}
-        volumeHandle: ${module.fsx-storage[0].fsx-rwx.id}
+          dnsname: ${module.fsx-storage[0].fsx_rwx_dns_name}
+          mountname: ${module.fsx-storage[0].fsx_rwx_mount_name}
+        volumeHandle: ${module.fsx-storage[0].fsx_rwx_id}
     indicoStorageClass:
       enabled: true
       name: indico-sc
       provisioner: fsx.csi.aws.com
       parameters:
         securityGroupIds: ${local.security_group_id}
-        subnetId: ${module.fsx-storage[0].fsx-rwx.subnet_ids[0]}
+        subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}
  EOF
   ] : []
-  storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
+  on_prem_values = var.on_prem_test == true ? [<<EOF
+  storage:
+    indicoStorageClass:
+      enabled: false
+    existingPVC:
+      name: read-write
+      namespace: default
+    onprem:
+      enabled: true
+      storageClass: nfs-client
+      size: 100Gi
+  EOF
+  ] : []
+  #storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
+  storage_spec = var.on_prem_test == true ? local.on_prem_values : var.include_fsx == true ? local.fsx_values : local.efs_values
+  
   alb_ipa_values = var.enable_waf == true ? (<<EOT
 app-edge:
   image:
@@ -1348,6 +1363,7 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
 
   source:
     chart: cod-smoketests
@@ -1444,6 +1460,7 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
   source:
     chart: ipa
     repoURL: ${var.ipa_repo}
@@ -1613,6 +1630,7 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   annotations:
      avp.kubernetes.io/path: ${each.value.vaultPath}
+     argocd.argoproj.io/compare-options: ServerSideDiff=true
   labels:
     app: ${each.value.name}
     region: ${var.region}
@@ -1628,6 +1646,7 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=${each.value.createNamespace}
+      - ServerSideApply=true
   source:
     chart: ${each.value.chart}
     repoURL: ${each.value.repo}

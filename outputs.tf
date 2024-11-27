@@ -18,14 +18,14 @@ output "efs_filesystem_id" {
   description = "ID of the EFS filesystem"
   value       = var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""
 }
-output "fsx-rwx" {
+output "fsx_rwx_id" {
   description = "Read write filesystem"
-  value       = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx : null
+  value       = var.include_fsx == true ? module.fsx-storage[0].fsx_rwx_id : null
 }
 
-output "fsx-rox" {
+output "fsx_rox_id" {
   description = "Read only filesystem"
-  value       = var.include_rox ? module.fsx-storage[0].fsx-rox : ""
+  value       = var.include_rox ? module.fsx-storage[0].fsx_rox_id : ""
 }
 
 output "key_pem" {
@@ -35,19 +35,19 @@ output "key_pem" {
 }
 
 output "fsx_storage_fsx_rwx_dns_name" {
-  value = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.dns_name : ""
+  value = var.include_fsx == true ? module.fsx-storage[0].fsx_rwx_dns_name : ""
 }
 
 output "fsx_storage_fsx_rwx_mount_name" {
-  value = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.mount_name : ""
+  value = var.include_fsx == true ? module.fsx-storage[0].fsx_rwx_mount_name : ""
 }
 
 output "fsx_storage_fsx_rwx_volume_handle" {
-  value = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.id : ""
+  value = var.include_fsx == true ? module.fsx-storage[0].fsx_rwx_id : ""
 }
 
 output "fsx_storage_fsx_rwx_subnet_id" {
-  value = var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.subnet_ids[0] : ""
+  value = var.include_fsx == true ? module.fsx-storage[0].fsx_rwx_subnet_ids[0] : ""
 }
 
 output "cluster_name" {

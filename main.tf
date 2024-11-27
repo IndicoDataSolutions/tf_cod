@@ -282,7 +282,7 @@ module "efs-storage-local-registry" {
 module "fsx-storage" {
   count                       = var.include_fsx == true ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-fsx/mod"
-  version                     = "1.4.2"
+  version                     = "2.0.0"
   label                       = var.label
   additional_tags             = var.additional_tags
   region                      = var.region
@@ -293,7 +293,17 @@ module "fsx-storage" {
   api_models_bucket           = module.s3-storage.api_models_s3_bucket_name
   kms_key                     = module.kms_key.key
   per_unit_storage_throughput = var.per_unit_storage_throughput
+  deployment_type             = var.fsx_deployment_type
   include_rox                 = var.include_rox
+  fsx_type                    = var.fsx_type
+  fsx_rwx_id                  = var.fsx_rwx_id
+  fsx_rwx_subnet_ids          = var.fsx_rwx_subnet_ids
+  fsx_rwx_security_group_ids  = var.fsx_rwx_security_group_ids
+  fsx_rwx_dns_name            = var.fsx_rwx_dns_name
+  fsx_rwx_mount_name          = var.fsx_rwx_mount_name
+  fsx_rwx_arn                 = var.fsx_rwx_arn
+  fsx_rox_id                  = var.fsx_rox_id
+  fsx_rox_arn                 = var.fsx_rox_arn
 }
 
 module "iam" {
@@ -487,7 +497,7 @@ module "argo-registration" {
 }
 
 locals {
-  security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx-rwx.security_group_ids)[0] : ""
+  security_group_id = var.include_fsx == true ? tolist(module.fsx-storage[0].fsx_rwx_security_group_ids)[0] : ""
   cluster_name      = var.label
   dns_zone_name     = var.dns_zone_name == "" ? lower("${var.aws_account}.${var.domain_suffix}") : var.dns_zone_name
   dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${local.dns_zone_name}") : var.domain_host
