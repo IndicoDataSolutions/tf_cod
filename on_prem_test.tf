@@ -45,7 +45,7 @@ spec:
     spec:
       containers:
       - name: nfs-server
-        image: k8s.gcr.io/volume-nfs:0.8
+        image: ${var.image_registry}/k8s.gcr.io/volume-nfs:0.8
         ports:
         - name: nfs
           containerPort: 2049
@@ -95,7 +95,7 @@ YAML
 data "local_file" "nfs_ip" {
   count      = var.on_prem_test == true ? 1 : 0
   filename   = "${path.module}/nfs_server_ip.txt"
-  depends_on = ["null_resource.get_nfs_server_ip"]
+  depends_on = [null_resource.get_nfs_server_ip]
 }
 
 
@@ -134,9 +134,9 @@ resource "null_resource" "get_nfs_server_ip" {
 resource "helm_release" "nfs-provider" {
   count      = var.on_prem_test == true ? 1 : 0
   name       = "nfs-subdir-external-provisioner"
-  repository = "https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner"
+  repository = var.ipa_repo
   chart      = "nfs-subdir-external-provisioner"
-  version    = "4.0.18"
+  version    = var.nfs_subdir_external_provisioner_version
   namespace  = "default"
   depends_on = [
     module.cluster,
@@ -144,11 +144,20 @@ resource "helm_release" "nfs-provider" {
     data.local_file.nfs_ip
   ]
 
-  // prometheus URL
-  set {
-    name  = "nfs.server"
-    value = data.local_file.nfs_ip[0].content
-  }
+  # // prometheus URL
+  # set {
+  #   name  = "nfs-subdir-external-provisioner.nfs.server"
+  #   value = data.local_file.nfs_ip[0].content
+  # }
+
+  values = [<<EOF
+    nfs-subdir-external-provisioner:
+      nfs:
+        server: ${data.local_file.nfs_ip[0].content}
+      image:
+        repository: ${var.image_registry}/registry.k8s.io/sig-storage/nfs-subdir-external-provisioner
+  EOF
+  ]
 }
 
 resource "null_resource" "update_storage_class" {

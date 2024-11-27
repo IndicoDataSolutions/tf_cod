@@ -206,7 +206,7 @@ variable "svp_client_secret" {
 
 variable "k8s_version" {
   type        = string
-  default     = "1.29"
+  default     = "1.31"
   description = "The version of the kubernetes cluster"
 }
 
@@ -642,7 +642,7 @@ variable "thanos_cluster_name" {
 
 variable "thanos_enabled" {
   type    = bool
-  default = false
+  default = true
 }
 
 variable "harness_delegate" {

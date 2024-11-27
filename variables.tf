@@ -192,7 +192,7 @@ variable "cluster_name" {
 
 variable "k8s_version" {
   type        = string
-  default     = "1.29"
+  default     = "1.31"
   description = "The EKS version to use"
 }
 
@@ -515,17 +515,25 @@ variable "hibernation_enabled" {
 }
 
 variable "keda_version" {
-  default = "2.13.2"
+  type    = string
+  default = "2.15.2"
 }
 
 variable "external_secrets_version" {
   type        = string
-  default     = "0.9.9"
+  default     = "0.10.5"
   description = "Version of external-secrets helm chart"
 }
 
-variable "opentelemetry-collector_version" {
-  default = "0.97.1"
+variable "opentelemetry_collector_version" {
+  type    = string
+  default = "0.108.0"
+}
+
+variable "nfs_subdir_external_provisioner_version" {
+  type        = string
+  default     = "4.0.18"
+  description = "Version of nfs_subdir_external_provisioner_version helm chart"
 }
 
 variable "include_fsx" {
@@ -791,7 +799,7 @@ variable "indico_devops_aws_region" {
 
 variable "thanos_enabled" {
   type    = bool
-  default = false
+  default = true
 }
 
 variable "keycloak_enabled" {
@@ -824,50 +832,50 @@ variable "harness_mount_path" {
 }
 
 variable "lambda_sns_forwarder_enabled" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "If enabled a lamda will be provisioned to forward sns messages to an external endpoint."
 }
 
 variable "lambda_sns_forwarder_destination_endpoint" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "destination URL for the lambda sns forwarder"
 }
 
 variable "lambda_sns_forwarder_topic_arn" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "SNS topic to triger lambda forwarder."
 }
 
 variable "lambda_sns_forwarder_github_organization" {
-  type = string
-  default = "IndicoDataSolutions"
+  type        = string
+  default     = "IndicoDataSolutions"
   description = "The github organization containing the lambda_sns_forwarder code to use"
 }
 
 variable "lambda_sns_forwarder_github_repository" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "The github repository containing the lambda_sns_forwarder code to use"
 }
 
 variable "lambda_sns_forwarder_github_branch" {
-  type = string
-  default = "main"
+  type        = string
+  default     = "main"
   description = "The github branch / tag containing the lambda_sns_forwarder code to use"
 }
 
 variable "lambda_sns_forwarder_github_zip_path" {
-  type      = string
-  default   = "zip/lambda.zip"
+  type        = string
+  default     = "zip/lambda.zip"
   description = "Full path to the lambda zip file"
 }
 
 variable "lambda_sns_forwarder_function_variables" {
-  type = map
-  default = {}
+  type        = map(any)
+  default     = {}
   description = "A map of variables for the lambda_sns_forwarder code to use"
 }
 
@@ -1034,7 +1042,7 @@ variable "vpc_flow_logs_iam_role_arn" {
 }
 variable "instance_volume_size" {
   type        = number
-  default     = 40
+  default     = 60
   description = "The size of EBS volume to attach to the cluster nodes"
 }
 
@@ -1069,4 +1077,155 @@ variable "indico_sqs_sns_policy_name" {
   type        = string
   description = "Full name of the SQS SNS policy"
   default     = null
+}
+
+variable "additional_users" {
+  type        = list(string)
+  default     = []
+  description = "The names of additional AWS users to provide admin access to the cluster"
+}
+
+
+## Unused variables
+
+variable "aws_account_name" {
+  type    = string
+  default = ""
+}
+
+variable "access_key" {
+  type    = string
+  default = ""
+}
+
+variable "secret_key" {
+  type    = string
+  default = ""
+}
+
+variable "cluster_type" {
+  type    = string
+  default = "EKS"
+}
+
+variable "argo_bcrypt_password" {
+  type    = string
+  default = ""
+}
+
+variable "harbor_admin_password" {
+  type    = string
+  default = ""
+}
+
+variable "azure_indico_io_client_secret_id" {
+  type    = string
+  default = ""
+}
+
+variable "az_readapi_subscription_id" {
+  type    = string
+  default = ""
+}
+
+variable "az_readapi_client_id" {
+  type    = string
+  default = ""
+}
+
+variable "az_readapi_client_secret_id" {
+  type    = string
+  default = ""
+}
+
+variable "aws_account_ids" {
+  type    = list(string)
+  default = []
+}
+
+variable "ipa_smoketest_cronjob_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "local_registry_harbor_robot_account_name" {
+  type    = string
+  default = ""
+}
+
+variable "bucket_type" {
+  type    = string
+  default = "create"
+  validation {
+    condition     = var.bucket_type == "create" || var.bucket_type == "load"
+    error_message = "${var.bucket_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "data_s3_bucket_name_override" {
+  type        = string
+  default     = null
+  description = "The name of the existing S3 bucket to be created/loaded and used as the data bucket"
+}
+
+variable "api_models_s3_bucket_name_override" {
+  type        = string
+  default     = null
+  description = "The name of the existing S3 bucket to be created/loaded and used as the API model bucket"
+}
+
+variable "pgbackup_s3_bucket_name_override" {
+  type        = string
+  default     = null
+  description = "The name of the existing S3 bucket to be created/loaded and used as the postgres backup bucket"
+}
+
+# Additional variables
+variable "enable_s3_replication" {
+  type = bool
+  default = false
+  description = "Flag to enable s3 replication"
+}
+
+variable "create_s3_replication_role" {
+  type = bool
+  default = true
+  description = "Flag to create or load s3 replication role"
+}
+
+variable "s3_replication_role_name_override" {
+  type = string
+  default = null
+  description = "Name override for s3 replication role"
+}
+
+variable "destination_kms_key_arn" {
+  type = string
+  default = ""
+  description = "arn of kms key used to encrypt s3 replication destination buckets"
+}
+
+variable "data_destination_bucket" {
+  type = string
+  default = ""
+  description = "s3 replication data destination bucket"
+}
+
+variable "api_model_destination_bucket" {
+  type    = string
+  default = ""
+  description = "s3 replication api model destination bucket"
+}
+
+# Node role
+variable "create_node_role" {
+  type = bool
+  default = true
+  description = "Flag to create or load node role"
+}
+
+variable "node_role_name_override" {
+  type = string
+  default = null
+  description = "Name override for node role"
 }
