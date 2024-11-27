@@ -1052,6 +1052,33 @@ variable "instance_volume_type" {
   description = "The type of EBS volume to attach to the cluster nodes"
 }
 
+variable "sqs_sns_type" {
+  type    = string
+  default = "create"
+  validation {
+    condition     = var.sqs_sns_type == "create" || var.sqs_sns_type == "load"
+    error_message = "${var.sqs_sns_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "ipa_sns_topic_name" {
+  type        = string
+  description = "Full name of the SNS topic"
+  default     = null
+}
+
+variable "ipa_sqs_queue_name" {
+  type        = string
+  description = "Full name of the SQS queue"
+  default     = null
+}
+
+variable "indico_sqs_sns_policy_name" {
+  type        = string
+  description = "Full name of the SQS SNS policy"
+  default     = null
+}
+
 variable "additional_users" {
   type        = list(string)
   default     = []
@@ -1202,5 +1229,3 @@ variable "node_role_name_override" {
   default = null
   description = "Name override for node role"
 }
-
-
