@@ -321,11 +321,6 @@ module "iam" {
   fsx_arns                   = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
   s3_buckets                 = [module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : ""]
   kms_key_arn                = module.kms_key.key_arn
-  # Buckets 
-  create_bucket          = var.bucket_type == "create"
-  data_bucket_name       = var.data_s3_bucket_name_override == null ? "indico-data-${var.label}" : var.data_s3_bucket_name_override
-  include_rox            = var.include_rox
-  api_models_bucket_name = var.api_models_s3_bucket_name_override == null ? "indico-api-models-${var.label}" : var.api_models_s3_bucket_name_override
   # s3 replication
   enable_s3_replication                            = var.enable_s3_replication
   create_s3_replication_role                       = var.create_s3_replication_role
