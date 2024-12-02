@@ -19,6 +19,7 @@ locals {
     crunchy:
       efsBacked: "${var.crunchy_efs_backed}"
       efs_filesystem_id: "${local.efs_filesystem_id}"
+      efs_pgha1_ap_id: "${module.efs-storage[0].efs_filesystem_ap_pgha1_id}"
     volumeSetup:
       image:
         registry: "${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}"
