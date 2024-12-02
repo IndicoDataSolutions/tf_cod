@@ -330,22 +330,6 @@ module "iam" {
   s3_replication_api_model_destination_bucket_name = var.api_model_destination_bucket
 }
 
-moved {
-  from = module.cluster.aws_iam_role_policy_attachment.ebs_cluster_policy
-  to   = module.iam.module.create_eks_node_role[0].aws_iam_policy_attachment.attachments[0]
-}
-
-moved {
-  from = module.cluster.aws_iam_role_policy_attachment.additional_cluster_policy
-  to   = module.iam.module.create_eks_node_role[0].aws_iam_policy_attachment.attachments[1]
-}
-
-moved {
-  from = module.cluster.aws_iam_role_policy_attachment.additional["IAMReadOnlyAccess"]
-  to   = module.iam.module.create_eks_node_role[0].aws_iam_policy_attachment.additional_policies[0]
-}
-
-
 module "cluster" {
   source          = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
   version         = "9.0.31"
