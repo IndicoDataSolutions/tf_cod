@@ -6,51 +6,9 @@ locals {
   the_domain            = local.the_splits[local.the_length - 2]
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
   enable_external_dns   = var.use_static_ssl_certificates == false ? true : false
-  storage_class         = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
+  storage_class         = var.on_prem_test == false ? var.crunchy_efs_backed == true ? "pg-sc" : "encrypted-gp2" : "nfs-client"
   acm_arn               = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
   pgbackup_s3_bucket_name = var.use_existing_s3_buckets ? var.pgbackup_s3_bucket_name : module.s3-storage[0].pgbackup_s3_bucket_name
-  crunchy_dataclaim_spec_pgha1 = var.crunchy_efs_backed == true ? (<<EOF
-      dataVolumeClaimSpec:
-        storageClassName: "pg-sc"
-        volumeName: indico-postgres-pgha1
-        accessModes:
-        - ReadWriteMany
-        resources:
-          requests:
-            storage: 200Gi          
-
-  EOF
-  ) : (<<EOF
-      dataVolumeClaimSpec:
-        storageClassName: ${local.storage_class}
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 200Gi
-  EOF
-  )
-  crunchy_dataclaim_spec_pgha2 = var.crunchy_efs_backed == true ? (<<EOF
-      dataVolumeClaimSpec:
-        storageClassName: "pg-sc"
-        volumeName: indico-postgres-pgha2
-        accessModes:
-        - ReadWriteMany
-        resources:
-          requests:
-            storage: 200Gi
-  
-  EOF
-  ) : (<<EOF
-      dataVolumeClaimSpec:
-        storageClassName: ${local.storage_class}
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 200Gi
-  EOF
-  )
   efs_filesystem_id       = module.efs-storage[0].efs_filesystem_id
   efs_values = var.include_efs == true ? [<<EOF
   aws-fsx-csi-driver:
@@ -61,8 +19,6 @@ locals {
     crunchy:
       efsBacked: "${var.crunchy_efs_backed}"
       efs_filesystem_id: "${local.efs_filesystem_id}"
-      efs_pgha1_ap_id: "${module.efs-storage[0].efs_filesystem_ap_pgha1_id}"
-      efs_pgha2_ap_id: "${module.efs-storage[0].efs_filesystem_ap_pgha2_id}"
     volumeSetup:
       image:
         registry: "${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}"
@@ -728,7 +684,7 @@ cluster-autoscaler:
     awsRegion: ${var.region}
     image:
       repository: ${var.image_registry}/public-gcr-k8s-proxy/autoscaling/cluster-autoscaler
-      tag: "v1.20.0"
+      tag: "v${var.k8s_version}.0"
     autoDiscovery:
       clusterName: "${var.label}"
     extraArgs:
@@ -764,42 +720,15 @@ crunchy-postgres:
         annotations:
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-${local.crunchy_dataclaim_spec_pgha1}
+      dataVolumeClaimSpec:
+        storageClassName: ${local.storage_class}
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 200Gi
       name: pgha1
-      replicas: 1
-      resources:
-        requests:
-          cpu: 1000m
-          memory: 3000Mi
-      tolerations:
-        - effect: NoSchedule
-          key: indico.io/crunchy
-          operator: Exists
-    - affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node_group
-                operator: In
-                values:
-                - pgo-workers
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: postgres-operator.crunchydata.com/cluster
-                operator: In
-                values:
-                - postgres-data
-            topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-${local.crunchy_dataclaim_spec_pgha2}
-      name: pgha2
-      replicas: 1
+      replicas: 2
       resources:
         requests:
           cpu: 1000m
