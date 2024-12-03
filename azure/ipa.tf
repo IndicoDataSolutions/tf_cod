@@ -788,7 +788,6 @@ spec:
   syncPolicy:
     automated:
       prune: true
-      selfHeal: true
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
@@ -866,7 +865,6 @@ spec:
   syncPolicy:
     automated:
       prune: true
-      selfHeal: true
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
@@ -968,6 +966,14 @@ resource "argocd_application" "ipa" {
       target_revision = var.argo_branch
     }
 
+    sync_policy {
+      automated {
+        prune       = true
+        self_heal   = false
+        allow_empty = false
+      }
+    }
+
     destination {
       server    = "https://kubernetes.default.svc"
       namespace = "argo"
@@ -1023,7 +1029,6 @@ spec:
   syncPolicy:
     automated:
       prune: true
-      selfHeal: true
     syncOptions:
       - CreateNamespace=${each.value.createNamespace}
       - ServerSideApply=true
