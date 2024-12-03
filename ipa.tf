@@ -1573,7 +1573,6 @@ resource "argocd_application" "ipa" {
       path            = var.argo_path
       target_revision = var.argo_branch
       directory {
-        exclude = "cod.yaml"
         recurse = false
         jsonnet {
         }
@@ -1582,9 +1581,13 @@ resource "argocd_application" "ipa" {
     sync_policy {
       automated {
         prune       = true
-        self_heal   = false
+        self_heal   = true
         allow_empty = false
       }
+      sync_options = [
+        "ServerSideApply=true",
+        "CreateNamespace=true"
+      ]
     }
 
     destination {
