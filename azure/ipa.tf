@@ -969,9 +969,12 @@ resource "argocd_application" "ipa" {
     sync_policy {
       automated {
         prune       = true
-        self_heal   = false
+        self_heal   = true
         allow_empty = false
       }
+      sync_options = [
+        "ServerSideApply=true"
+      ]
     }
 
     destination {
