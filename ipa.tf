@@ -1364,7 +1364,6 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - ServerSideApply=true
 
   source:
     chart: cod-smoketests
@@ -1462,7 +1461,6 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - ServerSideApply=true
   source:
     chart: ipa
     repoURL: ${var.ipa_repo}
