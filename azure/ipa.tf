@@ -973,7 +973,8 @@ resource "argocd_application" "ipa" {
         allow_empty = false
       }
       sync_options = [
-        "ServerSideApply=true"
+        "ServerSideApply=true",
+        "CreateNamespace=true"
       ]
     }
 
