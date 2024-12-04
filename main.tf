@@ -347,7 +347,7 @@ moved {
 
 module "cluster" {
   source          = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version         = "9.0.31"
+  version         = "9.0.32"
   label           = var.label
   region          = var.region
   cluster_version = var.k8s_version
