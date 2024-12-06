@@ -76,7 +76,7 @@ locals {
   ] : []
   #storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
   storage_spec = var.on_prem_test == true ? local.on_prem_values : var.include_fsx == true ? local.fsx_values : local.efs_values
-  
+
   alb_ipa_values = var.enable_waf == true ? (<<EOT
 app-edge:
   image:
@@ -795,7 +795,7 @@ crunchy-postgres:
         repo1-retention-full: '5'
         repo1-s3-key-type: auto
         repo1-s3-kms-key-id: "${module.kms_key.key_arn}"
-        repo1-s3-role: ${module.cluster.s3_role_id}
+        repo1-s3-role: ${module.iam.node_role_name}
       repos:
       - name: repo1
         s3:
@@ -869,7 +869,7 @@ crunchy-postgres:
         repo1-retention-full: '5'
         repo1-s3-key-type: auto
         repo1-s3-kms-key-id: "${module.kms_key.key_arn}"
-        repo1-s3-role: ${module.cluster.s3_role_id}
+        repo1-s3-role: ${module.iam.node_role_name}
       repos:
       - name: repo1
         s3:
