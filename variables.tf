@@ -1120,3 +1120,19 @@ variable "fsx_rox_arn" {
   type        = string
   default     = null
 }
+
+variable "efs_filesystem_name" {
+  type        = string
+  default     = ""
+  description = "The filesystem name of an existing efs instance"
+}
+
+variable "efs_type" {
+  type    = string
+  default = "create"
+
+  validation {
+    condition     = var.efs_type == "create" || var.efs_type == "load"
+    error_message = "${var.efs_type} not valid. Type must be either create or load"
+  }
+}
