@@ -95,7 +95,7 @@ YAML
 data "local_file" "nfs_ip" {
   count      = var.on_prem_test == true ? 1 : 0
   filename   = "${path.module}/nfs_server_ip.txt"
-  depends_on = ["null_resource.get_nfs_server_ip"]
+  depends_on = [null_resource.get_nfs_server_ip]
 }
 
 
