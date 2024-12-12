@@ -209,6 +209,8 @@ resource "kubernetes_config_map" "terraform-variables" {
     fsx_rwx_arn = "${jsonencode(var.fsx_rwx_arn)}"
     fsx_rox_id = "${jsonencode(var.fsx_rox_id)}"
     fsx_rox_arn = "${jsonencode(var.fsx_rox_arn)}"
+    efs_filesystem_name = "${jsonencode(var.efs_filesystem_name)}"
+    efs_type = "${jsonencode(var.efs_type)}"
 
     }
   }
