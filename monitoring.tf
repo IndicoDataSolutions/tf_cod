@@ -557,7 +557,7 @@ resource "helm_release" "opentelemetry-collector" {
 
   values = [<<EOF
     opentelemetry-collector:
-      enabled: true
+      enabled: false
       imagePullSecrets:
         - name: harbor-pull-secret
       image:
