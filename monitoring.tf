@@ -21,8 +21,8 @@ locals {
   )
 
   backend_port = var.acm_arn != "" ? "http" : "https"
-  enableHttp = var.acm_arn != "" || var.use_nlb == true ? false : true
-  lb_config = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
+  enableHttp   = var.acm_arn != "" || var.use_nlb == true ? false : true
+  lb_config    = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
   loadbalancer_config = var.use_nlb == true ? (<<EOT
       external:
         enabled: ${var.network_allow_public}
@@ -44,7 +44,7 @@ locals {
           service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
           service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
       external:
         enabled: ${var.network_allow_public}
       internal:
@@ -107,7 +107,7 @@ EOT
           hosts:
             - alertmanager-${local.dns_name}
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
       tls: []
   EOT
   )
@@ -117,7 +117,7 @@ EOT
           hosts:
             - grafana-${local.dns_name}
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
       tls: []
   EOT
   )
@@ -127,7 +127,7 @@ EOT
           hosts:
             - prometheus-${local.dns_name}
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
       tls: []
   EOT
   )
@@ -393,7 +393,7 @@ global:
 
 
 ingress-nginx:
-  enabled: true
+  enabled: false
   controller:
     service:
       enableHttp: ${local.enableHttp}
