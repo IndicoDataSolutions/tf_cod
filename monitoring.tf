@@ -391,6 +391,8 @@ resource "helm_release" "monitoring" {
 global:
   host: "${local.dns_name}"
 
+sql-exporter:
+  enabled: false
 
 ingress-nginx:
   enabled: false
