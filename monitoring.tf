@@ -21,8 +21,8 @@ locals {
   )
 
   backend_port = var.acm_arn != "" ? "http" : "https"
-  enableHttp = var.acm_arn != "" || var.use_nlb == true ? false : true
-  lb_config = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
+  enableHttp   = var.acm_arn != "" || var.use_nlb == true ? false : true
+  lb_config    = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
   loadbalancer_config = var.use_nlb == true ? (<<EOT
       external:
         enabled: ${var.network_allow_public}
@@ -44,7 +44,7 @@ locals {
           service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
           service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
       external:
         enabled: ${var.network_allow_public}
       internal:
@@ -107,7 +107,7 @@ EOT
           hosts:
             - alertmanager-${local.dns_name}
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
       tls: []
   EOT
   )
@@ -117,7 +117,7 @@ EOT
           hosts:
             - grafana-${local.dns_name}
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
       tls: []
   EOT
   )
@@ -127,7 +127,7 @@ EOT
           hosts:
             - prometheus-${local.dns_name}
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
       tls: []
   EOT
   )
@@ -188,7 +188,7 @@ ${local.alertmanager_tls}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
 ${local.thanos_config}
       nodeSelector:
-        node_group: static-workers
+        node_group: general
     ingress:
       enabled: true
       ingressClassName: nginx
@@ -216,6 +216,7 @@ ${local.prometheus_tls}
       path: /
 ${local.grafana_tls}
 sql-exporter:
+  enabled: false
   image:
     repository: '${var.image_registry}/dockerhub-proxy/burningalchemist/sql_exporter'
 tempo:
@@ -276,7 +277,7 @@ tempo:
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
 ${local.thanos_config}
       nodeSelector:
-        node_group: static-workers
+        node_group: general
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
@@ -299,6 +300,7 @@ ${local.thanos_config}
       labels:
         acme.cert-manager.io/dns01-solver: "true"
 sql-exporter:
+  enabled: false
   image:
     repository: '${var.image_registry}/dockerhub-proxy/burningalchemist/sql_exporter'
 tempo:
@@ -385,15 +387,14 @@ resource "helm_release" "monitoring" {
   version          = var.monitoring_version
   wait             = false
   timeout          = "900" # 15 minutes
-  skip_crds        = true
+  skip_crds        = false
 
   values = [<<EOF
 global:
   host: "${local.dns_name}"
 
-
 ingress-nginx:
-  enabled: true
+  enabled: false
   controller:
     service:
       enableHttp: ${local.enableHttp}
@@ -557,7 +558,7 @@ resource "helm_release" "opentelemetry-collector" {
 
   values = [<<EOF
     opentelemetry-collector:
-      enabled: true
+      enabled: false
       imagePullSecrets:
         - name: harbor-pull-secret
       image:
