@@ -188,7 +188,7 @@ ${local.alertmanager_tls}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
 ${local.thanos_config}
       nodeSelector:
-        node_group: static-workers
+        node_group: monitoring-workers
     ingress:
       enabled: true
       ingressClassName: nginx
@@ -216,6 +216,7 @@ ${local.prometheus_tls}
       path: /
 ${local.grafana_tls}
 sql-exporter:
+  enabled: false
   image:
     repository: '${var.image_registry}/dockerhub-proxy/burningalchemist/sql_exporter'
 tempo:
@@ -276,7 +277,7 @@ tempo:
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
 ${local.thanos_config}
       nodeSelector:
-        node_group: static-workers
+        node_group: monitoring-workers
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
@@ -299,6 +300,7 @@ ${local.thanos_config}
       labels:
         acme.cert-manager.io/dns01-solver: "true"
 sql-exporter:
+  enabled: false
   image:
     repository: '${var.image_registry}/dockerhub-proxy/burningalchemist/sql_exporter'
 tempo:
@@ -390,9 +392,6 @@ resource "helm_release" "monitoring" {
   values = [<<EOF
 global:
   host: "${local.dns_name}"
-
-sql-exporter:
-  enabled: false
 
 ingress-nginx:
   enabled: false
