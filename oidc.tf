@@ -12,7 +12,8 @@ resource "null_resource" "enable-oidc" {
 
 resource "kubernetes_cluster_role_binding" "cod-role-bindings" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   count = var.oidc_enabled == true && strcontains(lower(var.aws_account), "indico-") ? 1 : 0
@@ -48,7 +49,8 @@ resource "kubernetes_cluster_role_binding" "cod-role-bindings" {
 
 resource "kubernetes_cluster_role_binding" "eng-qa-rbac-bindings" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   count = var.oidc_enabled == true && strcontains(lower(var.aws_account), "indico-") ? 1 : 0
@@ -78,7 +80,8 @@ resource "kubernetes_cluster_role_binding" "eng-qa-rbac-bindings" {
 
 resource "kubernetes_cluster_role_binding" "devops-rbac-bindings" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   count = var.oidc_enabled == true ? 1 : 0

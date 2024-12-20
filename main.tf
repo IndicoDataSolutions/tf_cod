@@ -18,7 +18,7 @@ terraform {
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.33.0"
+      version = ">= 2.35.0"
     }
     kubectl = {
       source  = "gavinbunney/kubectl"
@@ -375,6 +375,12 @@ module "cluster" {
   cluster_additional_security_group_ids = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : []
 }
 
+resource "time_sleep" "wait_1_minutes_after_cluster" {
+  depends_on = [module.cluster]
+
+  create_duration = "1m"
+}
+
 locals {
   readapi_secret_path = var.environment == "production" ? "prod-readapi" : "dev-readapi"
 }
@@ -386,7 +392,10 @@ data "vault_kv_secret_v2" "readapi_secret" {
 
 resource "kubernetes_secret" "readapi" {
   count      = var.enable_readapi ? 1 : 0
-  depends_on = [module.cluster]
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
   metadata {
     name = "readapi-secret"
   }
@@ -421,12 +430,13 @@ data "aws_eks_cluster_auth" "local" {
 provider "kubernetes" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+  token                  = data.aws_eks_cluster_auth.local.token
   #token                  = module.cluster.kubernetes_token
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--cluster-name", var.label]
-    command     = "aws"
-  }
+  # exec {
+  #   api_version = "client.authentication.k8s.io/v1beta1"
+  #   args        = ["eks", "get-token", "--cluster-name", var.label]
+  #   command     = "aws"
+  # }
 }
 
 provider "kubectl" {
@@ -483,7 +493,8 @@ module "argo-registration" {
   count = var.argo_enabled == true ? 1 : 0
 
   depends_on = [
-    module.cluster
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   providers = {

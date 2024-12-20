@@ -2,7 +2,8 @@ module "harness_delegate" {
   count = var.harness_delegate && strcontains(lower(var.aws_account), "indico") ? 1 : 0
 
   depends_on = [
-    module.cluster
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   source = "./modules/harness"

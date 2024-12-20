@@ -246,7 +246,8 @@ EOT
 }
 resource "kubernetes_secret" "issuer-secret" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   metadata {
@@ -269,7 +270,8 @@ resource "kubernetes_secret" "issuer-secret" {
 #TODO: move to prereqs
 resource "kubernetes_secret" "harbor-pull-secret" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   metadata {
@@ -349,7 +351,8 @@ data "github_repository_file" "data-pre-reqs-values" {
 
 module "secrets-operator-setup" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
   ]
   count           = var.secrets_operator_enabled == true ? 1 : 0
   source          = "./modules/common/vault-secrets-operator-setup"
@@ -366,7 +369,8 @@ resource "helm_release" "ipa-vso" {
   depends_on = [
     module.cluster,
     data.github_repository_file.data-crds-values,
-    module.secrets-operator-setup
+    module.secrets-operator-setup,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   verify           = false
@@ -432,7 +436,8 @@ resource "helm_release" "external-secrets" {
   depends_on = [
     module.cluster,
     data.github_repository_file.data-crds-values,
-    module.secrets-operator-setup
+    module.secrets-operator-setup,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
 
@@ -466,7 +471,8 @@ resource "helm_release" "ipa-crds" {
   depends_on = [
     module.cluster,
     data.github_repository_file.data-crds-values,
-    module.secrets-operator-setup
+    module.secrets-operator-setup,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   verify           = false
@@ -608,6 +614,10 @@ EOT
 }
 
 resource "kubectl_manifest" "gp2-storageclass" {
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
   yaml_body = <<YAML
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
@@ -665,7 +675,8 @@ resource "helm_release" "ipa-pre-requisites" {
     helm_release.ipa-crds,
     data.vault_kv_secret_v2.zerossl_data,
     data.github_repository_file.data-pre-reqs-values,
-    null_resource.update_storage_class
+    null_resource.update_storage_class,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   verify           = false
@@ -1192,7 +1203,8 @@ resource "helm_release" "local-registry" {
     kubernetes_namespace.local-registry,
     time_sleep.wait_1_minutes_after_pre_reqs,
     module.cluster,
-    kubernetes_persistent_volume_claim.local-registry
+    kubernetes_persistent_volume_claim.local-registry,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   count = var.local_registry_enabled == true ? 1 : 0
@@ -1406,7 +1418,8 @@ resource "github_repository_file" "alb-values-yaml" {
   }
   depends_on = [
     module.cluster,
-    aws_acm_certificate_validation.alb[0]
+    aws_acm_certificate_validation.alb[0],
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   content = local.alb_ipa_values
@@ -1427,7 +1440,8 @@ resource "github_repository_file" "argocd-application-yaml" {
   }
   depends_on = [
     module.cluster,
-    aws_wafv2_web_acl.wafv2-acl[0]
+    aws_wafv2_web_acl.wafv2-acl[0],
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   content = <<EOT
