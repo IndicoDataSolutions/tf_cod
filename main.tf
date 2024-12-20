@@ -375,6 +375,12 @@ module "cluster" {
   cluster_additional_security_group_ids = var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : []
 }
 
+resource "time_sleep" "wait_1_minutes_after_cluster" {
+  depends_on = [module.cluster]
+
+  create_duration = "1m"
+}
+
 locals {
   readapi_secret_path = var.environment == "production" ? "prod-readapi" : "dev-readapi"
 }
@@ -386,7 +392,10 @@ data "vault_kv_secret_v2" "readapi_secret" {
 
 resource "kubernetes_secret" "readapi" {
   count      = var.enable_readapi ? 1 : 0
-  depends_on = [module.cluster]
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
   metadata {
     name = "readapi-secret"
   }
@@ -484,7 +493,8 @@ module "argo-registration" {
   count = var.argo_enabled == true ? 1 : 0
 
   depends_on = [
-    module.cluster
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   providers = {

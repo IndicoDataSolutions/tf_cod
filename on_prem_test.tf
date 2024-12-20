@@ -7,7 +7,8 @@
 
 resource "kubectl_manifest" "nfs_volume" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
   ]
   count     = var.on_prem_test == true ? 1 : 0
   yaml_body = <<YAML
@@ -103,7 +104,8 @@ resource "null_resource" "get_nfs_server_ip" {
   count = var.on_prem_test == true ? 1 : 0
   depends_on = [
     module.cluster,
-    kubectl_manifest.nfs_server_service
+    kubectl_manifest.nfs_server_service,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   triggers = {
@@ -140,7 +142,8 @@ resource "helm_release" "nfs-provider" {
   namespace  = "default"
   depends_on = [
     module.cluster,
-    kubectl_manifest.nfs_server_service
+    kubectl_manifest.nfs_server_service,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   # // prometheus URL

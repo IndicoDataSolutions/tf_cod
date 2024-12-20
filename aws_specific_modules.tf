@@ -107,7 +107,8 @@ data "aws_iam_policy_document" "eks_vpc_guardduty" {
 
 resource "aws_eks_addon" "guardduty" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
   ]
   count = var.eks_addon_version_guardduty != null ? 1 : 0
 
