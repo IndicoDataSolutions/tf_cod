@@ -608,6 +608,9 @@ EOT
 }
 
 resource "kubectl_manifest" "gp2-storageclass" {
+  depends_on = [
+    module.cluster
+  ]
   yaml_body = <<YAML
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
