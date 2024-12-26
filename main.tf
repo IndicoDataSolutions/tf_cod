@@ -348,7 +348,7 @@ moved {
 
 module "cluster" {
   source          = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version         = "9.0.32"
+  version         = "9.0.33"
   label           = var.label
   region          = var.region
   cluster_version = var.k8s_version
@@ -418,13 +418,13 @@ provider "argocd" {
 }
 
 data "aws_eks_cluster" "local" {
-  depends_on = [module.cluster.kubernetes_host]
-  name       = var.label
+  #depends_on = [module.cluster.kubernetes_host]
+  name       = module.cluster.cluster_name
 }
 
 data "aws_eks_cluster_auth" "local" {
-  depends_on = [module.cluster.kubernetes_host]
-  name       = var.label
+  #depends_on = [module.cluster.kubernetes_host]
+  name       = module.cluster.cluster_name
 }
 
 provider "kubernetes" {
