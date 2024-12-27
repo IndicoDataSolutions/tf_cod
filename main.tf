@@ -418,12 +418,12 @@ provider "argocd" {
 }
 
 data "aws_eks_cluster" "local" {
-  #depends_on = [module.cluster.kubernetes_host]
+  depends_on = [module.cluster.kubernetes_host]
   name       = module.cluster.cluster_name
 }
 
 data "aws_eks_cluster_auth" "local" {
-  #depends_on = [module.cluster.kubernetes_host]
+  depends_on = [module.cluster.kubernetes_host]
   name       = module.cluster.cluster_name
 }
 
