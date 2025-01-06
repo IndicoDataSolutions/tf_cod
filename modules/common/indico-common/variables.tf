@@ -19,7 +19,7 @@ variable "github_repo_branch" {
 
 variable "github_file_path" {
   type        = string
-  default     = "."
+  default     = ""
   description = "Path of the yaml files in the repo"
 }
 
@@ -48,15 +48,15 @@ variable "indico_crds_version" {
   description = "indico-crds chart version to deploy to the cluster"
 }
 
-variable "indico_crds_values_yaml_b64" {
+variable "crds_values_yaml_b64" {
   type        = string
   default     = "Cg=="
   description = "indico-crds values provided by the user in the cod.yaml"
 }
 
 variable "indico_crds_values_overrides" {
-  type        = list(string)
-  default     = []
+  type        = string
+  default     = ""
   description = "indico-crds values overrides from the terraform"
 }
 
@@ -67,32 +67,14 @@ variable "indico_pre_reqs_version" {
   description = "indico-pre-requisistes chart version to deploy to the cluster"
 }
 
-variable "indico_pre_reqs_values_yaml_b64" {
+variable "pre_reqs_values_yaml_b64" {
   type        = string
   default     = "Cg=="
   description = "indico-pre-requisistes values provided by the user in the cod.yaml"
 }
 
 variable "indico_pre_reqs_values_overrides" {
-  type        = list(string)
-  default     = []
-  description = "indico-pre-requisites values overrides from the terraform"
-}
-
-variable "monitoring_enabled" {
-  type        = bool
-  default     = true
-  description = "Flag to enable/disable monitoring"
-}
-
-variable "monitoring_values" {
-  type        = list(string)
-  default     = []
-  description = "Monitoring values"
-}
-
-variable "monitoring_version" {
   type        = string
   default     = ""
-  description = "Monitoring chart version"
+  description = "indico-pre-requisites values overrides from the terraform"
 }

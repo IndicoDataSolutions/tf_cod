@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    github = {
-      source  = "integrations/github"
-      version = "5.34.0"
-    }
-  }
-}
-
 # Start with application pre-reqs
 resource "github_repository_file" "pre_reqs_values_yaml" {
   count               = var.argo_enabled == true ? 1 : 0
@@ -38,6 +29,7 @@ data "github_repository_file" "data_pre_reqs_values" {
 resource "helm_release" "ins_pre_requisites" {
   depends_on = [
     data.github_repository_file.data_pre_reqs_values,
+    time_sleep.wait_1_minutes_after_crds
   ]
 
   verify           = false
@@ -45,7 +37,7 @@ resource "helm_release" "ins_pre_requisites" {
   create_namespace = true
   namespace        = var.namespace
   repository       = var.helm_registry
-  chart            = "insights-pre-reqs"
+  chart            = "insights-pre-requisites"
   version          = var.ins_pre_reqs_version
   wait             = false
   timeout          = "1800" # 30 minutes
@@ -67,7 +59,7 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
 # Deploy the application
 module "insights_application" {
   depends_on             = [time_sleep.wait_1_minutes_after_pre_reqs]
-  source                 = "../application-deployment"
+  source                 = "./application-deployment"
   account                = var.account
   region                 = var.region
   label                  = var.label
@@ -75,7 +67,7 @@ module "insights_application" {
   argo_enabled           = var.argo_enabled
   github_repo_name       = var.github_repo_name
   github_repo_branch     = var.github_repo_branch
-  github_file_path       = "${var.github_file_path}/insights_application.yaml"
+  github_file_path       = "${var.github_file_path}/ins_application.yaml"
   github_commit_message  = var.github_commit_message
   argo_application_name  = var.argo_application_name
   argo_vault_plugin_path = var.vault_path
@@ -83,9 +75,9 @@ module "insights_application" {
   argo_project_name      = var.argo_project_name
   chart_name             = "insights"
   chart_repo             = var.helm_registry
-  chart_version          = var.insights_version
+  chart_version          = var.intake_version
   k8s_version            = var.k8s_version
   release_name           = "insights"
-  terraform_helm_values  = indent(12, trimspace(var.insights_values_terraform_overrides))
-  helm_values            = trimspace(base64decode(var.insights_values_overrides))
+  terraform_helm_values  = var.insights_values_terraform_overrides
+  helm_values            = var.insights_values_overrides
 }

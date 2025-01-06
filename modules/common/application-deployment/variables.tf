@@ -23,9 +23,9 @@ variable "namespace" {
 }
 
 variable "argo_enabled" {
-  type        = bool
-  default     = true
-  description = "Flag to enable/disable argo. If argo is diabled, everything will be installed through helm"
+  type        = string
+  default     = ""
+  description = ""
 }
 
 # Argo enabled

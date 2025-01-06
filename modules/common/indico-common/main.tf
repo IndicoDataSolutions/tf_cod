@@ -1,22 +1,9 @@
 # Start with the crds and operators
-terraform {
-  required_providers {
-    github = {
-      source  = "integrations/github"
-      version = "5.34.0"
-    }
-    kubectl = {
-      source  = "gavinbunney/kubectl"
-      version = "1.14.0"
-    }
-  }
-}
-
 resource "github_repository_file" "crds_values_yaml" {
   count               = var.argo_enabled == true ? 1 : 0
   repository          = var.github_repo_name
   branch              = var.github_repo_branch
-  file                = "${var.github_file_path}/helm/indico-crds-values.values"
+  file                = "${var.github_file_path}/helm/crds-values.values"
   commit_message      = var.github_commit_message
   overwrite_on_create = true
 
@@ -25,17 +12,17 @@ resource "github_repository_file" "crds_values_yaml" {
       content
     ]
   }
-  content = base64decode(var.indico_crds_values_yaml_b64)
+  content = base64decode(var.crds_values_yaml_b64)
 }
 
 data "github_repository_file" "data_crds_values" {
   count = var.argo_enabled == true ? 1 : 0
   depends_on = [
-    github_repository_file.crds_values_yaml
+    github_repository_file.crds-values-yaml
   ]
   repository = var.github_repo_name
   branch     = var.github_repo_branch
-  file       = var.github_file_path == "." ? "helm/indico-crds-values.values" : "${var.github_file_path}/helm/indico-crds-values.values"
+  file       = "${var.github_file_path}/helm/crds-values.values"
 }
 
 resource "helm_release" "indico_crds" {
@@ -50,7 +37,7 @@ resource "helm_release" "indico_crds" {
   timeout          = "1800" # 30 minutes
 
   values = concat(var.indico_crds_values_overrides, [<<EOT
-${var.argo_enabled == true ? data.github_repository_file.data_crds_values[0].content : base64decode(var.indico_crds_values_yaml_b64)}
+${var.argo_enabled == true ? data.github_repository_file.data_crds_values[0].content : base64decode(var.crds_values_yaml_b64)}
 EOT
   ])
 }
@@ -76,7 +63,7 @@ resource "github_repository_file" "pre_reqs_values_yaml" {
       content
     ]
   }
-  content = base64decode(var.indico_pre_reqs_values_yaml_b64)
+  content = base64decode(var.pre_reqs_values_yaml_b64)
 }
 
 data "github_repository_file" "data_pre_reqs_values" {
@@ -93,7 +80,7 @@ data "github_repository_file" "data_pre_reqs_values" {
 resource "helm_release" "indico_pre_requisites" {
   depends_on = [
     data.github_repository_file.data_pre_reqs_values,
-    time_sleep.wait_1_minutes_after_crds,
+    time_sleep.wait_1_minutes_after_crds
   ]
 
   verify           = false
@@ -108,25 +95,7 @@ resource "helm_release" "indico_pre_requisites" {
   disable_webhooks = false
 
   values = concat(var.indico_pre_reqs_values_overrides, [<<EOT
-${var.argo_enabled == true ? data.github_repository_file.data_pre_reqs_values[0].content : base64decode(var.indico_pre_reqs_values_yaml_b64)}
+${var.argo_enabled == true ? data.github_repository_file.data_pre_reqs_values[0].content : base64decode(var.pre_reqs_values_yaml_b64)}
 EOT
   ])
-}
-
-resource "helm_release" "monitoring" {
-  depends_on = [helm_release.indico_pre_requisites]
-
-  count = var.monitoring_enabled == true ? 1 : 0
-
-  verify           = false
-  name             = "monitoring"
-  create_namespace = true
-  namespace        = "monitoring"
-  repository       = var.helm_registry
-  chart            = "monitoring"
-  version          = var.monitoring_version
-  wait             = false
-  timeout          = "1800" # 30 minutes
-
-  values = var.monitoring_values
 }

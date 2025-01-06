@@ -1430,29 +1430,3 @@ variable "insights_local_registry_enabled" {
   default     = ""
   description = ""
 }
-
-variable "minio_enabled" {
-  type        = bool
-  default     = false
-  description = "Toggle for enabling minio deployment"
-}
-
-variable "indico-crds-values-yaml-b64" {
-  default = "Cg=="
-}
-
-variable "indico-pre-reqs-values-yaml-b64" {
-  default = "Cg=="
-}
-
-variable "include_miniobkp" {
-  type        = string
-  default     = true
-  description = "If true this will create a miniobkp bucket"
-}
-
-variable "miniobkp_s3_bucket_name_override" {
-  type        = string
-  default     = null
-  description = "The name of the existing S3 bucket to be loaded and used as the minio backup bucket"
-}

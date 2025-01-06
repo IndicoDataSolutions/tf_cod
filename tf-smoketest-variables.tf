@@ -234,11 +234,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     insights_pre_reqs_version = "${jsonencode(var.insights_pre_reqs_version)}"
     insights_local_registry_harbor_robot_account_name = "${jsonencode(var.insights_local_registry_harbor_robot_account_name)}"
     insights_local_registry_enabled = "${jsonencode(var.insights_local_registry_enabled)}"
-    minio_enabled = "${jsonencode(var.minio_enabled)}"
-    indico_crds_values_yaml_b64 = "${jsonencode(var.indico-crds-values-yaml-b64)}"
-    indico_pre_reqs_values_yaml_b64 = "${jsonencode(var.indico-pre-reqs-values-yaml-b64)}"
-    include_miniobkp = "${jsonencode(var.include_miniobkp)}"
-    miniobkp_s3_bucket_name_override = "${jsonencode(var.miniobkp_s3_bucket_name_override)}"
 
     }
   }

@@ -55,8 +55,8 @@ variable "pre_reqs_values_yaml_b64" {
 }
 
 variable "ipa_pre_reqs_values_overrides" {
-  type        = list(string)
-  default     = []
+  type        = string
+  default     = ""
   description = "ipa-pre-requisites values overrides from the terraform"
 }
 

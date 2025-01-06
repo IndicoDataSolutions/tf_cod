@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    github = {
-      source  = "integrations/github"
-      version = "5.34.0"
-    }
-  }
-}
-
 # Start with application pre-reqs
 resource "github_repository_file" "pre_reqs_values_yaml" {
   count               = var.argo_enabled == true ? 1 : 0
@@ -35,17 +26,18 @@ data "github_repository_file" "data_pre_reqs_values" {
   file       = var.github_file_path == "." ? "helm/pre-reqs-values.values" : "${var.github_file_path}/helm/pre-reqs-values.values"
 }
 
-resource "helm_release" "ipa-pre-requisites" {
+resource "helm_release" "ipa_pre_requisites" {
   depends_on = [
     data.github_repository_file.data_pre_reqs_values,
+    time_sleep.wait_1_minutes_after_crds
   ]
 
   verify           = false
-  name             = "ipa-pre-reqs"
+  name             = "indico-pre-reqs"
   create_namespace = true
   namespace        = var.namespace
   repository       = var.helm_registry
-  chart            = "ipa-pre-requisites"
+  chart            = "indico-pre-reqs"
   version          = var.ipa_pre_reqs_version
   wait             = false
   timeout          = "1800" # 30 minutes
@@ -59,7 +51,7 @@ EOT
 
 # Let pre-reqs settle
 resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
-  depends_on = [helm_release.ipa-pre-requisites]
+  depends_on = [helm_release.ipa_pre_requisites]
 
   create_duration = "1m"
 }
@@ -67,7 +59,7 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
 # Deploy the application
 module "intake_application" {
   depends_on             = [time_sleep.wait_1_minutes_after_pre_reqs]
-  source                 = "../application-deployment"
+  source                 = "./application-deployment"
   account                = var.account
   region                 = var.region
   label                  = var.label
@@ -86,6 +78,6 @@ module "intake_application" {
   chart_version          = var.intake_version
   k8s_version            = var.k8s_version
   release_name           = "ipa"
-  terraform_helm_values  = indent(12, trimspace(var.intake_values_terraform_overrides))
-  helm_values            = trimspace(base64decode(var.intake_values_overrides))
+  terraform_helm_values  = var.intake_values_terraform_overrides
+  helm_values            = var.intake_values_overrides
 }

@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    github = {
-      source  = "integrations/github"
-      version = "5.34.0"
-    }
-  }
-}
-
 resource "github_repository_file" "argocd-application-yaml" {
   count               = var.argo_enabled == true ? 1 : 0
   repository          = var.github_repo_name
@@ -67,9 +58,23 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
-            ${var.terraform_helm_values}
+            ${var.terraform_helm_values}    
         - name: HELM_VALUES
           value: |
-            ${var.helm_values}
+            ${var.helm_values}    
 EOT
+}
+
+
+resource "helm_release" "ipa-vso" {
+  count            = var.argo_enabled == true ? 0 : 1
+  verify           = false
+  name             = var.release_name
+  create_namespace = true
+  namespace        = var.namespace
+  repository       = var.chart_repo
+  chart            = var.chart_name
+  version          = var.chart_version
+  wait             = true
+  values           = [var.terraform_helm_values, var.helm_values]
 }

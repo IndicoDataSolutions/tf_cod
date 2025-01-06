@@ -256,16 +256,6 @@ data "github_repository" "argo-github-repo" {
   full_name = "IndicoDataSolutions/${var.argo_repo}"
 }
 
-resource "kubernetes_namespace" "indico" {
-  depends_on = [
-    module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
-  ]
-  metadata {
-    name = "indico"
-  }
-}
-
 # Need to make sure the pull secret is in first, so that all of our images can be pulled from harbor
 resource "kubernetes_secret" "harbor-pull-secret" {
   depends_on = [
@@ -290,6 +280,26 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
+
+# Create default storage class. Is this necessary here or should it be in indico-crds?
+resource "kubectl_manifest" "gp2-storageclass" {
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
+  yaml_body = <<YAML
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+    storageclass.kubernetes.io/is-default-class: "true"
+parameters:
+  fsType: ext4
+  type: gp2
+provisioner: kubernetes.io/aws-ebs
+volumeBindingMode: WaitForFirstConsumer
+YAML
+}
+
 # Then set up the secrets operator authentication with vault 
 # (what level of permission does this require? Are we giving customers admin credentials?) 
 # The auth backend they create is named <account>-<region>-<cluster-name>, so we can make 
@@ -297,8 +307,7 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 module "secrets-operator-setup" {
   depends_on = [
     module.cluster,
-    time_sleep.wait_1_minutes_after_cluster,
-    kubernetes_secret.harbor-pull-secret
+    time_sleep.wait_1_minutes_after_cluster
   ]
   count           = var.secrets_operator_enabled == true ? 1 : 0
   source          = "./modules/common/vault-secrets-operator-setup"
@@ -309,34 +318,9 @@ module "secrets-operator-setup" {
   kubernetes_host = module.cluster.kubernetes_host
 }
 
-resource "kubectl_manifest" "gp2-storageclass" {
-  depends_on = [
-    module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
-  ]
-  yaml_body = <<YAML
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: gp2
-  annotations:
-    storageclass.kubernetes.io/is-default-class: "true"
-parameters:
-  fsType: ext4
-  type: gp2
-provisioner: kubernetes.io/aws-ebs
-volumeBindingMode: WaitForFirstConsumer
-YAML
-  lifecycle {
-    ignore_changes = [
-      yaml_body
-    ]
-  }
-}
-
 # Once (if) the secrets operator is set up, we can deploy the common charts
 locals {
-  indico_crds_values = [<<EOF
+  indico_crds_values = <<EOF
 migrations:
   image:
     registry: ${var.image_registry}
@@ -368,7 +352,7 @@ aws-ebs-csi-driver:
         repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
   controller:
     extraVolumeTags:
-      ${indent(6, yamlencode(var.default_tags))}
+      ${indent(8, yamlencode(var.default_tags))}
 cert-manager:
   enabled: true
   crds:
@@ -401,7 +385,7 @@ cert-manager:
     - name: AWS_REGION
       value: 'aws-global'
 crunchy-pgo:
-  enabled: ${var.ipa_enabled || var.insights_enabled}
+  enabled: true
   updateCRDs: 
     enabled: true
   pgo: 
@@ -449,14 +433,26 @@ crunchy-pgo:
       standalone_pgadmin:
         image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-8.12-1
 migrations-operator:
-  enabled: ${var.ipa_enabled || var.insights_enabled}
   image:
     repository: ${var.image_registry}/indico/migrations-operator
   controllerImage:
     repository: ${var.image_registry}/indico/migrations-controller
     kubectlImage: ${var.image_registry}/indico/migrations-controller-kubectl
 minio:
-  enabled: ${var.insights_enabled || var.minio_enabled}
+  enabled: true
+opentelemetry-operator:
+  enabled: ${var.monitoring_enabled}
+  testFramework:
+    image:
+      repository: ${var.image_registry}/docker.io/library/busybox
+  kubeRBACProxy:
+    image:
+      repository: ${var.image_registry}/quay.io/brancz/kube-rbac-proxy
+  manager:
+    image:
+      repository: ${var.image_registry}/ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator
+    collectorImage:
+      repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
 vault-secrets-operator:
   enabled: ${var.secrets_operator_enabled}
   controller: 
@@ -464,7 +460,7 @@ vault-secrets-operator:
       - name: harbor-pull-secret
     kubeRbacProxy:
       image:
-        repository: ${var.image_registry}/quay.io/brancz/kube-rbac-proxy
+        repository: ${var.image_registry}/gcr.io/kubebuilder/kube-rbac-proxy
       resources:
         limits:
           cpu: 500m
@@ -502,27 +498,13 @@ vault-secrets-operator:
         - name: manager
           args:
           - "--client-cache-persistence-model=direct-encrypted"
-external-secrets:
-  enabled: true
-  image:
-    repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
-  webhook:
-    image:
-      repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
-  certController:
-    image:
-      repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
   EOF
-  ]
 
-  indico_pre_reqs_values = [<<EOF
+  indico_pre_reqs_values = <<EOF
 global:
-  host: ${local.dns_name}
+  host: "${local.dns_name}"
   image:
     registry: ${var.image_registry}
-storage:
-  ebsStorageClass:
-    enabled: true
 secrets:
   clusterIssuer:
     zerossl:
@@ -530,12 +512,8 @@ secrets:
       eabEmail: devops-sa@indico.io
       eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
-    letsencrypt:
-      create: true
-    selfSigned:
-      create: true
 localPullSecret:
-  password: "${random_password.password.result}"
+  password: ${random_password.password.result}
   secretName: local-pull-secret
   username: local-user
 proxyRegistryAccess:
@@ -550,9 +528,8 @@ restartCronjob:
   image: bitnami/kubectl:1.20.13
 
 aws-efs-csi-driver:
-  enabled: ${var.include_efs ? var.include_efs : var.local_registry_enabled}
   image:
-    repository: ${var.image_registry}/public.ecr.aws/efs-csi-driver/amazon/aws-efs-csi-driver
+    repository: ${var.image_registry}/docker.io/amazon/aws-efs-csi-driver
   sidecars:
     livenessProbe:
       image:
@@ -572,7 +549,6 @@ aws-for-fluent-bit:
     logGroupName: "/aws/eks/fluentbit-cloudwatch/${var.label}/logs"
     logGroupTemplate: "/aws/eks/fluentbit-cloudwatch/${var.label}/workload/$kubernetes['namespace_name']"
 aws-fsx-csi-driver:
-  enabled: ${var.include_fsx}
   image:  
     repository: ${var.image_registry}/public.ecr.aws/fsx-csi-driver/aws-fsx-csi-driver
     pullPolicy: IfNotPresent
@@ -598,17 +574,64 @@ aws-load-balancer-controller:
     vpcId: ${local.network[0].indico_vpc_id}
     region: ${var.region}
 cluster-autoscaler:
-  enabled: true
   cluster-autoscaler:
     awsRegion: ${var.region}
     image:
       repository: ${var.image_registry}/public-gcr-k8s-proxy/autoscaling/cluster-autoscaler
-      tag: "v${var.k8s_version}.0"
+      tag: "v1.20.0"
     autoDiscovery:
       clusterName: "${var.label}"
     extraArgs:
       aws-use-static-instance-list: true
+docker-registry:
+  image:
+    repository: ${var.image_registry}/docker.io/library/registry
+    imagePullSecrets:
+      - name: harbor-pull-secret
+  service:
+    annotations: 
+      external-dns.alpha.kubernetes.io/hostname: "local-registry.${local.dns_name}"
+  extraEnvVars:
+  - name: GOGC
+    value: "50"
+  ingress:
+    className: nginx-internal
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: zerossl
+      kubernetes.io/ingress.class: nginx-internal
+      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+    labels: 
+      acme.cert-manager.io/dns01-solver: "true"
+    hosts:
+    - local-registry.${local.dns_name}
+    tls:
+    - hosts:
+      - local-registry.${local.dns_name}
+      secretName: registry-tls
+  persistence:
+    deleteEnabled: true
+    enabled: true
+    size: 100Gi
+    existingClaim: local-registry
+    storageClass: local-registry
+  proxy:
+    enabled: true
+    remoteurl: https://${var.image_registry}
+    secretRef: remote-access
+  replicaCount: 3
+  secrets:
+    htpasswd: local-user:${htpasswd_password.hash.bcrypt} 
 ${local.dns_configuration_values}
+external-secrets:
+  image:
+    repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+  webhook:
+    image:
+      repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+  certController:
+    image:
+      repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
 ingress-nginx:
   enabled: true
   controller:
@@ -637,24 +660,10 @@ ${local.lb_config}
   service:
     annotations:
       service.beta.kubernetes.io/oci-load-balancer-internal: "${local.internal_elb}"
-reflector:
-  image:
-    repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
-  EOF
-  ]
-
-  monitoring_values = var.monitoring_enabled ? [<<EOF
-global:
-  host: "${local.dns_name}"
-authentication:
-  ingressUsername: monitoring
-  ingressPassword: ${random_password.monitoring-password.result}
-${local.alerting_configuration_values}
 keda:
-  enabled: ${var.monitoring_enabled}
   global:
     image:
-      registry: "${var.image_registry}/ghcr.io"
+      registry: ${var.image_registry}/ghcr.io
   imagePullSecrets:
     - name: harbor-pull-secret
   resources:
@@ -675,6 +684,7 @@ keda:
       prometheus.io/scrape: "true"
       prometheus.io/path: "/metrics"
       prometheus.io/port: "9022"
+
   prometheus:
     metricServer:
       enabled: true
@@ -689,19 +699,6 @@ ${local.kube_prometheus_stack_values}
 metrics-server:
   global:
     imageRegistry: ${var.image_registry}/docker.io
-opentelemetry-operator:
-  enabled: ${var.monitoring_enabled}
-  testFramework:
-    image:
-      repository: ${var.image_registry}/docker.io/library/busybox
-  kubeRBACProxy:
-    image:
-      repository: ${var.image_registry}/quay.io/brancz/kube-rbac-proxy
-  manager:
-    image:
-      repository: ${var.image_registry}/ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator
-    collectorImage:
-      repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
 opentelemetry-collector:
   enabled: true
   imagePullSecrets:
@@ -747,41 +744,37 @@ opentelemetry-collector:
             - otlp
         metrics: null
         logs: null
+reflector:
+  image:
+    repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
   EOF
-  ] : []
 }
 
 module "indico-common" {
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
-    module.secrets-operator-setup,
-    kubectl_manifest.gp2-storageclass
+    module.secrets-operator-setup
   ]
   source                           = "./modules/common/indico-common"
   argo_enabled                     = var.argo_enabled
-  github_repo_name                 = var.argo_repo
+  github_repo_name                 = "IndicoDataSolutions/${var.argo_repo}"
   github_repo_branch               = var.argo_branch
   github_file_path                 = var.argo_path
   github_commit_message            = var.message
   helm_registry                    = var.ipa_repo
   namespace                        = "indico"
   indico_crds_version              = var.indico_crds_version
-  indico_crds_values_yaml_b64      = var.indico-crds-values-yaml-b64
+  crds_values_yaml_b64             = var.crds-values-yaml-b64
   indico_crds_values_overrides     = local.indico_crds_values
   indico_pre_reqs_version          = var.indico_pre_reqs_version
+  pre_reqs_values_yaml_b64         = var.indico-pre-reqs-values-yaml-b64
   indico_pre_reqs_values_overrides = local.indico_pre_reqs_values
-  indico_pre_reqs_values_yaml_b64  = var.indico-pre-reqs-values-yaml-b64
-  monitoring_enabled               = var.monitoring_enabled
-  monitoring_values                = local.monitoring_values
-  monitoring_version               = var.monitoring_version
 }
-
-
 
 # With the common charts are installed, we can then move on to installing intake and/or insights
 locals {
-  ipa_pre_reqs_values = concat(local.storage_spec, [<<EOF
+  ipa_pre_reqs_values = <<EOF
 global:
   image:
     registry: ${var.image_registry}
@@ -1088,33 +1081,258 @@ crunchy-postgres:
           requests:
             cpu: 1000m
             memory: 3000Mi
-    users:
-      - name: indico
-        options: "SUPERUSER"
-        databases:
-          - aqueduct
-          - ask_my_collection
-          - lagoon
-          - noct
-ingress:
-  useStaticCertificate: false
-  secretName: indico-ssl-static-cert
-  tls.crt: #base64 encoded value of certificate chain
-  tls.key: #base64 encoded value of certificate key
+    imagePullSecrets:
+      - name: harbor-pull-secret
+rabbitmq:
+  rabbitmq:
+    image:
+      registry: ${var.image_registry}
+  EOF
+
+  intake_values = <<EOF
+global:
+  image:
+    registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
+${local.local_registry_tf_cod_values}
+runtime-scanner:
+  enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
+  image:
+    repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico-devops/runtime-scanner
+  authentication:
+    ingressUser: monitoring
+    ingressPassword: ${random_password.monitoring-password.result}
+    ${indent(14, local.runtime_scanner_ingress_values)}
+celery-flower:
+  image:
+    repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/flower
+aws-node-termination:
+  aws-node-termination-handler:
+    image:
+      repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/aws-node-termination-handler
+nvidia-device-plugin:
+  nvidia-device-plugin:
+    image:
+      repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/public-nvcr-proxy/nvidia/k8s-device-plugin
+reloader:
+  reloader:
+    reloader:
+      deployment:
+        image:
+          name: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/stakater/reloader
+kafka-strimzi:
+  strimzi-kafka-operator: 
+    defaultImageRegistry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/strimzi-proxy
+  kafkacat:
+    image:
+      registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/confluentinc
+  schemaRegistry:
+    image:
+      registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/confluentinc
+  kafkaConnect:
+    image:
+      registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
+${local.alb_ipa_values}
+  EOF
+}
+
+module "intake" {
+  depends_on = [
+    module.indico-common
+  ]
+  source                            = "./modules/common/intake"
+  count                             = var.ipa_enabled ? 1 : 0
+  argo_enabled                      = var.argo_enabled
+  github_repo_name                  = "IndicoDataSolutions/${var.argo_repo}"
+  github_repo_branch                = var.argo_branch
+  github_file_path                  = var.argo_path
+  github_commit_message             = var.message
+  helm_registry                     = var.ipa_repo
+  namespace                         = "default"
+  ipa_pre_reqs_version              = var.pre_reqs_version
+  pre_reqs_values_yaml_b64          = var.pre-reqs-values-yaml-b64
+  ipa_pre_reqs_values_overrides     = local.ipa_pre_reqs_values
+  account                           = var.aws_account
+  region                            = var.region
+  label                             = var.label
+  argo_application_name             = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
+  vault_path                        = ""
+  argo_server                       = module.cluster.kubernetes_host
+  argo_project_name                 = module.argo-registration[0].argo_project_name
+  intake_version                    = var.ipa_version
+  k8s_version                       = var.k8s_version
+  intake_values_terraform_overrides = local.intake_values
+  intake_values_overrides           = var.ipa_values
+}
+
+locals {
+  insights_pre_reqs_values = <<EOF
+storage:
+  ebsStorageClass:
+    enabled: true
+clusterIssuer:
+  additionalSolvers:
+    - dns01:
+        route53:
+          region: ${cluster.region}
+      selector:
+        matchLabels:
+          "acme.cert-manager.io/dns01-solver": "true"
+crunchy-postgres:
+  enabled: true
+  postgres-data:
+    enabled: true
+    metadata:
+      annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+    instances:
+    - affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node_group
+                operator: In
+                values:
+                - pgo-workers
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: postgres-operator.crunchydata.com/cluster
+                operator: In
+                values:
+                - postgres-data
+              - key: postgres-operator.crunchydata.com/instance-set
+                operator: In
+                values:
+                - pgha1
+            topologyKey: kubernetes.io/hostname
+      metadata:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      dataVolumeClaimSpec:
+        storageClassName: ${local.storage_class}
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 200Gi
+      name: pgha1
+      replicas: ${var.az_count}
+      resources:
+        requests:
+          cpu: 1000m
+          memory: 3000Mi
+      tolerations:
+        - effect: NoSchedule
+          key: indico.io/crunchy
+          operator: Exists
+    pgBackRestConfig:
+      global:
+        archive-timeout: '10000'
+        repo1-path: /pgbackrest/postgres-data/repo1
+        repo1-retention-full: '5'
+        repo1-s3-key-type: auto
+        repo1-s3-kms-key-id: "${module.kms_key.key_arn}"
+        repo1-s3-role: ${module.iam.node_role_name}
+      repos:
+      - name: repo1
+        s3:
+          bucket: ${module.s3-storage.pgbackup_s3_bucket_name}
+          endpoint: s3.${var.region}.amazonaws.com
+          region: ${var.region}
+        schedules:
+          full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
+          differential: 0 0 * * * # Diff backup daily at midnight
+      jobs:
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 3000Mi
+    imagePullSecrets:
+      - name: harbor-pull-secret
+  postgres-metrics:
+    enabled: false
+    metadata:
+      annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+    instances:
+    - affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node_group
+                operator: In
+                values:
+                - pgo-workers
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: postgres-operator.crunchydata.com/cluster
+                operator: In
+                values:
+                - postgres-metrics
+              - key: postgres-operator.crunchydata.com/instance-set
+                operator: In
+                values:
+                - pgha1
+            topologyKey: kubernetes.io/hostname
+      metadata:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      dataVolumeClaimSpec:
+        storageClassName: ${local.storage_class}
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Gi
+      name: pgha1
+      replicas: 2
+      resources:
+        requests:
+          cpu: 500m
+          memory: 3000Mi
+      tolerations:
+        - effect: NoSchedule
+          key: indico.io/crunchy
+          operator: Exists
+    pgBackRestConfig:
+      global:
+        archive-timeout: '10000'
+        repo1-path: /pgbackrest/postgres-metrics/repo1
+        repo1-retention-full: '5'
+        repo1-s3-key-type: auto
+        repo1-s3-kms-key-id: "${module.kms_key.key_arn}"
+        repo1-s3-role: ${module.iam.node_role_name}
+      repos:
+      - name: repo1
+        s3:
+          bucket: ${module.s3-storage.pgbackup_s3_bucket_name}
+          endpoint: s3.${var.region}.amazonaws.com
+          region: ${var.region}
+        schedules:
+          full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
+          differential: 0 0 * * * # Diff backup daily at midnight
+      jobs:
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 3000Mi
+    imagePullSecrets:
+      - name: harbor-pull-secret
 minio:
   topology:
     volumeSize: 128Gi
   storage:
     accessKey: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
     secretKey: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
-  backup:
-    enabled: ${var.include_miniobkp}
-    schedule: "0 4 * * 2" # This schedules the job to run at 4:00 AM every Tuesday
-    localBackup: false
-    image:
-      repository: harbor.devops.indico.io/docker.io/amazon/aws-cli
-      tag: 2.22.4
-    awsBucket: ${module.s3-storage.miniobkp_s3_bucket_name}
 weaviate:
   cronjob:
     services:
@@ -1136,13 +1354,17 @@ weaviate:
           AWS_ACCESS_KEY_ID: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
           AWS_SECRET_ACCESS_KEY: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
   EOF
-  ]
 
   insights_values = <<EOF
 global:
-  host: ${lower("${var.label}.${var.region}.${var.aws_account}.indico.io")}
+  host: ${cluster.name}.${cluster.region}.indico-dev.indico.io
   features:
     askMyDocument: true
+  intake:
+    host: dev-ci.us-east-2.indico-dev.indico.io
+    apiToken: <path:tools/argo/data/indico-dev/ins-dev/intake#api_token>
+    tokenSecret: <path:tools/argo/data/indico-dev/ins-dev/intake#noct_token_secret>
+    cookieSecret: <path:tools/argo/data/indico-dev/ins-dev/intake#noct_cookie_secret>
 insights-edge:
   additionalAllowedOrigins:
     - https://local.indico.io:1234
@@ -1152,6 +1374,8 @@ server:
       env:
         FIELD_AUTOCONFIRM_CONFIDENCE: 0.8
         FIELD_CONFIG_PATH: "fields_config.yaml"
+cronjob:
+  enabled: false
 ask-my-docs:
   llmConfig:
     llm: indico-azure-instance
@@ -1169,7 +1393,7 @@ module "insights" {
   source                              = "./modules/common/insights"
   count                               = var.insights_enabled ? 1 : 0
   argo_enabled                        = var.argo_enabled
-  github_repo_name                    = var.argo_repo
+  github_repo_name                    = "IndicoDataSolutions/${var.argo_repo}"
   github_repo_branch                  = var.argo_branch
   github_file_path                    = var.argo_path
   github_commit_message               = var.message
@@ -1181,10 +1405,10 @@ module "insights" {
   account                             = var.aws_account
   region                              = var.region
   label                               = var.label
-  argo_application_name               = lower("${var.aws_account}.${var.region}.${var.label}-insights")
-  vault_path                          = "tools/argo/data/ipa-deploy"
+  argo_application_name               = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
+  vault_path                          = ""
   argo_server                         = module.cluster.kubernetes_host
-  argo_project_name                   = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
+  argo_project_name                   = module.argo-registration[0].argo_project_name
   insights_version                    = var.insights_version
   k8s_version                         = var.k8s_version
   insights_values_terraform_overrides = local.insights_values
@@ -1205,7 +1429,7 @@ module "additional_application" {
   label                  = var.label
   namespace              = each.value.namespace
   argo_enabled           = var.argo_enabled
-  github_repo_name       = var.argo_repo
+  github_repo_name       = data.github_repository.argo-github-repo[0].name
   github_repo_branch     = var.argo_branch
   github_file_path       = "${var.argo_path}/${each.value.name}_application.yaml"
   github_commit_message  = var.message
@@ -1219,17 +1443,19 @@ module "additional_application" {
   k8s_version            = var.k8s_version
   release_name           = each.value.name
   terraform_helm_values  = ""
-  helm_values            = trimspace(base64decode(each.value.values))
+  helm_values            = base64decode(each.value.values)
 }
 
 
 resource "argocd_application" "ipa" {
   depends_on = [
     # local_file.kubeconfig,
-    module.intake,
-    module.insights,
+    helm_release.ipa-pre-requisites,
+    time_sleep.wait_1_minutes_after_pre_reqs,
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
+    github_repository_file.argocd-application-yaml,
+    helm_release.monitoring
   ]
 
   count = var.argo_enabled == true ? 1 : 0
@@ -1282,6 +1508,28 @@ resource "argocd_application" "ipa" {
   }
 }
 
+
+
+
+output "ns" {
+  value = var.use_static_ssl_certificates ? ["no-hosted-zone"] : data.aws_route53_zone.primary[0].name_servers
+}
+
+
+data "external" "git_information" {
+  program = ["sh", "${path.module}/get_sha.sh"]
+}
+
+output "git_sha" {
+  value = data.external.git_information.result.sha
+}
+
+
+output "git_branch" {
+  value = data.external.git_information.result.branch
+}
+
+
 resource "null_resource" "wait-for-tf-cod-chart-build" {
   count = var.argo_enabled == true ? 1 : 0
 
@@ -1309,6 +1557,39 @@ output "harbor-api-token" {
 
 output "smoketest_chart_version" {
   value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+}
+
+resource "helm_release" "terraform-smoketests" {
+  count = var.terraform_smoketests_enabled == true ? 1 : 0
+
+  depends_on = [
+    null_resource.wait-for-tf-cod-chart-build,
+    #null_resource.sleep-5-minutes-wait-for-charts-smoketest-build,
+    kubernetes_config_map.terraform-variables,
+    helm_release.monitoring
+  ]
+
+  verify           = false
+  name             = "terraform-smoketests-${substr(data.external.git_information.result.sha, 0, 8)}"
+  namespace        = "default"
+  repository       = var.ipa_repo
+  chart            = "terraform-smoketests"
+  version          = "0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+  wait             = true
+  wait_for_jobs    = true
+  timeout          = "300" # 5 minutes
+  disable_webhooks = false
+  values = [<<EOF
+  cluster:
+    cloudProvider: aws
+    account: ${var.aws_account}
+    region: ${var.region}
+    name: ${var.label}
+  image:
+    repository: ${var.image_registry}/indico/terraform-smoketests
+    tag: "${substr(data.external.git_information.result.sha, 0, 8)}"
+  EOF
+  ]
 }
 
 data "vault_kv_secret_v2" "account-robot-credentials" {
@@ -1432,116 +1713,6 @@ resource "htpasswd_password" "hash" {
   salt     = random_password.salt.result
 }
 
-resource "helm_release" "local-registry" {
-  depends_on = [
-    module.indico-common
-  ]
-
-  count = var.local_registry_enabled == true ? 1 : 0
-
-  verify           = false
-  name             = "local-registry"
-  create_namespace = false
-  namespace        = "local-registry"
-  repository       = var.ipa_repo
-  chart            = "local-registry"
-  version          = var.local_registry_version
-  wait             = false
-  timeout          = "1800" # 30 minutes
-  disable_webhooks = false
-  values = [<<EOF
-cert-manager:
-  enabled: false
-ingress-nginx:
-  enabled: true
-  
-  controller:
-    ingressClass: nginx-internal
-    ingressClassResource:
-      controllerValue: "k8s.io/ingress-nginx-internal"
-      name: nginx-internal
-    admissionWebhooks:
-      enabled: false
-    autoscaling:
-      enabled: true
-      maxReplicas: 12
-      minReplicas: 6
-      targetCPUUtilizationPercentage: 50
-      targetMemoryUtilizationPercentage: 50
-    resources:
-      requests:
-        cpu: 1
-        memory: 2Gi
-    service:
-      external:
-        enabled: false
-      internal:
-        annotations:
-          service.beta.kubernetes.io/aws-load-balancer-internal: "true"
-        enabled: true
-docker-registry:
-  image:
-    repository: ${var.image_registry}/docker.io/library/registry
-    imagePullSecrets:
-      - name: harbor-pull-secret
-  service:
-    annotations: 
-      external-dns.alpha.kubernetes.io/hostname: "local-registry.${local.dns_name}"
-  extraEnvVars:
-  - name: GOGC
-    value: "50"
-  ingress:
-    className: nginx-internal
-    enabled: true
-    annotations:
-      cert-manager.io/cluster-issuer: zerossl
-      kubernetes.io/ingress.class: nginx-internal
-      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
-    labels: 
-      acme.cert-manager.io/dns01-solver: "true"
-    hosts:
-    - local-registry.${local.dns_name}
-    tls:
-    - hosts:
-      - local-registry.${local.dns_name}
-      secretName: registry-tls
-  
-  persistence:
-    deleteEnabled: true
-    enabled: true
-    size: 100Gi
-    existingClaim: local-registry
-    storageClass: local-registry
-  proxy:
-    enabled: true
-    remoteurl: https://${var.image_registry}
-    secretRef: remote-access
-  replicaCount: 3
-  secrets:
-    htpasswd: local-user:${htpasswd_password.hash.bcrypt}
-localPullSecret:
-  password: ${random_password.password.result}
-  secretName: local-pull-secret
-  username: local-user
-metrics-server:
-  apiService:
-    create: true
-  enabled: false
-proxyRegistryAccess:
-  proxyPassword: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_password"] : ""}
-  proxyPullSecretName: remote-access
-  proxyUrl: https://${var.image_registry}
-  proxyUsername: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_username"] : ""}
-  
-registryUrl: local-registry.${local.dns_name}
-restartCronjob:
-  cronSchedule: 0 0 */3 * *
-  disabled: false
-  image: bitnami/kubectl:1.20.13
-  EOF
-  ]
-}
-
 output "local_registry_password" {
   value = htpasswd_password.hash.bcrypt
 }
@@ -1549,6 +1720,75 @@ output "local_registry_password" {
 output "local_registry_username" {
   value = "local-user"
 }
+
+resource "github_repository_file" "smoketest-application-yaml" {
+  count = var.ipa_smoketest_enabled == true && var.argo_enabled == true ? 1 : 0
+
+  repository          = data.github_repository.argo-github-repo[0].name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/ipa_smoketest.yaml"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+
+  content = <<EOT
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ${local.argo_smoketest_app_name}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app: cod
+    region: ${var.region}
+    account: ${var.aws_account}
+    name: ${var.label}
+  annotations:
+    avp.kubernetes.io/path: tools/argo/data/ipa-deploy
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  destination:
+    server: ${module.cluster.kubernetes_host}
+    namespace: default
+  project: ${module.argo-registration[0].argo_project_name}
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+  source:
+    chart: cod-smoketests
+    repoURL: ${var.ipa_smoketest_repo}
+    targetRevision: ${var.ipa_smoketest_version}
+    plugin:
+      name: argocd-vault-plugin-helm-values-expand-no-build
+      env:
+        - name: KUBE_VERSION
+          value: "${var.k8s_version}"
+
+        - name: RELEASE_NAME
+          value: run
+      
+        - name: HELM_VALUES
+          value: |
+            cluster:
+              name: ${var.label}
+              region: ${var.region}
+              account: ${var.aws_account}
+            host: ${local.dns_name}
+            image:
+              repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/integration_tests
+            ${indent(12, base64decode(var.ipa_smoketest_values))}    
+EOT
+}
+
 
 data "vault_kv_secret_v2" "zerossl_data" {
   mount = var.vault_mount_path
@@ -1558,27 +1798,4 @@ data "vault_kv_secret_v2" "zerossl_data" {
 output "zerossl" {
   sensitive = true
   value     = data.vault_kv_secret_v2.zerossl_data.data_json
-}
-
-resource "kubernetes_secret" "issuer-secret" {
-  depends_on = [
-    module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
-  ]
-
-  metadata {
-    name      = "acme-route53"
-    namespace = "default"
-    annotations = {
-      "reflector.v1.k8s.emberstack.com/reflection-allowed"      = true
-      "reflector.v1.k8s.emberstack.com/reflection-auto-enabled" = true
-      "temporary.please.change/weaker-credentials-needed"       = true
-    }
-  }
-
-  type = "Opaque"
-
-  data = {
-    "secret-access-key" = var.aws_secret_key
-  }
 }
