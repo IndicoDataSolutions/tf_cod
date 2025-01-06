@@ -215,6 +215,19 @@ resource "kubernetes_config_map" "terraform-variables" {
     fsx_rox_arn = "${jsonencode(var.fsx_rox_arn)}"
     efs_filesystem_name = "${jsonencode(var.efs_filesystem_name)}"
     efs_type = "${jsonencode(var.efs_type)}"
+    indico_crds_version = "${jsonencode(var.indico_crds_version)}"
+    indico_pre_reqs_version = "${jsonencode(var.indico_pre_reqs_version)}"
+    insights_pre_reqs_values_yaml_b64 = "${jsonencode(var.insights-pre-reqs-values-yaml-b64)}"
+    insights_enabled = "${jsonencode(var.insights_enabled)}"
+    insights_values = "${jsonencode(var.insights_values)}"
+    insights_version = "${jsonencode(var.insights_version)}"
+    insights_smoketest_version = "${jsonencode(var.insights_smoketest_version)}"
+    insights_smoketest_values = "${jsonencode(var.insights_smoketest_values)}"
+    insights_smoketest_enabled = "${jsonencode(var.insights_smoketest_enabled)}"
+    insights_smoketest_cronjob_enabled = "${jsonencode(var.insights_smoketest_cronjob_enabled)}"
+    insights_pre_reqs_version = "${jsonencode(var.insights_pre_reqs_version)}"
+    insights_local_registry_harbor_robot_account_name = "${jsonencode(var.insights_local_registry_harbor_robot_account_name)}"
+    insights_local_registry_enabled = "${jsonencode(var.insights_local_registry_enabled)}"
 
     }
   }

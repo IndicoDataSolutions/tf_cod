@@ -103,3 +103,19 @@ output "argo_repo" {
 output "monitoring_enabled" {
   value = var.monitoring_enabled
 }
+
+output "ns" {
+  value = var.use_static_ssl_certificates ? ["no-hosted-zone"] : data.aws_route53_zone.primary[0].name_servers
+}
+
+data "external" "git_information" {
+  program = ["sh", "${path.module}/get_sha.sh"]
+}
+
+output "git_sha" {
+  value = data.external.git_information.result.sha
+}
+
+output "git_branch" {
+  value = data.external.git_information.result.branch
+}

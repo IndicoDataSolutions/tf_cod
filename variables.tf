@@ -1188,51 +1188,51 @@ variable "pgbackup_s3_bucket_name_override" {
 
 # Additional variables
 variable "enable_s3_replication" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "Flag to enable s3 replication"
 }
 
 variable "create_s3_replication_role" {
-  type = bool
-  default = true
+  type        = bool
+  default     = true
   description = "Flag to create or load s3 replication role"
 }
 
 variable "s3_replication_role_name_override" {
-  type = string
-  default = null
+  type        = string
+  default     = null
   description = "Name override for s3 replication role"
 }
 
 variable "destination_kms_key_arn" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "arn of kms key used to encrypt s3 replication destination buckets"
 }
 
 variable "data_destination_bucket" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "s3 replication data destination bucket"
 }
 
 variable "api_model_destination_bucket" {
-  type    = string
-  default = ""
+  type        = string
+  default     = ""
   description = "s3 replication api model destination bucket"
 }
 
 # Node role
 variable "create_node_role" {
-  type = bool
-  default = true
+  type        = bool
+  default     = true
   description = "Flag to create or load node role"
 }
 
 variable "node_role_name_override" {
-  type = string
-  default = null
+  type        = string
+  default     = null
   description = "Name override for node role"
 }
 
@@ -1313,4 +1313,82 @@ variable "efs_type" {
     condition     = var.efs_type == "create" || var.efs_type == "load"
     error_message = "${var.efs_type} not valid. Type must be either create or load"
   }
+}
+
+variable "indico_crds_version" {
+  type        = string
+  default     = ""
+  description = "Version of the indico-crds helm chart"
+}
+
+variable "indico_pre_reqs_version" {
+  type        = string
+  default     = ""
+  description = "Version of the indico-pre-reqs helm chart"
+}
+
+variable "insights-pre-reqs-values-yaml-b64" {
+  type        = string
+  default     = "Cg=="
+  description = "user provided overrides to indico-pre-reqs helm chart"
+}
+
+variable "insights_enabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling insights deployment"
+}
+
+variable "insights_values" {
+  type        = string
+  default     = ""
+  description = "User provided overrides to the insights application"
+}
+
+variable "insights_version" {
+  type        = string
+  default     = ""
+  description = "Insights helm chart version to deploy to the cluster"
+}
+
+variable "insights_smoketest_version" {
+  type        = string
+  default     = ""
+  description = "Insights smoketest to deploy to the cluster"
+}
+
+variable "insights_smoketest_values" {
+  type        = string
+  default     = ""
+  description = "Insights smoketest overrides"
+}
+
+variable "insights_smoketest_enabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling smoketest"
+}
+
+variable "insights_smoketest_cronjob_enabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for scheduling smoketests"
+}
+
+variable "insights_pre_reqs_version" {
+  type        = string
+  default     = ""
+  description = "insights-pre-requisites helm chart version"
+}
+
+variable "insights_local_registry_harbor_robot_account_name" {
+  type        = string
+  default     = ""
+  description = ""
+}
+
+variable "insights_local_registry_enabled" {
+  type        = string
+  default     = ""
+  description = ""
 }
