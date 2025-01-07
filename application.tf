@@ -287,7 +287,8 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 module "secrets-operator-setup" {
   depends_on = [
     module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
+    time_sleep.wait_1_minutes_after_cluster,
+    kubernetes_secret.harbor_pull_secret
   ]
   count           = var.secrets_operator_enabled == true ? 1 : 0
   source          = "./modules/common/vault-secrets-operator-setup"
@@ -1148,7 +1149,7 @@ module "intake_smoketests" {
   depends_on = [
     module.intake
   ]
-  count = var.ipa_smoketest_enabled ? 1 : 0 
+  count                  = var.ipa_smoketest_enabled ? 1 : 0
   source                 = "./modules/common/application-deployment"
   account                = var.aws_account
   region                 = var.region
