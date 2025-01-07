@@ -26,7 +26,7 @@ data "github_repository_file" "data_pre_reqs_values" {
   file       = var.github_file_path == "." ? "helm/pre-reqs-values.values" : "${var.github_file_path}/helm/pre-reqs-values.values"
 }
 
-resource "helm_release" "ipa_pre_requisites" {
+resource "helm_release" "ipa-pre-requisites" {
   depends_on = [
     data.github_repository_file.data_pre_reqs_values,
   ]
@@ -50,7 +50,7 @@ EOT
 
 # Let pre-reqs settle
 resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
-  depends_on = [helm_release.ipa_pre_requisites]
+  depends_on = [helm_release.ipa-pre-requisites]
 
   create_duration = "1m"
 }
