@@ -281,7 +281,7 @@ module "secrets-operator-setup" {
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
-    kubernetes_secret.harbor_pull_secret
+    kubernetes_secret.harbor-pull-secret
   ]
   count           = var.secrets_operator_enabled == true ? 1 : 0
   source          = "./modules/common/vault-secrets-operator-setup"
@@ -1057,7 +1057,7 @@ clusterIssuer:
   additionalSolvers:
     - dns01:
         route53:
-          region: ${cluster.region}
+          region: ${var.region}
       selector:
         matchLabels:
           "acme.cert-manager.io/dns01-solver": "true"
@@ -1241,7 +1241,7 @@ weaviate:
 
   insights_values = <<EOF
 global:
-  host: ${cluster.name}.${cluster.region}.indico-dev.indico.io
+  host: ${var.label}.${var.region}.indico-dev.indico.io
   features:
     askMyDocument: true
   intake:
@@ -1334,7 +1334,7 @@ module "additional_application" {
 resource "argocd_application" "ipa" {
   depends_on = [
     # local_file.kubeconfig,
-    helm_release.ipa-pre-requisites,
+    module.intake[0].helm_release.ipa-pre-requisites,
     time_sleep.wait_1_minutes_after_pre_reqs,
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
@@ -1397,7 +1397,7 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
 
   depends_on = [
     time_sleep.wait_1_minutes_after_pre_reqs,
-    helm_release.ipa-pre-requisites
+    module.intake[0].helm_release.ipa-pre-requisites
   ]
 
   triggers = {

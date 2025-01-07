@@ -5,7 +5,7 @@ module "keycloak" {
   count = var.keycloak_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
-    helm_release.ipa-pre-requisites
+    module.intake[0].helm_release.ipa-pre-requisites
   ]
   source         = "./modules/aws/keycloak"
   local_dns_name = local.dns_name
