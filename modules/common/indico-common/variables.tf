@@ -55,8 +55,8 @@ variable "crds_values_yaml_b64" {
 }
 
 variable "indico_crds_values_overrides" {
-  type        = string
-  default     = ""
+  type        = list(string)
+  default     = []
   description = "indico-crds values overrides from the terraform"
 }
 
@@ -74,7 +74,7 @@ variable "pre_reqs_values_yaml_b64" {
 }
 
 variable "indico_pre_reqs_values_overrides" {
-  type        = string
-  default     = ""
+  type        = list(string)
+  default     = []
   description = "indico-pre-requisites values overrides from the terraform"
 }
