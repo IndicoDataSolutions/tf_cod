@@ -1,6 +1,6 @@
 resource "kubectl_manifest" "snapshot-service-account" {
   depends_on = [
-    module.intake[0].helm_release.ipa-pre-requisites
+    module.intake
   ]
   count     = var.restore_snapshot_enabled == true ? 1 : 0
   yaml_body = <<YAML
@@ -15,7 +15,7 @@ YAML
 
 resource "kubectl_manifest" "snapshot-cluster-role" {
   depends_on = [
-    module.intake[0].helm_release.ipa-pre-requisites
+    module.intake
   ]
   count     = var.restore_snapshot_enabled == true ? 1 : 0
   yaml_body = <<YAML
@@ -36,7 +36,7 @@ YAML
 
 resource "kubectl_manifest" "snapshot-cluster-role-binding" {
   depends_on = [
-    module.intake[0].helm_release.ipa-pre-requisites
+    module.intake
   ]
   count     = var.restore_snapshot_enabled == true ? 1 : 0
   yaml_body = <<YAML

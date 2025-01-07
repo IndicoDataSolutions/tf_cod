@@ -1337,7 +1337,7 @@ module "additional_application" {
 resource "argocd_application" "ipa" {
   depends_on = [
     # local_file.kubeconfig,
-    module.intake[0].helm_release.ipa-pre-requisites,
+    module.intake,
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
     github_repository_file.argocd-application-yaml,
@@ -1398,7 +1398,7 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
   count = var.argo_enabled == true ? 1 : 0
 
   depends_on = [
-    module.intake[0].helm_release.ipa-pre-requisites,
+    module.intake,
     module.indico-common
   ]
 
