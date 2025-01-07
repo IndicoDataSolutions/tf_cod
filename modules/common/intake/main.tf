@@ -59,7 +59,7 @@ resource "time_sleep" "wait_1_minutes_after_pre_reqs" {
 # Deploy the application
 module "intake_application" {
   depends_on             = [time_sleep.wait_1_minutes_after_pre_reqs]
-  source                 = "./application-deployment"
+  source                 = "../application-deployment"
   account                = var.account
   region                 = var.region
   label                  = var.label
