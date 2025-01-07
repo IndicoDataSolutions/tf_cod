@@ -1162,7 +1162,7 @@ module "intake_smoketests" {
   github_repo_branch     = var.argo_branch
   github_file_path       = "${var.argo_path}/ipa_smoketest_application.yaml"
   github_commit_message  = var.message
-  argo_application_name  = lower("${var.aws_account}-${var.region}-${var.label}-${each.value.name}")
+  argo_application_name  = lower("${var.aws_account}-${var.region}-${var.label}-smoketest")
   argo_vault_plugin_path = ""
   argo_server            = module.cluster.kubernetes_host
   argo_project_name      = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
