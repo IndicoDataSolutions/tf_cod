@@ -742,7 +742,6 @@ module "indico-common" {
   crds_values_yaml_b64             = var.crds-values-yaml-b64
   indico_crds_values_overrides     = local.indico_crds_values
   indico_pre_reqs_version          = var.indico_pre_reqs_version
-  pre_reqs_values_yaml_b64         = var.indico-pre-reqs-values-yaml-b64
   indico_pre_reqs_values_overrides = local.indico_pre_reqs_values
 }
 
@@ -995,7 +994,7 @@ module "intake" {
   github_commit_message             = var.message
   helm_registry                     = var.ipa_repo
   namespace                         = "default"
-  ipa_pre_reqs_version              = var.pre_reqs_version
+  ipa_pre_reqs_version              = var.ipa_pre_reqs_version
   pre_reqs_values_yaml_b64          = var.pre-reqs-values-yaml-b64
   ipa_pre_reqs_values_overrides     = local.ipa_pre_reqs_values
   account                           = var.aws_account
