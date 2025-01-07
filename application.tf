@@ -294,7 +294,7 @@ module "secrets-operator-setup" {
 
 # Once (if) the secrets operator is set up, we can deploy the common charts
 locals {
-  indico_crds_values = <<EOF
+  indico_crds_values = [<<EOF
 migrations:
   image:
     registry: ${var.image_registry}
@@ -473,8 +473,9 @@ vault-secrets-operator:
           args:
           - "--client-cache-persistence-model=direct-encrypted"
   EOF
+  ]
 
-  indico_pre_reqs_values = <<EOF
+  indico_pre_reqs_values = [<<EOF
 global:
   host: "${local.dns_name}"
   image:
@@ -722,6 +723,7 @@ reflector:
   image:
     repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
   EOF
+  ]
 }
 
 module "indico-common" {
@@ -747,7 +749,7 @@ module "indico-common" {
 
 # With the common charts are installed, we can then move on to installing intake and/or insights
 locals {
-  ipa_pre_reqs_values = <<EOF
+  ipa_pre_reqs_values = [<<EOF
 global:
   image:
     registry: ${var.image_registry}
@@ -934,6 +936,7 @@ rabbitmq:
     image:
       registry: ${var.image_registry}
   EOF
+  ]
 
   intake_values = <<EOF
 global:
@@ -1048,7 +1051,7 @@ module "intake_smoketests" {
 }
 
 locals {
-  insights_pre_reqs_values = <<EOF
+  insights_pre_reqs_values = [<<EOF
 storage:
   ebsStorageClass:
     enabled: true
@@ -1237,6 +1240,7 @@ weaviate:
           AWS_ACCESS_KEY_ID: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
           AWS_SECRET_ACCESS_KEY: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
   EOF
+  ]
 
   insights_values = <<EOF
 global:
