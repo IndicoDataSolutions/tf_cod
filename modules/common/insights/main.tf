@@ -75,7 +75,7 @@ module "insights_application" {
   argo_project_name      = var.argo_project_name
   chart_name             = "insights"
   chart_repo             = var.helm_registry
-  chart_version          = var.intake_version
+  chart_version          = var.insights_version
   k8s_version            = var.k8s_version
   release_name           = "insights"
   terraform_helm_values  = var.insights_values_terraform_overrides
