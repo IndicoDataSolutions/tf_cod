@@ -391,7 +391,7 @@ data "vault_kv_secret_v2" "readapi_secret" {
 }
 
 resource "kubernetes_secret" "readapi" {
-  count      = var.enable_readapi ? 1 : 0
+  count = var.enable_readapi ? 1 : 0
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster
@@ -418,13 +418,15 @@ provider "argocd" {
 }
 
 data "aws_eks_cluster" "local" {
+  depends_on = [module.cluster]
   #depends_on = [module.cluster.kubernetes_host]
-  name       = module.cluster.cluster_name
+  name = module.cluster.cluster_name
 }
 
 data "aws_eks_cluster_auth" "local" {
+  depends_on = [module.cluster]
   #depends_on = [module.cluster.kubernetes_host]
-  name       = module.cluster.cluster_name
+  name = module.cluster.cluster_name
 }
 
 provider "kubernetes" {
