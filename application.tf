@@ -1474,8 +1474,6 @@ resource "argocd_application" "ipa" {
     module.intake,
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
-    github_repository_file.argocd-application-yaml,
-    helm_release.monitoring
   ]
 
   count = var.argo_enabled == true ? 1 : 0
