@@ -1525,28 +1525,6 @@ resource "argocd_application" "ipa" {
   }
 }
 
-
-
-
-output "ns" {
-  value = var.use_static_ssl_certificates ? ["no-hosted-zone"] : data.aws_route53_zone.primary[0].name_servers
-}
-
-
-data "external" "git_information" {
-  program = ["sh", "${path.module}/get_sha.sh"]
-}
-
-output "git_sha" {
-  value = data.external.git_information.result.sha
-}
-
-
-output "git_branch" {
-  value = data.external.git_information.result.branch
-}
-
-
 resource "null_resource" "wait-for-tf-cod-chart-build" {
   count = var.argo_enabled == true ? 1 : 0
 
