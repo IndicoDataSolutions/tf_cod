@@ -273,28 +273,6 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
-
-# Create default storage class. Is this necessary here or should it be in indico-crds?
-resource "kubectl_manifest" "gp2-storageclass" {
-  depends_on = [
-    module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
-  ]
-  yaml_body = <<YAML
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: gp2
-  annotations:
-    storageclass.kubernetes.io/is-default-class: "true"
-parameters:
-  fsType: ext4
-  type: gp2
-provisioner: kubernetes.io/aws-ebs
-volumeBindingMode: WaitForFirstConsumer
-YAML
-}
-
 # Then set up the secrets operator authentication with vault 
 # (what level of permission does this require? Are we giving customers admin credentials?) 
 # The auth backend they create is named <account>-<region>-<cluster-name>, so we can make 
@@ -1033,6 +1011,43 @@ module "intake" {
   intake_values_overrides           = var.ipa_values
 }
 
+module "intake_smoketests" {
+  depends_on = [
+    module.intake
+  ]
+  count = var.ipa_smoketest_enabled ? 1 : 0 
+  source                 = "./modules/common/application-deployment"
+  account                = var.aws_account
+  region                 = var.region
+  label                  = var.label
+  namespace              = "default"
+  argo_enabled           = var.argo_enabled
+  github_repo_name       = data.github_repository.argo-github-repo[0].name
+  github_repo_branch     = var.argo_branch
+  github_file_path       = "${var.argo_path}/ipa_smoketest_application.yaml"
+  github_commit_message  = var.message
+  argo_application_name  = lower("${var.aws_account}-${var.region}-${var.label}-${each.value.name}")
+  argo_vault_plugin_path = ""
+  argo_server            = module.cluster.kubernetes_host
+  argo_project_name      = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
+  chart_name             = "terraform_smoketests"
+  chart_repo             = var.ipa_repo
+  chart_version          = "0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+  k8s_version            = var.k8s_version
+  release_name           = "terraform-smoketests-${substr(data.external.git_information.result.sha, 0, 8)}"
+  terraform_helm_values  = ""
+  helm_values            = <<EOF
+  cluster:
+    cloudProvider: aws
+    account: ${var.aws_account}
+    region: ${var.region}
+    name: ${var.label}
+  image:
+    repository: ${var.image_registry}/indico/terraform-smoketests
+    tag: "${substr(data.external.git_information.result.sha, 0, 8)}"
+  EOF
+}
+
 locals {
   insights_pre_reqs_values = <<EOF
 storage:
@@ -1426,39 +1441,6 @@ output "harbor-api-token" {
 
 output "smoketest_chart_version" {
   value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
-}
-
-resource "helm_release" "terraform-smoketests" {
-  count = var.terraform_smoketests_enabled == true ? 1 : 0
-
-  depends_on = [
-    null_resource.wait-for-tf-cod-chart-build,
-    #null_resource.sleep-5-minutes-wait-for-charts-smoketest-build,
-    kubernetes_config_map.terraform-variables,
-    helm_release.monitoring
-  ]
-
-  verify           = false
-  name             = "terraform-smoketests-${substr(data.external.git_information.result.sha, 0, 8)}"
-  namespace        = "default"
-  repository       = var.ipa_repo
-  chart            = "terraform-smoketests"
-  version          = "0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
-  wait             = true
-  wait_for_jobs    = true
-  timeout          = "300" # 5 minutes
-  disable_webhooks = false
-  values = [<<EOF
-  cluster:
-    cloudProvider: aws
-    account: ${var.aws_account}
-    region: ${var.region}
-    name: ${var.label}
-  image:
-    repository: ${var.image_registry}/indico/terraform-smoketests
-    tag: "${substr(data.external.git_information.result.sha, 0, 8)}"
-  EOF
-  ]
 }
 
 data "vault_kv_secret_v2" "account-robot-credentials" {
