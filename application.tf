@@ -1125,7 +1125,7 @@ module "intake" {
   source                            = "./modules/common/intake"
   count                             = var.ipa_enabled ? 1 : 0
   argo_enabled                      = var.argo_enabled
-  github_repo_name                  = "IndicoDataSolutions/${var.argo_repo}"
+  github_repo_name                  = data.github_repository.argo-github-repo[0].name
   github_repo_branch                = var.argo_branch
   github_file_path                  = var.argo_path
   github_commit_message             = var.message
@@ -1414,7 +1414,7 @@ module "insights" {
   source                              = "./modules/common/insights"
   count                               = var.insights_enabled ? 1 : 0
   argo_enabled                        = var.argo_enabled
-  github_repo_name                    = "IndicoDataSolutions/${var.argo_repo}"
+  github_repo_name                    = data.github_repository.argo-github-repo[0].name
   github_repo_branch                  = var.argo_branch
   github_file_path                    = var.argo_path
   github_commit_message               = var.message
