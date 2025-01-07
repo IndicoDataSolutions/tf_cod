@@ -391,7 +391,7 @@ data "vault_kv_secret_v2" "readapi_secret" {
 }
 
 resource "kubernetes_secret" "readapi" {
-  count      = var.enable_readapi ? 1 : 0
+  count = var.enable_readapi ? 1 : 0
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster
@@ -430,13 +430,13 @@ data "aws_eks_cluster_auth" "local" {
 provider "kubernetes" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  token                  = data.aws_eks_cluster_auth.local.token
+  #token                  = data.aws_eks_cluster_auth.local.token
   #token                  = module.cluster.kubernetes_token
-  # exec {
-  #   api_version = "client.authentication.k8s.io/v1beta1"
-  #   args        = ["eks", "get-token", "--cluster-name", var.label]
-  #   command     = "aws"
-  # }
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", var.label]
+    command     = "aws"
+  }
 }
 
 provider "kubectl" {
