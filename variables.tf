@@ -1430,3 +1430,9 @@ variable "insights_local_registry_enabled" {
   default     = ""
   description = ""
 }
+
+variable "minio_enabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling minio deployment"
+}
