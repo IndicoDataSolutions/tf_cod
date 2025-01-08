@@ -1,11 +1,5 @@
 # Start with the crds and operators
-provider "github" {
-  owner = var.github_repo_name
-  token = var.github_token
-}
-
 resource "github_repository_file" "crds_values_yaml" {
-  count               = var.argo_enabled == true ? 1 : 0
   repository          = var.github_repo_name
   branch              = var.github_repo_branch
   file                = "${var.github_file_path}/helm/crds-values.values"
