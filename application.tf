@@ -251,6 +251,11 @@ EOT
   dns01RecursiveNameservers     = var.network_allow_public == true ? "" : "kube-dns.kube-system.svc.cluster.local:53"
 }
 
+data "github_repository" "argo-github-repo" {
+  count     = var.argo_enabled == true ? 1 : 0
+  full_name = "IndicoDataSolutions/${var.argo_repo}"
+}
+
 # Need to make sure the pull secret is in first, so that all of our images can be pulled from harbor
 resource "kubernetes_secret" "harbor-pull-secret" {
   depends_on = [
