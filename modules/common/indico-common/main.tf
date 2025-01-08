@@ -3,7 +3,7 @@ resource "github_repository_file" "crds_values_yaml" {
   count               = var.argo_enabled == true ? 1 : 0
   repository          = var.github_repo_name
   branch              = var.github_repo_branch
-  file                = "${var.github_file_path}/helm/crds-values.values"
+  file                = "helm/crds-values.values"
   commit_message      = var.github_commit_message
   overwrite_on_create = true
 
