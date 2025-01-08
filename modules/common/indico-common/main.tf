@@ -1,7 +1,12 @@
 # Start with the crds and operators
+data "github_repository" "argo-github-repo" {
+  count     = var.argo_enabled == true ? 1 : 0
+  full_name = "IndicoDataSolutions/${var.github_repo_name}"
+}
+
 resource "github_repository_file" "crds_values_yaml" {
   count               = var.argo_enabled == true ? 1 : 0
-  repository          = var.github_repo_name
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.github_repo_branch
   file                = "${var.github_file_path}/helm/crds-values.values"
   commit_message      = var.github_commit_message
@@ -20,7 +25,7 @@ data "github_repository_file" "data_crds_values" {
   depends_on = [
     github_repository_file.crds_values_yaml
   ]
-  repository = var.github_repo_name
+  repository = data.github_repository.argo-github-repo[0].name
   branch     = var.github_repo_branch
   file       = "${var.github_file_path}/helm/crds-values.values"
 }
@@ -52,7 +57,7 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
 # Operator installed, on to pre-reqs
 resource "github_repository_file" "pre_reqs_values_yaml" {
   count               = var.argo_enabled == true ? 1 : 0
-  repository          = var.github_repo_name
+  repository          = data.github_repository.argo-github-repo[0].name
   branch              = var.github_repo_branch
   file                = "${var.github_file_path}/helm/indico-pre-reqs-values.values"
   commit_message      = var.github_commit_message
@@ -72,7 +77,7 @@ data "github_repository_file" "data_pre_reqs_values" {
   depends_on = [
     github_repository_file.pre_reqs_values_yaml
   ]
-  repository = var.github_repo_name
+  repository = data.github_repository.argo-github-repo[0].name
   branch     = var.github_repo_branch
   file       = var.github_file_path == "." ? "helm/indico-pre-reqs-values.values" : "${var.github_file_path}/helm/indico-pre-reqs-values.values"
 }
