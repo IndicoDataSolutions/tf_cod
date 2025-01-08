@@ -752,7 +752,7 @@ module "indico-common" {
   indico_crds_values_overrides     = local.indico_crds_values
   indico_pre_reqs_version          = var.indico_pre_reqs_version
   indico_pre_reqs_values_overrides = local.indico_pre_reqs_values
-  github_token                     = var.github_token
+  github_token                     = var.git_pat
 }
 
 # With the common charts are installed, we can then move on to installing intake and/or insights
