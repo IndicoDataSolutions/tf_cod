@@ -414,19 +414,6 @@ migrations-operator:
     kubectlImage: ${var.image_registry}/indico/migrations-controller-kubectl
 minio:
   enabled: true
-opentelemetry-operator:
-  enabled: ${var.monitoring_enabled}
-  testFramework:
-    image:
-      repository: ${var.image_registry}/docker.io/library/busybox
-  kubeRBACProxy:
-    image:
-      repository: ${var.image_registry}/quay.io/brancz/kube-rbac-proxy
-  manager:
-    image:
-      repository: ${var.image_registry}/ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator
-    collectorImage:
-      repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
 vault-secrets-operator:
   enabled: ${var.secrets_operator_enabled}
   controller: 
@@ -674,6 +661,19 @@ ${local.kube_prometheus_stack_values}
 metrics-server:
   global:
     imageRegistry: ${var.image_registry}/docker.io
+opentelemetry-operator:
+  enabled: ${var.monitoring_enabled}
+  testFramework:
+    image:
+      repository: ${var.image_registry}/docker.io/library/busybox
+  kubeRBACProxy:
+    image:
+      repository: ${var.image_registry}/quay.io/brancz/kube-rbac-proxy
+  manager:
+    image:
+      repository: ${var.image_registry}/ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator
+    collectorImage:
+      repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
 opentelemetry-collector:
   enabled: true
   imagePullSecrets:
