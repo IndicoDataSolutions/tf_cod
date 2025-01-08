@@ -1,10 +1,29 @@
 # Start with the crds and operators
+provider "github" {
+  owner = var.github_repo_name
+  token = var.github_token
+}
 
+resource "github_repository_file" "crds_values_yaml" {
+  count               = var.argo_enabled == true ? 1 : 0
+  repository          = var.github_repo_name
+  branch              = var.github_repo_branch
+  file                = "${var.github_file_path}/helm/crds-values.values"
+  commit_message      = var.github_commit_message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+  content = base64decode(var.crds_values_yaml_b64)
+}
 
 data "github_repository_file" "data_crds_values" {
   count = var.argo_enabled == true ? 1 : 0
   depends_on = [
-    github_repository_file.pre_reqs_values_yaml
+    github_repository_file.crds_values_yaml
   ]
   repository = var.github_repo_name
   branch     = var.github_repo_branch
