@@ -1,19 +1,5 @@
 # Start with the crds and operators
-resource "github_repository_file" "crds_values_yaml" {
-  count               = var.argo_enabled == true ? 1 : 0
-  repository          = var.github_repo_name
-  branch              = var.github_repo_branch
-  file                = "helm/crds-values.values"
-  commit_message      = var.github_commit_message
-  overwrite_on_create = true
 
-  lifecycle {
-    ignore_changes = [
-      content
-    ]
-  }
-  content = base64decode(var.crds_values_yaml_b64)
-}
 
 data "github_repository_file" "data_crds_values" {
   count = var.argo_enabled == true ? 1 : 0

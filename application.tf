@@ -754,6 +754,22 @@ module "indico-common" {
   indico_pre_reqs_values_overrides = local.indico_pre_reqs_values
 }
 
+resource "github_repository_file" "crds_values_yaml" {
+  count               = var.argo_enabled == true ? 1 : 0
+  repository          = data.github_repository.argo-github-repo[0].name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/helm/crds-values.values"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+  content = base64decode(var.crds-values-yaml-b64)
+}
+
 # With the common charts are installed, we can then move on to installing intake and/or insights
 locals {
   ipa_pre_reqs_values = [<<EOF
