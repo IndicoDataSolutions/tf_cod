@@ -4,7 +4,7 @@
 data "github_repository_file" "data_crds_values" {
   count = var.argo_enabled == true ? 1 : 0
   depends_on = [
-    github_repository_file.crds_values_yaml
+    github_repository_file.pre_reqs_values_yaml
   ]
   repository = var.github_repo_name
   branch     = var.github_repo_branch
