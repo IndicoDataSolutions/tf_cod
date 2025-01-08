@@ -19,7 +19,7 @@ variable "github_repo_branch" {
 
 variable "github_file_path" {
   type        = string
-  default     = ""
+  default     = "."
   description = "Path of the yaml files in the repo"
 }
 
