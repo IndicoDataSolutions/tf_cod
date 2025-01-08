@@ -78,3 +78,9 @@ variable "indico_pre_reqs_values_overrides" {
   default     = []
   description = "indico-pre-requisites values overrides from the terraform"
 }
+
+variable "github_token" {
+  type        = string
+  default     = ""
+  description = "Github token to use for the github provider"
+}
