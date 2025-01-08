@@ -725,6 +725,28 @@ reflector:
   EOF
   ]
 }
+
+module "indico-common" {
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster,
+    module.secrets-operator-setup
+  ]
+  source                           = "./modules/common/indico-common"
+  argo_enabled                     = var.argo_enabled
+  github_repo_name                 = var.argo_repo
+  github_repo_branch               = var.argo_branch
+  github_file_path                 = var.argo_path
+  github_commit_message            = var.message
+  helm_registry                    = var.ipa_repo
+  namespace                        = "indico"
+  indico_crds_version              = var.indico_crds_version
+  crds_values_yaml_b64             = var.crds-values-yaml-b64
+  indico_crds_values_overrides     = local.indico_crds_values
+  indico_pre_reqs_version          = var.indico_pre_reqs_version
+  indico_pre_reqs_values_overrides = local.indico_pre_reqs_values
+}
+
 resource "github_repository_file" "crds_values_yaml" {
   count               = var.argo_enabled == true ? 1 : 0
   repository          = data.github_repository.argo-github-repo[0].name
@@ -740,90 +762,6 @@ resource "github_repository_file" "crds_values_yaml" {
   }
   content = base64decode(var.crds-values-yaml-b64)
 }
-
-data "github_repository_file" "data_crds_values" {
-  count = var.argo_enabled == true ? 1 : 0
-  depends_on = [
-    github_repository_file.crds_values_yaml
-  ]
-  repository = var.argo_repo
-  branch     = var.argo_branch
-  file       = "${var.argo_path}/helm/crds-values.values"
-}
-
-resource "helm_release" "indico_crds" {
-  verify           = false
-  name             = "indico-crds"
-  create_namespace = true
-  namespace        = "indico"
-  repository       = var.ipa_repo
-  chart            = "indico-crds"
-  version          = var.ipa_crds_version
-  wait             = true
-  timeout          = "1800" # 30 minutes
-
-  values = concat(local.indico_crds_values, [<<EOT
-${var.argo_enabled == true ? data.github_repository_file.data_crds_values[0].content : base64decode(var.crds-values-yaml-b64)}
-EOT
-  ])
-}
-
-resource "time_sleep" "wait_1_minutes_after_crds" {
-  depends_on = [helm_release.indico_crds]
-
-  create_duration = "1m"
-}
-
-resource "github_repository_file" "pre_reqs_values_yaml" {
-  count               = var.argo_enabled == true ? 1 : 0
-  repository          = var.argo_repo
-  branch              = var.argo_branch
-  file                = "${var.argo_path}/helm/indico-pre-reqs-values.values"
-  commit_message      = var.message
-  overwrite_on_create = true
-
-  lifecycle {
-    ignore_changes = [
-      content
-    ]
-  }
-  content = base64decode(var.pre-reqs-values-yaml-b64)
-}
-
-data "github_repository_file" "data_pre_reqs_values" {
-  count = var.argo_enabled == true ? 1 : 0
-
-  depends_on = [
-    github_repository_file.pre_reqs_values_yaml
-  ]
-  repository = var.argo_repo
-  branch     = var.argo_branch
-  file       = "${var.argo_path}/helm/indico-pre-reqs-values.values"
-}
-
-resource "helm_release" "indico_pre_requisites" {
-  depends_on = [
-    data.github_repository_file.data_pre_reqs_values,
-    time_sleep.wait_1_minutes_after_crds
-  ]
-
-  verify           = false
-  name             = "indico-pre-reqs"
-  create_namespace = true
-  namespace        = "indico"
-  repository       = var.ipa_repo
-  chart            = "indico-pre-reqs"
-  version          = var.ipa_pre_reqs_version
-  wait             = false
-  timeout          = "1800" # 30 minutes
-  disable_webhooks = false
-
-  values = concat(local.indico_pre_reqs_values, [<<EOT
-${var.argo_enabled == true ? data.github_repository_file.data_pre_reqs_values[0].content : base64decode(var.pre-reqs-values-yaml-b64)}
-EOT
-  ])
-}
-
 
 # With the common charts are installed, we can then move on to installing intake and/or insights
 locals {
