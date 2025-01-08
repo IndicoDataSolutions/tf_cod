@@ -259,7 +259,7 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 
   metadata {
     name      = "harbor-pull-secret"
-    namespace = "default"
+    namespace = "indico"
     annotations = {
       "reflector.v1.k8s.emberstack.com/reflection-allowed"      = true
       "reflector.v1.k8s.emberstack.com/reflection-auto-enabled" = true
@@ -413,7 +413,7 @@ migrations-operator:
     repository: ${var.image_registry}/indico/migrations-controller
     kubectlImage: ${var.image_registry}/indico/migrations-controller-kubectl
 minio:
-  enabled: true
+  enabled: ${var.insights_enabled || var.minio_enabled}
 vault-secrets-operator:
   enabled: ${var.secrets_operator_enabled}
   controller: 
