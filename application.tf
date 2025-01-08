@@ -302,6 +302,13 @@ module "secrets-operator-setup" {
 # Once (if) the secrets operator is set up, we can deploy the common charts
 locals {
   indico_crds_values = [<<EOF
+migrations:
+  image:
+    registry: ${var.image_registry}
+  vaultSecretsOperator:
+    updateCRDs: ${var.secrets_operator_enabled}
+  opentelemetryOperator:
+    updateCRDs: ${var.monitoring_enabled}
 aws-ebs-csi-driver:
   image:
     repository: ${var.image_registry}/public.ecr.aws/ebs-csi-driver/aws-ebs-csi-driver
@@ -326,7 +333,7 @@ aws-ebs-csi-driver:
         repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
   controller:
     extraVolumeTags:
-      ${indent(8, yamlencode(var.default_tags))}
+      ${indent(6, yamlencode(var.default_tags))}
 cert-manager:
   enabled: true
   crds:
