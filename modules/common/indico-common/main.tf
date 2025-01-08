@@ -1,5 +1,15 @@
 # Start with the crds and operators
+terraform {
+  required_providers {
+    github = {
+      source  = "integrations/github"
+      version = "5.34.0"
+    }
+  }
+}
+
 resource "github_repository_file" "crds_values_yaml" {
+  count               = var.argo_enabled == true ? 1 : 0
   repository          = var.github_repo_name
   branch              = var.github_repo_branch
   file                = "${var.github_file_path}/helm/crds-values.values"
