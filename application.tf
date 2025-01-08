@@ -245,11 +245,6 @@ EOT
   dns01RecursiveNameservers     = var.network_allow_public == true ? "" : "kube-dns.kube-system.svc.cluster.local:53"
 }
 
-data "github_repository" "argo-github-repo" {
-  count     = var.argo_enabled == true ? 1 : 0
-  full_name = "IndicoDataSolutions/${var.argo_repo}"
-}
-
 # Need to make sure the pull secret is in first, so that all of our images can be pulled from harbor
 resource "kubernetes_secret" "harbor-pull-secret" {
   depends_on = [
@@ -734,7 +729,7 @@ module "indico-common" {
   ]
   source                           = "./modules/common/indico-common"
   argo_enabled                     = var.argo_enabled
-  github_repo_name                 = data.github_repository.argo-github-repo[0].name
+  github_repo_name                 = var.argo_repo
   github_repo_branch               = var.argo_branch
   github_file_path                 = var.argo_path
   github_commit_message            = var.message
@@ -991,7 +986,7 @@ module "intake" {
   source                            = "./modules/common/intake"
   count                             = var.ipa_enabled ? 1 : 0
   argo_enabled                      = var.argo_enabled
-  github_repo_name                  = data.github_repository.argo-github-repo[0].name
+  github_repo_name                  = var.argo_repo
   github_repo_branch                = var.argo_branch
   github_file_path                  = var.argo_path
   github_commit_message             = var.message
@@ -1024,7 +1019,7 @@ module "intake_smoketests" {
   label                  = var.label
   namespace              = "default"
   argo_enabled           = var.argo_enabled
-  github_repo_name       = data.github_repository.argo-github-repo[0].name
+  github_repo_name       = var.argo_repo
   github_repo_branch     = var.argo_branch
   github_file_path       = "${var.argo_path}/ipa_smoketest_application.yaml"
   github_commit_message  = var.message
@@ -1280,7 +1275,7 @@ module "insights" {
   source                              = "./modules/common/insights"
   count                               = var.insights_enabled ? 1 : 0
   argo_enabled                        = var.argo_enabled
-  github_repo_name                    = data.github_repository.argo-github-repo[0].name
+  github_repo_name                    = var.argo_repo
   github_repo_branch                  = var.argo_branch
   github_file_path                    = var.argo_path
   github_commit_message               = var.message
@@ -1316,7 +1311,7 @@ module "additional_application" {
   label                  = var.label
   namespace              = each.value.namespace
   argo_enabled           = var.argo_enabled
-  github_repo_name       = data.github_repository.argo-github-repo[0].name
+  github_repo_name       = var.argo_repo
   github_repo_branch     = var.argo_branch
   github_file_path       = "${var.argo_path}/${each.value.name}_application.yaml"
   github_commit_message  = var.message
