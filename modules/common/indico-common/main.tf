@@ -31,7 +31,7 @@ data "github_repository_file" "data_crds_values" {
   ]
   repository = var.github_repo_name
   branch     = var.github_repo_branch
-  file       = "${var.github_file_path}/helm/crds-values.values"
+  file       = var.github_file_path == "." ? "helm/crds-values.values" : "${var.github_file_path}/helm/crds-values.values"
 }
 
 resource "helm_release" "indico_crds" {
