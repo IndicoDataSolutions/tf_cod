@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    github = {
+      source  = "integrations/github"
+      version = "5.34.0"
+    }
+  }
+}
+
 # Start with application pre-reqs
 resource "github_repository_file" "pre_reqs_values_yaml" {
   count               = var.argo_enabled == true ? 1 : 0
