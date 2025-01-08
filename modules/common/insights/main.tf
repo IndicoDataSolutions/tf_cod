@@ -1,9 +1,4 @@
 # Start with application pre-reqs
-provider "github" {
-  owner = var.github_repo_name
-  token = var.github_token
-}
-
 resource "github_repository_file" "pre_reqs_values_yaml" {
   count               = var.argo_enabled == true ? 1 : 0
   repository          = var.github_repo_name
