@@ -109,7 +109,7 @@ EOT
   ])
 }
 
-resource "kubernetes_annotation" "gp2_default_storage_class" {
+resource "kubernetes_annotations" "gp2_default_storage_class" {
   depends_on = [helm_release.indico_pre_requisites]
 
   api_version = "storage.k8s.io/v1"
