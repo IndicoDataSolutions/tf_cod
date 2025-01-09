@@ -486,10 +486,10 @@ localPullSecret:
   secretName: local-pull-secret
   username: local-user
 proxyRegistryAccess:
-  proxyPassword: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_password"] : ""}
+  proxyPassword: "${var.local_registry_enabled ? try(jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json).harbor_password, "") : ""}"
   proxyPullSecretName: remote-access
   proxyUrl: https://${var.image_registry}
-  proxyUsername: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_username"] : ""}
+  proxyUsername: "${var.local_registry_enabled ? try(jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json).harbor_username, "") : ""}"
 registryUrl: local-registry.${local.dns_name}
 restartCronjob:
   cronSchedule: 0 0 */3 * *
