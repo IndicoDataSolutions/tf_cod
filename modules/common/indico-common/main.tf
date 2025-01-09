@@ -129,7 +129,7 @@ volumeBindingMode: WaitForFirstConsumer
 YAML
   lifecycle {
     ignore_changes = [
-      content
+      yaml_body
     ]
   }
 }
