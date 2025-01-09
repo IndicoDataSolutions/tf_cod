@@ -45,7 +45,7 @@ resource "helm_release" "ins_pre_requisites" {
   create_namespace = true
   namespace        = var.namespace
   repository       = var.helm_registry
-  chart            = "insights-pre-requisites"
+  chart            = "insights-pre-reqs"
   version          = var.ins_pre_reqs_version
   wait             = false
   timeout          = "1800" # 30 minutes
