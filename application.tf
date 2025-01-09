@@ -739,11 +739,24 @@ reflector:
   ]
 }
 
+resource "kubernetes_annotations" "gp2_default_storage_class" {
+  api_version = "storage.k8s.io/v1"
+  kind        = "StorageClass"
+  metadata {
+    name = "gp2"
+  }
+
+  annotations = {
+    "storageclass.kubernetes.io/is-default-class" = "true"
+  }
+}
+
 module "indico-common" {
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
-    module.secrets-operator-setup
+    module.secrets-operator-setup,
+    kubernetes_annotations.gp2_default_storage_class
   ]
   source                           = "./modules/common/indico-common"
   argo_enabled                     = var.argo_enabled
