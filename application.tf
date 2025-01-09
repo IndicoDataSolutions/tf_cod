@@ -554,6 +554,7 @@ aws-load-balancer-controller:
     vpcId: ${local.network[0].indico_vpc_id}
     region: ${var.region}
 cluster-autoscaler:
+  enabled: true
   cluster-autoscaler:
     awsRegion: ${var.region}
     image:
