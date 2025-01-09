@@ -90,10 +90,17 @@ data "github_repository_file" "data_pre_reqs_values" {
   file       = var.github_file_path == "." ? "helm/indico-pre-reqs-values.values" : "${var.github_file_path}/helm/indico-pre-reqs-values.values"
 }
 
+resource "kubernetes_namespace" "monitoring" {
+  metadata {
+    name = "monitoring"
+  }
+}
+
 resource "helm_release" "indico_pre_requisites" {
   depends_on = [
     data.github_repository_file.data_pre_reqs_values,
-    time_sleep.wait_1_minutes_after_crds
+    time_sleep.wait_1_minutes_after_crds,
+    kubernetes_namespace.monitoring
   ]
 
   verify           = false
