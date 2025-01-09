@@ -614,7 +614,7 @@ ingress-nginx:
       enableHttp: ${local.enableHttp}
       targetPorts:
         https: ${local.backend_port}
-${local.lb_config}
+
     image:
       registry: ${var.image_registry}/registry.k8s.io
       digest: ""
@@ -669,7 +669,8 @@ keda:
       enabled: true
       podMonitor:
         enabled: true
-
+kube-prometheus-stack:
+${local.kube_prometheus_stack_values}
 metrics-server:
   global:
     imageRegistry: ${var.image_registry}/docker.io
