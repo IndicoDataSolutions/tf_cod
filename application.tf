@@ -591,7 +591,7 @@ docker-registry:
   replicaCount: 3
   secrets:
     htpasswd: local-user:${htpasswd_password.hash.bcrypt} 
-${local.dns_configuration_values}
+
 external-secrets:
   image:
     repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
@@ -608,7 +608,7 @@ ingress-nginx:
       enableHttp: ${local.enableHttp}
       targetPorts:
         https: ${local.backend_port}
-
+${local.lb_config}
     image:
       registry: ${var.image_registry}/registry.k8s.io
       digest: ""
