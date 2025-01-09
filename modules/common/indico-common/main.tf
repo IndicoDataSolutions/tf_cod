@@ -127,4 +127,9 @@ parameters:
 provisioner: kubernetes.io/aws-ebs
 volumeBindingMode: WaitForFirstConsumer
 YAML
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
 }
