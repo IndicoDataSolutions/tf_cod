@@ -637,7 +637,7 @@ reflector:
   EOF
   ]
 
-  monitoring_values = var.monitoring_enabled ? (<<EOF
+  monitoring_values = var.monitoring_enabled ? [<<EOF
 global:
   host: "${local.dns_name}"
 authentication:
@@ -742,9 +742,7 @@ opentelemetry-collector:
         metrics: null
         logs: null
   EOF
-    ) : (<<EOF
-  EOF
-  )
+  ] : []
 }
 
 module "indico-common" {
