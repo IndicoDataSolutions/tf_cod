@@ -481,7 +481,20 @@ secrets:
       eabEmail: devops-sa@indico.io
       eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
-
+localPullSecret:
+  password: ${random_password.password.result}
+  secretName: local-pull-secret
+  username: local-user
+proxyRegistryAccess:
+  proxyPassword: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_password"] : ""}
+  proxyPullSecretName: remote-access
+  proxyUrl: https://${var.image_registry}
+  proxyUsername: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_username"] : ""}
+registryUrl: local-registry.${local.dns_name}
+restartCronjob:
+  cronSchedule: 0 0 */3 * *
+  disabled: false
+  image: bitnami/kubectl:1.20.13
 
 aws-efs-csi-driver:
   image:
