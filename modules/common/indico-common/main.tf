@@ -109,14 +109,18 @@ EOT
   ])
 }
 
-resource "kubernetes_annotations" "gp2_default_storage_class" {
-  api_version = "storage.k8s.io/v1"
-  kind        = "StorageClass"
-  metadata {
-    name = "gp2"
-  }
-
-  annotations = {
-    "storageclass.kubernetes.io/is-default-class" = "true"
-  }
+resource "kubectl_manifest" "gp2-storageclass" {
+  yaml_body = <<YAML
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp2
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+parameters:
+  fsType: ext4
+  type: gp2
+provisioner: kubernetes.io/aws-ebs
+volumeBindingMode: WaitForFirstConsumer
+YAML
 }
