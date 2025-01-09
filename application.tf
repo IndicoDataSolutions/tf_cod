@@ -471,7 +471,7 @@ vault-secrets-operator:
 
   indico_pre_reqs_values = [<<-EOF
 global:
-  host: "${local.dns_name}"
+  host: ${local.dns_name}
   image:
     registry: ${var.image_registry}
 secrets:
@@ -663,8 +663,7 @@ keda:
       enabled: true
       podMonitor:
         enabled: true
-kube-prometheus-stack:
-${local.kube_prometheus_stack_values}
+
 metrics-server:
   global:
     imageRegistry: ${var.image_registry}/docker.io
