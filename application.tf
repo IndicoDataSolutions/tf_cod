@@ -260,7 +260,8 @@ resource "kubernetes_namespace" "indico" {
 resource "kubernetes_secret" "harbor-pull-secret" {
   depends_on = [
     module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
+    time_sleep.wait_1_minutes_after_cluster,
+    kubernetes_namespace.indico
   ]
 
   metadata {
