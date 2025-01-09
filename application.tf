@@ -663,7 +663,8 @@ keda:
       enabled: true
       podMonitor:
         enabled: true
-
+kube-prometheus-stack:
+${local.kube_prometheus_stack_values}
 metrics-server:
   global:
     imageRegistry: ${var.image_registry}/docker.io
@@ -732,24 +733,11 @@ reflector:
   ]
 }
 
-resource "kubernetes_annotations" "gp2_default_storage_class" {
-  api_version = "storage.k8s.io/v1"
-  kind        = "StorageClass"
-  metadata {
-    name = "gp2"
-  }
-
-  annotations = {
-    "storageclass.kubernetes.io/is-default-class" = "true"
-  }
-}
-
 module "indico-common" {
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
-    module.secrets-operator-setup,
-    kubernetes_annotations.gp2_default_storage_class
+    module.secrets-operator-setup
   ]
   source                           = "./modules/common/indico-common"
   argo_enabled                     = var.argo_enabled
