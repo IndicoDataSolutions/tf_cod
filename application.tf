@@ -597,7 +597,7 @@ docker-registry:
   replicaCount: 3
   secrets:
     htpasswd: local-user:${htpasswd_password.hash.bcrypt} 
-${local.dns_configuration_values}
+
 external-secrets:
   image:
     repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
