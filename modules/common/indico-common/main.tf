@@ -86,10 +86,25 @@ data "github_repository_file" "data_pre_reqs_values" {
   file       = var.github_file_path == "." ? "helm/indico-pre-reqs-values.values" : "${var.github_file_path}/helm/indico-pre-reqs-values.values"
 }
 
+resource "kubernetes_annotations" "gp2_default_storage_class" {
+  depends_on = [helm_release.indico_pre_requisites]
+
+  api_version = "storage.k8s.io/v1"
+  kind        = "StorageClass"
+  metadata {
+    name = "gp2"
+  }
+
+  annotations = {
+    "storageclass.kubernetes.io/is-default-class" = "true"
+  }
+}
+
 resource "helm_release" "indico_pre_requisites" {
   depends_on = [
     data.github_repository_file.data_pre_reqs_values,
-    time_sleep.wait_1_minutes_after_crds
+    time_sleep.wait_1_minutes_after_crds,
+    kubernetes_annotations.gp2_default_storage_class
   ]
 
   verify           = false
@@ -107,18 +122,4 @@ resource "helm_release" "indico_pre_requisites" {
 ${var.argo_enabled == true ? data.github_repository_file.data_pre_reqs_values[0].content : base64decode(var.pre_reqs_values_yaml_b64)}
 EOT
   ])
-}
-
-resource "kubernetes_annotations" "gp2_default_storage_class" {
-  depends_on = [helm_release.indico_pre_requisites]
-
-  api_version = "storage.k8s.io/v1"
-  kind        = "StorageClass"
-  metadata {
-    name = "gp2"
-  }
-
-  annotations = {
-    "storageclass.kubernetes.io/is-default-class" = "true"
-  }
 }
