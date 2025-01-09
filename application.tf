@@ -608,7 +608,7 @@ ingress-nginx:
       enableHttp: ${local.enableHttp}
       targetPorts:
         https: ${local.backend_port}
-${local.lb_config}
+
     image:
       registry: ${var.image_registry}/registry.k8s.io
       digest: ""
