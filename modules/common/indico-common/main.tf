@@ -108,3 +108,15 @@ ${var.argo_enabled == true ? data.github_repository_file.data_pre_reqs_values[0]
 EOT
   ])
 }
+
+resource "kubernetes_annotations" "gp2_default_storage_class" {
+  api_version = "storage.k8s.io/v1"
+  kind        = "StorageClass"
+  metadata {
+    name = "gp2"
+  }
+
+  annotations = {
+    "storageclass.kubernetes.io/is-default-class" = "true"
+  }
+}
