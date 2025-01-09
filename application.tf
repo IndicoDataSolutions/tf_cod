@@ -466,6 +466,16 @@ vault-secrets-operator:
         - name: manager
           args:
           - "--client-cache-persistence-model=direct-encrypted"
+external-secrets:
+  enabled: true
+  image:
+    repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+  webhook:
+    image:
+      repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+  certController:
+    image:
+      repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
   EOF
   ]
 
@@ -592,15 +602,6 @@ docker-registry:
   secrets:
     htpasswd: local-user:${htpasswd_password.hash.bcrypt} 
 ${local.dns_configuration_values}
-external-secrets:
-  image:
-    repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
-  webhook:
-    image:
-      repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
-  certController:
-    image:
-      repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
 ingress-nginx:
   enabled: true
   controller:
