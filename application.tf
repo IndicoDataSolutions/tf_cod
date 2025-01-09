@@ -256,6 +256,12 @@ data "github_repository" "argo-github-repo" {
   full_name = "IndicoDataSolutions/${var.argo_repo}"
 }
 
+resource "kubernetes_namespace" "indico" {
+  metadata {
+    name = "indico"
+  }
+}
+
 # Need to make sure the pull secret is in first, so that all of our images can be pulled from harbor
 resource "kubernetes_secret" "harbor-pull-secret" {
   depends_on = [
