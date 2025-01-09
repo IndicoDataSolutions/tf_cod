@@ -372,7 +372,7 @@ cert-manager:
     - name: AWS_REGION
       value: 'aws-global'
 crunchy-pgo:
-  enabled: true
+  enabled: ${var.ipa_enabled || var.insights_enabled}
   updateCRDs: 
     enabled: true
   pgo: 
@@ -420,6 +420,7 @@ crunchy-pgo:
       standalone_pgadmin:
         image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-8.12-1
 migrations-operator:
+  enabled: ${var.ipa_enabled || var.insights_enabled}
   image:
     repository: ${var.image_registry}/indico/migrations-operator
   controllerImage:
@@ -636,10 +637,24 @@ ${local.lb_config}
   service:
     annotations:
       service.beta.kubernetes.io/oci-load-balancer-internal: "${local.internal_elb}"
+reflector:
+  image:
+    repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
+  EOF
+  ]
+
+  monitoring_values = var.monitoring_enabled ? (<<EOF
+global:
+  host: "${local.dns_name}"
+authentication:
+  ingressUsername: monitoring
+  ingressPassword: ${random_password.monitoring-password.result}
+${local.alerting_configuration_values}
 keda:
+  enabled: ${var.monitoring_enabled}
   global:
     image:
-      registry: ${var.image_registry}/ghcr.io
+      registry: "${var.image_registry}/ghcr.io"
   imagePullSecrets:
     - name: harbor-pull-secret
   resources:
@@ -660,7 +675,6 @@ keda:
       prometheus.io/scrape: "true"
       prometheus.io/path: "/metrics"
       prometheus.io/port: "9022"
-
   prometheus:
     metricServer:
       enabled: true
@@ -733,11 +747,10 @@ opentelemetry-collector:
             - otlp
         metrics: null
         logs: null
-reflector:
-  image:
-    repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
   EOF
-  ]
+    ) : (<<EOF
+  EOF
+  )
 }
 
 module "indico-common" {
@@ -759,8 +772,12 @@ module "indico-common" {
   indico_crds_values_overrides     = local.indico_crds_values
   indico_pre_reqs_version          = var.indico_pre_reqs_version
   indico_pre_reqs_values_overrides = local.indico_pre_reqs_values
-  github_token                     = var.git_pat
+  monitoring_enabled               = var.monitoring_enabled
+  monitoring_values                = local.monitoring_values
+  monitoring_version               = var.monitoring_version
 }
+
+
 
 # With the common charts are installed, we can then move on to installing intake and/or insights
 locals {

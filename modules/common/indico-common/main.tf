@@ -90,12 +90,6 @@ data "github_repository_file" "data_pre_reqs_values" {
   file       = var.github_file_path == "." ? "helm/indico-pre-reqs-values.values" : "${var.github_file_path}/helm/indico-pre-reqs-values.values"
 }
 
-resource "kubernetes_namespace" "monitoring" {
-  metadata {
-    name = "monitoring"
-  }
-}
-
 resource "helm_release" "indico_pre_requisites" {
   depends_on = [
     data.github_repository_file.data_pre_reqs_values,
@@ -139,4 +133,20 @@ YAML
       yaml_body
     ]
   }
+}
+
+resource "helm_release" "monitoring" {
+  depends_on = [helm_release.indico_pre_requisites]
+
+  verify           = false
+  name             = "monitoring"
+  create_namespace = true
+  namespace        = "monitoring"
+  repository       = var.helm_registry
+  chart            = "monitoring"
+  version          = var.monitoring_version
+  wait             = false
+  timeout          = "1800" # 30 minutes
+
+  values = var.monitoring_values
 }

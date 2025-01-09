@@ -79,8 +79,20 @@ variable "indico_pre_reqs_values_overrides" {
   description = "indico-pre-requisites values overrides from the terraform"
 }
 
-variable "github_token" {
+variable "monitoring_enabled" {
+  type        = bool
+  default     = true
+  description = "Flag to enable/disable monitoring"
+}
+
+variable "monitoring_values" {
+  type        = list(string)
+  default     = []
+  description = "Monitoring values"
+}
+
+variable "monitoring_version" {
   type        = string
   default     = ""
-  description = "Github token to use for the github provider"
+  description = "Monitoring chart version"
 }
