@@ -87,8 +87,6 @@ data "github_repository_file" "data_pre_reqs_values" {
 }
 
 resource "kubernetes_annotations" "gp2_default_storage_class" {
-  depends_on = [helm_release.indico_pre_requisites]
-
   api_version = "storage.k8s.io/v1"
   kind        = "StorageClass"
   metadata {
