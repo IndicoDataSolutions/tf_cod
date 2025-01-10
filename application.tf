@@ -486,7 +486,7 @@ external-secrets:
   EOF
   ]
 
-  indico_pre_reqs_values = [<<EOF
+  indico_pre_reqs_values = concat(local.storage_spec, [<<EOF
 global:
   host: ${local.dns_name}
   image:
@@ -607,7 +607,7 @@ reflector:
   image:
     repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
   EOF
-  ]
+  ])
 
   monitoring_values = var.monitoring_enabled ? [<<EOF
 global:
