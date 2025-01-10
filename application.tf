@@ -49,8 +49,8 @@ locals {
       name: indico-sc
       provisioner: fsx.csi.aws.com
       parameters:
-        securityGroupIds: ${local.security_group_id}
-        subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}
+        securityGroupIds: "${local.security_group_id}"
+        subnetId: "${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}"
  EOF
   ] : []
   on_prem_values = var.on_prem_test == true ? [<<EOF
