@@ -1,3 +1,13 @@
+
+terraform {
+  required_providers {
+    github = {
+      source  = "integrations/github"
+      version = "5.34.0"
+    }
+  }
+}
+
 resource "github_repository_file" "argocd-application-yaml" {
   count               = var.argo_enabled == true ? 1 : 0
   repository          = var.github_repo_name
