@@ -67,9 +67,9 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
-${indent(12, trimspace(var.terraform_helm_values))}
+            ${var.terraform_helm_values}
         - name: HELM_VALUES
           value: |
-${indent(12, trimspace(var.helm_values))}
+            ${var.helm_values}
 EOT
 }
