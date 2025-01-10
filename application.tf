@@ -747,7 +747,7 @@ module "indico-common" {
 
 # With the common charts are installed, we can then move on to installing intake and/or insights
 locals {
-  ipa_pre_reqs_values = concat(local.storage_spec, [<<EOF
+  ipa_pre_reqs_values = [<<EOF
 global:
   image:
     registry: ${var.image_registry}
@@ -1060,8 +1060,9 @@ rabbitmq:
   rabbitmq:
     image:
       registry: ${var.image_registry}
+${local.storage_spec}
   EOF
-  ])
+  ]
 
   intake_values = <<EOF
 global:
