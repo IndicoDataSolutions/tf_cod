@@ -498,6 +498,10 @@ secrets:
       eabEmail: devops-sa@indico.io
       eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
       eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
+    letsencrypt:
+      create: true
+    selfSigned:
+      create: true
 localPullSecret:
   password: "${random_password.password.result}"
   secretName: local-pull-secret
@@ -1174,14 +1178,6 @@ locals {
 storage:
   ebsStorageClass:
     enabled: true
-clusterIssuer:
-  additionalSolvers:
-    - dns01:
-        route53:
-          region: ${var.region}
-      selector:
-        matchLabels:
-          "acme.cert-manager.io/dns01-solver": "true"
 crunchy-postgres:
   enabled: true
   postgres-data:
@@ -1356,10 +1352,6 @@ crunchy-postgres:
             memory: 3000Mi
     imagePullSecrets:
       - name: harbor-pull-secret
-secrets:
-  clusterIssuer:
-    letsencrypt:
-      create: true
 ingress:
   useStaticCertificate: false
   secretName: indico-ssl-static-cert
