@@ -991,7 +991,7 @@ module "intake" {
   region                            = var.region
   label                             = var.label
   argo_application_name             = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
-  vault_path                        = ""
+  vault_path                        = "tools/argo/data/ipa-deploy"
   argo_server                       = module.cluster.kubernetes_host
   argo_project_name                 = module.argo-registration[0].argo_project_name
   intake_version                    = var.ipa_version
