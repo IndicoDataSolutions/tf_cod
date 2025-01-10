@@ -9,10 +9,6 @@ locals {
   storage_class         = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
   acm_arn               = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
   efs_values = var.include_efs == true ? [<<EOF
-  aws-fsx-csi-driver:
-    enabled: false
-  aws-efs-csi-driver:
-    enabled: true
   storage:
     volumeSetup:
       image:
@@ -37,10 +33,6 @@ locals {
  EOF
   ] : []
   fsx_values = var.include_fsx == true ? [<<EOF
-  aws-fsx-csi-driver:
-    enabled: true
-  aws-efs-csi-driver:
-    enabled: ${var.local_registry_enabled} 
   storage:
     volumeSetup:
       image:
@@ -512,6 +504,7 @@ restartCronjob:
   image: bitnami/kubectl:1.20.13
 
 aws-efs-csi-driver:
+  enabled: ${var.include_efs} ? true : ${var.local_registry_enabled}
   image:
     repository: ${var.image_registry}/docker.io/amazon/aws-efs-csi-driver
   sidecars:
@@ -533,6 +526,7 @@ aws-for-fluent-bit:
     logGroupName: "/aws/eks/fluentbit-cloudwatch/${var.label}/logs"
     logGroupTemplate: "/aws/eks/fluentbit-cloudwatch/${var.label}/workload/$kubernetes['namespace_name']"
 aws-fsx-csi-driver:
+  enabled: ${var.include_fsx}
   image:  
     repository: ${var.image_registry}/public.ecr.aws/fsx-csi-driver/aws-fsx-csi-driver
     pullPolicy: IfNotPresent
