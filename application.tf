@@ -518,6 +518,7 @@ restartCronjob:
   image: bitnami/kubectl:1.20.13
 
 aws-efs-csi-driver:
+  enabled: ${var.include_efs} ? true : ${var.local_registry_enabled}
   image:
     repository: ${var.image_registry}/docker.io/amazon/aws-efs-csi-driver
   sidecars:
@@ -539,6 +540,7 @@ aws-for-fluent-bit:
     logGroupName: "/aws/eks/fluentbit-cloudwatch/${var.label}/logs"
     logGroupTemplate: "/aws/eks/fluentbit-cloudwatch/${var.label}/workload/$kubernetes['namespace_name']"
 aws-fsx-csi-driver:
+  enabled: ${var.include_fsx}
   image:  
     repository: ${var.image_registry}/public.ecr.aws/fsx-csi-driver/aws-fsx-csi-driver
     pullPolicy: IfNotPresent
