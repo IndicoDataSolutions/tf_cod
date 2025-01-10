@@ -87,5 +87,5 @@ module "intake_application" {
   k8s_version            = var.k8s_version
   release_name           = "ipa"
   terraform_helm_values  = var.intake_values_terraform_overrides
-  helm_values            = var.intake_values_overrides
+  helm_values            = base64decode(var.intake_values_overrides)
 }

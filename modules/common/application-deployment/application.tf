@@ -1,4 +1,3 @@
-
 terraform {
   required_providers {
     github = {
@@ -68,9 +67,9 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
-            ${var.terraform_helm_values}    
+            ${trimspace(var.terraform_helm_values)}
         - name: HELM_VALUES
           value: |
-            ${var.helm_values}    
+            ${trimspace(var.helm_values)}
 EOT
 }
