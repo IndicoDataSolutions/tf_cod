@@ -1000,6 +1000,20 @@ module "intake" {
   intake_values_overrides           = var.ipa_values
 }
 
+locals {
+  smoketests_values = <<EOF
+  cluster:
+    cloudProvider: aws
+    account: ${var.aws_account}
+    region: ${var.region}
+    name: ${var.label}
+  host: ${local.dns_name}
+  image:
+    repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/integration_tests
+  ${indent(4, base64decode(var.ipa_smoketest_values))}
+  EOF
+}
+
 module "intake_smoketests" {
   depends_on = [
     module.intake
@@ -1025,17 +1039,7 @@ module "intake_smoketests" {
   k8s_version            = var.k8s_version
   release_name           = "terraform-smoketests-${substr(data.external.git_information.result.sha, 0, 8)}"
   terraform_helm_values  = ""
-  helm_values            = <<EOF
-  cluster:
-    cloudProvider: aws
-    account: ${var.aws_account}
-    region: ${var.region}
-    name: ${var.label}
-  host: ${local.dns_name}
-  image:
-    repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/integration_tests
-  ${indent(4, base64decode(var.ipa_smoketest_values))}
-  EOF
+  helm_values            = indent(12, trimspace(local.smoketests_values))
 }
 
 locals {
