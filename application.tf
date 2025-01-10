@@ -1003,7 +1003,7 @@ module "intake_smoketests" {
   depends_on = [
     module.intake
   ]
-  count                  = var.ipa_smoketest_enabled ? 1 : 0
+  count                  = var.ipa_smoketest_enabled && var.ipa_enabled ? 1 : 0
   source                 = "./modules/common/application-deployment"
   account                = var.aws_account
   region                 = var.region
