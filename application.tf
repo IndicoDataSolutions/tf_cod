@@ -937,7 +937,7 @@ runtime-scanner:
   authentication:
     ingressUser: monitoring
     ingressPassword: ${random_password.monitoring-password.result}
-    ${indent(6, local.runtime_scanner_ingress_values)}
+    ${indent(4, local.runtime_scanner_ingress_values)}
 celery-flower:
   image:
     repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/flower
