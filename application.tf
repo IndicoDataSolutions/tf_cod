@@ -564,45 +564,6 @@ cluster-autoscaler:
       clusterName: "${var.label}"
     extraArgs:
       aws-use-static-instance-list: true
-docker-registry:
-  image:
-    repository: ${var.image_registry}/docker.io/library/registry
-    imagePullSecrets:
-      - name: harbor-pull-secret
-  service:
-    annotations: 
-      external-dns.alpha.kubernetes.io/hostname: "local-registry.${local.dns_name}"
-  extraEnvVars:
-  - name: GOGC
-    value: "50"
-  ingress:
-    className: nginx-internal
-    enabled: true
-    annotations:
-      cert-manager.io/cluster-issuer: zerossl
-      kubernetes.io/ingress.class: nginx-internal
-      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
-    labels: 
-      acme.cert-manager.io/dns01-solver: "true"
-    hosts:
-    - local-registry.${local.dns_name}
-    tls:
-    - hosts:
-      - local-registry.${local.dns_name}
-      secretName: registry-tls
-  persistence:
-    deleteEnabled: true
-    enabled: true
-    size: 100Gi
-    existingClaim: local-registry
-    storageClass: local-registry
-  proxy:
-    enabled: true
-    remoteurl: https://${var.image_registry}
-    secretRef: remote-access
-  replicaCount: 3
-  secrets:
-    htpasswd: local-user:${htpasswd_password.hash.bcrypt} 
 ${local.dns_configuration_values}
 ingress-nginx:
   enabled: true
@@ -1565,6 +1526,116 @@ resource "random_password" "salt" {
 resource "htpasswd_password" "hash" {
   password = random_password.password.result
   salt     = random_password.salt.result
+}
+
+resource "helm_release" "local-registry" {
+  depends_on = [
+    module.indico-common
+  ]
+
+  count = var.local_registry_enabled == true ? 1 : 0
+
+  verify           = false
+  name             = "local-registry"
+  create_namespace = false
+  namespace        = "local-registry"
+  repository       = var.ipa_repo
+  chart            = "local-registry"
+  version          = var.local_registry_version
+  wait             = false
+  timeout          = "1800" # 30 minutes
+  disable_webhooks = false
+  values = [<<EOF
+cert-manager:
+  enabled: false
+ingress-nginx:
+  enabled: true
+  
+  controller:
+    ingressClass: nginx-internal
+    ingressClassResource:
+      controllerValue: "k8s.io/ingress-nginx-internal"
+      name: nginx-internal
+    admissionWebhooks:
+      enabled: false
+    autoscaling:
+      enabled: true
+      maxReplicas: 12
+      minReplicas: 6
+      targetCPUUtilizationPercentage: 50
+      targetMemoryUtilizationPercentage: 50
+    resources:
+      requests:
+        cpu: 1
+        memory: 2Gi
+    service:
+      external:
+        enabled: false
+      internal:
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+        enabled: true
+docker-registry:
+  image:
+    repository: ${var.image_registry}/docker.io/library/registry
+    imagePullSecrets:
+      - name: harbor-pull-secret
+  service:
+    annotations: 
+      external-dns.alpha.kubernetes.io/hostname: "local-registry.${local.dns_name}"
+  extraEnvVars:
+  - name: GOGC
+    value: "50"
+  ingress:
+    className: nginx-internal
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: zerossl
+      kubernetes.io/ingress.class: nginx-internal
+      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+    labels: 
+      acme.cert-manager.io/dns01-solver: "true"
+    hosts:
+    - local-registry.${local.dns_name}
+    tls:
+    - hosts:
+      - local-registry.${local.dns_name}
+      secretName: registry-tls
+  
+  persistence:
+    deleteEnabled: true
+    enabled: true
+    size: 100Gi
+    existingClaim: local-registry
+    storageClass: local-registry
+  proxy:
+    enabled: true
+    remoteurl: https://${var.image_registry}
+    secretRef: remote-access
+  replicaCount: 3
+  secrets:
+    htpasswd: local-user:${htpasswd_password.hash.bcrypt}
+localPullSecret:
+  password: ${random_password.password.result}
+  secretName: local-pull-secret
+  username: local-user
+metrics-server:
+  apiService:
+    create: true
+  enabled: false
+proxyRegistryAccess:
+  proxyPassword: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_password"] : ""}
+  proxyPullSecretName: remote-access
+  proxyUrl: https://${var.image_registry}
+  proxyUsername: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_username"] : ""}
+  
+registryUrl: local-registry.${local.dns_name}
+restartCronjob:
+  cronSchedule: 0 0 */3 * *
+  disabled: false
+  image: bitnami/kubectl:1.20.13
+  EOF
+  ]
 }
 
 output "local_registry_password" {
