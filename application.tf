@@ -1186,6 +1186,8 @@ crunchy-postgres:
   enabled: true
   postgres-data:
     enabled: true
+    name: postgres
+    postgresVersion: 13
     metadata:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
@@ -1332,6 +1334,15 @@ crunchy-postgres:
             memory: 3000Mi
     imagePullSecrets:
       - name: harbor-pull-secret
+secrets:
+  clusterIssuer:
+    letsencrypt:
+      create: true
+ingress:
+  useStaticCertificate: false
+  secretName: indico-ssl-static-cert
+  tls.crt: #base64 encoded value of certificate chain
+  tls.key: #base64 encoded value of certificate key
 minio:
   topology:
     volumeSize: 128Gi
