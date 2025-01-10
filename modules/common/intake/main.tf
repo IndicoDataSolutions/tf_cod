@@ -86,6 +86,6 @@ module "intake_application" {
   chart_version          = var.intake_version
   k8s_version            = var.k8s_version
   release_name           = "ipa"
-  terraform_helm_values  = indent(12, trimspace(base64decode(var.intake_values_terraform_overrides)))
+  terraform_helm_values  = indent(12, trimspace(var.intake_values_terraform_overrides))
   helm_values            = trimspace(base64decode(var.intake_values_overrides))
 }

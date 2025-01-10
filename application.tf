@@ -1037,7 +1037,7 @@ module "intake_smoketests" {
   chart_repo             = var.ipa_smoketest_repo
   chart_version          = var.ipa_smoketest_version
   k8s_version            = var.k8s_version
-  release_name           = "terraform-smoketests-${substr(data.external.git_information.result.sha, 0, 8)}"
+  release_name           = "run"
   terraform_helm_values  = ""
   helm_values            = indent(12, trimspace(local.smoketests_values))
 }
