@@ -477,6 +477,9 @@ global:
   host: ${local.dns_name}
   image:
     registry: ${var.image_registry}
+storage:
+  ebsStorageClass:
+    enabled: true
 secrets:
   clusterIssuer:
     zerossl:
@@ -1036,9 +1039,6 @@ module "intake_smoketests" {
 
 locals {
   insights_pre_reqs_values = [<<EOF
-storage:
-  ebsStorageClass:
-    enabled: true
 crunchy-postgres:
   enabled: true
   postgres-data:
