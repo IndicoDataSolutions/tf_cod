@@ -18,14 +18,14 @@ locals {
       mountOptions: []
       csi:
         driver: efs.csi.aws.com
-        volumeHandle: ${module.efs-storage[0].efs_filesystem_id}
+        volumeHandle: "${module.efs-storage[0].efs_filesystem_id}"
     indicoStorageClass:
       enabled: true
       name: indico-sc
       provisioner: efs.csi.aws.com
       parameters:
         provisioningMode: efs-ap
-        fileSystemId: ${module.efs-storage[0].efs_filesystem_id}
+        fileSystemId: "${module.efs-storage[0].efs_filesystem_id}"
         directoryPerms: "700"
         gidRangeStart: "1000" # optional
         gidRangeEnd: "2000" # optional
@@ -41,16 +41,16 @@ locals {
       csi:
         driver: fsx.csi.aws.com
         volumeAttributes:
-          dnsname: ${module.fsx-storage[0].fsx_rwx_dns_name}
-          mountname: ${module.fsx-storage[0].fsx_rwx_mount_name}
-        volumeHandle: ${module.fsx-storage[0].fsx_rwx_id}
+          dnsname: "${module.fsx-storage[0].fsx_rwx_dns_name}"
+          mountname: "${module.fsx-storage[0].fsx_rwx_mount_name}"
+        volumeHandle: "${module.fsx-storage[0].fsx_rwx_id}"
     indicoStorageClass:
       enabled: true
       name: indico-sc
       provisioner: fsx.csi.aws.com
       parameters:
-        securityGroupIds: ${local.security_group_id}
-        subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}
+        securityGroupIds: "${local.security_group_id}"
+        subnetId: "${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}"
  EOF
   ] : []
   on_prem_values = var.on_prem_test == true ? [<<EOF
