@@ -504,7 +504,7 @@ restartCronjob:
   image: bitnami/kubectl:1.20.13
 
 aws-efs-csi-driver:
-  enabled: ${var.include_efs} ? ${var.include_efs} : ${var.local_registry_enabled}
+  enabled: ${var.include_efs ? var.include_efs : var.local_registry_enabled}
   image:
     repository: ${var.image_registry}/docker.io/amazon/aws-efs-csi-driver
   sidecars:
@@ -733,7 +733,7 @@ module "indico-common" {
 
 # With the common charts are installed, we can then move on to installing intake and/or insights
 locals {
-  ipa_pre_reqs_values = [<<EOF
+  ipa_pre_reqs_values = concat(local.storage_spec, [<<EOF
 global:
   image:
     registry: ${var.image_registry}
@@ -920,7 +920,7 @@ rabbitmq:
     image:
       registry: ${var.image_registry}
   EOF
-  ]
+  ])
 
   intake_values = <<EOF
 global:
