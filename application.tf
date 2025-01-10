@@ -486,7 +486,7 @@ external-secrets:
   EOF
   ]
 
-  indico_pre_reqs_values = concat(local.storage_spec, [<<EOF
+  indico_pre_reqs_values = [<<EOF
 global:
   host: ${local.dns_name}
   image:
@@ -609,7 +609,7 @@ reflector:
   image:
     repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
   EOF
-  ])
+  ]
 
   monitoring_values = var.monitoring_enabled ? [<<EOF
 global:
@@ -747,7 +747,7 @@ module "indico-common" {
 
 # With the common charts are installed, we can then move on to installing intake and/or insights
 locals {
-  ipa_pre_reqs_values = [<<EOF
+  ipa_pre_reqs_values = concat(local.storage_spec, [<<EOF
 global:
   image:
     registry: ${var.image_registry}
@@ -1061,7 +1061,7 @@ rabbitmq:
     image:
       registry: ${var.image_registry}
   EOF
-  ]
+  ])
 
   intake_values = <<EOF
 global:
