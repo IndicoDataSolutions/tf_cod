@@ -1171,7 +1171,7 @@ module "intake_smoketests" {
   github_file_path       = "${var.argo_path}/ipa_smoketest.yaml"
   github_commit_message  = var.message
   argo_application_name  = local.argo_smoketest_app_name
-  argo_vault_plugin_path = ""
+  argo_vault_plugin_path = "tools/argo/data/ipa-deploy"
   argo_server            = module.cluster.kubernetes_host
   argo_project_name      = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
   chart_name             = "cod-smoketests"
