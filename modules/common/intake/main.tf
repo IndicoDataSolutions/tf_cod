@@ -41,11 +41,11 @@ resource "helm_release" "ipa-pre-requisites" {
   ]
 
   verify           = false
-  name             = "ipa-pre-reqs"
+  name             = "ipa-pre-requisites"
   create_namespace = true
   namespace        = var.namespace
   repository       = var.helm_registry
-  chart            = "ipa-pre-reqs"
+  chart            = "ipa-pre-requisites"
   version          = var.ipa_pre_reqs_version
   wait             = false
   timeout          = "1800" # 30 minutes
