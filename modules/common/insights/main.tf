@@ -87,5 +87,5 @@ module "insights_application" {
   k8s_version            = var.k8s_version
   release_name           = "insights"
   terraform_helm_values  = var.insights_values_terraform_overrides
-  helm_values            = var.insights_values_overrides
+  helm_values            = base64decode(var.insights_values_overrides)
 }
