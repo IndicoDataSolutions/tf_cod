@@ -1679,3 +1679,26 @@ output "zerossl" {
   sensitive = true
   value     = data.vault_kv_secret_v2.zerossl_data.data_json
 }
+
+resource "kubernetes_secret" "issuer-secret" {
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
+
+  metadata {
+    name      = "acme-route53"
+    namespace = "default"
+    annotations = {
+      "reflector.v1.k8s.emberstack.com/reflection-allowed"      = true
+      "reflector.v1.k8s.emberstack.com/reflection-auto-enabled" = true
+      "temporary.please.change/weaker-credentials-needed"       = true
+    }
+  }
+
+  type = "Opaque"
+
+  data = {
+    "secret-access-key" = var.aws_secret_key
+  }
+}
