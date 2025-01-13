@@ -17,28 +17,3 @@ moved {
   from = github_repository_file.argocd-application-yaml[0]
   to   = module.intake[0].module.intake_application.github_repository_file.argocd-application-yaml[0]
 }
-
-moved {
-  from = github_repository_file.crds-values-yaml[0]
-  to   = module.indico-common.github_repository_file.crds_values_yaml[0]
-}
-
-moved {
-  from = github_repository_file.pre-reqs-values-yaml[0]
-  to   = module.intake[0].github_repository_file.pre_reqs_values_yaml[0]
-}
-
-moved {
-  from = github_repository_file.smoketest-application-yaml[0]
-  to   = module.intake_smoketests[0].github_repository_file.argocd-application-yaml[0]
-}
-
-moved {
-  from = helm_release.ipa-pre-requisites
-  to   = module.intake[0].helm_release.ipa-pre-requisites
-}
-
-moved {
-  from = helm_release.monitoring[0]
-  to   = module.indico-common.helm_release.monitoring[0]
-}
