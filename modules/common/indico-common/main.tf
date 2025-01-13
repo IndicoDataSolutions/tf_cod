@@ -137,6 +137,8 @@ YAML
 resource "helm_release" "monitoring" {
   depends_on = [helm_release.indico_pre_requisites]
 
+  count = var.monitoring_enabled == true ? 1 : 0
+
   verify           = false
   name             = "monitoring"
   create_namespace = true
