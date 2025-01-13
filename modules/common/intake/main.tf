@@ -41,7 +41,7 @@ resource "helm_release" "ipa-pre-requisites" {
   ]
 
   verify           = false
-  name             = "ipa-pre-requisites"
+  name             = "ipa-pre-reqs"
   create_namespace = true
   namespace        = var.namespace
   repository       = var.helm_registry
