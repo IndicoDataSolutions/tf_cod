@@ -20,8 +20,8 @@ default_node_pool = {
     "node_group" : "default-workers"
   }
   cluster_auto_scaling           = true
-  cluster_auto_scaling_min_count = null
-  cluster_auto_scaling_max_count = null
+  cluster_auto_scaling_min_count = 0
+  cluster_auto_scaling_max_count = 5
 }
 
 additional_node_pools = {
