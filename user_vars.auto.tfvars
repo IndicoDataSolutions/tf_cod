@@ -94,6 +94,33 @@ node_groups = {
     desired_capacity = "1"
     taints           = "--register-with-taints=indico.io/azurite=true:NoSchedule"
   }
+  minio = {
+    type             = "cpu"
+    spot             = false
+    instance_types   = ["r6i.xlarge"]
+    min_size         = 0
+    max_size         = 4
+    desired_capacity = "4"
+    taints           = "--register-with-taints=indico.io/minio=true:NoSchedule"
+  }
+  weaviate = {
+    type             = "cpu"
+    spot             = false
+    instance_types   = ["r5a.xlarge"]
+    min_size         = 0
+    max_size         = 3
+    desired_capacity = "3"
+    taints           = "--register-with-taints=indico.io/weaviate=true:NoSchedule"
+  }
+  weaviate-workers = {
+    type             = "cpu"
+    spot             = false
+    instance_types   = ["c6a.2xlarge"]
+    min_size         = 0
+    max_size         = 2
+    desired_capacity = "2"
+    taints           = "--register-with-taints=indico.io/weaviate-workers=true:NoSchedule"
+  }
 }
 # additional_tags = { # delete this if no additional tags needed
 #   foo = "bar",
