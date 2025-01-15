@@ -2,7 +2,7 @@
 resource "kubernetes_service_account_v1" "vault-auth-default" {
   metadata {
     name      = "vault-auth"
-    namespace = "default"
+    namespace = "indico"
   }
 
   automount_service_account_token = true
@@ -33,7 +33,7 @@ resource "kubernetes_secret_v1" "vault-auth-default" {
   depends_on = [kubernetes_service_account_v1.vault-auth-default]
   metadata {
     name      = "vault-auth"
-    namespace = "default"
+    namespace = "indico"
     annotations = {
       "kubernetes.io/service-account.name" = kubernetes_service_account_v1.vault-auth-default.metadata.0.name
     }
@@ -79,7 +79,7 @@ resource "vault_kubernetes_auth_backend_role" "vault-auth-role" {
   backend                          = vault_auth_backend.kubernetes.path
   role_name                        = "vault-auth-role"
   bound_service_account_names      = [kubernetes_service_account_v1.vault-auth-default.metadata.0.name]
-  bound_service_account_namespaces = ["default"]
+  bound_service_account_namespaces = ["indico"]
   token_ttl                        = 3600
   token_policies                   = [vault_policy.vault-auth-policy.name]
   audience                         = var.audience
