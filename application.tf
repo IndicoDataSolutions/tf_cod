@@ -1120,28 +1120,28 @@ crunchy-postgres:
           requests:
             cpu: 1000m
             memory: 3000Mi
-      monitoring: true
-      users:
-        - name: indico
-          options: "SUPERUSER"
-          databases:
-            - aqueduct
-            - ask_my_collection
-            - lagoon
-      patroni:
-        dynamicConfiguration:
-          postgresql:
-            listen: "*"
-            pg_hba:
-              - host all all 0.0.0.0/0 password
-            parameters:
-              max_worker_processes: 90
-              max_parallel_workers_per_gather: 20
-              force_parallel_mode: 0
-              work_mem: 131072
-              wal_level: logical
-              max_stack_depth: 6144
-              max_connections: 1000
+    monitoring: true
+    users:
+      - name: indico
+        options: "SUPERUSER"
+        databases:
+          - aqueduct
+          - ask_my_collection
+          - lagoon
+    patroni:
+      dynamicConfiguration:
+        postgresql:
+          listen: "*"
+          pg_hba:
+            - host all all 0.0.0.0/0 password
+          parameters:
+            max_worker_processes: 90
+            max_parallel_workers_per_gather: 20
+            force_parallel_mode: 0
+            work_mem: 131072
+            wal_level: logical
+            max_stack_depth: 6144
+            max_connections: 1000
     imagePullSecrets:
       - name: harbor-pull-secret
   postgres-metrics:
