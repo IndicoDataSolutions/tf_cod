@@ -560,7 +560,7 @@ cluster-autoscaler:
     awsRegion: ${var.region}
     image:
       repository: ${var.image_registry}/public-gcr-k8s-proxy/autoscaling/cluster-autoscaler
-      tag: "v1.20.0"
+      tag: "v${var.k8s_version}.0"
     autoDiscovery:
       clusterName: "${var.label}"
     extraArgs:
