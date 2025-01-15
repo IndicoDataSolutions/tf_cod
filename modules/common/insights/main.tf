@@ -75,7 +75,7 @@ module "insights_application" {
   argo_enabled           = var.argo_enabled
   github_repo_name       = var.github_repo_name
   github_repo_branch     = var.github_repo_branch
-  github_file_path       = "${var.github_file_path}/ins_application.yaml"
+  github_file_path       = "${var.github_file_path}/insights_application.yaml"
   github_commit_message  = var.github_commit_message
   argo_application_name  = var.argo_application_name
   argo_vault_plugin_path = var.vault_path
@@ -86,6 +86,6 @@ module "insights_application" {
   chart_version          = var.insights_version
   k8s_version            = var.k8s_version
   release_name           = "insights"
-  terraform_helm_values  = var.insights_values_terraform_overrides
-  helm_values            = base64decode(var.insights_values_overrides)
+  terraform_helm_values  = indent(12, trimspace(var.insights_values_terraform_overrides))
+  helm_values            = trimspace(base64decode(var.insights_values_overrides))
 }
