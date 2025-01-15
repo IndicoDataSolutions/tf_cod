@@ -100,7 +100,7 @@ node_groups = {
     instance_types   = ["r6i.xlarge"]
     min_size         = 0
     max_size         = 4
-    desired_capacity = "4"
+    desired_capacity = "0"
     taints           = "--register-with-taints=indico.io/minio=true:NoSchedule"
   }
   weaviate = {
@@ -109,7 +109,7 @@ node_groups = {
     instance_types   = ["r5a.xlarge"]
     min_size         = 0
     max_size         = 3
-    desired_capacity = "3"
+    desired_capacity = "0"
     taints           = "--register-with-taints=indico.io/weaviate=true:NoSchedule"
   }
   weaviate-workers = {
@@ -118,7 +118,7 @@ node_groups = {
     instance_types   = ["c6a.2xlarge"]
     min_size         = 0
     max_size         = 2
-    desired_capacity = "2"
+    desired_capacity = "0"
     taints           = "--register-with-taints=indico.io/weaviate-workers=true:NoSchedule"
   }
 }
