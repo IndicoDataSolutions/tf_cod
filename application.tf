@@ -1701,34 +1701,3 @@ resource "kubernetes_secret" "issuer-secret" {
     "secret-access-key" = var.aws_secret_key
   }
 }
-
-resource "helm_release" "terraform-smoketests" {
-  count = var.terraform_smoketests_enabled == true ? 1 : 0
-
-  depends_on = [
-    kubernetes_config_map.terraform-variables,
-    module.indico-common
-  ]
-
-  verify           = false
-  name             = "terraform-smoketests-${substr(data.external.git_information.result.sha, 0, 8)}"
-  namespace        = "default"
-  repository       = var.ipa_repo
-  chart            = "terraform-smoketests"
-  version          = "0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
-  wait             = true
-  wait_for_jobs    = true
-  timeout          = "300" # 5 minutes
-  disable_webhooks = false
-  values = [<<EOF
-  cluster:
-    cloudProvider: aws
-    account: ${var.aws_account}
-    region: ${var.region}
-    name: ${var.label}
-  image:
-    repository: ${var.image_registry}/indico/terraform-smoketests
-    tag: "${substr(data.external.git_information.result.sha, 0, 8)}"
-  EOF
-  ]
-}
