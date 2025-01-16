@@ -1144,7 +1144,6 @@ module "intake" {
 locals {
   smoketests_values = <<EOF
   cluster:
-    cloudProvider: aws
     account: ${var.aws_account}
     region: ${var.region}
     name: ${var.label}
