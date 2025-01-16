@@ -1398,3 +1398,11 @@ variable "minio_enabled" {
   default     = false
   description = "Toggle for enabling minio deployment"
 }
+
+variable "indico-crds-values-yaml-b64" {
+  default = "Cg=="
+}
+
+variable "indico-pre-reqs-values-yaml-b64" {
+  default = "Cg=="
+}

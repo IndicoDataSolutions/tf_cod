@@ -723,10 +723,11 @@ module "indico-common" {
   helm_registry                    = var.ipa_repo
   namespace                        = "indico"
   indico_crds_version              = var.indico_crds_version
-  crds_values_yaml_b64             = var.crds-values-yaml-b64
+  indico_crds_values_yaml_b64      = var.indico-crds-values-yaml-b64
   indico_crds_values_overrides     = local.indico_crds_values
   indico_pre_reqs_version          = var.indico_pre_reqs_version
   indico_pre_reqs_values_overrides = local.indico_pre_reqs_values
+  indico_pre_reqs_values_yaml_b64  = var.indico-pre-reqs-values-yaml-b64
   monitoring_enabled               = var.monitoring_enabled
   monitoring_values                = local.monitoring_values
   monitoring_version               = var.monitoring_version
