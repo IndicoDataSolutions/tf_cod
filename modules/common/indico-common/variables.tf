@@ -48,7 +48,7 @@ variable "indico_crds_version" {
   description = "indico-crds chart version to deploy to the cluster"
 }
 
-variable "crds_values_yaml_b64" {
+variable "indico_crds_values_yaml_b64" {
   type        = string
   default     = "Cg=="
   description = "indico-crds values provided by the user in the cod.yaml"
@@ -67,7 +67,7 @@ variable "indico_pre_reqs_version" {
   description = "indico-pre-requisistes chart version to deploy to the cluster"
 }
 
-variable "pre_reqs_values_yaml_b64" {
+variable "indico_pre_reqs_values_yaml_b64" {
   type        = string
   default     = "Cg=="
   description = "indico-pre-requisistes values provided by the user in the cod.yaml"
