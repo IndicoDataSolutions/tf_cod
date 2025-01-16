@@ -1039,7 +1039,7 @@ module "intake_smoketests" {
   k8s_version            = var.k8s_version
   release_name           = "run"
   terraform_helm_values  = ""
-  helm_values            = indent(12, trimspace(local.smoketests_values))
+  helm_values            = indent(10, trimspace(local.smoketests_values))
 }
 
 locals {
