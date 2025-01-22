@@ -817,3 +817,95 @@ variable "aks_storage_account_name" {
   default     = ""
   description = "specifies the storage account name for the cluster if we don't want it generated automatically"
 }
+
+variable "indico_crds_version" {
+  type        = string
+  default     = ""
+  description = "Version of the indico-crds helm chart"
+}
+
+variable "indico_pre_reqs_version" {
+  type        = string
+  default     = ""
+  description = "Version of the indico-pre-reqs helm chart"
+}
+
+variable "insights-pre-reqs-values-yaml-b64" {
+  type        = string
+  default     = "Cg=="
+  description = "user provided overrides to indico-pre-reqs helm chart"
+}
+
+variable "insights_enabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling insights deployment"
+}
+
+variable "insights_values" {
+  type        = string
+  default     = ""
+  description = "User provided overrides to the insights application"
+}
+
+variable "insights_version" {
+  type        = string
+  default     = ""
+  description = "Insights helm chart version to deploy to the cluster"
+}
+
+variable "insights_smoketest_version" {
+  type        = string
+  default     = ""
+  description = "Insights smoketest to deploy to the cluster"
+}
+
+variable "insights_smoketest_values" {
+  type        = string
+  default     = ""
+  description = "Insights smoketest overrides"
+}
+
+variable "insights_smoketest_enabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling smoketest"
+}
+
+variable "insights_smoketest_cronjob_enabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for scheduling smoketests"
+}
+
+variable "insights_pre_reqs_version" {
+  type        = string
+  default     = ""
+  description = "insights-pre-requisites helm chart version"
+}
+
+variable "insights_local_registry_harbor_robot_account_name" {
+  type        = string
+  default     = ""
+  description = ""
+}
+
+variable "insights_local_registry_enabled" {
+  type        = string
+  default     = ""
+  description = ""
+}
+
+variable "minio_enabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling minio deployment"
+}
+
+variable "indico-crds-values-yaml-b64" {
+  default = "Cg=="
+}
+
+variable "indico-pre-reqs-values-yaml-b64" {
+  default = "Cg=="
+}
