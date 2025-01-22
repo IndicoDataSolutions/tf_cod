@@ -410,8 +410,7 @@ resource "helm_release" "crunchy-postgres" {
   count = var.is_openshift == true ? 1 : 0
   depends_on = [
     module.cluster,
-    helm_release.ipa-crds,
-    time_sleep.wait_1_minutes_after_crds
+    module.indico-common
   ]
 
   name             = "crunchy"
@@ -1085,5 +1084,25 @@ resource "argocd_application" "ipa" {
   timeouts {
     create = "30m"
     delete = "30m"
+  }
+}
+
+resource "null_resource" "wait-for-tf-cod-chart-build" {
+  count = var.argo_enabled == true ? 1 : 0
+
+  depends_on = [
+    module.intake,
+    module.indico-common
+  ]
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    environment = {
+      HARBOR_API_TOKEN = jsondecode(data.vault_kv_secret_v2.harbor-api-token[0].data_json)["bearer_token"]
+    }
+    command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
   }
 }
