@@ -86,12 +86,6 @@ module "secrets-operator-setup" {
   kubernetes_host = module.cluster.kubernetes_host
 }
 
-resource "kubernetes_namespace" "indico" {
-  metadata {
-    name = "indico"
-  }
-}
-
 locals {
   indico_crds_values = [<<EOF
 migrations:
@@ -111,13 +105,6 @@ cert-manager:
   cainjector:
     nodeSelector:
       kubernetes.io/os: linux
-migrations-operator:
-  enabled: ${var.ipa_enabled || var.insights_enabled}
-  image:
-    repository: ${var.image_registry}/indico/migrations-operator
-  controllerImage:
-    repository: ${var.image_registry}/indico/migrations-controller
-    kubectlImage: ${var.image_registry}/indico/migrations-controller-kubectl
 crunchy-pgo:
   enabled: ${var.ipa_enabled || var.insights_enabled}
 minio:
@@ -129,7 +116,7 @@ vault-secrets-operator:
       - name: harbor-pull-secret
     kubeRbacProxy:
       image:
-        repository: ${var.image_registry}/quay.io/brancz/kube-rbac-proxy
+        repository: ${var.image_registry}/gcr.io/kubebuilder/kube-rbac-proxy
       resources:
         limits:
           cpu: 500m
@@ -169,7 +156,6 @@ vault-secrets-operator:
           - "--client-cache-persistence-model=direct-encrypted"
 external-secrets:
   enabled: true
-  installCRDs: true
   image:
     repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
   webhook:
@@ -381,15 +367,11 @@ opentelemetry-collector:
             - otlp
         metrics: null
         logs: null
-sql-exporter:
-  enabled: ${var.ipa_enabled}
-  image:
-    repository: '${var.image_registry}/dockerhub-proxy/burningalchemist/sql_exporter'
   EOF
-    ], [<<EOF
+    ], <<EOF
 ${local.private_dns_config}
   EOF
-  ]) : []
+  ) : []
 }
 
 module "indico-common" {
@@ -428,7 +410,8 @@ resource "helm_release" "crunchy-postgres" {
   count = var.is_openshift == true ? 1 : 0
   depends_on = [
     module.cluster,
-    module.indico-common
+    helm_release.ipa-crds,
+    time_sleep.wait_1_minutes_after_crds
   ]
 
   name             = "crunchy"
@@ -528,16 +511,10 @@ resource "azurerm_role_assignment" "external_dns" {
 
 resource "kubernetes_secret" "azure_storage_key" {
   depends_on = [
-    module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
+    module.cluster
   ]
   metadata {
-    name      = "azure-storage-key"
-    namespace = "indico"
-    annotations = {
-      "reflector.v1.k8s.emberstack.com/reflection-allowed"      = true
-      "reflector.v1.k8s.emberstack.com/reflection-auto-enabled" = true
-    }
+    name = "azure-storage-key"
   }
 
   data = {
@@ -554,13 +531,11 @@ resource "kubernetes_config_map" "azure_dns_credentials" {
   count = var.include_external_dns == true ? 1 : 0
 
   depends_on = [
-    module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
+    module.cluster
   ]
 
   metadata {
-    name      = "dns-credentials-config"
-    namespace = "indico"
+    name = "dns-credentials-config"
   }
 
   data = {
@@ -574,8 +549,7 @@ resource "kubectl_manifest" "custom-cluster-issuer" {
   depends_on = [
     module.cluster,
     module.storage,
-    module.indico-common,
-    time_sleep.wait_1_minutes_after_cluster,
+    helm_release.ipa-crds,
     data.vault_kv_secret_v2.zerossl_data,
     kubernetes_secret.azure_storage_key,
     kubernetes_config_map.azure_dns_credentials,
@@ -648,7 +622,8 @@ crunchy-postgres:
   postgres-data:
     metadata:
       annotations:
-        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
     instances:
     - affinity:
         nodeAffinity:
@@ -676,7 +651,6 @@ crunchy-postgres:
         annotations:
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
       dataVolumeClaimSpec:
         accessModes:
         - ReadWriteOnce
@@ -694,7 +668,7 @@ crunchy-postgres:
           key: indico.io/crunchy
           operator: Exists
     pgBackRestConfig:
-      global:
+      global: # https://access.crunchydata.com/documentation/postgres-operator/v5/tutorial/backups/#using-azure-blob-storage
         archive-timeout: '10000'
         repo1-path: /pgbackrest/postgres-data/repo1
         repo1-retention-full: '5'
@@ -706,12 +680,11 @@ crunchy-postgres:
           container: " ${module.storage.crunchy_backup_name}"
         schedules:
           full: 30 4 * * *
-          incremental: 0 0 * * *
-      jobs:
-        resources:
-          requests:
-            cpu: 1000m
-            memory: 3000Mi
+          incremental: 0 */1 * * *
+    imagePullSecrets:
+      - name: harbor-pull-secret
+  postgres-metrics:
+    enabled: false
   EOF
   ]
 
@@ -732,9 +705,6 @@ readapi:
     - azure-storage-key
 aws-node-termination:
   enabled: false 
-app-edge:
-  cspApprovedSources:
-    - ${module.storage.storage_account_name}.blob.core.windows.net
 global:
   podLabels:
     "azure.workload.identity/use": "true"
@@ -788,10 +758,8 @@ locals {
     region: ${var.region}
     name: ${var.label}
   host: ${local.dns_name}
-  slack:
-    channel: ${var.ipa_smoketest_slack_channel}
-  prometheus:
-    url: ${local.prometheus_address}
+  image:
+    repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/integration_tests
   ${indent(4, base64decode(var.ipa_smoketest_values))}
   EOF
 }
@@ -824,17 +792,88 @@ module "intake_smoketests" {
   helm_values            = indent(10, trimspace(local.smoketests_values))
 }
 
+
+resource "github_repository_file" "smoketest-application-yaml" {
+  count = var.ipa_smoketest_enabled == true ? 1 : 0
+
+  repository          = data.github_repository.argo-github-repo[0].name
+  branch              = var.argo_branch
+  file                = "${var.argo_path}/ipa_smoketest.yaml"
+  commit_message      = var.message
+  overwrite_on_create = true
+
+  lifecycle {
+    ignore_changes = [
+      content
+    ]
+  }
+
+  content = <<EOT
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ${local.argo_smoketest_app_name}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app: cod
+    region: ${var.region}
+    account: ${var.account}
+    name: ${var.label}
+  annotations:
+    avp.kubernetes.io/path: tools/argo/data/ipa-deploy
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  destination:
+    server: ${module.cluster.kubernetes_host}
+    namespace: default
+  project: "${lower("${var.account}.${var.label}.${var.region}")}"
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+  source:
+    chart: cod-smoketests
+    repoURL: ${var.ipa_smoketest_repo}
+    targetRevision: ${var.ipa_smoketest_version}
+    plugin:
+      name: argocd-vault-plugin-helm-values-expand-no-build
+      env:
+        - name: KUBE_VERSION
+          value: "${var.k8s_version}"
+          
+        - name: RELEASE_NAME
+          value: run
+  
+        - name: HELM_TF_COD_VALUES
+          value: |
+            prometheus:
+              url: ${local.prometheus_address}
+
+        - name: HELM_VALUES
+          value: |
+            cluster:
+              name: ${var.label}
+              region: ${var.region}
+              account: ${var.account}
+            host: ${local.dns_name}
+            slack:
+              channel: ${var.ipa_smoketest_slack_channel}
+            ${indent(12, base64decode(var.ipa_smoketest_values))} 
+EOT
+}
+
 locals {
   insights_pre_reqs_values = [<<EOF
 crunchy-postgres:
   enabled: ${!var.is_openshift}
   postgres-data:
-    enabled: true
-    name: postgres-insights
-    postgresVersion: 13
     metadata:
       annotations:
-        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
     instances:
     - affinity:
         nodeAffinity:
@@ -852,42 +891,41 @@ crunchy-postgres:
               - key: postgres-operator.crunchydata.com/cluster
                 operator: In
                 values:
-                - postgres-insights
+                - postgres-data
               - key: postgres-operator.crunchydata.com/instance-set
                 operator: In
                 values:
-                - pgha2
+                - pgha1
             topologyKey: kubernetes.io/hostname
       metadata:
         annotations:
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
       dataVolumeClaimSpec:
         accessModes:
         - ReadWriteOnce
         resources:
           requests:
             storage: 200Gi
-      name: pgha2
+      name: pgha1
       replicas: 1
       resources:
         requests:
-          cpu: 1000m
+          cpu: 500m
           memory: 3000Mi
       tolerations:
         - effect: NoSchedule
           key: indico.io/crunchy
           operator: Exists
     pgBackRestConfig:
-      global:
+      global: # https://access.crunchydata.com/documentation/postgres-operator/v5/tutorial/backups/#using-azure-blob-storage
         archive-timeout: '10000'
-        repo2-path: /pgbackrest/postgres-data/repo2
-        repo2-retention-full: '5'
-        repo2-azure-account: ${module.storage.storage_account_name}
-        repo2-azure-key: ${module.storage.storage_account_primary_access_key}
+        repo1-path: /pgbackrest/postgres-data/repo1
+        repo1-retention-full: '5'
+        repo1-azure-account: ${module.storage.storage_account_name}
+        repo1-azure-key: ${module.storage.storage_account_primary_access_key}
       repos:
-      - name: repo2
+      - name: repo1
         azure:
           container: " ${module.storage.crunchy_backup_name}"
         schedules:
@@ -906,17 +944,32 @@ crunchy-postgres:
           - aqueduct
           - ask_my_collection
           - lagoon
-          - noct
+    patroni:
+      dynamicConfiguration:
+        postgresql:
+          listen: "*"
+          pg_hba:
+            - host all all 0.0.0.0/0 password
+          parameters:
+            max_worker_processes: 90
+            max_parallel_workers_per_gather: 20
+            force_parallel_mode: 0
+            work_mem: 131072
+            wal_level: logical
+            max_stack_depth: 6144
+            max_connections: 1000
+    imagePullSecrets:
+      - name: harbor-pull-secret
+  postgres-metrics:
+    enabled: false
 ingress:
   useStaticCertificate: false
   secretName: indico-ssl-static-cert
   tls.crt: #base64 encoded value of certificate chain
   tls.key: #base64 encoded value of certificate key
 minio:
-  createStorageClass: false
   topology:
     volumeSize: 128Gi
-    storageClassName: default
   storage:
     accessKey: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
     secretKey: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
@@ -963,6 +1016,8 @@ server:
       env:
         FIELD_AUTOCONFIRM_CONFIDENCE: 0.8
         FIELD_CONFIG_PATH: "fields_config.yaml"
+cronjob:
+  enabled: false
 ask-my-docs:
   llmConfig:
     llm: indico-azure-instance
@@ -1045,10 +1100,13 @@ output "zerossl" {
 
 resource "argocd_application" "ipa" {
   depends_on = [
-    module.intake,
-    module.insights,
+    helm_release.ipa-pre-requisites,
+    time_sleep.wait_1_minutes_after_pre_reqs,
     module.argo-registration,
-    helm_release.cod-snapshot-restore
+    helm_release.cod-snapshot-restore,
+    github_repository_file.smoketest-application-yaml,
+    github_repository_file.argocd-application-yaml,
+    helm_release.keda-monitoring
   ]
 
   count = var.ipa_enabled == true ? 1 : 0
@@ -1068,14 +1126,12 @@ resource "argocd_application" "ipa" {
     project = lower("${var.account}.${var.label}.${var.region}")
 
     source {
+      plugin {
+        name = "argocd-vault-plugin"
+      }
       repo_url        = "https://github.com/IndicoDataSolutions/${var.argo_repo}.git"
       path            = var.argo_path
       target_revision = var.argo_branch
-      directory {
-        recurse = false
-        jsonnet {
-        }
-      }
     }
 
     sync_policy {
@@ -1099,25 +1155,5 @@ resource "argocd_application" "ipa" {
   timeouts {
     create = "30m"
     delete = "30m"
-  }
-}
-
-resource "null_resource" "wait-for-tf-cod-chart-build" {
-  count = var.argo_enabled == true ? 1 : 0
-
-  depends_on = [
-    module.intake,
-    module.indico-common
-  ]
-
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-
-  provisioner "local-exec" {
-    environment = {
-      HARBOR_API_TOKEN = jsondecode(data.vault_kv_secret_v2.harbor-api-token[0].data_json)["bearer_token"]
-    }
-    command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
   }
 }
