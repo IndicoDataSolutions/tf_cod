@@ -86,6 +86,12 @@ module "secrets-operator-setup" {
   kubernetes_host = module.cluster.kubernetes_host
 }
 
+resource "kubernetes_namespace" "indico" {
+  metadata {
+    name = "indico"
+  }
+}
+
 locals {
   indico_crds_values = [<<EOF
 migrations:
