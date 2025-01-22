@@ -179,6 +179,5 @@ additional_node_pools = {
     cluster_auto_scaling           = true
     cluster_auto_scaling_min_count = 0
     cluster_auto_scaling_max_count = 2
-    taints                         = "--register-with-taints=indico.io/weaviate-workers=true:NoSchedule"
   }
 }
