@@ -511,10 +511,12 @@ resource "azurerm_role_assignment" "external_dns" {
 
 resource "kubernetes_secret" "azure_storage_key" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
   ]
   metadata {
-    name = "azure-storage-key"
+    name      = "azure-storage-key"
+    namespace = "indico"
   }
 
   data = {
@@ -531,11 +533,13 @@ resource "kubernetes_config_map" "azure_dns_credentials" {
   count = var.include_external_dns == true ? 1 : 0
 
   depends_on = [
-    module.cluster
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   metadata {
-    name = "dns-credentials-config"
+    name      = "dns-credentials-config"
+    namespace = "indico"
   }
 
   data = {
@@ -549,7 +553,8 @@ resource "kubectl_manifest" "custom-cluster-issuer" {
   depends_on = [
     module.cluster,
     module.storage,
-    helm_release.ipa-crds,
+    module.indico-common,
+    time_sleep.wait_1_minutes_after_cluster,
     data.vault_kv_secret_v2.zerossl_data,
     kubernetes_secret.azure_storage_key,
     kubernetes_config_map.azure_dns_credentials,
@@ -758,8 +763,10 @@ locals {
     region: ${var.region}
     name: ${var.label}
   host: ${local.dns_name}
-  image:
-    repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/integration_tests
+  slack:
+    channel: ${var.ipa_smoketest_slack_channel}
+  prometheus:
+    url: ${local.prometheus_address}
   ${indent(4, base64decode(var.ipa_smoketest_values))}
   EOF
 }
@@ -790,79 +797,6 @@ module "intake_smoketests" {
   release_name           = "run"
   terraform_helm_values  = ""
   helm_values            = indent(10, trimspace(local.smoketests_values))
-}
-
-
-resource "github_repository_file" "smoketest-application-yaml" {
-  count = var.ipa_smoketest_enabled == true ? 1 : 0
-
-  repository          = data.github_repository.argo-github-repo[0].name
-  branch              = var.argo_branch
-  file                = "${var.argo_path}/ipa_smoketest.yaml"
-  commit_message      = var.message
-  overwrite_on_create = true
-
-  lifecycle {
-    ignore_changes = [
-      content
-    ]
-  }
-
-  content = <<EOT
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: ${local.argo_smoketest_app_name}
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-  labels:
-    app: cod
-    region: ${var.region}
-    account: ${var.account}
-    name: ${var.label}
-  annotations:
-    avp.kubernetes.io/path: tools/argo/data/ipa-deploy
-    argocd.argoproj.io/sync-wave: "2"
-spec:
-  destination:
-    server: ${module.cluster.kubernetes_host}
-    namespace: default
-  project: "${lower("${var.account}.${var.label}.${var.region}")}"
-  syncPolicy:
-    automated:
-      prune: true
-    syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true
-  source:
-    chart: cod-smoketests
-    repoURL: ${var.ipa_smoketest_repo}
-    targetRevision: ${var.ipa_smoketest_version}
-    plugin:
-      name: argocd-vault-plugin-helm-values-expand-no-build
-      env:
-        - name: KUBE_VERSION
-          value: "${var.k8s_version}"
-          
-        - name: RELEASE_NAME
-          value: run
-  
-        - name: HELM_TF_COD_VALUES
-          value: |
-            prometheus:
-              url: ${local.prometheus_address}
-
-        - name: HELM_VALUES
-          value: |
-            cluster:
-              name: ${var.label}
-              region: ${var.region}
-              account: ${var.account}
-            host: ${local.dns_name}
-            slack:
-              channel: ${var.ipa_smoketest_slack_channel}
-            ${indent(12, base64decode(var.ipa_smoketest_values))} 
-EOT
 }
 
 locals {
@@ -1100,13 +1034,9 @@ output "zerossl" {
 
 resource "argocd_application" "ipa" {
   depends_on = [
-    helm_release.ipa-pre-requisites,
-    time_sleep.wait_1_minutes_after_pre_reqs,
+    module.indico-common,
     module.argo-registration,
-    helm_release.cod-snapshot-restore,
-    github_repository_file.smoketest-application-yaml,
-    github_repository_file.argocd-application-yaml,
-    helm_release.keda-monitoring
+    helm_release.cod-snapshot-restore
   ]
 
   count = var.ipa_enabled == true ? 1 : 0
