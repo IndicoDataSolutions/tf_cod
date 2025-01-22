@@ -368,10 +368,10 @@ opentelemetry-collector:
         metrics: null
         logs: null
   EOF
-    ], <<EOF
+    ], [<<EOF
 ${local.private_dns_config}
   EOF
-  ) : []
+  ]) : []
 }
 
 module "indico-common" {
