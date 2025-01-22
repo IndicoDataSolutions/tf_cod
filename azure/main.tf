@@ -14,10 +14,11 @@ terraform {
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.33.0"
+      version = ">= 2.35.0"
     }
     kubectl = {
-      source = "gavinbunney/kubectl"
+      source  = "gavinbunney/kubectl"
+      version = "1.14.0"
     }
     helm = {
       source  = "hashicorp/helm"
@@ -25,7 +26,7 @@ terraform {
     }
     argocd = {
       source  = "oboukili/argocd"
-      version = "5.4.0"
+      version = "6.0.2"
     }
     local = {
       source  = "hashicorp/local"
@@ -33,11 +34,15 @@ terraform {
     }
     github = {
       source  = "integrations/github"
-      version = "4.26.0"
+      version = "5.34.0"
     }
     vault = {
       source  = "hashicorp/vault"
-      version = "3.13.0"
+      version = "3.22.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~>3.5.1"
     }
   }
 }
