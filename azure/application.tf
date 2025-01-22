@@ -162,6 +162,7 @@ vault-secrets-operator:
           - "--client-cache-persistence-model=direct-encrypted"
 external-secrets:
   enabled: true
+  installCRDs: true
   image:
     repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
   webhook:
