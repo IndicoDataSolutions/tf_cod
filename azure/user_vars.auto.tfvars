@@ -168,7 +168,7 @@ additional_node_pools = {
   }
   weaviate-workers = {
     node_count = 0
-    pool_name  = "weaviateworkers"
+    pool_name  = "weavworkers"
     vm_size    = "Standard_D16_v3"
     node_os    = "Linux"
     zones      = ["1", "2"]
