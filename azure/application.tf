@@ -111,6 +111,13 @@ cert-manager:
   cainjector:
     nodeSelector:
       kubernetes.io/os: linux
+migrations-operator:
+  enabled: ${var.ipa_enabled || var.insights_enabled}
+  image:
+    repository: ${var.image_registry}/indico/migrations-operator
+  controllerImage:
+    repository: ${var.image_registry}/indico/migrations-controller
+    kubectlImage: ${var.image_registry}/indico/migrations-controller-kubectl
 crunchy-pgo:
   enabled: ${var.ipa_enabled || var.insights_enabled}
 minio:
@@ -814,6 +821,8 @@ locals {
 crunchy-postgres:
   enabled: ${!var.is_openshift}
   postgres-data:
+    enabled: true
+    name: postgres
     metadata:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
