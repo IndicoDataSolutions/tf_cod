@@ -113,27 +113,6 @@ EOT
   ])
 }
 
-resource "kubectl_manifest" "gp2-storageclass" {
-  yaml_body = <<YAML
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: gp2
-  annotations:
-    storageclass.kubernetes.io/is-default-class: "true"
-parameters:
-  fsType: ext4
-  type: gp2
-provisioner: kubernetes.io/aws-ebs
-volumeBindingMode: WaitForFirstConsumer
-YAML
-  lifecycle {
-    ignore_changes = [
-      yaml_body
-    ]
-  }
-}
-
 resource "helm_release" "monitoring" {
   depends_on = [helm_release.indico_pre_requisites]
 
