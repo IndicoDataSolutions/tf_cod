@@ -523,6 +523,10 @@ resource "kubernetes_secret" "azure_storage_key" {
   metadata {
     name      = "azure-storage-key"
     namespace = "indico"
+    annotations = {
+      "reflector.v1.k8s.emberstack.com/reflection-allowed"      = true
+      "reflector.v1.k8s.emberstack.com/reflection-auto-enabled" = true
+    }
   }
 
   data = {
