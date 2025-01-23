@@ -823,6 +823,7 @@ crunchy-postgres:
   postgres-data:
     enabled: true
     name: postgres
+    postgresVersion: 13
     metadata:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
