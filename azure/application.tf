@@ -912,8 +912,10 @@ ingress:
   tls.crt: #base64 encoded value of certificate chain
   tls.key: #base64 encoded value of certificate key
 minio:
+  createStorageClass: false
   topology:
     volumeSize: 128Gi
+    storageClassName: default
   storage:
     accessKey: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
     secretKey: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
