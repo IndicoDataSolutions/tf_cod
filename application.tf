@@ -1514,6 +1514,7 @@ resource "argocd_application" "ipa" {
   depends_on = [
     # local_file.kubeconfig,
     module.intake,
+    module.insights,
     module.argo-registration,
     kubernetes_job.snapshot-restore-job,
   ]
