@@ -381,6 +381,10 @@ opentelemetry-collector:
             - otlp
         metrics: null
         logs: null
+sql-exporter:
+  enabled: ${var.ipa_enabled}
+  image:
+    repository: '${var.image_registry}/dockerhub-proxy/burningalchemist/sql_exporter'
   EOF
     ], [<<EOF
 ${local.private_dns_config}
@@ -1057,7 +1061,6 @@ output "zerossl" {
 resource "argocd_application" "ipa" {
   depends_on = [
     module.indico-common,
-    module.argo-registration,
     helm_release.cod-snapshot-restore
   ]
 
