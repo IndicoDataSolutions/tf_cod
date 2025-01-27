@@ -1081,12 +1081,14 @@ resource "argocd_application" "ipa" {
     project = lower("${var.account}.${var.label}.${var.region}")
 
     source {
-      plugin {
-        name = "argocd-vault-plugin"
-      }
       repo_url        = "https://github.com/IndicoDataSolutions/${var.argo_repo}.git"
       path            = var.argo_path
       target_revision = var.argo_branch
+      directory {
+        recurse = false
+        jsonnet {
+        }
+      }
     }
 
     sync_policy {
