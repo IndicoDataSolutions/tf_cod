@@ -190,7 +190,8 @@ provider "kubectl" {
 
 module "argo-registration" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   count = var.argo_enabled == true ? 1 : 0

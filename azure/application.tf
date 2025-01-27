@@ -1060,7 +1060,9 @@ output "zerossl" {
 
 resource "argocd_application" "ipa" {
   depends_on = [
-    module.indico-common,
+    module.intake,
+    module.insights,
+    module.argo-registration,
     helm_release.cod-snapshot-restore
   ]
 
