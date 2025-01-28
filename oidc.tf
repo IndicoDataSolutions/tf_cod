@@ -30,19 +30,19 @@ resource "kubernetes_cluster_role_binding" "cod-role-bindings" {
 
   subject {
     kind      = "Group"
-    name      = "oidcgroup:Engineering"
+    name      = "oidcgroup:engineering@indico.io"
     api_group = "rbac.authorization.k8s.io"
   }
 
   subject {
     kind      = "Group"
-    name      = "oidcgroup:QA"
+    name      = "oidcgroup:qa@indico.io"
     api_group = "rbac.authorization.k8s.io"
   }
 
   subject {
     kind      = "Group"
-    name      = "oidcgroup:DevOps"
+    name      = "oidcgroup:devops@indico.io"
     api_group = "rbac.authorization.k8s.io"
   }
 }
@@ -67,13 +67,13 @@ resource "kubernetes_cluster_role_binding" "eng-qa-rbac-bindings" {
 
   subject {
     kind      = "Group"
-    name      = "oidcgroup:Engineering"
+    name      = "oidcgroup:engineering@indico.io"
     api_group = "rbac.authorization.k8s.io"
   }
 
   subject {
     kind      = "Group"
-    name      = "oidcgroup:QA"
+    name      = "oidcgroup:qa@indico.io"
     api_group = "rbac.authorization.k8s.io"
   }
 }
@@ -98,7 +98,7 @@ resource "kubernetes_cluster_role_binding" "devops-rbac-bindings" {
 
   subject {
     kind      = "Group"
-    name      = "oidcgroup:DevOps"
+    name      = "oidcgroup:devops@indico.io"
     api_group = "rbac.authorization.k8s.io"
   }
 }
