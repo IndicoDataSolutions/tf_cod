@@ -1420,14 +1420,9 @@ weaviate:
 
   insights_values = <<EOF
 global:
-  host: ${var.label}.${var.region}.indico-dev.indico.io
+  host: ${lower("${var.label}.${var.region}.${var.aws_account}.indico.io")}
   features:
     askMyDocument: true
-  intake:
-    host: dev-ci.us-east-2.indico-dev.indico.io
-    apiToken: <path:tools/argo/data/indico-dev/ins-dev/intake#api_token>
-    tokenSecret: <path:tools/argo/data/indico-dev/ins-dev/intake#noct_token_secret>
-    cookieSecret: <path:tools/argo/data/indico-dev/ins-dev/intake#noct_cookie_secret>
 insights-edge:
   additionalAllowedOrigins:
     - https://local.indico.io:1234
