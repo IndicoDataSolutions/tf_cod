@@ -800,8 +800,7 @@ crunchy-postgres:
     enabled: true
     metadata:
       annotations:
-        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
     instances:
     - affinity:
         nodeAffinity:
@@ -829,6 +828,7 @@ crunchy-postgres:
         annotations:
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
       dataVolumeClaimSpec:
         storageClassName: ${local.storage_class}
         accessModes:
@@ -868,82 +868,6 @@ crunchy-postgres:
           requests:
             cpu: 1000m
             memory: 3000Mi
-    imagePullSecrets:
-      - name: harbor-pull-secret
-  postgres-metrics:
-    enabled: false
-    metadata:
-      annotations:
-        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-    instances:
-    - affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node_group
-                operator: In
-                values:
-                - pgo-workers
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: postgres-operator.crunchydata.com/cluster
-                operator: In
-                values:
-                - postgres-metrics
-              - key: postgres-operator.crunchydata.com/instance-set
-                operator: In
-                values:
-                - pgha1
-            topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      dataVolumeClaimSpec:
-        storageClassName: ${local.storage_class}
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 100Gi
-      name: pgha1
-      replicas: 2
-      resources:
-        requests:
-          cpu: 500m
-          memory: 3000Mi
-      tolerations:
-        - effect: NoSchedule
-          key: indico.io/crunchy
-          operator: Exists
-    pgBackRestConfig:
-      global:
-        archive-timeout: '10000'
-        repo1-path: /pgbackrest/postgres-metrics/repo1
-        repo1-retention-full: '5'
-        repo1-s3-key-type: auto
-        repo1-s3-kms-key-id: "${module.kms_key.key_arn}"
-        repo1-s3-role: ${module.iam.node_role_name}
-      repos:
-      - name: repo1
-        s3:
-          bucket: ${module.s3-storage.pgbackup_s3_bucket_name}
-          endpoint: s3.${var.region}.amazonaws.com
-          region: ${var.region}
-        schedules:
-          full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
-          differential: 0 0 * * * # Diff backup daily at midnight
-      jobs:
-        resources:
-          requests:
-            cpu: 1000m
-            memory: 3000Mi
-    imagePullSecrets:
-      - name: harbor-pull-secret
 rabbitmq:
   rabbitmq:
     image:
@@ -1073,12 +997,11 @@ crunchy-postgres:
   enabled: true
   postgres-data:
     enabled: true
-    name: postgres
+    name: postgres-insights
     postgresVersion: 13
     metadata:
       annotations:
-        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
     instances:
     - affinity:
         nodeAffinity:
@@ -1096,16 +1019,17 @@ crunchy-postgres:
               - key: postgres-operator.crunchydata.com/cluster
                 operator: In
                 values:
-                - postgres-data
+                - postgres-insights
               - key: postgres-operator.crunchydata.com/instance-set
                 operator: In
                 values:
-                - pgha1
+                - pgha2
             topologyKey: kubernetes.io/hostname
       metadata:
         annotations:
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
       dataVolumeClaimSpec:
         storageClassName: ${local.storage_class}
         accessModes:
@@ -1113,7 +1037,7 @@ crunchy-postgres:
         resources:
           requests:
             storage: 200Gi
-      name: pgha1
+      name: pgha2
       replicas: ${var.az_count}
       resources:
         requests:
@@ -1126,13 +1050,13 @@ crunchy-postgres:
     pgBackRestConfig:
       global:
         archive-timeout: '10000'
-        repo1-path: /pgbackrest/postgres-data/repo1
-        repo1-retention-full: '5'
-        repo1-s3-key-type: auto
-        repo1-s3-kms-key-id: "${module.kms_key.key_arn}"
-        repo1-s3-role: ${module.iam.node_role_name}
+        repo2-path: /pgbackrest/postgres-insights/repo1
+        repo2-retention-full: '5'
+        repo2-s3-key-type: auto
+        repo2-s3-kms-key-id: "${module.kms_key.key_arn}"
+        repo2-s3-role: ${module.iam.node_role_name}
       repos:
-      - name: repo1
+      - name: repo2
         s3:
           bucket: ${module.s3-storage.pgbackup_s3_bucket_name}
           endpoint: s3.${var.region}.amazonaws.com
@@ -1145,7 +1069,6 @@ crunchy-postgres:
           requests:
             cpu: 1000m
             memory: 3000Mi
-    monitoring: true
     users:
       - name: indico
         options: "SUPERUSER"
@@ -1153,96 +1076,6 @@ crunchy-postgres:
           - aqueduct
           - ask_my_collection
           - lagoon
-    patroni:
-      dynamicConfiguration:
-        postgresql:
-          listen: "*"
-          pg_hba:
-            - host all all 0.0.0.0/0 password
-          parameters:
-            max_worker_processes: 90
-            max_parallel_workers_per_gather: 20
-            force_parallel_mode: 0
-            work_mem: 131072
-            wal_level: logical
-            max_stack_depth: 6144
-            max_connections: 1000
-    imagePullSecrets:
-      - name: harbor-pull-secret
-  postgres-metrics:
-    enabled: false
-    metadata:
-      annotations:
-        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-    instances:
-    - affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node_group
-                operator: In
-                values:
-                - pgo-workers
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: postgres-operator.crunchydata.com/cluster
-                operator: In
-                values:
-                - postgres-metrics
-              - key: postgres-operator.crunchydata.com/instance-set
-                operator: In
-                values:
-                - pgha1
-            topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      dataVolumeClaimSpec:
-        storageClassName: ${local.storage_class}
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 100Gi
-      name: pgha1
-      replicas: 2
-      resources:
-        requests:
-          cpu: 500m
-          memory: 3000Mi
-      tolerations:
-        - effect: NoSchedule
-          key: indico.io/crunchy
-          operator: Exists
-    pgBackRestConfig:
-      global:
-        archive-timeout: '10000'
-        repo1-path: /pgbackrest/postgres-metrics/repo1
-        repo1-retention-full: '5'
-        repo1-s3-key-type: auto
-        repo1-s3-kms-key-id: "${module.kms_key.key_arn}"
-        repo1-s3-role: ${module.iam.node_role_name}
-      repos:
-      - name: repo1
-        s3:
-          bucket: ${module.s3-storage.pgbackup_s3_bucket_name}
-          endpoint: s3.${var.region}.amazonaws.com
-          region: ${var.region}
-        schedules:
-          full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
-          differential: 0 0 * * * # Diff backup daily at midnight
-      jobs:
-        resources:
-          requests:
-            cpu: 1000m
-            memory: 3000Mi
-    imagePullSecrets:
-      - name: harbor-pull-secret
 ingress:
   useStaticCertificate: false
   secretName: indico-ssl-static-cert
