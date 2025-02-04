@@ -827,11 +827,6 @@ variable "blob_type" {
   }
 }
 
-variable "storage_account_name" {
-  type    = string
-  default = ""
-}
-
 variable "fileshare_name" {
   type    = string
   default = ""

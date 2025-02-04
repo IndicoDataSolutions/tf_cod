@@ -278,6 +278,10 @@ module "storage" {
   resource_group_name  = local.resource_group_name
   storage_account_name = local.storage_account_name
   keyvault_name        = var.keyvault_name
+  blob_type            = var.blob_type
+  fileshare_name       = var.fileshare_name
+  blob_store_name      = var.blob_store_name
+  crunchy_backup_name  = var.crunchy_backup_name
 }
 
 resource "azurerm_user_assigned_identity" "cluster_dns" {
