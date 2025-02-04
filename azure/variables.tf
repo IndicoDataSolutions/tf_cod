@@ -817,3 +817,32 @@ variable "aks_storage_account_name" {
   default     = ""
   description = "specifies the storage account name for the cluster if we don't want it generated automatically"
 }
+
+variable "blob_type" {
+  type    = string
+  default = "create"
+  validation {
+    condition     = var.blob_type == "create" || var.blob_type == "load"
+    error_message = "${var.blob_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "storage_account_name" {
+  type    = string
+  default = ""
+}
+
+variable "fileshare_name" {
+  type    = string
+  default = ""
+}
+
+variable "blob_store_name" {
+  type    = string
+  default = ""
+}
+
+variable "crunchy_backup_name" {
+  type    = string
+  default = ""
+}
