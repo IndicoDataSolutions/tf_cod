@@ -828,8 +828,9 @@ variable "blob_type" {
 }
 
 variable "fileshare_name" {
-  type    = string
-  default = ""
+  type        = string
+  default     = "indico-user-data"
+  description = "Name of the indico file share"
 }
 
 variable "blob_store_name" {
