@@ -446,7 +446,7 @@ vault-secrets-operator:
       - name: harbor-pull-secret
     kubeRbacProxy:
       image:
-        repository: ${var.image_registry}/gcr.io/kubebuilder/kube-rbac-proxy
+        repository: ${var.image_registry}/quay.io/brancz/kube-rbac-proxy
       resources:
         limits:
           cpu: 500m
