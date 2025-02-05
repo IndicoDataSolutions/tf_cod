@@ -145,6 +145,9 @@ external-dns:
     - ${local.dns_zone_name}
 
   provider: aws
+  env:
+    - name: AWS_DEFAULT_REGION
+      value: ${var.region}
   policy: sync
   sources:
     - service
@@ -171,6 +174,9 @@ external-dns:
     - ${local.dns_zone_name}
 
   provider: aws
+  env:
+    - name: AWS_DEFAULT_REGION
+      value: ${var.region}
   policy: sync
   sources:
     - service
@@ -189,7 +195,9 @@ alternate-external-dns:
     - "--aws-assume-role=${var.aws_primary_dns_role_arn}"
 
   provider: aws
-
+  env:
+    - name: AWS_DEFAULT_REGION
+      value: ${var.region}
   policy: sync
   sources:
     - ingress
