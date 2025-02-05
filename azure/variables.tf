@@ -817,3 +817,29 @@ variable "aks_storage_account_name" {
   default     = ""
   description = "specifies the storage account name for the cluster if we don't want it generated automatically"
 }
+
+variable "readapi_type" {
+  type    = string
+  default = "create"
+  validation {
+    condition     = var.readapi_type == "create" || var.readapi_type == "load"
+    error_message = "${var.readapi_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "azure_resource_group" {
+  type        = string
+  default     = "indico-readapi"
+  description = "azure resource group where the Computer Vision for read api resides"
+}
+
+variable "readapi_name" {
+  type        = string
+  default     = ""
+  description = "azure Computer Vision name for readapi service"
+}
+
+variable "readapi_queue_name" {
+  type    = string
+  default = "readapi"
+}
