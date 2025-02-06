@@ -432,17 +432,19 @@ provider "kubernetes" {
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
   #token                  = data.aws_eks_cluster_auth.local.token
   #token                  = module.cluster.kubernetes_token
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--cluster-name", var.label]
-    command     = "aws"
-  }
+  token = var.manual_eks_token
+  #exec {
+  #  api_version = "client.authentication.k8s.io/v1beta1"
+  #  args        = ["eks", "get-token", "--cluster-name", var.label]
+  #  command     = "aws"
+  #}
 }
 
 provider "kubectl" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  token                  = data.aws_eks_cluster_auth.local.token
+  token = var.manual_eks_token
+  #token                  = data.aws_eks_cluster_auth.local.token
   load_config_file       = false
 }
 
@@ -481,11 +483,12 @@ provider "helm" {
     host                   = module.cluster.kubernetes_host
     cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
     #token                  = module.cluster.kubernetes_token
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      args        = ["eks", "get-token", "--cluster-name", var.label]
-      command     = "aws"
-    }
+    token = var.manual_eks_token
+    #exec {
+    #  api_version = "client.authentication.k8s.io/v1beta1"
+    #  args        = ["eks", "get-token", "--cluster-name", var.label]
+    #  command     = "aws"
+    #}
   }
 }
 
