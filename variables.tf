@@ -1,3 +1,7 @@
+variable "manual_eks_token" {
+  type    = string
+  default = ""
+}
 
 variable "is_azure" {
   type    = bool
