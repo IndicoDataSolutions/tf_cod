@@ -844,9 +844,3 @@ variable "servicebus_topic_name" {
   default     = ""
   description = "The name of the servicebus topic to create"
 }
-
-variable "servicebus_principal_id" {
-  type        = string
-  default     = ""
-  description = "The servicebus principal ID"
-}

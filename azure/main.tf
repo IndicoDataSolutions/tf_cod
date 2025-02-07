@@ -401,6 +401,5 @@ module "servicebus" {
   servicebus_namespace_name = var.servicebus_namespace_name
   servicebus_queue_name     = var.servicebus_queue_name
   servicebus_topic_name     = var.servicebus_topic_name
-  servicebus_principal_id   = var.servicebus_principal_id
 }
 
