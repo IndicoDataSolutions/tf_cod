@@ -847,5 +847,6 @@ variable "servicebus_topic_name" {
 
 variable "servicebus_principal_id" {
   type        = string
+  default     = ""
   description = "The servicebus principal ID"
 }
