@@ -817,3 +817,35 @@ variable "aks_storage_account_name" {
   default     = ""
   description = "specifies the storage account name for the cluster if we don't want it generated automatically"
 }
+
+variable "servicebus_type" {
+  type    = string
+  default = "create"
+  validation {
+    condition     = var.servicebus_type == "create" || var.servicebus_type == "load"
+    error_message = "${var.servicebus_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "servicebus_namespace_name" {
+  type        = string
+  default     = ""
+  description = "The name of the servicebus namespace to create"
+}
+
+variable "servicebus_queue_name" {
+  type        = string
+  default     = ""
+  description = "The name of the servicebus queue to create"
+}
+
+variable "servicebus_topic_name" {
+  type        = string
+  default     = ""
+  description = "The name of the servicebus topic to create"
+}
+
+variable "servicebus_principal_id" {
+  type        = string
+  description = "The servicebus principal ID"
+}
