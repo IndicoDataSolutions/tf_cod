@@ -251,6 +251,10 @@ data "github_repository" "argo-github-repo" {
 }
 
 resource "kubernetes_namespace" "indico" {
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
   metadata {
     name = "indico"
   }
@@ -1095,6 +1099,14 @@ minio:
   storage:
     accessKey: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
     secretKey: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
+  backup:
+    enabled: ${var.include_miniobkp}
+    schedule: "0 4 * * 2" # This schedules the job to run at 4:00 AM every Tuesday
+    localBackup: false
+    image:
+      repository: harbor.devops.indico.io/docker.io/amazon/aws-cli
+      tag: 2.22.4
+    awsBucket: ${module.s3-storage.miniobkp_s3_bucket_name}
 weaviate:
   cronjob:
     services:
