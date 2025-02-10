@@ -1444,3 +1444,15 @@ variable "indico-crds-values-yaml-b64" {
 variable "indico-pre-reqs-values-yaml-b64" {
   default = "Cg=="
 }
+
+variable "include_miniobkp" {
+  type        = string
+  default     = true
+  description = "If true this will create a miniobkp bucket"
+}
+
+variable "miniobkp_s3_bucket_name" {
+  type        = string
+  default     = ""
+  description = "The name of the existing S3 bucket to be loaded and used as the minio backup bucket"
+}
