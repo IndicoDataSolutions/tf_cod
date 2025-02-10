@@ -251,6 +251,10 @@ data "github_repository" "argo-github-repo" {
 }
 
 resource "kubernetes_namespace" "indico" {
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
   metadata {
     name = "indico"
   }
