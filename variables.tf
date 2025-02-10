@@ -1413,7 +1413,7 @@ variable "include_miniobkp" {
   description = "If true this will create a miniobkp bucket"
 }
 
-variable "miniobkp_s3_bucket_name" {
+variable "miniobkp_s3_bucket_name_override" {
   type        = string
   default     = ""
   description = "The name of the existing S3 bucket to be loaded and used as the minio backup bucket"
