@@ -827,18 +827,20 @@ variable "blob_type" {
   }
 }
 
-variable "fileshare_name" {
+variable "fileshare_name_override" {
   type        = string
-  default     = "indico-user-data"
-  description = "Name of the indico file share"
+  default     = null
+  description = "Override the default indico-user-data file share name"
 }
 
-variable "blob_store_name" {
-  type    = string
-  default = ""
+variable "blob_store_name_override" {
+  type        = string
+  default     = null
+  description = "Override the default indico-blob-store name"
 }
 
-variable "crunchy_backup_name" {
-  type    = string
-  default = ""
+variable "crunchy_backup_name_override" {
+  type        = string
+  default     = null
+  description = "Override the default crunchy-backup name"
 }
