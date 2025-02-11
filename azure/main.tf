@@ -352,7 +352,7 @@ module "readapi_queue" {
     azurerm = azurerm.readapi
   }
   source                        = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
-  version                       = "1.1.0"
+  version                       = "1.1.1"
   label                         = var.label
   account                       = var.account
   readapi_type                  = var.readapi_type
