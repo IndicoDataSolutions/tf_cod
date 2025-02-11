@@ -843,3 +843,30 @@ variable "readapi_queue_name" {
   type    = string
   default = "readapi"
 }
+
+variable "blob_type" {
+  type    = string
+  default = "create"
+  validation {
+    condition     = var.blob_type == "create" || var.blob_type == "load"
+    error_message = "${var.blob_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "fileshare_name_override" {
+  type        = string
+  default     = null
+  description = "Override the default indico-user-data file share name"
+}
+
+variable "blob_store_name_override" {
+  type        = string
+  default     = null
+  description = "Override the default indico-blob-store name"
+}
+
+variable "crunchy_backup_name_override" {
+  type        = string
+  default     = null
+  description = "Override the default crunchy-backup name"
+}
