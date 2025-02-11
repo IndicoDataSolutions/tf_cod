@@ -351,12 +351,14 @@ module "readapi_queue" {
   providers = {
     azurerm = azurerm.readapi
   }
-  source               = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
-  version              = "1.1.0"
-  readapi_type         = var.readapi_type
-  readapi_name         = var.readapi_type == "create" ? lower("${var.account}-${var.label}-s") : var.readapi_name
-  azure_resource_group = var.azure_resource_group
-  readapi_queue_name   = var.readapi_queue_name
+  source                        = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
+  version                       = "1.1.0"
+  label                         = var.label
+  account                       = var.account
+  readapi_type                  = var.readapi_type
+  readapi_name_override         = var.readapi_name_override
+  azure_resource_group_override = var.readapi_azure_resource_group_override
+  readapi_queue_name_override   = var.readapi_queue_name_override
 }
 
 locals {

@@ -827,21 +827,22 @@ variable "readapi_type" {
   }
 }
 
-variable "azure_resource_group" {
+variable "readapi_azure_resource_group_override" {
   type        = string
-  default     = "indico-readapi"
-  description = "azure resource group where the Computer Vision for read api resides"
+  default     = null
+  description = "Override the default indico-readapi resource group"
 }
 
-variable "readapi_name" {
+variable "readapi_name_override" {
   type        = string
-  default     = ""
-  description = "azure Computer Vision name for readapi service"
+  default     = null
+  description = "Override the default indico-readapi name"
 }
 
-variable "readapi_queue_name" {
-  type    = string
-  default = "readapi"
+variable "readapi_queue_name_override" {
+  type        = string
+  default     = null
+  description = "Override the default indico-readapi-queue name"
 }
 
 variable "blob_type" {
