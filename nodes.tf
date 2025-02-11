@@ -144,5 +144,5 @@ locals {
 
   default_node_groups = merge(local.insights_node_groups, local.intake_node_groups)
 
-  node_groups = var.node_groups == null ? local.default_node_groups : var.node_groups
+  node_groups = var.node_groups == null ? local.default_node_groups : var.node_groups 
 }
