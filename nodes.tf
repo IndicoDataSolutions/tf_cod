@@ -139,7 +139,7 @@ locals {
     }
   }
 
-  default_node_groups = merge((var.insights_enabled ? local.insights_default_node_groups : tomap({})), (var.ipa_enabled ? local.intake_default_node_groups : tomap({})))
+  default_node_groups = merge((var.insights_enabled ? local.insights_default_node_groups : tomap(null)), (var.ipa_enabled ? local.intake_default_node_groups : tomap(null)))
 
   node_groups = var.node_groups == null ? local.default_node_groups : var.node_groups 
 }
