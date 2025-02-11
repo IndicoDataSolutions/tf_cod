@@ -197,6 +197,8 @@ variable "k8s_version" {
 }
 
 variable "node_groups" {
+  default = null
+  description = "Override for the node groups assigned to the cluster. If not supplied, the node groups will be determined from intake and insights defaults"
 }
 
 variable "node_bootstrap_arguments" {
