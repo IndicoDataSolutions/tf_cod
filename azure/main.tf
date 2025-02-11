@@ -271,13 +271,17 @@ module "storage" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  source               = "app.terraform.io/indico/indico-azure-blob/mod"
-  version              = "0.1.145" # 0.1.144 is a branch off 0.1.14
-  label                = var.label
-  region               = var.region
-  resource_group_name  = local.resource_group_name
-  storage_account_name = local.storage_account_name
-  keyvault_name        = var.keyvault_name
+  source                       = "app.terraform.io/indico/indico-azure-blob/mod"
+  version                      = "1.0.1"
+  label                        = var.label
+  region                       = var.region
+  resource_group_name          = local.resource_group_name
+  storage_account_name         = local.storage_account_name
+  keyvault_name                = var.keyvault_name
+  blob_type                    = var.blob_type
+  fileshare_name_override      = var.fileshare_name_override
+  blob_store_name_override     = var.blob_store_name_override
+  crunchy_backup_name_override = var.crunchy_backup_name_override
 }
 
 resource "azurerm_user_assigned_identity" "cluster_dns" {
