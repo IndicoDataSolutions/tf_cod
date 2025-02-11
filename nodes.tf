@@ -99,7 +99,7 @@ locals {
         min_size               = 1
         max_size               = 2
         desired_capacity       = "2"
-        taints                 = "--register-with-taints=indico.io/pgo-workers=true:NoSchedule"
+        taints                 = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
     }
     celery-workers = {
       type                     = "cpu"
