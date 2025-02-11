@@ -139,7 +139,10 @@ locals {
     }
   }
 
-  default_node_groups = merge(((var.insights_enabled == true) ? local.insights_default_node_groups : {}),((var.ipa_enabled == true) ? local.intake_default_node_groups : {}))
+  insights_node_groups = var.insights_enabled ? local.insights_default_node_groups : {}
+  intake_node_groups = var.ipa_enabled ? local.intake_default_node_groups : {}
+
+  default_node_groups = merge(local.insights_node_groups, local.intake_node_groups)
 
   node_groups = var.node_groups == null ? local.default_node_groups : var.node_groups
 }
