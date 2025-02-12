@@ -139,13 +139,15 @@ locals {
     }
   }
 
-  karpenter_node_groups = {
-    karpenter-default = {
+  karpenter_node_group = {
+    karpenter = {
+      type             = "cpu"
+      spot             = false
+      instance_types   = ["m5.large"]
       min_size         = 1
       max_size         = 1
-      instance_types   = ["m5.large"]
-      taints           = "--register-with-taints=indico.io/karpenter=true:NoSchedule"
       desired_capacity = "1"
+      taints           = "--register-with-taints=indico.io/karpenter=true:NoSchedule"
     }
   }
 
@@ -153,5 +155,5 @@ locals {
 
   cluster_autoscaler_node_groups = var.node_groups == null ? local.default_node_groups : var.node_groups
 
-  node_groups = var.karpenter_enabled ? local.karpenter_node_groups : local.cluster_autoscaler_node_groups
+  node_groups = var.karpenter_enabled ? [local.karpenter_node_group] : [local.cluster_autoscaler_node_groups]
 }
