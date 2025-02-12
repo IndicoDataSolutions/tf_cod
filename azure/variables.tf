@@ -827,20 +827,20 @@ variable "servicebus_type" {
   }
 }
 
-variable "servicebus_namespace_name" {
+variable "servicebus_namespace_name_override" {
   type        = string
-  default     = ""
-  description = "The name of the servicebus namespace to create"
+  default     = null
+  description = "Override the default servicebus namespace name"
 }
 
-variable "servicebus_queue_name" {
+variable "servicebus_queue_name_override" {
   type        = string
-  default     = ""
-  description = "The name of the servicebus queue to create"
+  default     = null
+  description = "Override the default servicebus queue name"
 }
 
-variable "servicebus_topic_name" {
+variable "servicebus_topic_name_override" {
   type        = string
-  default     = ""
-  description = "The name of the servicebus topic to create"
+  default     = null
+  description = "Override the default servicebus topic name"
 }

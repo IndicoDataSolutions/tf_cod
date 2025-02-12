@@ -388,18 +388,18 @@ module "servicebus" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  count                     = var.use_workload_identity == true && var.enable_servicebus == true ? 1 : 0
-  source                    = "app.terraform.io/indico/indico-azure-servicebus/mod"
-  version                   = "1.2.0"
-  label                     = var.label
-  resource_group_name       = local.resource_group_name
-  region                    = var.region
-  svp_client_id             = var.svp_client_id
-  servicebus_pricing_tier   = var.servicebus_pricing_tier
-  workload_identity_id      = azuread_service_principal.workload_identity.0.id
-  servicebus_type           = var.servicebus_type
-  servicebus_namespace_name = var.servicebus_namespace_name
-  servicebus_queue_name     = var.servicebus_queue_name
-  servicebus_topic_name     = var.servicebus_topic_name
+  count                              = var.use_workload_identity == true && var.enable_servicebus == true ? 1 : 0
+  source                             = "app.terraform.io/indico/indico-azure-servicebus/mod"
+  version                            = "1.2.1"
+  label                              = var.label
+  resource_group_name                = local.resource_group_name
+  region                             = var.region
+  svp_client_id                      = var.svp_client_id
+  servicebus_pricing_tier            = var.servicebus_pricing_tier
+  workload_identity_id               = azuread_service_principal.workload_identity.0.id
+  servicebus_type                    = var.servicebus_type
+  servicebus_namespace_name_override = var.servicebus_namespace_name_override
+  servicebus_queue_name_override     = var.servicebus_queue_name_override
+  servicebus_topic_name_override     = var.servicebus_topic_name_override
 }
 
