@@ -152,7 +152,7 @@ resource "aws_iam_role_policy_attachment" "karpenter_controller_policy_attachmen
 
 resource "helm_release" "karpenter" {
   name             = "karpenter"
-  repository       = "oci://public.ecr.aws/karpenter/karpenter"
+  repository       = "oci://public.ecr.aws/karpenter"
   chart            = "karpenter"
   version          = "1.2.1"
   namespace        = "karpenter"
