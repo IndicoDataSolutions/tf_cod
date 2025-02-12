@@ -143,7 +143,7 @@ locals {
     karpenter = {
       type             = "cpu"
       spot             = false
-      instance_types   = ["m5.large"]
+      instance_types   = ["t3.small"]
       min_size         = 1
       max_size         = 1
       desired_capacity = "1"
@@ -155,7 +155,15 @@ locals {
 
   cluster_autoscaler_node_groups = var.node_groups == null ? local.default_node_groups : var.node_groups
 
-  karpenter = var.karpenter_enabled ? local.karpenter_node_group : tomap(null)
-
-  node_groups = var.karpenter_enabled ? local.karpenter : local.cluster_autoscaler_node_groups
+  node_groups = {
+    for name, config in(var.karpenter_enabled ? local.karpenter_node_group : local.cluster_autoscaler_node_groups) : name => {
+      min_size         = config.min_size
+      max_size         = config.max_size
+      instance_types   = config.instance_types
+      type             = config.type
+      spot             = config.spot
+      desired_capacity = config.desired_capacity
+      taints           = try(config.taints, null)
+    }
+  }
 }
