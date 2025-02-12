@@ -174,7 +174,9 @@ tolerations:
     operator: Equal
     value: "true"
     effect: NoSchedule
-  EOF
+nodeSelector:
+  node_group: karpenter
+EOF
   ]
 }
 
