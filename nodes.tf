@@ -147,7 +147,7 @@ locals {
       min_size         = 1
       max_size         = 1
       desired_capacity = "1"
-      taints           = "--register-with-taints=indico.io/karpenter=true:NoSchedule"
+      taints           = "--register-with-taints=node-role.kubernetes.io/control-plane:NoSchedule"
     }
   }
 
