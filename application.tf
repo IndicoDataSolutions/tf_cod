@@ -291,6 +291,7 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 }
 
 module "karpenter" {
+  count = var.karpenter_enabled == true ? 1 : 0
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster
@@ -611,7 +612,7 @@ aws-load-balancer-controller:
     vpcId: ${local.network[0].indico_vpc_id}
     region: ${var.region}
 cluster-autoscaler:
-  enabled: true
+  enabled: ${var.karpenter_enabled == true ? false : true}
   cluster-autoscaler:
     awsRegion: ${var.region}
     image:

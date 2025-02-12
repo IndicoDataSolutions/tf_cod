@@ -197,7 +197,7 @@ variable "k8s_version" {
 }
 
 variable "node_groups" {
-  default = null
+  default     = null
   description = "Override for the node groups assigned to the cluster. If not supplied, the node groups will be determined from intake and insights defaults"
 }
 
@@ -1455,4 +1455,10 @@ variable "miniobkp_s3_bucket_name_override" {
   type        = string
   default     = null
   description = "The name of the existing S3 bucket to be loaded and used as the minio backup bucket"
+}
+
+variable "karpenter_enabled" {
+  type        = bool
+  default     = true
+  description = "Toggle for enabling karpenter deployment"
 }

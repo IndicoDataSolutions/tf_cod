@@ -150,3 +150,26 @@ resource "aws_iam_role_policy_attachment" "karpenter_controller_policy_attachmen
   policy_arn = aws_iam_policy.karpenter_controller_policy.arn
 }
 
+resource "helm_release" "karpenter" {
+  name             = "karpenter"
+  repository       = "oci://public.ecr.aws/karpenter/karpenter"
+  chart            = "karpenter"
+  version          = "1.2.1"
+  namespace        = "karpenter"
+  create_namespace = true
+  values           = <<EOF
+settings:
+  clusterName: ${var.cluster_name}
+controller:
+  resources:
+    requests:
+      cpu: 1
+      memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 2Gi
+replicas: 1
+  EOF
+}
+
+
