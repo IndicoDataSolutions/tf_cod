@@ -648,8 +648,7 @@ crunchy-postgres:
   postgres-data:
     metadata:
       annotations:
-        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
     instances:
     - affinity:
         nodeAffinity:
@@ -677,6 +676,7 @@ crunchy-postgres:
         annotations:
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
       dataVolumeClaimSpec:
         accessModes:
         - ReadWriteOnce
@@ -694,7 +694,7 @@ crunchy-postgres:
           key: indico.io/crunchy
           operator: Exists
     pgBackRestConfig:
-      global: # https://access.crunchydata.com/documentation/postgres-operator/v5/tutorial/backups/#using-azure-blob-storage
+      global:
         archive-timeout: '10000'
         repo1-path: /pgbackrest/postgres-data/repo1
         repo1-retention-full: '5'
@@ -706,11 +706,12 @@ crunchy-postgres:
           container: " ${module.storage.crunchy_backup_name}"
         schedules:
           full: 30 4 * * *
-          incremental: 0 */1 * * *
-    imagePullSecrets:
-      - name: harbor-pull-secret
-  postgres-metrics:
-    enabled: false
+          incremental: 0 0 * * *
+      jobs:
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 3000Mi
   EOF
   ]
 
