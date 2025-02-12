@@ -91,7 +91,7 @@ locals {
         min_size               = 1
         max_size               = 5
         desired_capacity       = "3"
-    }
+    },
     pgo-workers = {
         type                   = "cpu"
         spot                   = false
@@ -100,7 +100,7 @@ locals {
         max_size               = 2
         desired_capacity       = "2"
         taints                 = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
-    }
+    },
     celery-workers = {
       type                     = "cpu"
       spot                     = false
@@ -109,7 +109,7 @@ locals {
       max_size                 = 3
       desired_capacity         = "1"
       taints                   = "--register-with-taints=indico.io/celery-workers=true:NoSchedule"
-    }
+    },
     minio = {
         type                   = "cpu"
         spot                   = false
@@ -118,7 +118,16 @@ locals {
         max_size               = 4
         desired_capacity       = "4"
         taints                 = "--register-with-taints=indico.io/minio=true:NoSchedule"
-    }
+    },
+    monitoring-workers = {
+      min_size         = 1
+      max_size         = 4
+      instance_types   = ["m5.large"]
+      type             = "cpu"
+      spot             = false
+      desired_capacity = "1"
+      taints           = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
+    },
     weaviate = {
         type                   = "cpu"
         spot                   = false
@@ -127,7 +136,7 @@ locals {
         max_size               = 3
         desired_capacity       = "3"
         taints                 = "--register-with-taints=indico.io/weaviate=true:NoSchedule"
-    }
+    },
     weaviate-workers = {
         type                   = "cpu"
         spot                   = false
