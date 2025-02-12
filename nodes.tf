@@ -151,5 +151,7 @@ locals {
 
   default_node_groups = merge((var.insights_enabled ? local.insights_default_node_groups : tomap(null)), (var.ipa_enabled ? local.intake_default_node_groups : tomap(null)))
 
-  node_groups = var.karpenter_enabled ? local.karpenter_node_groups : (var.node_groups == null ? local.default_node_groups : var.node_groups)
+  cluster_autoscaler_node_groups = var.node_groups == null ? local.default_node_groups : var.node_groups
+
+  node_groups = var.karpenter_enabled ? local.karpenter_node_groups : local.cluster_autoscaler_node_groups
 }
