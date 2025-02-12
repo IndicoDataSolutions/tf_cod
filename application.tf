@@ -291,10 +291,14 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 }
 
 module "karpenter" {
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
   source         = "./modules/common/karpenter"
   region         = var.region
   cluster_name   = var.label
-  account_id     = var.aws_account
+  account_id     = data.aws_caller_identity.current.account_id
   node_role_arn  = module.iam.node_role_arn
   node_role_name = module.iam.node_role_name
 }
