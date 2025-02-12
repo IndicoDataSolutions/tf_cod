@@ -153,17 +153,9 @@ locals {
 
   default_node_groups = merge((var.insights_enabled ? local.insights_default_node_groups : tomap(null)), (var.ipa_enabled ? local.intake_default_node_groups : tomap(null)))
 
-  cluster_autoscaler_node_groups = var.node_groups == null ? local.default_node_groups : var.node_groups
+  default_node_groups_logic = var.node_groups == null && var.karpenter_enabled == false ? local.default_node_groups : tomap(null)
 
-  node_groups = {
-    for name, config in(var.karpenter_enabled ? local.karpenter_node_group : local.cluster_autoscaler_node_groups) : name => {
-      min_size         = config.min_size
-      max_size         = config.max_size
-      instance_types   = config.instance_types
-      type             = config.type
-      spot             = config.spot
-      desired_capacity = config.desired_capacity
-      taints           = try(config.taints, null)
-    }
-  }
+  variable_node_groups = var.node_groups != null && var.karpenter_enabled == false ? var.node_groups : tomap(null)
+
+  node_groups = var.karpenter_enabled ? local.karpenter_node_group : merge(local.default_node_groups_logic, local.variable_node_groups)
 }
