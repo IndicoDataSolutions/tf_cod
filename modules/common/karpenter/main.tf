@@ -170,9 +170,8 @@ controller:
       memory: 2Gi
 replicas: 1
 tolerations:
-  - key: "indico.io/karpenter"
+  - key: "node-role.kubernetes.io/control-plane"
     operator: Equal
-    value: "true"
     effect: NoSchedule
 nodeSelector:
   node_group: karpenter
