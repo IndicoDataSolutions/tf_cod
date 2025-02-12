@@ -170,9 +170,9 @@ controller:
       memory: 2Gi
 replicas: 1
 tolerations:
-  - key: indico.io/karpenter
+  - key: "indico.io/karpenter"
     operator: Equal
-    value: true
+    value: "true"
     effect: NoSchedule
   EOF
   ]
