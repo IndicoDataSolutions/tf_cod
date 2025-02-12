@@ -1062,7 +1062,7 @@ crunchy-postgres:
     pgBackRestConfig:
       global:
         archive-timeout: '10000'
-        repo2-path: /pgbackrest/postgres-insights/repo1
+        repo2-path: /pgbackrest/postgres-insights/repo2
         repo2-retention-full: '5'
         repo2-s3-key-type: auto
         repo2-s3-kms-key-id: "${module.kms_key.key_arn}"

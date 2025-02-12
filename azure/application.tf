@@ -826,12 +826,11 @@ crunchy-postgres:
   enabled: ${!var.is_openshift}
   postgres-data:
     enabled: true
-    name: postgres
+    name: postgres-insights
     postgresVersion: 13
     metadata:
       annotations:
-        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
     instances:
     - affinity:
         nodeAffinity:
@@ -849,41 +848,42 @@ crunchy-postgres:
               - key: postgres-operator.crunchydata.com/cluster
                 operator: In
                 values:
-                - postgres-data
+                - postgres-insights
               - key: postgres-operator.crunchydata.com/instance-set
                 operator: In
                 values:
-                - pgha1
+                - pgha2
             topologyKey: kubernetes.io/hostname
       metadata:
         annotations:
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
           reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
       dataVolumeClaimSpec:
         accessModes:
         - ReadWriteOnce
         resources:
           requests:
             storage: 200Gi
-      name: pgha1
+      name: pgha2
       replicas: 1
       resources:
         requests:
-          cpu: 500m
+          cpu: 1000m
           memory: 3000Mi
       tolerations:
         - effect: NoSchedule
           key: indico.io/crunchy
           operator: Exists
     pgBackRestConfig:
-      global: # https://access.crunchydata.com/documentation/postgres-operator/v5/tutorial/backups/#using-azure-blob-storage
+      global:
         archive-timeout: '10000'
-        repo1-path: /pgbackrest/postgres-data/repo1
-        repo1-retention-full: '5'
-        repo1-azure-account: ${module.storage.storage_account_name}
-        repo1-azure-key: ${module.storage.storage_account_primary_access_key}
+        repo2-path: /pgbackrest/postgres-data/repo2
+        repo2-retention-full: '5'
+        repo2-azure-account: ${module.storage.storage_account_name}
+        repo2-azure-key: ${module.storage.storage_account_primary_access_key}
       repos:
-      - name: repo1
+      - name: repo2
         azure:
           container: " ${module.storage.crunchy_backup_name}"
         schedules:
@@ -902,24 +902,6 @@ crunchy-postgres:
           - aqueduct
           - ask_my_collection
           - lagoon
-    patroni:
-      dynamicConfiguration:
-        postgresql:
-          listen: "*"
-          pg_hba:
-            - host all all 0.0.0.0/0 password
-          parameters:
-            max_worker_processes: 90
-            max_parallel_workers_per_gather: 20
-            force_parallel_mode: 0
-            work_mem: 131072
-            wal_level: logical
-            max_stack_depth: 6144
-            max_connections: 1000
-    imagePullSecrets:
-      - name: harbor-pull-secret
-  postgres-metrics:
-    enabled: false
 ingress:
   useStaticCertificate: false
   secretName: indico-ssl-static-cert
