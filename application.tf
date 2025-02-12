@@ -290,6 +290,15 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
+module "karpenter" {
+  source         = "./modules/common/karpenter"
+  region         = var.region
+  cluster_name   = var.label
+  account_id     = var.aws_account
+  node_role_arn  = module.iam.node_role_arn
+  node_role_name = module.iam.node_role_name
+}
+
 # Then set up the secrets operator authentication with vault 
 # (what level of permission does this require? Are we giving customers admin credentials?) 
 # The auth backend they create is named <account>-<region>-<cluster-name>, so we can make 

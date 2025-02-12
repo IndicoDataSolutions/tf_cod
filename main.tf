@@ -317,6 +317,10 @@ module "fsx-storage" {
   fsx_rox_arn                 = var.fsx_rox_arn
 }
 
+locals {
+  cluster_node_policies = concat(var.cluster_node_policies, ["AmazonEKSWorkerNodePolicy", "AmazonEKS_CNI_Policy", "AmazonEC2ContainerRegistryReadOnly", "AmazonSSMManagedInstanceCore"])
+}
+
 module "iam" {
   source  = "app.terraform.io/indico/indico-aws-iam/mod"
   version = "0.0.12"
@@ -326,7 +330,7 @@ module "iam" {
   eks_cluster_nodes_iam_role = var.node_role_name_override == null ? "${var.label}-${var.region}-node-role" : var.node_role_name_override
   label                      = var.label
   region                     = var.region
-  cluster_node_policies      = var.cluster_node_policies
+  cluster_node_policies      = local.cluster_node_policies
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
   fsx_arns                   = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
