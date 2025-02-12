@@ -30,7 +30,7 @@ data "aws_iam_policy_document" "karpenter_controller_policy" {
     condition {
       test     = "StringEquals"
       variable = "ec2:ResourceTag/karpenter.sh/nodepool"
-      values   = "*"
+      values   = ["*"]
     }
   }
   statement {
