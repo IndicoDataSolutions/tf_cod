@@ -169,6 +169,11 @@ controller:
       cpu: 2
       memory: 2Gi
 replicas: 1
+tolerations:
+  - key: indico.io/karpenter
+    operator: Equal
+    value: true
+    effect: NoSchedule
   EOF
   ]
 }
