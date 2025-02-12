@@ -155,5 +155,7 @@ locals {
 
   cluster_autoscaler_node_groups = var.node_groups == null ? local.default_node_groups : var.node_groups
 
-  node_groups = var.karpenter_enabled ? [local.karpenter_node_group] : [local.cluster_autoscaler_node_groups]
+  karpenter = var.karpenter_enabled ? local.karpenter_node_group : tomap(null)
+
+  node_groups = var.karpenter_enabled ? local.karpenter : local.cluster_autoscaler_node_groups
 }
