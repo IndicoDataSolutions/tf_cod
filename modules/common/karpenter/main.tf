@@ -157,7 +157,7 @@ resource "helm_release" "karpenter" {
   version          = "1.2.1"
   namespace        = "karpenter"
   create_namespace = true
-  values           = <<EOF
+  values = [<<EOF
 settings:
   clusterName: ${var.cluster_name}
 controller:
@@ -170,6 +170,7 @@ controller:
       memory: 2Gi
 replicas: 1
   EOF
+  ]
 }
 
 
