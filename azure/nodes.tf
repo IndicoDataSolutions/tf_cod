@@ -136,7 +136,7 @@ locals {
   insights_default_node_pools = {
     general = {
       node_count = 3
-      pool_name  = "pgo"
+      pool_name  = "general"
       vm_size    = "Standard_D16_v3"
       node_os    = "Linux"
       zones      = ["1", "2"]
