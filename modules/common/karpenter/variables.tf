@@ -18,3 +18,7 @@ variable "node_role_name" {
   type = string
 }
 
+variable "k8s_version" {
+  type = string
+}
+
