@@ -938,7 +938,7 @@ aws-fsx-csi-driver:
         repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-resizer
 aws-efs-csi-driver:
   image:
-    repository: ${var.image_registry}/docker.io/amazon/aws-efs-csi-driver
+    repository: ${var.image_registry}/public.ecr.aws/efs-csi-driver/amazon/aws-efs-csi-driver
   sidecars:
     livenessProbe:
       image:
