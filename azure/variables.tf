@@ -211,37 +211,12 @@ variable "k8s_version" {
 }
 
 variable "default_node_pool" {
-  type = object({
-    node_count                     = number
-    vm_size                        = string
-    name                           = string
-    zones                          = list(string)
-    taints                         = list(string)
-    cluster_auto_scaling           = bool
-    cluster_auto_scaling_min_count = number
-    cluster_auto_scaling_max_count = number
-    labels                         = map(string)
-  })
-
   default = null
 
   description = "Override the default configuration for the cluster node pool"
 }
 
 variable "additional_node_pools" {
-  type = map(object({
-    node_count                     = number
-    vm_size                        = string
-    zones                          = list(string)
-    node_os                        = string
-    pool_name                      = string
-    taints                         = list(string)
-    labels                         = map(string)
-    cluster_auto_scaling           = bool
-    cluster_auto_scaling_min_count = number
-    cluster_auto_scaling_max_count = number
-  }))
-
   default = null
 
   description = "Override the default configuration for additional node pools, which is generated based on enabled applications"
