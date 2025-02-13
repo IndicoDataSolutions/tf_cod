@@ -233,7 +233,7 @@ locals {
     }
   }
 
-  default_node_pools = merge((var.insights_enabled ? local.insights_default_node_pools : tomap(null)), (var.ipa_enabled ? local.intake_default_node_pools : tomap(null)))
+  default_node_pools = merge((var.insights_enabled ? local.insights_default_node_pools : null), (var.ipa_enabled ? local.intake_default_node_pools : null))
 
   # This is to avoid terraform errors when the node groups variable is set,
   # as different keys make the objects incompatible for a ternary function. 
