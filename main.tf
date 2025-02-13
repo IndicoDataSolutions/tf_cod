@@ -135,10 +135,6 @@ module "public_networking" {
   s3_endpoint_enabled  = var.s3_endpoint_enabled
 }
 
-locals {
-  karpenter_tags = { "karpenter.sh/discovery" = "${var.label}" }
-}
-
 module "networking" {
   count                      = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
   source                     = "app.terraform.io/indico/indico-aws-network/mod"
@@ -160,7 +156,6 @@ module "networking" {
   sg_tag_value               = var.sg_tag_value
   enable_vpc_flow_logs       = var.enable_vpc_flow_logs
   vpc_flow_logs_iam_role_arn = var.vpc_flow_logs_iam_role_arn
-  additional_tags            = local.karpenter_tags
 }
 
 module "sqs_sns" {

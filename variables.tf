@@ -1462,3 +1462,9 @@ variable "karpenter_enabled" {
   default     = true
   description = "Toggle for enabling karpenter deployment"
 }
+
+variable "karpenter_version" {
+  type        = string
+  default     = ""
+  description = "Version of the karpenter helm chart"
+}
