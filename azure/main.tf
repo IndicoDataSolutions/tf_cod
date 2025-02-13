@@ -313,8 +313,8 @@ module "cluster" {
   region                       = var.region
   svp_client_id                = var.svp_client_id
   svp_client_secret            = var.svp_client_secret
-  default_node_pool            = var.default_node_pool
-  additional_node_pools        = var.additional_node_pools
+  default_node_pool            = local.default_node_pool
+  additional_node_pools        = local.additional_node_pools
   vnet_subnet_id               = module.networking.subnet_id
   k8s_version                  = var.k8s_version
   private_cluster_enabled      = var.private_cluster_enabled

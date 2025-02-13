@@ -223,21 +223,9 @@ variable "default_node_pool" {
     labels                         = map(string)
   })
 
-  default = {
-    name                           = "empty"
-    cluster_auto_scaling           = false
-    cluster_auto_scaling_max_count = 0
-    cluster_auto_scaling_min_count = 0
-    labels = {
-      "key" = "value"
-    }
-    node_count = 0
-    node_os    = "value"
-    pool_name  = "value"
-    taints     = ["value"]
-    vm_size    = "value"
-    zones      = ["value"]
-  }
+  default = null
+
+  description = "Override the default configuration for the cluster node pool"
 }
 
 variable "additional_node_pools" {
@@ -254,22 +242,9 @@ variable "additional_node_pools" {
     cluster_auto_scaling_max_count = number
   }))
 
-  default = {
-    "empty" = {
-      cluster_auto_scaling           = false
-      cluster_auto_scaling_max_count = 0
-      cluster_auto_scaling_min_count = 0
-      labels = {
-        "key" = "value"
-      }
-      node_count = 1
-      node_os    = "value"
-      pool_name  = "value"
-      taints     = ["value"]
-      vm_size    = "value"
-      zones      = ["value"]
-    }
-  }
+  default = null
+
+  description = "Override the default configuration for additional node pools, which is generated based on enabled applications"
 }
 
 variable "applications" {

@@ -150,5 +150,10 @@ locals {
 
   default_node_groups = merge((var.insights_enabled ? local.insights_default_node_groups : tomap(null)), (var.ipa_enabled ? local.intake_default_node_groups : tomap(null)))
 
-  node_groups = var.node_groups == null ? local.default_node_groups : var.node_groups 
+  # This is to avoid terraform errors when the node groups variable is set,
+  # as different keys make the objects incompatible for a ternary function. 
+  # To solve this, we set it to null which matches all types
+  default_node_groups_logic = var.node_groups == null ? local.default_node_groups : null 
+
+  node_groups = var.node_groups == null ? local.default_node_groups_logic : var.node_groups 
 }
