@@ -115,9 +115,9 @@ locals {
   argo_app_name           = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
   argo_smoketest_app_name = lower("${var.aws_account}.${var.region}.${var.label}-smoketest")
   argo_cluster_name       = "${var.aws_account}.${var.region}.${var.label}"
-  
+
   chart_version_parts = split("-", var.ipa_version)
-  chart_suffix = trimprefix(var.ipa_version, local.chart_version_parts[0])
+  chart_suffix        = trimprefix(var.ipa_version, local.chart_version_parts[0])
 }
 
 resource "tls_private_key" "pk" {
@@ -146,7 +146,7 @@ module "public_networking" {
 module "networking" {
   count                      = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
   source                     = "app.terraform.io/indico/indico-aws-network/mod"
-  version                    = "2.1.0"
+  version                    = "2.1.1"
   label                      = var.label
   vpc_cidr                   = var.vpc_cidr
   private_subnet_cidrs       = var.private_subnet_cidrs
@@ -369,13 +369,13 @@ provider "argocd" {
 }
 
 data "aws_eks_cluster" "local" {
-  depends_on = [ module.cluster.kubernetes_host ]
-  name     = var.label
+  depends_on = [module.cluster.kubernetes_host]
+  name       = var.label
 }
 
 data "aws_eks_cluster_auth" "local" {
-  depends_on = [ module.cluster.kubernetes_host ]
-  name     = var.label
+  depends_on = [module.cluster.kubernetes_host]
+  name       = var.label
 }
 
 provider "kubernetes" {
