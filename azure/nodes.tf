@@ -140,6 +140,7 @@ locals {
       vm_size    = "Standard_D16_v3"
       node_os    = "Linux"
       zones      = ["1", "2"]
+      taints     = []
       labels = {
         "node_group" : "general"
       }
