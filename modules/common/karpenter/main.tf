@@ -152,29 +152,47 @@ resource "aws_iam_role_policy_attachment" "karpenter_controller_policy_attachmen
 
 resource "helm_release" "karpenter" {
   name             = "karpenter"
-  repository       = "oci://public.ecr.aws/karpenter"
+  repository       = var.helm_registry
   chart            = "karpenter"
-  version          = "1.2.1"
+  version          = var.karpenter_version
   namespace        = "karpenter"
   create_namespace = true
   values = [<<EOF
-settings:
+karpenter:
+  settings:
   clusterName: ${var.cluster_name}
-controller:
+  controller:
   resources:
-    requests:
+      requests:
       cpu: 1
       memory: 1Gi
-    limits:
+      limits:
       cpu: 2
       memory: 2Gi
-replicas: 1
-tolerations:
+  replicas: 1
+  tolerations:
   - key: "node-role.kubernetes.io/control-plane"
-    operator: Equal
-    effect: NoSchedule
-nodeSelector:
+      operator: Equal
+      effect: NoSchedule
+  nodeSelector:
   node_group: karpenter
+
+nodeClass:
+  name: default
+  amiFamily: AL2
+  role: ${var.node_role_name}
+  clusterName: ${var.cluster_name}
+  amiIds: [${data.aws_ami.default_eks_node.id}, ${data.aws_ami.gpu_eks_node.id}]
+  subnetIds: ${join(",", var.subnet_ids)}
+  securityGroupIds: [${var.cluster_security_group_id}]
+  tags:
+    ${indent(4, yamlencode(var.default_tags))}
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        volumeSize: ${var.instance_volume_size}
+        volumeType: ${var.instance_volume_type}
+        kmsKeyId: ${var.kms_key_id}
 EOF
   ]
 }
