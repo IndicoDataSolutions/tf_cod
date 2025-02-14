@@ -1088,6 +1088,7 @@ crunchy-postgres:
           - aqueduct
           - ask_my_collection
           - lagoon
+          - noct
 ingress:
   useStaticCertificate: false
   secretName: indico-ssl-static-cert
