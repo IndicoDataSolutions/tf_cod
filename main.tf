@@ -146,7 +146,7 @@ module "public_networking" {
 module "networking" {
   count                      = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
   source                     = "app.terraform.io/indico/indico-aws-network/mod"
-  version                    = "2.1.1"
+  version                    = "2.1.0"
   label                      = var.label
   vpc_cidr                   = var.vpc_cidr
   private_subnet_cidrs       = var.private_subnet_cidrs
@@ -164,6 +164,7 @@ module "networking" {
   sg_tag_value               = var.sg_tag_value
   enable_vpc_flow_logs       = var.enable_vpc_flow_logs
   vpc_flow_logs_iam_role_arn = var.vpc_flow_logs_iam_role_arn
+  enable_firewall            = var.enable_firewall
 }
 
 module "sqs_sns" {
