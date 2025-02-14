@@ -779,7 +779,8 @@ module "indico-common" {
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
-    module.secrets-operator-setup
+    module.secrets-operator-setup,
+    module.karpenter
   ]
   source                           = "./modules/common/indico-common"
   argo_enabled                     = var.argo_enabled
