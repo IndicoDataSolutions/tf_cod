@@ -190,7 +190,7 @@ nodeClass:
   blockDeviceMappings:
     - deviceName: /dev/xvda
       ebs:
-        volumeSize: ${var.instance_volume_size}
+        volumeSize: "${var.instance_volume_size}"
         volumeType: ${var.instance_volume_type}
         kmsKeyId: "${split("/", var.kms_key_id)[length(split("/", var.kms_key_id)) - 1]}"
 EOF
