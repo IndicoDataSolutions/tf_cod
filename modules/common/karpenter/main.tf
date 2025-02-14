@@ -153,12 +153,10 @@ resource "aws_iam_role_policy_attachment" "karpenter_controller_policy_attachmen
 locals {
   node_types = {
     cpu = {
-      ami_filter = "amazon-eks-node-${var.k8s_version}-*"
-      ami_data   = data.aws_ami.default_eks_node
+      ami_data = data.aws_ami.default_eks_node
     }
     gpu = {
-      ami_filter = "amazon-eks-gpu-node-${var.k8s_version}-*"
-      ami_data   = data.aws_ami.gpu_eks_node
+      ami_data = data.aws_ami.gpu_eks_node
     }
   }
 
@@ -220,7 +218,7 @@ EOF
 data "aws_ami" "gpu_eks_node" {
   filter {
     name   = "name"
-    values = [local.node_types.gpu.ami_filter]
+    values = ["amazon-eks-gpu-node-${var.k8s_version}-*"]
   }
 
   most_recent = true
@@ -230,7 +228,7 @@ data "aws_ami" "gpu_eks_node" {
 data "aws_ami" "default_eks_node" {
   filter {
     name   = "name"
-    values = [local.node_types.cpu.ami_filter]
+    values = ["amazon-eks-node-${var.k8s_version}-*"]
   }
 
   most_recent = true
