@@ -151,6 +151,7 @@ resource "aws_iam_role_policy_attachment" "karpenter_controller_policy_attachmen
 }
 
 locals {
+  node_subnet_ids = slice(var.subnet_ids, 0, var.az_count)
   node_classes = {
     cpu = {
       name   = "cpu"
@@ -197,7 +198,7 @@ ${yamlencode([for k, v in local.node_classes : {
     role             = var.node_role_name
     clusterName      = var.cluster_name
     amiIds           = [v.ami_id]
-    subnetIds        = var.subnet_ids
+    subnetIds        = local.node_subnet_ids
     securityGroupIds = [var.cluster_security_group_id]
     tags             = var.default_tags
     blockDeviceMappings = [{
