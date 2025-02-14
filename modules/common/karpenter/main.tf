@@ -151,30 +151,15 @@ resource "aws_iam_role_policy_attachment" "karpenter_controller_policy_attachmen
 }
 
 locals {
-  node_types = {
+  node_classes = {
     cpu = {
-      ami_data = data.aws_ami.default_eks_node
+      name   = "cpu"
+      ami_id = data.aws_ami.default_eks_node.id
     }
     gpu = {
-      ami_data = data.aws_ami.gpu_eks_node
+      name   = "gpu"
+      ami_id = data.aws_ami.gpu_eks_node.id
     }
-  }
-
-  base_node_config = {
-    amiFamily        = "AL2"
-    role             = var.node_role_name
-    clusterName      = var.cluster_name
-    subnetIds        = var.subnet_ids
-    securityGroupIds = [var.cluster_security_group_id]
-    tags             = var.default_tags
-    blockDeviceMappings = [{
-      deviceName = "/dev/xvda"
-      ebs = {
-        volumeSize = var.instance_volume_size
-        volumeType = var.instance_volume_type
-        kmsKeyId   = split("/", var.kms_key_id)[length(split("/", var.kms_key_id)) - 1]
-      }
-    }]
   }
 }
 
@@ -205,12 +190,25 @@ karpenter:
   nodeSelector:
     node_group: karpenter
 
-nodeClass: ${jsonencode([
-    for name, config in local.node_types : merge(local.base_node_config, {
-      name   = name
-      amiIds = [config.ami_data.id]
-    })
-])}
+nodeClass:
+${yamlencode([for k, v in local.node_classes : {
+    name             = v.name
+    amiFamily        = "AL2"
+    role             = var.node_role_name
+    clusterName      = var.cluster_name
+    amiIds           = [v.ami_id]
+    subnetIds        = var.subnet_ids
+    securityGroupIds = [var.cluster_security_group_id]
+    tags             = var.default_tags
+    blockDeviceMappings = [{
+      deviceName = "/dev/xvda"
+      ebs = {
+        volumeSize = var.instance_volume_size
+        volumeType = var.instance_volume_type
+        kmsKeyId   = split("/", var.kms_key_id)[length(split("/", var.kms_key_id)) - 1]
+      }
+    }]
+}])}
 EOF
 ]
 }
