@@ -160,29 +160,29 @@ resource "helm_release" "karpenter" {
   values = [<<EOF
 karpenter:
   settings:
-  clusterName: ${var.cluster_name}
+    clusterName: ${var.cluster_name}
   controller:
-  resources:
+    resources:
       requests:
-      cpu: 1
-      memory: 1Gi
+        cpu: 1
+        memory: 1Gi
       limits:
-      cpu: 2
-      memory: 2Gi
+        cpu: 2
+        memory: 2Gi
   replicas: 1
   tolerations:
-  - key: "node-role.kubernetes.io/control-plane"
+    - key: "node-role.kubernetes.io/control-plane"
       operator: Equal
       effect: NoSchedule
   nodeSelector:
-  node_group: karpenter
+    node_group: karpenter
 
 nodeClass:
   name: default
   amiFamily: AL2
   role: ${var.node_role_name}
   clusterName: ${var.cluster_name}
-  amiIds: [${data.aws_ami.default_eks_node.id}, ${data.aws_ami.gpu_eks_node.id}]
+  amiIds: ["${data.aws_ami.default_eks_node.id}", "${data.aws_ami.gpu_eks_node.id}"]
   subnetIds: ${jsonencode(var.subnet_ids)}
   securityGroupIds: ["${var.cluster_security_group_id}"]
   tags:
@@ -192,7 +192,7 @@ nodeClass:
       ebs:
         volumeSize: ${var.instance_volume_size}
         volumeType: ${var.instance_volume_type}
-        kmsKeyId: ${var.kms_key_id}
+        kmsKeyId: "${split("/", var.kms_key_id)[length(split("/", var.kms_key_id)) - 1]}"
 EOF
   ]
 }
