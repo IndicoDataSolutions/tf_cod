@@ -183,8 +183,8 @@ nodeClass:
   role: ${var.node_role_name}
   clusterName: ${var.cluster_name}
   amiIds: [${data.aws_ami.default_eks_node.id}, ${data.aws_ami.gpu_eks_node.id}]
-  subnetIds: ${join(",", var.subnet_ids)}
-  securityGroupIds: [${var.cluster_security_group_id}]
+  subnetIds: ${jsonencode(var.subnet_ids)}
+  securityGroupIds: ["${var.cluster_security_group_id}"]
   tags:
     ${indent(4, yamlencode(var.default_tags))}
   blockDeviceMappings:
