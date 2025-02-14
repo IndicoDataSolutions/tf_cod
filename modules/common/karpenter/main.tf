@@ -150,6 +150,36 @@ resource "aws_iam_role_policy_attachment" "karpenter_controller_policy_attachmen
   policy_arn = aws_iam_policy.karpenter_controller_policy.arn
 }
 
+locals {
+  node_types = {
+    cpu = {
+      ami_filter = "amazon-eks-node-${var.k8s_version}-*"
+      ami_data   = data.aws_ami.default_eks_node
+    }
+    gpu = {
+      ami_filter = "amazon-eks-gpu-node-${var.k8s_version}-*"
+      ami_data   = data.aws_ami.gpu_eks_node
+    }
+  }
+
+  base_node_config = {
+    amiFamily        = "AL2"
+    role             = var.node_role_name
+    clusterName      = var.cluster_name
+    subnetIds        = var.subnet_ids
+    securityGroupIds = [var.cluster_security_group_id]
+    tags             = var.default_tags
+    blockDeviceMappings = [{
+      deviceName = "/dev/xvda"
+      ebs = {
+        volumeSize = var.instance_volume_size
+        volumeType = var.instance_volume_type
+        kmsKeyId   = split("/", var.kms_key_id)[length(split("/", var.kms_key_id)) - 1]
+      }
+    }]
+  }
+}
+
 resource "helm_release" "karpenter" {
   name             = "karpenter"
   repository       = var.helm_registry
@@ -177,30 +207,20 @@ karpenter:
   nodeSelector:
     node_group: karpenter
 
-nodeClass:
-  name: default
-  amiFamily: AL2
-  role: ${var.node_role_name}
-  clusterName: ${var.cluster_name}
-  amiIds: ["${data.aws_ami.default_eks_node.id}", "${data.aws_ami.gpu_eks_node.id}"]
-  subnetIds: ${jsonencode(var.subnet_ids)}
-  securityGroupIds: ["${var.cluster_security_group_id}"]
-  tags:
-    ${indent(4, yamlencode(var.default_tags))}
-  blockDeviceMappings:
-    - deviceName: /dev/xvda
-      ebs:
-        volumeSize: "${var.instance_volume_size}"
-        volumeType: ${var.instance_volume_type}
-        kmsKeyId: "${split("/", var.kms_key_id)[length(split("/", var.kms_key_id)) - 1]}"
+nodeClass: ${jsonencode([
+    for name, config in local.node_types : merge(local.base_node_config, {
+      name   = name
+      amiIds = [config.ami_data.id]
+    })
+])}
 EOF
-  ]
+]
 }
 
 data "aws_ami" "gpu_eks_node" {
   filter {
     name   = "name"
-    values = ["amazon-eks-gpu-node-${var.k8s_version}-*"]
+    values = [local.node_types.gpu.ami_filter]
   }
 
   most_recent = true
@@ -210,7 +230,7 @@ data "aws_ami" "gpu_eks_node" {
 data "aws_ami" "default_eks_node" {
   filter {
     name   = "name"
-    values = ["amazon-eks-node-${var.k8s_version}-*"]
+    values = [local.node_types.cpu.ami_filter]
   }
 
   most_recent = true
