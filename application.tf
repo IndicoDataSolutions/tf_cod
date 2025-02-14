@@ -296,22 +296,22 @@ module "karpenter" {
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster
   ]
-  source                     = "./modules/common/karpenter"
-  region                     = var.region
-  cluster_name               = var.label
-  account_id                 = data.aws_caller_identity.current.account_id
-  node_role_arn              = module.iam.node_role_arn
-  node_role_name             = module.iam.node_role_name
-  k8s_version                = var.k8s_version
-  az_count                   = var.az_count
-  subnet_ids                 = flatten([local.network[0].private_subnet_ids])
-  cluster_security_group_id  = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
-  helm_registry              = var.ipa_repo
-  karpenter_version          = var.karpenter_version
-  default_tags               = var.default_tags
-  instance_volume_size       = var.instance_volume_size
-  instance_volume_type       = var.instance_volume_type
-  instance_volume_kms_key_id = module.kms_key.key_arn
+  source                    = "./modules/common/karpenter"
+  region                    = var.region
+  cluster_name              = var.label
+  account_id                = data.aws_caller_identity.current.account_id
+  node_role_arn             = module.iam.node_role_arn
+  node_role_name            = module.iam.node_role_name
+  k8s_version               = var.k8s_version
+  az_count                  = var.az_count
+  subnet_ids                = flatten([local.network[0].private_subnet_ids])
+  cluster_security_group_id = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  helm_registry             = var.ipa_repo
+  karpenter_version         = var.karpenter_version
+  default_tags              = var.default_tags
+  instance_volume_size      = var.instance_volume_size
+  instance_volume_type      = var.instance_volume_type
+  kms_key_id                = module.kms_key.key_arn
 }
 
 # Then set up the secrets operator authentication with vault 
