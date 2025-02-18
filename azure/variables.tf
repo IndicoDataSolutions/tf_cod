@@ -818,6 +818,33 @@ variable "aks_storage_account_name" {
   description = "specifies the storage account name for the cluster if we don't want it generated automatically"
 }
 
+variable "readapi_type" {
+  type    = string
+  default = "create"
+  validation {
+    condition     = var.readapi_type == "create" || var.readapi_type == "load"
+    error_message = "${var.readapi_type} not valid. Type must be either create or load"
+  }
+}
+
+variable "readapi_azure_resource_group_override" {
+  type        = string
+  default     = null
+  description = "Override the default indico-readapi resource group"
+}
+
+variable "readapi_name_override" {
+  type        = string
+  default     = null
+  description = "Override the default indico-readapi name"
+}
+
+variable "readapi_queue_name_override" {
+  type        = string
+  default     = null
+  description = "Override the default indico-readapi-queue name"
+}
+
 variable "servicebus_type" {
   type    = string
   default = "create"

@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.95.0"
+      version = "3.106.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -351,9 +351,14 @@ module "readapi_queue" {
   providers = {
     azurerm = azurerm.readapi
   }
-  source       = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
-  version      = "1.0.0"
-  readapi_name = lower("${var.account}-${var.label}-s")
+  source                        = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
+  version                       = "1.1.1"
+  label                         = var.label
+  account                       = var.account
+  readapi_type                  = var.readapi_type
+  readapi_name_override         = var.readapi_name_override
+  azure_resource_group_override = var.readapi_azure_resource_group_override
+  readapi_queue_name_override   = var.readapi_queue_name_override
 }
 
 locals {
