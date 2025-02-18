@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.95.0"
+      version = "3.106.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -277,13 +277,17 @@ module "storage" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  source               = "app.terraform.io/indico/indico-azure-blob/mod"
-  version              = "0.1.145" # 0.1.144 is a branch off 0.1.14
-  label                = var.label
-  region               = var.region
-  resource_group_name  = local.resource_group_name
-  storage_account_name = local.storage_account_name
-  keyvault_name        = var.keyvault_name
+  source                       = "app.terraform.io/indico/indico-azure-blob/mod"
+  version                      = "1.0.1"
+  label                        = var.label
+  region                       = var.region
+  resource_group_name          = local.resource_group_name
+  storage_account_name         = local.storage_account_name
+  keyvault_name                = var.keyvault_name
+  blob_type                    = var.blob_type
+  fileshare_name_override      = var.fileshare_name_override
+  blob_store_name_override     = var.blob_store_name_override
+  crunchy_backup_name_override = var.crunchy_backup_name_override
 }
 
 resource "azurerm_user_assigned_identity" "cluster_dns" {
@@ -353,9 +357,14 @@ module "readapi_queue" {
   providers = {
     azurerm = azurerm.readapi
   }
-  source       = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
-  version      = "1.0.0"
-  readapi_name = lower("${var.account}-${var.label}-s")
+  source                        = "app.terraform.io/indico/indico-azure-readapi-queue/mod"
+  version                       = "1.1.1"
+  label                         = var.label
+  account                       = var.account
+  readapi_type                  = var.readapi_type
+  readapi_name_override         = var.readapi_name_override
+  azure_resource_group_override = var.readapi_azure_resource_group_override
+  readapi_queue_name_override   = var.readapi_queue_name_override
 }
 
 locals {
@@ -394,14 +403,18 @@ module "servicebus" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  count                   = var.use_workload_identity == true && var.enable_servicebus == true ? 1 : 0
-  source                  = "app.terraform.io/indico/indico-azure-servicebus/mod"
-  version                 = "1.1.1"
-  label                   = var.label
-  resource_group_name     = local.resource_group_name
-  region                  = var.region
-  svp_client_id           = var.svp_client_id
-  servicebus_pricing_tier = var.servicebus_pricing_tier
-  workload_identity_id    = azuread_service_principal.workload_identity.0.id
+  count                              = var.use_workload_identity == true && var.enable_servicebus == true ? 1 : 0
+  source                             = "app.terraform.io/indico/indico-azure-servicebus/mod"
+  version                            = "1.2.1"
+  label                              = var.label
+  resource_group_name                = local.resource_group_name
+  region                             = var.region
+  svp_client_id                      = var.svp_client_id
+  servicebus_pricing_tier            = var.servicebus_pricing_tier
+  workload_identity_id               = azuread_service_principal.workload_identity.0.id
+  servicebus_type                    = var.servicebus_type
+  servicebus_namespace_name_override = var.servicebus_namespace_name_override
+  servicebus_queue_name_override     = var.servicebus_queue_name_override
+  servicebus_topic_name_override     = var.servicebus_topic_name_override
 }
 

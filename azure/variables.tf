@@ -849,7 +849,6 @@ variable "crunchy_backup_name_override" {
   description = "Override the default crunchy-backup name"
 }
 
-
 variable "indico_crds_version" {
   type        = string
   default     = ""
