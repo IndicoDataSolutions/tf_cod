@@ -154,7 +154,7 @@ module "networking" {
   enable_vpc_flow_logs       = var.enable_vpc_flow_logs
   vpc_flow_logs_iam_role_arn = var.vpc_flow_logs_iam_role_arn
   enable_firewall            = var.enable_firewall
-  indico_firewall_subnets    = var.firewall_subnet_cidrs
+  firewall_subnet_cidrs      = var.firewall_subnet_cidrs
   firewall_allow_list        = var.firewall_allow_list
 }
 
