@@ -960,8 +960,6 @@ server:
       env:
         FIELD_AUTOCONFIRM_CONFIDENCE: 0.8
         FIELD_CONFIG_PATH: "fields_config.yaml"
-cronjob:
-  enabled: false
 ask-my-docs:
   llmConfig:
     llm: indico-azure-instance
