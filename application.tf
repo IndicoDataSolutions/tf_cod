@@ -546,7 +546,7 @@ restartCronjob:
 aws-efs-csi-driver:
   enabled: ${var.include_efs ? var.include_efs : var.local_registry_enabled}
   image:
-    repository: ${var.image_registry}/docker.io/amazon/aws-efs-csi-driver
+    repository: ${var.image_registry}/public.ecr.aws/efs-csi-driver/amazon/aws-efs-csi-driver
   sidecars:
     livenessProbe:
       image:
