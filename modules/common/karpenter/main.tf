@@ -183,6 +183,7 @@ locals {
 
   default_node_pools = {
     static-workers = {
+      type   = "cpu"
       spot   = false
       taints = {}
     }
@@ -263,6 +264,7 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
         values   = v.spot ? ["spot", "on-demand"] : ["on-demand"]
       }]
     )
+    nodeClassRefName       = v.type
     expireAfter            = "Never"
     terminationGracePeriod = "24h"
     disruption = {
