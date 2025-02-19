@@ -261,11 +261,11 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
       node_group = k
       node_pool  = k
     }
-    taints = [for k2, v2 in v.taints : {
+    taints = length(v.taints) > 0 ? [for k2, v2 in v.taints : {
       key    = v2.key
       value  = v2.value
       effect = v2.effect
-    }]
+    }] : []
     requirements = concat(
       [for k3, v3 in local.cpu_instance_requirements : {
         key      = v3.key
