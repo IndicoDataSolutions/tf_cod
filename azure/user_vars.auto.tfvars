@@ -6,7 +6,6 @@
 region                  = "eastus"
 vnet_cidr               = "192.168.0.0/20"
 subnet_cidrs            = ["192.168.0.0/22"]
-storage_account_name    = ""
 private_cluster_enabled = false
 k8s_version             = "1.31"
 
