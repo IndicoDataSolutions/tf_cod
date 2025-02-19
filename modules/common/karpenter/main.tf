@@ -278,7 +278,7 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
     }
     limits = {
       cpu    = "1000"
-      memory = "1000Mi"
+      memory = "1000Gi"
     }
     weight = 10
 }])}
