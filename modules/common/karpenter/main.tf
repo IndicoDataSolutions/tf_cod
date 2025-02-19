@@ -188,7 +188,7 @@ locals {
     }
   }
 
-  karpenter_node_pools = merge(local.default_node_pools, var.node_pools)
+  karpenter_node_pools = concat(local.default_node_pools, var.node_pools)
 
 }
 
@@ -251,15 +251,18 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
       value  = v2.value
       effect = v2.effect
     }]
-    requirements = merge([for k3, v3 in local.cpu_instance_requirements : {
-      key      = v3.key
-      operator = v3.operator
-      values   = v3.values
-      }], {
-      key      = "karpenter.k8s.aws/capacity-type"
-      operator = "In"
-      values   = v.spot ? ["spot", "on-demand"] : ["on-demand"]
-    })
+    requirements = concat(
+      [for k3, v3 in local.cpu_instance_requirements : {
+        key      = v3.key
+        operator = v3.operator
+        values   = v3.values
+      }],
+      [{
+        key      = "karpenter.k8s.aws/capacity-type"
+        operator = "In"
+        values   = v.spot ? ["spot", "on-demand"] : ["on-demand"]
+      }]
+    )
 }])}
 EOF
 ]
