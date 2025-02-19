@@ -252,6 +252,11 @@ ${yamlencode([for k, v in local.node_classes : {
         kmsKeyId   = split("/", var.kms_key_id)[length(split("/", var.kms_key_id)) - 1]
       }
     }]
+    metadataOptions = {
+      httpEndpoint            = "enabled"
+      httpTokens              = "required"
+      httpPutResponseHopLimit = 3
+    }
     }])}
 
 nodePool:
