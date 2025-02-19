@@ -190,16 +190,16 @@ locals {
     static-workers = {
       type   = "cpu"
       spot   = false
-      taints = {}
+      taints = []
     }
     monitoring-workers = {
       type = "cpu"
       spot = false
-      taints = {
+      taints = [{
         key    = "indico.io/monitoring"
         value  = "true"
         effect = "NoSchedule"
-      }
+      }]
     }
   }
 
@@ -261,11 +261,7 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
       node_group = k
       node_pool  = k
     }
-    taints = length(v.taints) > 0 ? [for k2, v2 in v.taints : {
-      key    = v2.key
-      value  = v2.value
-      effect = v2.effect
-    }] : []
+    taints = v.taints
     requirements = concat(
       [for k3, v3 in local.cpu_instance_requirements : {
         key      = v3.key
