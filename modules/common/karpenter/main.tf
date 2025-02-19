@@ -28,7 +28,7 @@ data "aws_iam_policy_document" "karpenter_controller_policy" {
     effect    = "Allow"
     resources = ["*"]
     condition {
-      test     = "StringEquals"
+      test     = "StringLike"
       variable = "ec2:ResourceTag/karpenter.sh/nodepool"
       values   = ["*"]
     }
