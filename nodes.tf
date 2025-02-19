@@ -155,20 +155,20 @@ locals {
     gpu-workers = {
       type = "gpu"
       spot = false
-      taints = {
+      taints = [{
         key    = "nvidia.com/gpu"
         value  = "true"
         effect = "NoSchedule"
-      }
+      }]
     },
     celery-workers = {
       type = "cpu"
       spot = false
-      taints = {
+      taints = [{
         key    = "indico.io/celery"
         value  = "true"
         effect = "NoSchedule"
-      }
+      }]
     },
     static-workers = {
       type = "cpu"
@@ -177,56 +177,56 @@ locals {
     pdf-workers = {
       type = "cpu"
       spot = false
-      taints = {
+      taints = [{
         key    = "indico.io/pdfextraction"
         value  = "true"
         effect = "NoSchedule"
-      }
+      }]
     },
     highmem-workers = {
       type = "cpu"
       spot = false
-      taints = {
+      taints = [{
         key    = "indico.io/highmem"
         value  = "true"
         effect = "NoSchedule"
-      }
+      }]
     },
     monitoring-workers = {
       type = "cpu"
       spot = false
-      taints = {
+      taints = [{
         key    = "indico.io/monitoring"
         value  = "true"
         effect = "NoSchedule"
-      }
+      }]
     },
     pgo-workers = {
       type = "cpu"
       spot = false
-      taints = {
+      taints = [{
         key    = "indico.io/crunchy"
         value  = "true"
         effect = "NoSchedule"
-      }
+      }]
     },
     readapi-servers = {
       type = "cpu"
       spot = false
-      taints = {
+      taints = [{
         key    = "indico.io/readapi-server"
         value  = "true"
         effect = "NoSchedule"
-      }
+      }]
     },
     readapi-azurite = {
       type = "cpu"
       spot = false
-      taints = {
+      taints = [{
         key    = "indico.io/azurite"
         value  = "true"
         effect = "NoSchedule"
-      }
+      }]
     }
 
   }
@@ -235,47 +235,47 @@ locals {
     pgo-workers = {
       type = "cpu"
       spot = false
-      taints = {
+      taints = [{
         key    = "indico.io/crunchy"
         value  = "true"
         effect = "NoSchedule"
-      }
+      }]
     }
     celery-workers = {
       type = "cpu"
       spot = false
-      taints = {
+      taints = [{
         key    = "indico.io/celery-workers"
         value  = "true"
         effect = "NoSchedule"
-      }
+      }]
     }
     minio = {
       type = "cpu"
       spot = false
-      taints = {
+      taints = [{
         key    = "indico.io/minio"
         value  = "true"
         effect = "NoSchedule"
-      }
+      }]
     }
     weaviate = {
       type = "cpu"
       spot = false
-      taints = {
+      taints = [{
         key    = "indico.io/weaviate"
         value  = "true"
         effect = "NoSchedule"
-      }
+      }]
     }
     weaviate-workers = {
       type = "cpu"
       spot = false
-      taints = {
+      taints = [{
         key    = "indico.io/weaviate-workers"
         value  = "true"
         effect = "NoSchedule"
-      }
+      }]
     }
   }
 
