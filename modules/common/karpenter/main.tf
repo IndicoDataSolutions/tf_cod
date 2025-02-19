@@ -242,7 +242,7 @@ ${yamlencode([for k, v in local.node_classes : {
 nodePool:
 ${yamlencode([for k, v in local.karpenter_node_pools : {
     name = k
-    lables = {
+    labels = {
       node_group = k
       node_pool  = k
     }
@@ -263,6 +263,17 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
         values   = v.spot ? ["spot", "on-demand"] : ["on-demand"]
       }]
     )
+    expireAfter            = Never
+    terminationGracePeriod = "24h"
+    disruption = {
+      consolidationPolicy = "WhenEmptyOrUnderutilized"
+      consolidateAfter    = "10m"
+    }
+    limits = {
+      cpu    = "1000"
+      memory = "1000Mi"
+    }
+    weight = 10
 }])}
 EOF
 ]
