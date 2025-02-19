@@ -263,7 +263,7 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
         values   = v.spot ? ["spot", "on-demand"] : ["on-demand"]
       }]
     )
-    expireAfter            = Never
+    expireAfter            = "Never"
     terminationGracePeriod = "24h"
     disruption = {
       consolidationPolicy = "WhenEmptyOrUnderutilized"
