@@ -1,9 +1,5 @@
 data "azuread_client_config" "current" {}
 
-
-
-
-
 resource "azuread_application" "workload_identity" {
   count        = var.use_workload_identity == true ? 1 : 0
   display_name = "${var.label}-${var.region}-workload-identity"
@@ -12,7 +8,7 @@ resource "azuread_application" "workload_identity" {
 
 resource "azuread_service_principal" "workload_identity" {
   count                        = var.use_workload_identity == true ? 1 : 0
-  application_id               = azuread_application.workload_identity.0.application_id
+  client_id                    = azuread_application.workload_identity.0.client_id
   app_role_assignment_required = false
   owners                       = [data.azuread_client_config.current.object_id]
 }
@@ -32,9 +28,9 @@ resource "azurerm_role_assignment" "dns-zone-dns-zone-contributor" {
 }
 
 resource "azuread_application_password" "workload_identity" {
-  count                 = var.use_workload_identity == true ? 1 : 0
-  display_name          = "workload_identity"
-  application_object_id = azuread_application.workload_identity.0.object_id
+  count          = var.use_workload_identity == true ? 1 : 0
+  display_name   = "workload_identity"
+  application_id = azuread_application.workload_identity.0.id
 }
 
 resource "kubernetes_secret" "workload_identity" {
@@ -128,24 +124,24 @@ resource "kubernetes_service_account" "workload_identity" {
 }
 
 resource "azuread_application_federated_identity_credential" "workload_identity" {
-  count                 = var.use_workload_identity == true ? 1 : 0
-  application_object_id = azuread_application.workload_identity.0.object_id
-  display_name          = "${var.label}-${var.region}-workload-identity"
-  description           = "Initial workload identity for cluster"
-  audiences             = ["api://AzureADTokenExchange"]
-  issuer                = module.cluster.oidc_issuer_url
-  subject               = "system:serviceaccount:default:workload-identity-storage-account"
+  count          = var.use_workload_identity == true ? 1 : 0
+  application_id = azuread_application.workload_identity.0.id
+  display_name   = "${var.label}-${var.region}-workload-identity"
+  description    = "Initial workload identity for cluster"
+  audiences      = ["api://AzureADTokenExchange"]
+  issuer         = module.cluster.oidc_issuer_url
+  subject        = "system:serviceaccount:default:workload-identity-storage-account"
 }
 
 
 resource "azuread_application_federated_identity_credential" "workload_snapshot_identity" {
-  count                 = var.use_workload_identity == true ? 1 : 0
-  application_object_id = azuread_application.workload_identity.0.object_id
-  display_name          = "${var.label}-${var.region}-workload-snapshot-identity"
-  description           = "Initial workload snapshot identity for cluster"
-  audiences             = ["api://AzureADTokenExchange"]
-  issuer                = module.cluster.oidc_issuer_url
-  subject               = "system:serviceaccount:default:cod-snapshots"
+  count          = var.use_workload_identity == true ? 1 : 0
+  application_id = azuread_application.workload_identity.0.id
+  display_name   = "${var.label}-${var.region}-workload-snapshot-identity"
+  description    = "Initial workload snapshot identity for cluster"
+  audiences      = ["api://AzureADTokenExchange"]
+  issuer         = module.cluster.oidc_issuer_url
+  subject        = "system:serviceaccount:default:cod-snapshots"
 }
 
 

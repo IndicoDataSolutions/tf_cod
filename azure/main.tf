@@ -225,7 +225,6 @@ locals {
   sentinel_workspace_resource_group_name = coalesce(var.sentinel_workspace_resource_group_name, "${var.account}-sentinel-group")
 
   snapshot_storage_account_name = replace(lower("${var.account}snapshots"), "-", "")
-  storage_account_name          = replace(lower(var.storage_account_name), "-", "")
 
   argo_app_name           = lower("${var.account}.${var.region}.${var.label}-ipa")
   argo_cluster_name       = "${var.account}.${var.region}.${var.label}"
@@ -277,17 +276,18 @@ module "storage" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  source                       = "app.terraform.io/indico/indico-azure-blob/mod"
-  version                      = "1.0.1"
-  label                        = var.label
-  region                       = var.region
-  resource_group_name          = local.resource_group_name
-  storage_account_name         = local.storage_account_name
-  keyvault_name                = var.keyvault_name
-  blob_type                    = var.blob_type
-  fileshare_name_override      = var.fileshare_name_override
-  blob_store_name_override     = var.blob_store_name_override
-  crunchy_backup_name_override = var.crunchy_backup_name_override
+  source                        = "app.terraform.io/indico/indico-azure-blob/mod"
+  version                       = "1.1.1"
+  label                         = var.label
+  region                        = var.region
+  resource_group_name           = local.resource_group_name
+  storage_account_name_override = var.storage_account_name_override
+  keyvault_name_override        = var.keyvault_name_override
+  keyvault_key_name_override    = var.keyvault_key_name_override
+  blob_type                     = var.blob_type
+  fileshare_name_override       = var.fileshare_name_override
+  blob_store_name_override      = var.blob_store_name_override
+  crunchy_backup_name_override  = var.crunchy_backup_name_override
 }
 
 resource "azurerm_user_assigned_identity" "cluster_dns" {

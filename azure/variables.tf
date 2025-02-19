@@ -75,10 +75,10 @@ variable "worker_subnet_cidrs" {
 }
 
 ### storage account variables
-variable "storage_account_name" {
+variable "storage_account_name_override" {
   type        = string
-  default     = ""
-  description = "Name of the indico storage account"
+  default     = null
+  description = "Name of the indico storage account if not using the default"
 }
 
 variable "vault_address" {
@@ -682,9 +682,16 @@ variable "virtual_subnet_name" {
   type    = string
 }
 
-variable "keyvault_name" {
-  default = null
-  type    = string
+variable "keyvault_name_override" {
+  default     = null
+  type        = string
+  description = "keyvault name override if not using the default"
+}
+
+variable "keyvault_key_name_override" {
+  default     = null
+  type        = string
+  description = "keyvault key name override if not using the default"
 }
 
 variable "network_plugin" {
