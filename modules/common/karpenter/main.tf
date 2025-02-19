@@ -164,28 +164,21 @@ locals {
   }
 
   cpu_instance_requirements = {
-    instance-category = {
-      key      = "karpenter.k8s.aws/instance-category"
-      operator = "In"
-      values   = ["c", "m", "r"]
-    }
     instance-family = {
-      key      = "karpenter.k8s.aws/instance-family"
-      operator = "In"
-      values   = ["m5", "m6i", "m6a", "m7i", "m7a", "c5", "c6i", "c6a", "c7i", "c7a", "c7i-flex", "r5", "r6i", "r6a", "r7i", "r7a"]
-    }
-    arch = {
-      key      = "kubernetes.io/arch"
-      operator = "In"
-      values   = ["amd64"]
-    }
-    cpu = {
-      key      = "karpenter.k8s.aws/instance-cpu"
-      operator = "In"
-      values   = ["4", "8", "16"]
+      key       = "karpenter.k8s.aws/instance-family"
+      operator  = "In"
+      values    = ["m5", "m6i", "m6a", "m7i", "m7a", "c5", "c6i", "c6a", "c7i", "c7a", "c7i-flex", "r5", "r6i", "r6a", "r7i", "r7a"]
+      minValues = 16
     }
   }
-
+  gpu_instance_requirements = {
+    instance-family = {
+      key       = "karpenter.k8s.aws/instance-family"
+      operator  = "In"
+      values    = ["g4dn", "g5", "g6"]
+      minValues = 3
+    }
+  }
   default_node_pools = {
     static-workers = {
       type   = "cpu"
@@ -268,16 +261,29 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
     }
     taints = v.taints
     requirements = concat(
-      [for k3, v3 in local.cpu_instance_requirements : {
-        key      = v3.key
-        operator = v3.operator
-        values   = v3.values
+      [for k3, v3 in v.type == "gpu" ? local.gpu_instance_requirements : local.cpu_instance_requirements : {
+        key       = v3.key
+        operator  = v3.operator
+        values    = v3.values
+        minValues = v3.minValues
       }],
-      [{
-        key      = "karpenter.sh/capacity-type"
-        operator = "In"
-        values   = v.spot ? ["spot", "on-demand"] : ["on-demand"]
-      }]
+      [
+        {
+          key      = "karpenter.sh/capacity-type"
+          operator = "In"
+          values   = v.spot ? ["spot", "on-demand"] : ["on-demand"]
+        },
+        {
+          key      = "kubernetes.io/arch"
+          operator = "In"
+          values   = ["amd64"]
+        },
+        {
+          key      = "karpenter.k8s.aws/instance-cpu"
+          operator = "In"
+          values   = ["4", "8", "16"]
+        }
+      ]
     )
     nodeClassRefName       = v.type
     expireAfter            = "Never"
