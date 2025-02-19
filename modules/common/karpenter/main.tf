@@ -192,6 +192,15 @@ locals {
       spot   = false
       taints = {}
     }
+    monitoring-workers = {
+      type = "cpu"
+      spot = false
+      taints = {
+        key    = "indico.io/monitoring"
+        value  = "true"
+        effect = "NoSchedule"
+      }
+    }
   }
 
   karpenter_node_pools = merge(local.default_node_pools, var.node_pools)
