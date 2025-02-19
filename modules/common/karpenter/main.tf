@@ -188,7 +188,7 @@ locals {
     }
   }
 
-  karpenter_node_pools = concat(local.default_node_pools, var.node_pools)
+  karpenter_node_pools = merge(local.default_node_pools, var.node_pools)
 
 }
 
