@@ -68,5 +68,5 @@ variable "kms_key_id" {
 }
 
 variable "node_pools" {
-  type = map(object())
+  default = null
 }
