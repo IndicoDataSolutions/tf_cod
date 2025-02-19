@@ -140,7 +140,7 @@ data "aws_iam_policy_document" "karpenter_controller_policy" {
 }
 
 resource "aws_iam_policy" "karpenter_controller_policy" {
-  name        = "karpenter-controller-policy"
+  name        = "${var.cluster_name}-karpenter-controller-policy"
   description = "Policy for the Karpenter controller"
   policy      = data.aws_iam_policy_document.karpenter_controller_policy.json
 }
