@@ -172,12 +172,17 @@ locals {
     instance-family = {
       key      = "karpenter.k8s.aws/instance-family"
       operator = "In"
-      values   = ["c", "m", "r"]
+      values   = ["m5", "m6i", "m6a", "m7i", "m7a", "c5", "c6i", "c6a", "c7i", "c7a", "c7i-flex", "r5", "r6i", "r6a", "r7i", "r7a"]
     }
     arch = {
-      key      = "karpenter.k8s.aws/arch"
+      key      = "kubernetes.io/arch"
       operator = "In"
       values   = ["amd64"]
+    }
+    cpu = {
+      key      = "karpenter.k8s.aws/instance-cpu"
+      operator = "In"
+      values   = ["4", "8", "16"]
     }
   }
 
