@@ -264,7 +264,7 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
         values   = v3.values
       }],
       [{
-        key      = "karpenter.k8s.aws/capacity-type"
+        key      = "karpenter.sh/capacity-type"
         operator = "In"
         values   = v.spot ? ["spot", "on-demand"] : ["on-demand"]
       }]
