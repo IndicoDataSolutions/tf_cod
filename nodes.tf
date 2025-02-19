@@ -151,6 +151,134 @@ locals {
     }
   }
 
+  intake_default_node_pool = {
+    gpu-workers = {
+      type = "gpu"
+      spot = false
+      taints = {
+        key    = "nvidia.com/gpu"
+        value  = "true"
+        effect = "NoSchedule"
+      }
+    },
+    celery-workers = {
+      type = "cpu"
+      spot = false
+      taints = {
+        key    = "indico.io/celery"
+        value  = "true"
+        effect = "NoSchedule"
+      }
+    },
+    static-workers = {
+      type = "cpu"
+      spot = false
+    },
+    pdf-workers = {
+      type = "cpu"
+      spot = false
+      taints = {
+        key    = "indico.io/pdfextraction"
+        value  = "true"
+        effect = "NoSchedule"
+      }
+    },
+    highmem-workers = {
+      type = "cpu"
+      spot = false
+      taints = {
+        key    = "indico.io/highmem"
+        value  = "true"
+        effect = "NoSchedule"
+      }
+    },
+    monitoring-workers = {
+      type = "cpu"
+      spot = false
+      taints = {
+        key    = "indico.io/monitoring"
+        value  = "true"
+        effect = "NoSchedule"
+      }
+    },
+    pgo-workers = {
+      type = "cpu"
+      spot = false
+      taints = {
+        key    = "indico.io/crunchy"
+        value  = "true"
+        effect = "NoSchedule"
+      }
+    },
+    readapi-servers = {
+      type = "cpu"
+      spot = false
+      taints = {
+        key    = "indico.io/readapi-server"
+        value  = "true"
+        effect = "NoSchedule"
+      }
+    },
+    readapi-azurite = {
+      type = "cpu"
+      spot = false
+      taints = {
+        key    = "indico.io/azurite"
+        value  = "true"
+        effect = "NoSchedule"
+      }
+    }
+
+  }
+
+  insights_default_node_pool = {
+    pgo-workers = {
+      type = "cpu"
+      spot = false
+      taints = {
+        key    = "indico.io/crunchy"
+        value  = "true"
+        effect = "NoSchedule"
+      }
+    }
+    celery-workers = {
+      type = "cpu"
+      spot = false
+      taints = {
+        key    = "indico.io/celery-workers"
+        value  = "true"
+        effect = "NoSchedule"
+      }
+    }
+    minio = {
+      type = "cpu"
+      spot = false
+      taints = {
+        key    = "indico.io/minio"
+        value  = "true"
+        effect = "NoSchedule"
+      }
+    }
+    weaviate = {
+      type = "cpu"
+      spot = false
+      taints = {
+        key    = "indico.io/weaviate"
+        value  = "true"
+        effect = "NoSchedule"
+      }
+    }
+    weaviate-workers = {
+      type = "cpu"
+      spot = false
+      taints = {
+        key    = "indico.io/weaviate-workers"
+        value  = "true"
+        effect = "NoSchedule"
+      }
+    }
+  }
+
   default_node_groups = merge((var.insights_enabled ? local.insights_default_node_groups : tomap(null)), (var.ipa_enabled ? local.intake_default_node_groups : tomap(null)))
 
   default_node_groups_logic = var.node_groups == null && var.karpenter_enabled == false ? local.default_node_groups : tomap(null)
@@ -158,4 +286,10 @@ locals {
   variable_node_groups = var.node_groups != null && var.karpenter_enabled == false ? var.node_groups : tomap(null)
 
   node_groups = var.karpenter_enabled ? local.karpenter_node_group : merge(local.default_node_groups_logic, local.variable_node_groups)
+
+  default_node_pools = merge((var.insights_enabled ? local.insights_default_node_pool : tomap(null)), (var.ipa_enabled ? local.intake_default_node_pool : tomap(null)))
+
+  default_node_pools_logic = var.node_pools == null ? local.default_node_pools : null
+
+  node_pools = var.node_pools == null ? local.default_node_pools : var.node_pools
 }
