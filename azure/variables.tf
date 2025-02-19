@@ -667,9 +667,10 @@ variable "network_type" {
   default = "create"
 }
 
-variable "network_resource_group_name" {
-  type    = string
-  default = null
+variable "network_resource_group_name_override" {
+  type        = string
+  default     = null
+  description = "Name for the resource group that will contain the networking resources. If not specified, defaults to general resource group"
 }
 
 variable "virtual_network_name" {

@@ -115,7 +115,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     sentinel_workspace_id = "${jsonencode(var.sentinel_workspace_id)}"
     cluster_manager_vm_size = "${jsonencode(var.cluster_manager_vm_size)}"
     network_type = "${jsonencode(var.network_type)}"
-    network_resource_group_name = "${jsonencode(var.network_resource_group_name)}"
+    network_resource_group_name_override = "${jsonencode(var.network_resource_group_name_override)}"
     virtual_network_name = "${jsonencode(var.virtual_network_name)}"
     virtual_subnet_name = "${jsonencode(var.virtual_subnet_name)}"
     keyvault_name_override = "${jsonencode(var.keyvault_name_override)}"
