@@ -181,6 +181,15 @@ locals {
     }
   }
 
+  default_node_pools = {
+    static-workers = {
+      spot   = false
+      taints = {}
+    }
+  }
+
+  karpenter_node_pools = merge(local.default_node_pools, var.node_pools)
+
 }
 
 resource "helm_release" "karpenter" {
@@ -231,7 +240,7 @@ ${yamlencode([for k, v in local.node_classes : {
     }])}
 
 nodePool:
-${yamlencode([for k, v in var.node_pools : {
+${yamlencode([for k, v in local.karpenter_node_pools : {
     name = k
     lables = {
       node_group = k
