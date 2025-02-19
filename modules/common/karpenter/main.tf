@@ -162,6 +162,25 @@ locals {
       ami_id = data.aws_ami.gpu_eks_node.id
     }
   }
+
+  cpu_instance_requirements = {
+    instance-category = {
+      key      = "karpenter.k8s.aws/instance-category"
+      operator = "In"
+      values   = ["c", "m", "r"]
+    }
+    instance-family = {
+      key      = "karpenter.k8s.aws/instance-family"
+      operator = "In"
+      values   = ["c", "m", "r"]
+    }
+    arch = {
+      key      = "karpenter.k8s.aws/arch"
+      operator = "In"
+      values   = ["amd64"]
+    }
+  }
+
 }
 
 resource "helm_release" "karpenter" {
@@ -209,6 +228,29 @@ ${yamlencode([for k, v in local.node_classes : {
         kmsKeyId   = split("/", var.kms_key_id)[length(split("/", var.kms_key_id)) - 1]
       }
     }]
+    }])}
+
+nodePool:
+${yamlencode([for k, v in var.node_pools : {
+    name = k
+    lables = {
+      node_group = k
+      node_pool  = k
+    }
+    taints = [for k2, v2 in v.taints : {
+      key    = v2.key
+      value  = v2.value
+      effect = v2.effect
+    }]
+    requirements = merge([for k3, v3 in local.cpu_instance_requirements : {
+      key      = v3.key
+      operator = v3.operator
+      values   = v3.values
+      }], {
+      key      = "karpenter.k8s.aws/capacity-type"
+      operator = "In"
+      values   = v.spot ? ["spot", "on-demand"] : ["on-demand"]
+    })
 }])}
 EOF
 ]

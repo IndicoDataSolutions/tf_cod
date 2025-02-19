@@ -312,6 +312,7 @@ module "karpenter" {
   instance_volume_size      = var.instance_volume_size
   instance_volume_type      = var.instance_volume_type
   kms_key_id                = module.kms_key.key_arn
+  node_pools                = local.node_pools
 }
 
 # Then set up the secrets operator authentication with vault 
