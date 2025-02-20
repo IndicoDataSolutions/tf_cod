@@ -259,7 +259,7 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
       node_group = k
       node_pool  = k
     }
-    taints = v.taints
+    taints = length(v.taints) > 0 ? v.taints : []
     requirements = concat(
       [for k3, v3 in v.type == "gpu" ? local.gpu_instance_requirements : local.cpu_instance_requirements : {
         key       = v3.key
