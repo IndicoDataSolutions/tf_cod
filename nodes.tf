@@ -160,6 +160,10 @@ locals {
         value  = "true"
         effect = "NoSchedule"
       }]
+      additional_labels = {
+        "group"                         = "gpu-enabled"
+        "k8s.amazonaws.com/accelerator" = "nvidia-tesla-t4"
+      }
     },
     celery-workers = {
       type = "cpu"

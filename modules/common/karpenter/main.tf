@@ -255,10 +255,10 @@ ${yamlencode([for k, v in local.node_classes : {
 nodePool:
 ${yamlencode([for k, v in local.karpenter_node_pools : {
     name = k
-    labels = {
+    labels = merge({
       node_group = k
       node_pool  = k
-    }
+    }, try(v.additional_labels, {}))
     taints = try(v.taints, [])
     requirements = concat(
       [for k3, v3 in v.type == "gpu" ? local.gpu_instance_requirements : local.cpu_instance_requirements : {
