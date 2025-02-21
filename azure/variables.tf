@@ -75,10 +75,10 @@ variable "worker_subnet_cidrs" {
 }
 
 ### storage account variables
-variable "storage_account_name" {
+variable "storage_account_name_override" {
   type        = string
-  default     = ""
-  description = "Name of the indico storage account"
+  default     = null
+  description = "Name of the indico storage account if not using the default"
 }
 
 variable "vault_address" {
@@ -211,65 +211,15 @@ variable "k8s_version" {
 }
 
 variable "default_node_pool" {
-  type = object({
-    node_count                     = number
-    vm_size                        = string
-    name                           = string
-    zones                          = list(string)
-    taints                         = list(string)
-    cluster_auto_scaling           = bool
-    cluster_auto_scaling_min_count = number
-    cluster_auto_scaling_max_count = number
-    labels                         = map(string)
-  })
+  default = null
 
-  default = {
-    name                           = "empty"
-    cluster_auto_scaling           = false
-    cluster_auto_scaling_max_count = 0
-    cluster_auto_scaling_min_count = 0
-    labels = {
-      "key" = "value"
-    }
-    node_count = 0
-    node_os    = "value"
-    pool_name  = "value"
-    taints     = ["value"]
-    vm_size    = "value"
-    zones      = ["value"]
-  }
+  description = "Override the default configuration for the cluster node pool"
 }
 
 variable "additional_node_pools" {
-  type = map(object({
-    node_count                     = number
-    vm_size                        = string
-    zones                          = list(string)
-    node_os                        = string
-    pool_name                      = string
-    taints                         = list(string)
-    labels                         = map(string)
-    cluster_auto_scaling           = bool
-    cluster_auto_scaling_min_count = number
-    cluster_auto_scaling_max_count = number
-  }))
+  default = null
 
-  default = {
-    "empty" = {
-      cluster_auto_scaling           = false
-      cluster_auto_scaling_max_count = 0
-      cluster_auto_scaling_min_count = 0
-      labels = {
-        "key" = "value"
-      }
-      node_count = 1
-      node_os    = "value"
-      pool_name  = "value"
-      taints     = ["value"]
-      vm_size    = "value"
-      zones      = ["value"]
-    }
-  }
+  description = "Override the default configuration for additional node pools, which is generated based on enabled applications"
 }
 
 variable "applications" {
@@ -717,9 +667,10 @@ variable "network_type" {
   default = "create"
 }
 
-variable "network_resource_group_name" {
-  type    = string
-  default = null
+variable "network_resource_group_name_override" {
+  type        = string
+  default     = null
+  description = "Name for the resource group that will contain the networking resources. If not specified, defaults to general resource group"
 }
 
 variable "virtual_network_name" {
@@ -732,9 +683,16 @@ variable "virtual_subnet_name" {
   type    = string
 }
 
-variable "keyvault_name" {
-  default = null
-  type    = string
+variable "keyvault_name_override" {
+  default     = null
+  type        = string
+  description = "keyvault name override if not using the default"
+}
+
+variable "keyvault_key_name_override" {
+  default     = null
+  type        = string
+  description = "keyvault key name override if not using the default"
 }
 
 variable "network_plugin" {
@@ -897,4 +855,96 @@ variable "crunchy_backup_name_override" {
   type        = string
   default     = null
   description = "Override the default crunchy-backup name"
+}
+
+variable "indico_crds_version" {
+  type        = string
+  default     = ""
+  description = "Version of the indico-crds helm chart"
+}
+
+variable "indico_pre_reqs_version" {
+  type        = string
+  default     = ""
+  description = "Version of the indico-pre-reqs helm chart"
+}
+
+variable "insights-pre-reqs-values-yaml-b64" {
+  type        = string
+  default     = "Cg=="
+  description = "user provided overrides to indico-pre-reqs helm chart"
+}
+
+variable "insights_enabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling insights deployment"
+}
+
+variable "insights_values" {
+  type        = string
+  default     = ""
+  description = "User provided overrides to the insights application"
+}
+
+variable "insights_version" {
+  type        = string
+  default     = ""
+  description = "Insights helm chart version to deploy to the cluster"
+}
+
+variable "insights_smoketest_version" {
+  type        = string
+  default     = ""
+  description = "Insights smoketest to deploy to the cluster"
+}
+
+variable "insights_smoketest_values" {
+  type        = string
+  default     = ""
+  description = "Insights smoketest overrides"
+}
+
+variable "insights_smoketest_enabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling smoketest"
+}
+
+variable "insights_smoketest_cronjob_enabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for scheduling smoketests"
+}
+
+variable "insights_pre_reqs_version" {
+  type        = string
+  default     = ""
+  description = "insights-pre-requisites helm chart version"
+}
+
+variable "insights_local_registry_harbor_robot_account_name" {
+  type        = string
+  default     = ""
+  description = ""
+}
+
+variable "insights_local_registry_enabled" {
+  type        = string
+  default     = ""
+  description = ""
+}
+
+variable "minio_enabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling minio deployment"
+}
+
+variable "indico-crds-values-yaml-b64" {
+  default = "Cg=="
+}
+
+variable "indico-pre-reqs-values-yaml-b64" {
+  default = "Cg=="
 }

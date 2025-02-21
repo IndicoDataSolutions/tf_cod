@@ -14,18 +14,19 @@ terraform {
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.33.0"
+      version = ">= 2.35.0"
     }
     kubectl = {
-      source = "gavinbunney/kubectl"
+      source  = "gavinbunney/kubectl"
+      version = "1.14.0"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "2.15.0"
+      version = ">= 2.15.0"
     }
     argocd = {
       source  = "oboukili/argocd"
-      version = "5.4.0"
+      version = "6.0.2"
     }
     local = {
       source  = "hashicorp/local"
@@ -33,11 +34,15 @@ terraform {
     }
     github = {
       source  = "integrations/github"
-      version = "4.26.0"
+      version = "5.34.0"
     }
     vault = {
       source  = "hashicorp/vault"
-      version = "3.13.0"
+      version = "3.22.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~>3.5.1"
     }
   }
 }
@@ -185,7 +190,8 @@ provider "kubectl" {
 
 module "argo-registration" {
   depends_on = [
-    module.cluster
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
   ]
 
   count = var.argo_enabled == true ? 1 : 0
@@ -213,13 +219,12 @@ provider "local" {}
 
 locals {
   resource_group_name         = coalesce(var.resource_group_name, "${var.label}-${var.region}")
-  network_resource_group_name = var.network_type == "load" ? var.network_resource_group_name : local.resource_group_name
+  network_resource_group_name = var.network_resource_group_name_override != null ? var.network_resource_group_name_override : local.resource_group_name
 
   sentinel_workspace_name                = coalesce(var.sentinel_workspace_name, "${var.account}-sentinel-workspace")
   sentinel_workspace_resource_group_name = coalesce(var.sentinel_workspace_resource_group_name, "${var.account}-sentinel-group")
 
   snapshot_storage_account_name = replace(lower("${var.account}snapshots"), "-", "")
-  storage_account_name          = replace(lower(var.storage_account_name), "-", "")
 
   argo_app_name           = lower("${var.account}.${var.region}.${var.label}-ipa")
   argo_cluster_name       = "${var.account}.${var.region}.${var.label}"
@@ -271,17 +276,18 @@ module "storage" {
   depends_on = [
     azurerm_resource_group.cod-cluster
   ]
-  source                       = "app.terraform.io/indico/indico-azure-blob/mod"
-  version                      = "1.0.1"
-  label                        = var.label
-  region                       = var.region
-  resource_group_name          = local.resource_group_name
-  storage_account_name         = local.storage_account_name
-  keyvault_name                = var.keyvault_name
-  blob_type                    = var.blob_type
-  fileshare_name_override      = var.fileshare_name_override
-  blob_store_name_override     = var.blob_store_name_override
-  crunchy_backup_name_override = var.crunchy_backup_name_override
+  source                        = "app.terraform.io/indico/indico-azure-blob/mod"
+  version                       = "1.1.1"
+  label                         = var.label
+  region                        = var.region
+  resource_group_name           = local.resource_group_name
+  storage_account_name_override = var.storage_account_name_override
+  keyvault_name_override        = var.keyvault_name_override
+  keyvault_key_name_override    = var.keyvault_key_name_override
+  blob_type                     = var.blob_type
+  fileshare_name_override       = var.fileshare_name_override
+  blob_store_name_override      = var.blob_store_name_override
+  crunchy_backup_name_override  = var.crunchy_backup_name_override
 }
 
 resource "azurerm_user_assigned_identity" "cluster_dns" {
@@ -311,8 +317,8 @@ module "cluster" {
   region                       = var.region
   svp_client_id                = var.svp_client_id
   svp_client_secret            = var.svp_client_secret
-  default_node_pool            = var.default_node_pool
-  additional_node_pools        = var.additional_node_pools
+  default_node_pool            = local.default_node_pool
+  additional_node_pools        = local.additional_node_pools
   vnet_subnet_id               = module.networking.subnet_id
   k8s_version                  = var.k8s_version
   private_cluster_enabled      = var.private_cluster_enabled

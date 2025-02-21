@@ -161,7 +161,7 @@ module "networking" {
 module "sqs_sns" {
   count                      = var.sqs_sns == true ? 1 : 0
   source                     = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
-  version                    = "2.0.0"
+  version                    = "2.0.2"
   region                     = var.region
   label                      = var.label
   kms_master_key_id          = module.kms_key.key.id
@@ -209,7 +209,7 @@ module "security-group" {
 
 module "s3-storage" {
   source                             = "app.terraform.io/indico/indico-aws-buckets/mod"
-  version                            = "4.1.1"
+  version                            = "4.2.2"
   force_destroy                      = true # allows terraform to destroy non-empty buckets.
   label                              = var.label
   kms_key_arn                        = module.kms_key.key.arn
@@ -222,6 +222,8 @@ module "s3-storage" {
   data_s3_bucket_name_override       = var.data_s3_bucket_name_override
   api_models_s3_bucket_name_override = var.api_models_s3_bucket_name_override
   pgbackup_s3_bucket_name_override   = var.pgbackup_s3_bucket_name_override
+  miniobkp_s3_bucket_name_override   = var.miniobkp_s3_bucket_name_override
+  include_miniobkp                   = var.include_miniobkp && var.insights_enabled ? true : false
 }
 
 
@@ -323,7 +325,7 @@ module "iam" {
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
   fsx_arns                   = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
-  s3_buckets                 = compact([module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : ""])
+  s3_buckets                 = compact([module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "", var.include_miniobkp && var.insights_enabled ? module.s3-storage.miniobkp_s3_bucket_name : ""])
   kms_key_arn                = module.kms_key.key_arn
   # s3 replication
   enable_s3_replication                            = var.enable_s3_replication
@@ -363,7 +365,7 @@ module "cluster" {
   az_count   = var.az_count
   subnet_ids = flatten([local.network[0].private_subnet_ids])
 
-  node_groups          = var.node_groups
+  node_groups          = local.node_groups
   node_role_name       = module.iam.node_role_name
   node_role_arn        = module.iam.node_role_arn
   instance_volume_size = var.instance_volume_size

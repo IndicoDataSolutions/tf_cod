@@ -18,7 +18,7 @@ resource "kubernetes_secret" "cod-snapshot-client-id" {
 resource "helm_release" "cod-snapshot-restore" {
   depends_on = [
     module.cluster,
-    helm_release.ipa-pre-requisites,
+    module.indico-common,
     kubernetes_secret.cod-snapshot-client-id,
     azuread_application_federated_identity_credential.workload_snapshot_identity,
     kubernetes_service_account.workload_identity

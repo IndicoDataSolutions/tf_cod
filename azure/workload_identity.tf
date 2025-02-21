@@ -1,9 +1,5 @@
 data "azuread_client_config" "current" {}
 
-
-
-
-
 resource "azuread_application" "workload_identity" {
   count        = var.use_workload_identity == true ? 1 : 0
   display_name = "${var.label}-${var.region}-workload-identity"

@@ -19,10 +19,10 @@ locals {
       thanos: {}
   EOT
   )
-  
+
   backend_port = var.acm_arn != "" ? "http" : "https"
-  enableHttp = var.acm_arn != "" || var.use_nlb == true ? false : true
-  lb_config = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
+  enableHttp   = var.acm_arn != "" || var.use_nlb == true ? false : true
+  lb_config    = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
   loadbalancer_config = var.use_nlb == true ? (<<EOT
       external:
         enabled: ${var.network_allow_public}
@@ -44,7 +44,7 @@ locals {
           service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
           service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
       external:
         enabled: ${var.network_allow_public}
       internal:
@@ -107,7 +107,7 @@ EOT
           hosts:
             - alertmanager-${local.dns_name}
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
       tls: []
   EOT
   )
@@ -117,7 +117,7 @@ EOT
           hosts:
             - grafana-${local.dns_name}
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
       tls: []
   EOT
   )
@@ -127,7 +127,7 @@ EOT
           hosts:
             - prometheus-${local.dns_name}
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
       tls: []
   EOT
   )
@@ -216,6 +216,7 @@ ${local.prometheus_tls}
       path: /
 ${local.grafana_tls}
 sql-exporter:
+  enabled: ${var.ipa_enabled}
   image:
     repository: '${var.image_registry}/dockerhub-proxy/burningalchemist/sql_exporter'
 tempo:
@@ -299,6 +300,7 @@ ${local.thanos_config}
       labels:
         acme.cert-manager.io/dns01-solver: "true"
 sql-exporter:
+  enabled: ${var.ipa_enabled}
   image:
     repository: '${var.image_registry}/dockerhub-proxy/burningalchemist/sql_exporter'
 tempo:
@@ -361,247 +363,3 @@ output "monitoring-password" {
   sensitive = true
   value     = random_password.monitoring-password.result
 }
-
-
-resource "helm_release" "monitoring" {
-  count = var.monitoring_enabled == true ? 1 : 0
-  depends_on = [
-    module.cluster,
-    helm_release.ipa-pre-requisites,
-    helm_release.external-secrets,
-    aws_route53_record.alertmanager-caa,
-    aws_route53_record.grafana-caa,
-    aws_route53_record.prometheus-caa,
-    time_sleep.wait_1_minutes_after_pre_reqs,
-    null_resource.update_storage_class
-  ]
-
-  verify           = false
-  name             = "monitoring"
-  create_namespace = true
-  namespace        = "monitoring"
-  repository       = var.ipa_repo
-  chart            = "monitoring"
-  version          = var.monitoring_version
-  wait             = false
-  timeout          = "900" # 15 minutes
-  skip_crds        = true
-
-  values = [<<EOF
-global:
-  host: "${local.dns_name}"
-
-
-ingress-nginx:
-  enabled: true
-  controller:
-    service:
-      enableHttp: ${local.enableHttp}
-      targetPorts:
-        https: ${local.backend_port}
-${local.lb_config}
-    image:
-      registry: ${var.image_registry}/registry.k8s.io
-      digest: ""
-    admissionWebhooks:
-      patch:
-        image:
-          registry: ${var.image_registry}/registry.k8s.io
-          digest: ""
-  rbac:
-    create: true
-
-  admissionWebhooks:
-    patch:
-      nodeSelector.beta.kubernetes.io/os: linux
-
-  defaultBackend:
-    nodeSelector.beta.kubernetes.io/os: linux
-  service:
-    annotations:
-      service.beta.kubernetes.io/oci-load-balancer-internal: "${local.internal_elb}"
-
-authentication:
-  ingressUsername: monitoring
-  ingressPassword: ${random_password.monitoring-password.result}
-
-${local.alerting_configuration_values}
-kube-prometheus-stack:
-${local.kube_prometheus_stack_values}
-EOF
-  ]
-}
-
-
-# resource "kubectl_manifest" "thanos-datasource-credentials" {
-#   count     = var.thanos_enabled ? 1 : 0
-#   provider  = kubectl.thanos-kubectl
-#   yaml_body = <<YAML
-# apiVersion: v1
-# stringData:
-#   admin-password: ${random_password.monitoring-password.result}
-# kind: Secret
-# metadata:
-#   name: ${replace(local.dns_name, ".", "-")}
-#   namespace: default
-# type: Opaque
-#   YAML
-# }
-
-# resource "kubectl_manifest" "thanos-datasource" {
-#   count      = var.thanos_enabled ? 1 : 0
-#   depends_on = [kubectl_manifest.thanos-datasource-credentials]
-#   provider   = kubectl.thanos-kubectl
-#   yaml_body  = <<YAML
-# apiVersion: grafana.integreatly.org/v1beta1
-# kind: GrafanaDatasource
-# metadata:
-#   name: ${replace(local.dns_name, ".", "-")}
-#   namespace: default
-# spec:
-#   valuesFrom:
-#     - targetPath: "secureJsonData.basicAuthPassword"
-#       valueFrom:
-#         secretKeyRef:
-#           name: ${replace(local.dns_name, ".", "-")}
-#           key: admin-password
-#   datasource:
-#     basicAuth: true
-#     basicAuthUser: monitoring
-#     editable: false
-#     access: proxy
-#     editable: true
-#     jsonData:
-#       timeInterval: 5s
-#       tlsSkipVerify: true
-#     name: ${local.dns_name}
-#     secureJsonData:
-#       basicAuthPassword: $${admin-password}
-#     type: prometheus
-#     url: https://prometheus.${local.dns_name}/prometheus
-#   instanceSelector:
-#     matchLabels:
-#       dashboards: external-grafana
-#   YAML
-# }
-
-resource "helm_release" "keda-monitoring" {
-  count = var.monitoring_enabled == true ? 1 : 0
-  depends_on = [
-    module.cluster,
-    helm_release.monitoring
-  ]
-
-  name             = "keda"
-  create_namespace = true
-  namespace        = "default"
-  repository       = var.ipa_repo
-  chart            = "keda"
-  version          = var.keda_version
-
-
-  values = [<<EOF
-    keda:
-      global:
-        image:
-          registry: ${var.image_registry}/ghcr.io
-      imagePullSecrets:
-        - name: harbor-pull-secret
-      resources:
-        operator:
-          requests:
-            memory: 512Mi
-          limits:
-            memory: 4Gi
-          
-      crds:
-        install: true
-      
-      podAnnotations:
-        keda:
-          prometheus.io/scrape: "true"
-          prometheus.io/path: "/metrics"
-          prometheus.io/port: "8080"
-        metricsAdapter: 
-          prometheus.io/scrape: "true"
-          prometheus.io/path: "/metrics"
-          prometheus.io/port: "9022"
-
-      prometheus:
-        metricServer:
-          enabled: true
-          podMonitor:
-            enabled: true
-        operator:
-          enabled: true
-          podMonitor:
-            enabled: true
- EOF
-  ]
-}
-
-resource "helm_release" "opentelemetry-collector" {
-  count = var.monitoring_enabled == true ? 1 : 0
-  depends_on = [
-    module.cluster,
-    helm_release.monitoring
-  ]
-
-  name             = "opentelemetry-collector"
-  create_namespace = true
-  namespace        = "default"
-  repository       = var.ipa_repo
-  chart            = "opentelemetry-collector"
-  version          = var.opentelemetry_collector_version
-
-
-  values = [<<EOF
-    opentelemetry-collector:
-      enabled: true
-      imagePullSecrets:
-        - name: harbor-pull-secret
-      image:
-        repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
-      fullnameOverride: "collector-collector"
-      mode: deployment
-      tolerations:
-      - effect: NoSchedule
-        key: indico.io/monitoring
-        operator: Exists
-      nodeSelector:
-        node_group: monitoring-workers
-      ports:
-        jaeger-compact:
-          enabled: false
-        jaeger-thrift:
-          enabled: false
-        jaeger-grpc:
-          enabled: false
-        zipkin:
-          enabled: false
-
-      config:
-        receivers:
-          jaeger: null
-          prometheus: null
-          zipkin: null
-        exporters:
-          otlp:
-            endpoint: monitoring-tempo.monitoring.svc:4317
-            tls:
-              insecure: true
-        service:
-          pipelines:
-            traces:
-              receivers:
-                - otlp
-              processors:
-                - batch
-              exporters:
-                - otlp
-            metrics: null
-            logs: null
- EOF
-  ]
-}
-

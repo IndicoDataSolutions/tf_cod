@@ -28,7 +28,7 @@ ingress-nginx:
     ) : (<<EOT
       thanos: {}
   EOT
-   )
+  )
   alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
 noExtraConfigs: true
   EOT
@@ -90,7 +90,7 @@ EOT
         clusterFullName: ${lower("${var.account}-${var.region}-${var.name}")}
 ${local.thanos_config}
       nodeSelector:
-        node_group: static-workers
+        node_group: monitoring-workers
     ingress:
       enabled: true
       annotations:
@@ -149,7 +149,7 @@ ${local.thanos_config}
         clusterFullName: ${lower("${var.account}-${var.region}-${var.name}")}
 ${local.thanos_config}
       nodeSelector:
-        node_group: static-workers
+        node_group: monitoring-workers
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
@@ -229,260 +229,4 @@ resource "azurerm_role_assignment" "private_dns_contributor" {
   scope                = module.networking.vnet_id
   role_definition_name = "Network Contributor"
   principal_id         = var.private_dns_zone_id == "System" ? module.cluster.principal_id : azurerm_user_assigned_identity.cluster_dns[0].principal_id
-}
-
-
-resource "helm_release" "monitoring" {
-  count = var.monitoring_enabled == true ? 1 : 0
-  depends_on = [
-    module.cluster,
-    helm_release.external-secrets,
-    helm_release.ipa-pre-requisites,
-    azurerm_dns_caa_record.alertmanager-caa,
-    azurerm_dns_caa_record.grafana-caa,
-    azurerm_dns_caa_record.prometheus-caa,
-    time_sleep.wait_1_minutes_after_pre_reqs,
-    azurerm_role_assignment.private_dns_contributor
-  ]
-
-  verify           = false
-  name             = "monitoring"
-  create_namespace = true
-  namespace        = "monitoring"
-  repository       = var.ipa_repo
-  chart            = "monitoring"
-  version          = var.monitoring_version
-  wait             = false
-  timeout          = "900" # 15 minutes
-  skip_crds        = true
-
-  values = [<<EOF
-global:
-  host: "${local.dns_name}"
-
-prometheus-postgres-exporter:
-  enabled: false
-
-ingress-nginx:
-  enabled: ${local.kube_prometheus_stack_enabled}
-
-  rbac:
-    create: true
-
-  controller:
-    service:
-      annotations:
-        service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
-
-  admissionWebhooks:
-    patch:
-      nodeSelector.beta.kubernetes.io/os: linux
-
-    controller:
-      service:
-        annotations:
-          service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
-  
-  authentication:
-    ingressUsername: monitoring
-    ingressPassword: ${random_password.monitoring-password.result}
-
-
-  defaultBackend:
-    nodeSelector.beta.kubernetes.io/os: linux
-
-authentication:
-  ingressUsername: monitoring
-  ingressPassword: ${random_password.monitoring-password.result}
-
-${local.alerting_configuration_values}
-kube-prometheus-stack:
-${local.kube_prometheus_stack_values}
-EOF
-    ,
-    <<EOF
-${local.private_dns_config}
-    EOF
-  ]
-}
-
-# resource "kubectl_manifest" "thanos-datasource-credentials" {
-#   count     = var.thanos_enabled ? 1 : 0
-#   provider  = kubectl.thanos-kubectl
-#   yaml_body = <<YAML
-# apiVersion: v1
-# stringData:
-#   admin-password: ${random_password.monitoring-password.result}
-# kind: Secret
-# metadata:
-#   name: ${replace(local.dns_name, ".", "-")}
-#   namespace: default
-# type: Opaque
-#   YAML
-# }
-
-# resource "kubectl_manifest" "thanos-datasource" {
-#   count      = var.thanos_enabled ? 1 : 0
-#   depends_on = [kubectl_manifest.thanos-datasource-credentials]
-#   provider   = kubectl.thanos-kubectl
-#   yaml_body  = <<YAML
-# apiVersion: grafana.integreatly.org/v1beta1
-# kind: GrafanaDatasource
-# metadata:
-#   name: ${replace(local.dns_name, ".", "-")}
-#   namespace: default
-# spec:
-#   valuesFrom:
-#     - targetPath: "secureJsonData.basicAuthPassword"
-#       valueFrom:
-#         secretKeyRef:
-#           name: ${replace(local.dns_name, ".", "-")}
-#           key: admin-password
-#   datasource:
-#     basicAuth: true
-#     basicAuthUser: monitoring
-#     editable: false
-#     access: proxy
-#     editable: true
-#     jsonData:
-#       timeInterval: 5s
-#       tlsSkipVerify: true
-#     name: ${local.dns_name}
-#     secureJsonData:
-#       basicAuthPassword: $${admin-password}
-#     type: prometheus
-#     url: https://prometheus.${local.dns_name}/prometheus
-#   instanceSelector:
-#     matchLabels:
-#       dashboards: external-grafana
-#   YAML
-# }
-
-
-resource "helm_release" "keda-monitoring" {
-  count = !var.is_openshift == true && var.monitoring_enabled == true ? 1 : 0
-  depends_on = [
-    module.cluster,
-    helm_release.monitoring
-  ]
-
-  name             = "keda"
-  create_namespace = true
-  namespace        = "default"
-  repository       = var.ipa_repo
-  chart            = "keda"
-  version          = var.keda_version
-  wait             = true
-
-
-  values = [<<EOF
-    image:
-      metricsApiServer:
-        repository: ${var.image_registry}/ghcr.io/kedacore/keda-metrics-apiserver
-      webhooks:
-        repository: ${var.image_registry}/ghcr.io/kedacore/keda-admission-webhooks
-      keda:
-        repository: ${var.image_registry}/ghcr.io/kedacore/keda
-    imagePullSecrets:
-      - name: harbor-pull-secret
-      
-    resources:
-      operator:
-        requests:
-          memory: 512Mi
-        limits:
-          memory: 4Gi
-
-    crds:
-      install: true
-    
-    podAnnotations:
-      keda:
-        prometheus.io/scrape: "true"
-        prometheus.io/path: "/metrics"
-        prometheus.io/port: "8080"
-      metricsAdapter: 
-        prometheus.io/scrape: "true"
-        prometheus.io/path: "/metrics"
-        prometheus.io/port: "9022"
-
-    prometheus:
-      metricServer:
-        enabled: true
-        serviceMonitor:
-          enabled: true
-        podMonitor:
-          enabled: true
-      operator:
-        enabled: true
-        serviceMonitor:
-          enabled: true
-        podMonitor:
-          enabled: true
- EOF
-  ]
-}
-
-resource "helm_release" "opentelemetry-collector" {
-  count = local.kube_prometheus_stack_enabled == true ? 1 : 0
-  depends_on = [
-    module.cluster,
-    helm_release.monitoring
-  ]
-
-  name             = "opentelemetry-collector"
-  create_namespace = true
-  namespace        = "default"
-  repository       = var.ipa_repo
-  chart            = "opentelemetry-collector"
-  version          = var.opentelemetry_collector_version
-
-
-  values = [<<EOF
-    enabled: true
-    imagePullSecrets:
-      - name: harbor-pull-secret
-    image:
-      repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
-    fullnameOverride: "collector-collector"
-    mode: deployment
-    tolerations:
-    - effect: NoSchedule
-      key: indico.io/monitoring
-      operator: Exists
-    nodeSelector:
-      node_group: monitoring-workers
-    ports:
-      jaeger-compact:
-        enabled: false
-      jaeger-thrift:
-        enabled: false
-      jaeger-grpc:
-        enabled: false
-      zipkin:
-        enabled: false
-
-    config:
-      receivers:
-        jaeger: null
-        prometheus: null
-        zipkin: null
-      exporters:
-        otlp:
-          endpoint: monitoring-tempo.monitoring.svc:4317
-          tls:
-            insecure: true
-      service:
-        pipelines:
-          traces:
-            receivers:
-              - otlp
-            processors:
-              - batch
-            exporters:
-              - otlp
-          metrics: null
-          logs: null
- EOF
-  ]
 }
