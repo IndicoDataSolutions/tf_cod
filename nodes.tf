@@ -85,39 +85,39 @@ locals {
 
   insights_default_node_groups = {
     general = {
-        type                   = "cpu"
-        spot                   = false
-        instance_types         = ["m5a.xlarge"]
-        min_size               = 1
-        max_size               = 5
-        desired_capacity       = "3"
+      type             = "cpu"
+      spot             = false
+      instance_types   = ["m5a.xlarge"]
+      min_size         = 1
+      max_size         = 5
+      desired_capacity = "3"
     },
     pgo-workers = {
-        type                   = "cpu"
-        spot                   = false
-        instance_types         = ["m5a.large"]
-        min_size               = 1
-        max_size               = 2
-        desired_capacity       = "2"
-        taints                 = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
+      type             = "cpu"
+      spot             = false
+      instance_types   = ["m5a.large"]
+      min_size         = 1
+      max_size         = 2
+      desired_capacity = "2"
+      taints           = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
     },
     celery-workers = {
-      type                     = "cpu"
-      spot                     = false
-      instance_types           = ["m5a.xlarge"]
-      min_size                 = 1
-      max_size                 = 3
-      desired_capacity         = "1"
-      taints                   = "--register-with-taints=indico.io/celery-workers=true:NoSchedule"
+      type             = "cpu"
+      spot             = false
+      instance_types   = ["m5a.xlarge"]
+      min_size         = 1
+      max_size         = 3
+      desired_capacity = "1"
+      taints           = "--register-with-taints=indico.io/celery-workers=true:NoSchedule"
     },
     minio = {
-        type                   = "cpu"
-        spot                   = false
-        instance_types         = ["t3a.xlarge"]
-        min_size               = 1
-        max_size               = 4
-        desired_capacity       = "4"
-        taints                 = "--register-with-taints=indico.io/minio=true:NoSchedule"
+      type             = "cpu"
+      spot             = false
+      instance_types   = ["t3a.xlarge"]
+      min_size         = 1
+      max_size         = 4
+      desired_capacity = "4"
+      taints           = "--register-with-taints=indico.io/minio=true:NoSchedule"
     },
     monitoring-workers = {
       min_size         = 1
@@ -129,31 +129,33 @@ locals {
       taints           = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
     },
     weaviate = {
-        type                   = "cpu"
-        spot                   = false
-        instance_types         = ["r5a.xlarge"]
-        min_size               = 1
-        max_size               = 3
-        desired_capacity       = "3"
-        taints                 = "--register-with-taints=indico.io/weaviate=true:NoSchedule"
+      type             = "cpu"
+      spot             = false
+      instance_types   = ["r5a.xlarge"]
+      min_size         = 1
+      max_size         = 3
+      desired_capacity = "3"
+      taints           = "--register-with-taints=indico.io/weaviate=true:NoSchedule"
     },
     weaviate-workers = {
-        type                   = "cpu"
-        spot                   = false
-        instance_types         = ["c6a.2xlarge"]
-        min_size               = 1
-        max_size               = 4
-        desired_capacity       = "2"
-        taints                 = "--register-with-taints=indico.io/weaviate-workers=true:NoSchedule"
+      type             = "cpu"
+      spot             = false
+      instance_types   = ["c6a.2xlarge"]
+      min_size         = 1
+      max_size         = 4
+      desired_capacity = "2"
+      taints           = "--register-with-taints=indico.io/weaviate-workers=true:NoSchedule"
     }
   }
 
-  default_node_groups = merge((var.insights_enabled ? local.insights_default_node_groups : null), (var.ipa_enabled ? local.intake_default_node_groups : null))
+  default_node_groups = merge((var.insights_enabled ? local.insights_default_node_groups : tomap(null)), (var.ipa_enabled ? local.intake_default_node_groups : tomap(null)))
 
   # This is to avoid terraform errors when the node groups variable is set,
   # as different keys make the objects incompatible for a ternary function. 
   # To solve this, we set it to null which matches all types
-  default_node_groups_logic = var.node_groups == null ? local.default_node_groups : null 
+  default_node_groups_logic = var.node_groups == null ? local.default_node_groups : tomap(null)
 
-  node_groups = var.node_groups == null ? local.default_node_groups_logic : var.node_groups 
+  variable_node_groups = var.node_groups != null ? var.node_groups : tomap(null)
+
+  node_groups = merge(local.default_node_groups_logic, local.variable_node_groups)
 }
