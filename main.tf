@@ -447,8 +447,13 @@ provider "kubernetes" {
 provider "kubectl" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  token                  = data.aws_eks_cluster_auth.local.token
-  load_config_file       = false
+  #token                  = data.aws_eks_cluster_auth.local.token
+  load_config_file = false
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", var.label]
+    command     = "aws"
+  }
 }
 
 
