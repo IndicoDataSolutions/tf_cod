@@ -360,9 +360,8 @@ aws-ebs-csi-driver:
     nodeDriverRegistrar:
       image:
         repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
-  controller:
-    extraVolumeTags:
-      ${indent(6, yamlencode(var.default_tags))}
+  extraVolumeTags:
+    ${indent(6, yamlencode(var.default_tags))}
 cert-manager:
   enabled: true
   crds:
