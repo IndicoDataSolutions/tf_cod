@@ -340,7 +340,7 @@ module "iam" {
   s3_replication_api_model_destination_bucket_name = var.api_model_destination_bucket
   # s3 backup
   create_s3_backup_role = var.create_s3_backup_role
-  s3_backup_bucket_arn = var.data_s3_bucket_name_override == null ? indico-data-${var.label} : var.data_s3_bucket_name_override
+  s3_backup_bucket_arn = var.data_s3_bucket_name_override == null ? "indico-data-${var.label}" : var.data_s3_bucket_name_override
   s3_backup_role_name = var.s3_backup_role_name_override
   # Iam flow logs role
   create_iam_flow_logs_role = var.create_iam_flow_logs_role
