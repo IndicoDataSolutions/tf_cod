@@ -314,7 +314,7 @@ module "fsx-storage" {
 
 module "iam" {
   source  = "app.terraform.io/indico/indico-aws-iam/mod"
-  version = "0.0.11"
+  version = "0.0.12"
 
   # EKS node role
   create_node_role           = var.create_node_role
@@ -327,6 +327,10 @@ module "iam" {
   fsx_arns                   = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
   s3_buckets                 = compact([module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "", var.include_miniobkp && var.insights_enabled ? module.s3-storage.miniobkp_s3_bucket_name : ""])
   kms_key_arn                = module.kms_key.key_arn
+  # EKS cluster role
+  create_cluster_iam_role = var.create_eks_cluster_role
+  eks_cluster_iam_role = var.eks_cluster_iam_role_name_override == null ? "eks-cluster-${var.label}-${var.region}" : var.eks_cluster_iam_role_name_override
+
   # s3 replication
   enable_s3_replication                            = var.enable_s3_replication
   create_s3_replication_role                       = var.create_s3_replication_role
@@ -334,6 +338,13 @@ module "iam" {
   s3_replication_destination_kms_key_arn           = var.destination_kms_key_arn
   s3_replication_data_destination_bucket_name      = var.data_destination_bucket
   s3_replication_api_model_destination_bucket_name = var.api_model_destination_bucket
+  # s3 backup
+  create_s3_backup_role = var.create_s3_backup_role
+  s3_backup_bucket_arn = var.data_s3_bucket_name_override == null ? indico-data-${var.label} : var.data_s3_bucket_name_override
+  s3_backup_role_name = var.s3_backup_role_name_override
+  # Iam flow logs role
+  create_iam_flow_logs_role = var.create_iam_flow_logs_role
+  iam_flow_logs_role_name = var.iam_flow_logs_role_name_override
 }
 
 moved {
