@@ -1188,10 +1188,16 @@ variable "create_s3_backup_role" {
   description = "Flag to create or load s3 backup role"
 }
 
-variable "create_iam_flow_logs_role" {
+variable "create_vpc_flow_logs_role" {
   type        = bool
   default     = true
-  description = "Flag to create or load iam flow logs role"
+  description = "Flag to create or load vpc flow logs role"
+}
+
+variable "vpc_flow_logs_role_name_override" {
+  type        = string
+  default     = null
+  description = "The name of the existing vpc flow logs role"
 }
 
 variable "create_eks_cluster_role" {

@@ -343,8 +343,8 @@ module "iam" {
   s3_backup_bucket_arn = var.data_s3_bucket_name_override == null ? "indico-data-${var.label}" : var.data_s3_bucket_name_override
   s3_backup_role_name = var.s3_backup_role_name_override
   # Iam flow logs role
-  create_iam_flow_logs_role = var.create_iam_flow_logs_role
-  iam_flow_logs_role_name = var.iam_flow_logs_role_name_override
+  create_vpc_flow_logs_role = var.create_iam_flow_logs_role
+  vpc_flow_logs_role_name = var.vpc_flow_logs_role_name_override
 }
 
 moved {
