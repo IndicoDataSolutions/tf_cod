@@ -1031,6 +1031,20 @@ module "intake_smoketests" {
   helm_values            = indent(10, trimspace(local.smoketests_values))
 }
 
+resource "random_password" "minio-password" {
+  length  = 16
+  special = false
+}
+
+output "minio-username" {
+  value = "indico"
+}
+
+output "minio-password" {
+  sensitive = true
+  value     = random_password.minio-password.result
+}
+
 locals {
   insights_pre_reqs_values = [<<EOF
 crunchy-postgres:
@@ -1120,14 +1134,10 @@ crunchy-postgres:
 ingress:
   useStaticCertificate: false
   secretName: indico-ssl-static-cert
-  tls.crt: #base64 encoded value of certificate chain
-  tls.key: #base64 encoded value of certificate key
 minio:
-  topology:
-    volumeSize: 128Gi
   storage:
-    accessKey: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
-    secretKey: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
+    accessKey: ${random_password.minio-username.result}
+    secretKey: ${random_password.minio-password.result}
   backup:
     enabled: ${var.include_miniobkp}
     schedule: "0 4 * * 2" # This schedules the job to run at 4:00 AM every Tuesday
@@ -1142,20 +1152,22 @@ weaviate:
       weaviate-backup:
         enabled: true
   backupStorageConfig:
-    accessKey: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
-    secretKey: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
+    accessKey: ${random_password.minio-username.result}
+    secretKey: ${random_password.minio-password.result}
     url: http://minio-tenant-hl.insights.svc.cluster.local:9000
   weaviate:
     env:
-      GOMEMLIMIT: "31GiB" # 1 less than the hard limit on the used nodes 
+      # 1 less than the hard limit of the weaviate node group type
+      GOMEMLIMIT: "31GiB"
+    # TODO: switch this to a dedicated weaviate backup bucket
     backups:
       s3:
         enabled: true
         envconfig:
           BACKUP_S3_ENDPOINT: minio-tenant-hl.insights.svc.cluster.local:9000
         secrets:
-          AWS_ACCESS_KEY_ID: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
-          AWS_SECRET_ACCESS_KEY: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
+          AWS_ACCESS_KEY_ID: ${random_password.minio-username.result}
+          AWS_SECRET_ACCESS_KEY: ${random_password.minio-password.result}
 rabbitmq:
   rabbitmq:
     image:
@@ -1170,15 +1182,6 @@ global:
   host: ${lower("${var.label}.${var.region}.${var.aws_account}.indico.io")}
   features:
     askMyDocument: true
-insights-edge:
-  additionalAllowedOrigins:
-    - https://local.indico.io:1234
-server:
-  services:
-    lagoon:
-      env:
-        FIELD_AUTOCONFIRM_CONFIDENCE: 0.8
-        FIELD_CONFIG_PATH: "fields_config.yaml"
 ask-my-docs:
   llmConfig:
     llm: indico-azure-instance
