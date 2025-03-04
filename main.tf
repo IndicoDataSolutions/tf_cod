@@ -329,7 +329,8 @@ module "iam" {
   s3_buckets                 = compact([module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "", var.include_miniobkp && var.insights_enabled ? module.s3-storage.miniobkp_s3_bucket_name : ""])
   kms_key_arn                = module.kms_key.key_arn
   # EKS cluster role
-  cluster_iam_role_arn       = var.create_eks_cluster_role ? var.eks_cluster_iam_role_name_override == null ? "eks-cluster-${var.label}-${var.region}" : var.eks_cluster_iam_role_name_override : null
+  create_eks_cluster_role = var.create_eks_cluster_role
+  eks_cluster_iam_role_arn = var.eks_cluster_iam_role_name_override == null ? "eks-cluster-${var.label}-${var.region}" : var.eks_cluster_iam_role_name_override
 
   # s3 replication
   enable_s3_replication                            = var.enable_s3_replication
