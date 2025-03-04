@@ -152,7 +152,7 @@ module "networking" {
   sg_tag_name                = var.sg_tag_name
   sg_tag_value               = var.sg_tag_value
   enable_vpc_flow_logs       = var.enable_vpc_flow_logs
-  vpc_flow_logs_iam_role_arn = var.vpc_flow_logs_iam_role_arn
+  vpc_flow_logs_iam_role_arn = var.vpc_flow_logs_iam_role_arn != "" ? var.vpc_flow_logs_iam_role_arn : var.enable_vpc_flow_logs ? module.iam.vpc_flow_logs_role_arn : ""
   enable_firewall            = var.enable_firewall
   firewall_subnet_cidrs      = var.firewall_subnet_cidrs
   firewall_allow_list        = var.firewall_allow_list
@@ -209,7 +209,7 @@ module "security-group" {
 
 module "s3-storage" {
   source                             = "app.terraform.io/indico/indico-aws-buckets/mod"
-  version                            = "4.2.2"
+  version                            = "4.3.0"
   force_destroy                      = true # allows terraform to destroy non-empty buckets.
   label                              = var.label
   kms_key_arn                        = module.kms_key.key.arn
@@ -217,6 +217,7 @@ module "s3-storage" {
   uploads_expiry                     = var.uploads_expiry
   include_rox                        = var.include_rox
   enable_backup                      = var.enable_s3_backup
+  backup_role_arn                    = var.enable_s3_backup ? module.iam.s3_backup_role_arn : ""
   enable_access_logging              = var.enable_s3_access_logging
   bucket_type                        = var.bucket_type
   data_s3_bucket_name_override       = var.data_s3_bucket_name_override
@@ -329,7 +330,7 @@ module "iam" {
   kms_key_arn                = module.kms_key.key_arn
   # EKS cluster role
   create_cluster_iam_role = var.create_eks_cluster_role
-  eks_cluster_iam_role = var.eks_cluster_iam_role_name_override == null ? "eks-cluster-${var.label}-${var.region}" : var.eks_cluster_iam_role_name_override
+  eks_cluster_iam_role    = var.eks_cluster_iam_role_name_override == null ? "eks-cluster-${var.label}-${var.region}" : var.eks_cluster_iam_role_name_override
 
   # s3 replication
   enable_s3_replication                            = var.enable_s3_replication
@@ -340,11 +341,11 @@ module "iam" {
   s3_replication_api_model_destination_bucket_name = var.api_model_destination_bucket
   # s3 backup
   create_s3_backup_role = var.create_s3_backup_role
-  s3_backup_bucket_arn = var.data_s3_bucket_name_override == null ? "indico-data-${var.label}" : var.data_s3_bucket_name_override
-  s3_backup_role_name = var.s3_backup_role_name_override
+  s3_backup_bucket_arn  = var.data_s3_bucket_name_override == null ? "indico-data-${var.label}" : var.data_s3_bucket_name_override
+  s3_backup_role_name   = var.s3_backup_role_name_override
   # Iam flow logs role
   create_vpc_flow_logs_role = var.create_vpc_flow_logs_role
-  vpc_flow_logs_role_name = var.vpc_flow_logs_role_name_override
+  vpc_flow_logs_role_name   = var.vpc_flow_logs_role_name_override
 }
 
 moved {
@@ -363,12 +364,13 @@ moved {
 }
 
 module "cluster" {
-  source          = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version         = "9.0.34"
-  label           = var.label
-  region          = var.region
-  cluster_version = var.k8s_version
-  default_tags    = merge(coalesce(var.default_tags, {}), coalesce(var.additional_tags, {}))
+  source               = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
+  version              = "9.0.34"
+  label                = var.label
+  region               = var.region
+  cluster_version      = var.k8s_version
+  default_tags         = merge(coalesce(var.default_tags, {}), coalesce(var.additional_tags, {}))
+  cluster_iam_role_arn = var.create_eks_cluster_role ? module.iam.cluster_role_arn : null
 
   kms_key_arn = module.kms_key.key_arn
 
