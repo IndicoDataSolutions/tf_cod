@@ -156,6 +156,7 @@ module "networking" {
   enable_firewall            = var.enable_firewall
   firewall_subnet_cidrs      = var.firewall_subnet_cidrs
   firewall_allow_list        = var.firewall_allow_list
+  s3_endpoint_enabled        = var.s3_endpoint_enabled
 }
 
 module "sqs_sns" {
