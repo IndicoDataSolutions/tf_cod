@@ -374,7 +374,7 @@ module "cluster" {
   cluster_version      = var.k8s_version
   default_tags         = merge(coalesce(var.default_tags, {}), coalesce(var.additional_tags, {}))
   cluster_iam_role_arn = local.cluster_iam_role_arn
-
+  generate_kms_key = false
   kms_key_arn = module.kms_key.key_arn
 
   vpc_id     = local.network[0].indico_vpc_id
