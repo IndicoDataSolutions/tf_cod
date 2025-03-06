@@ -107,6 +107,9 @@ locals {
 
   chart_version_parts = split("-", var.ipa_version)
   chart_suffix        = trimprefix(var.ipa_version, local.chart_version_parts[0])
+
+  cluster_iam_role_arn = var.create_eks_cluster_role ? (var.eks_cluster_iam_role_name_override == null ? "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/eks-cluster-${var.label}-${var.region}" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.eks_cluster_iam_role_name_override}") : null
+  # note: this is a workaround to avoid a race condition where the cluster is created before the IAM role is created. Adding a dependency on the IAM module doesn't work.
 }
 
 resource "tls_private_key" "pk" {
@@ -370,7 +373,7 @@ module "cluster" {
   region               = var.region
   cluster_version      = var.k8s_version
   default_tags         = merge(coalesce(var.default_tags, {}), coalesce(var.additional_tags, {}))
-  cluster_iam_role_arn = var.create_eks_cluster_role ? module.iam.cluster_role_arn : null
+  cluster_iam_role_arn = local.cluster_iam_role_arn
 
   kms_key_arn = module.kms_key.key_arn
 
