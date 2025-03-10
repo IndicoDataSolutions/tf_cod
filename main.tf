@@ -333,7 +333,7 @@ module "iam" {
   kms_key_arn                = module.kms_key.key_arn
   # EKS cluster role
   create_cluster_iam_role = var.create_eks_cluster_role
-  eks_cluster_iam_role    = var.eks_cluster_iam_role_name_override == null ? "eks-cluster-${var.label}-${var.region}" : var.eks_cluster_iam_role_name_override
+  eks_cluster_iam_role    = var.eks_cluster_iam_role_name_override == null ? (var.create_eks_cluster_role ? "eks-cluster-${var.label}-${var.region}" : null) : var.eks_cluster_iam_role_name_override
 
   # s3 replication
   enable_s3_replication                            = var.enable_s3_replication
