@@ -1202,8 +1202,8 @@ variable "vpc_flow_logs_role_name_override" {
 
 variable "create_eks_cluster_role" {
   type        = bool
-  default     = true
-  description = "Flag to create or load eks cluster role"
+  default     = false
+  description = "Flag to create or load eks cluster role."
 }
 
 variable "eks_cluster_iam_role_name_override" {

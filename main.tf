@@ -333,7 +333,7 @@ module "iam" {
   kms_key_arn                = module.kms_key.key_arn
   # EKS cluster role
   create_cluster_iam_role = var.create_eks_cluster_role
-  eks_cluster_iam_role = var.eks_cluster_iam_role_name_override == null ? "eks-cluster-${var.label}-${var.region}" : var.eks_cluster_iam_role_name_override
+  eks_cluster_iam_role    = var.eks_cluster_iam_role_name_override == null ? "eks-cluster-${var.label}-${var.region}" : var.eks_cluster_iam_role_name_override
 
   # s3 replication
   enable_s3_replication                            = var.enable_s3_replication
@@ -374,8 +374,8 @@ module "cluster" {
   cluster_version      = var.k8s_version
   default_tags         = merge(coalesce(var.default_tags, {}), coalesce(var.additional_tags, {}))
   cluster_iam_role_arn = local.cluster_iam_role_arn
-  generate_kms_key = false
-  kms_key_arn = module.kms_key.key_arn
+  generate_kms_key     = var.create_eks_cluster_role ? false : true #Once the cluster is created, we cannot change the kms key.
+  kms_key_arn          = module.kms_key.key_arn
 
   vpc_id     = local.network[0].indico_vpc_id
   az_count   = var.az_count
@@ -451,25 +451,25 @@ data "aws_eks_cluster_auth" "local" {
 provider "kubernetes" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  #token                  = data.aws_eks_cluster_auth.local.token
+  token                  = data.aws_eks_cluster_auth.local.token
   #token                  = module.cluster.kubernetes_token
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--cluster-name", var.label]
-    command     = "aws"
-  }
+  # exec {
+  #   api_version = "client.authentication.k8s.io/v1beta1"
+  #   args        = ["eks", "get-token", "--cluster-name", var.label]
+  #   command     = "aws"
+  # }
 }
 
 provider "kubectl" {
   host                   = module.cluster.kubernetes_host
   cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-  #token                  = data.aws_eks_cluster_auth.local.token
+  token                  = data.aws_eks_cluster_auth.local.token
   load_config_file = false
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--cluster-name", var.label]
-    command     = "aws"
-  }
+  # exec {
+  #   api_version = "client.authentication.k8s.io/v1beta1"
+  #   args        = ["eks", "get-token", "--cluster-name", var.label]
+  #   command     = "aws"
+  # }
 }
 
 
