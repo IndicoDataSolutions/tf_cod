@@ -197,7 +197,7 @@ variable "k8s_version" {
 }
 
 variable "node_groups" {
-  default = null
+  default     = null
   description = "Override for the node groups assigned to the cluster. If not supplied, the node groups will be determined from intake and insights defaults"
 }
 
@@ -1174,6 +1174,42 @@ variable "data_s3_bucket_name_override" {
   type        = string
   default     = null
   description = "The name of the existing S3 bucket to be created/loaded and used as the data bucket"
+}
+
+variable "s3_backup_role_name_override" {
+  type        = string
+  default     = null
+  description = "The name of the existing S3 backup role"
+}
+
+variable "create_s3_backup_role" {
+  type        = bool
+  default     = true
+  description = "Flag to create or load s3 backup role"
+}
+
+variable "create_vpc_flow_logs_role" {
+  type        = bool
+  default     = true
+  description = "Flag to create or load vpc flow logs role"
+}
+
+variable "vpc_flow_logs_role_name_override" {
+  type        = string
+  default     = null
+  description = "The name of the existing vpc flow logs role"
+}
+
+variable "create_eks_cluster_role" {
+  type        = bool
+  default     = false
+  description = "Flag to create or load eks cluster role."
+}
+
+variable "eks_cluster_iam_role_name_override" {
+  type        = string
+  default     = null
+  description = "The name of the existing eks cluster role"
 }
 
 variable "api_models_s3_bucket_name_override" {
