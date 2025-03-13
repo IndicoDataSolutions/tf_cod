@@ -107,6 +107,9 @@ locals {
 
   chart_version_parts = split("-", var.ipa_version)
   chart_suffix        = trimprefix(var.ipa_version, local.chart_version_parts[0])
+
+  cluster_iam_role_arn = var.create_eks_cluster_role ? (var.eks_cluster_iam_role_name_override == null ? "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/eks-cluster-${var.label}-${var.region}" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.eks_cluster_iam_role_name_override}") : null
+  # note: this is a workaround to avoid a race condition where the cluster is created before the IAM role is created. Adding a dependency on the IAM module doesn't work.
 }
 
 resource "tls_private_key" "pk" {
@@ -210,7 +213,7 @@ module "security-group" {
 
 module "s3-storage" {
   source                             = "app.terraform.io/indico/indico-aws-buckets/mod"
-  version                            = "4.2.2"
+  version                            = "4.4.0"
   force_destroy                      = true # allows terraform to destroy non-empty buckets.
   label                              = var.label
   kms_key_arn                        = module.kms_key.key.arn
@@ -225,6 +228,7 @@ module "s3-storage" {
   pgbackup_s3_bucket_name_override   = var.pgbackup_s3_bucket_name_override
   miniobkp_s3_bucket_name_override   = var.miniobkp_s3_bucket_name_override
   include_miniobkp                   = var.include_miniobkp && var.insights_enabled ? true : false
+  allowed_origins                    = [local.dns_name]
 }
 
 
@@ -315,7 +319,7 @@ module "fsx-storage" {
 
 module "iam" {
   source  = "app.terraform.io/indico/indico-aws-iam/mod"
-  version = "0.0.11"
+  version = "0.0.12"
 
   # EKS node role
   create_node_role           = var.create_node_role
@@ -328,6 +332,10 @@ module "iam" {
   fsx_arns                   = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
   s3_buckets                 = compact([module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "", var.include_miniobkp && var.insights_enabled ? module.s3-storage.miniobkp_s3_bucket_name : ""])
   kms_key_arn                = module.kms_key.key_arn
+  # EKS cluster role
+  create_cluster_iam_role = var.create_eks_cluster_role
+  eks_cluster_iam_role    = var.eks_cluster_iam_role_name_override == null ? (var.create_eks_cluster_role ? "eks-cluster-${var.label}-${var.region}" : null) : var.eks_cluster_iam_role_name_override
+
   # s3 replication
   enable_s3_replication                            = var.enable_s3_replication
   create_s3_replication_role                       = var.create_s3_replication_role
@@ -335,6 +343,13 @@ module "iam" {
   s3_replication_destination_kms_key_arn           = var.destination_kms_key_arn
   s3_replication_data_destination_bucket_name      = var.data_destination_bucket
   s3_replication_api_model_destination_bucket_name = var.api_model_destination_bucket
+  # s3 backup
+  create_s3_backup_role = var.create_s3_backup_role
+  s3_backup_bucket_arn  = var.data_s3_bucket_name_override == null ? "indico-data-${var.label}" : var.data_s3_bucket_name_override
+  s3_backup_role_name   = var.s3_backup_role_name_override
+  # Iam flow logs role
+  create_vpc_flow_logs_role = var.create_vpc_flow_logs_role
+  vpc_flow_logs_role_name   = var.vpc_flow_logs_role_name_override
 }
 
 moved {
