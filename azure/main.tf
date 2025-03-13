@@ -289,7 +289,7 @@ module "storage" {
   blob_store_name_override      = var.blob_store_name_override
   crunchy_backup_name_override  = var.crunchy_backup_name_override
   allowed_origins               = [local.dns_name]
-}]
+}
 
 resource "azurerm_user_assigned_identity" "cluster_dns" {
   count               = var.private_dns_zone_id == "System" ? 0 : 1
