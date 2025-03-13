@@ -138,7 +138,7 @@ module "public_networking" {
 module "networking" {
   count                      = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
   source                     = "app.terraform.io/indico/indico-aws-network/mod"
-  version                    = "2.1.1"
+  version                    = "2.2.0"
   label                      = var.label
   vpc_cidr                   = var.vpc_cidr
   private_subnet_cidrs       = var.private_subnet_cidrs
@@ -155,7 +155,7 @@ module "networking" {
   sg_tag_name                = var.sg_tag_name
   sg_tag_value               = var.sg_tag_value
   enable_vpc_flow_logs       = var.enable_vpc_flow_logs
-  vpc_flow_logs_iam_role_arn = var.vpc_flow_logs_iam_role_arn
+  vpc_flow_logs_iam_role_arn = var.vpc_flow_logs_iam_role_arn != "" ? var.vpc_flow_logs_iam_role_arn : var.enable_vpc_flow_logs ? module.iam.vpc_flow_logs_role_arn : ""
   enable_firewall            = var.enable_firewall
   firewall_subnet_cidrs      = var.firewall_subnet_cidrs
   firewall_allow_list        = var.firewall_allow_list
@@ -221,6 +221,7 @@ module "s3-storage" {
   uploads_expiry                     = var.uploads_expiry
   include_rox                        = var.include_rox
   enable_backup                      = var.enable_s3_backup
+  backup_role_arn                    = var.enable_s3_backup ? module.iam.s3_backup_role_arn : ""
   enable_access_logging              = var.enable_s3_access_logging
   bucket_type                        = var.bucket_type
   data_s3_bucket_name_override       = var.data_s3_bucket_name_override
@@ -374,7 +375,8 @@ module "cluster" {
   region          = var.region
   cluster_version = var.k8s_version
   default_tags    = merge(coalesce(var.default_tags, {}), coalesce(var.additional_tags, {}))
-
+  cluster_iam_role_arn = local.cluster_iam_role_arn
+  generate_kms_key     = var.create_eks_cluster_role ? false : true #Once the cluster is created, we cannot change the kms key.
   kms_key_arn = module.kms_key.key_arn
 
   vpc_id     = local.network[0].indico_vpc_id
