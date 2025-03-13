@@ -229,7 +229,7 @@ module "s3-storage" {
   pgbackup_s3_bucket_name_override   = var.pgbackup_s3_bucket_name_override
   miniobkp_s3_bucket_name_override   = var.miniobkp_s3_bucket_name_override
   include_miniobkp                   = var.include_miniobkp && var.insights_enabled ? true : false
-  allowed_origins                    = [local.dns_name]
+  allowed_origins                    = [l"https://${local.dns_name}"]
 }
 
 

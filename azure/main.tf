@@ -288,7 +288,7 @@ module "storage" {
   fileshare_name_override       = var.fileshare_name_override
   blob_store_name_override      = var.blob_store_name_override
   crunchy_backup_name_override  = var.crunchy_backup_name_override
-  allowed_origins               = [local.dns_name]
+  allowed_origins               = ["https://${local.dns_name}"
 }
 
 resource "azurerm_user_assigned_identity" "cluster_dns" {
