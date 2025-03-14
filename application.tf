@@ -75,8 +75,8 @@ app-edge:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
   alternateDomain: ""
   cspApprovedSources:
-    - ${module.s3-storage.data_s3_bucket_name}.s3.${var.region}.amazonaws.com
-    - ${module.s3-storage.data_s3_bucket_name}.s3.amazonaws.com
+    - https://${module.s3-storage.data_s3_bucket_name}.s3.${var.region}.amazonaws.com
+    - https://${module.s3-storage.data_s3_bucket_name}.s3.amazonaws.com
   service:
     type: "NodePort"
     ports:
@@ -114,8 +114,8 @@ app-edge:
     ) : (<<EOT
 app-edge:
   cspApprovedSources:
-    - ${module.s3-storage.data_s3_bucket_name}.s3.${var.region}.amazonaws.com
-    - ${module.s3-storage.data_s3_bucket_name}.s3.amazonaws.com
+    - https://${module.s3-storage.data_s3_bucket_name}.s3.${var.region}.amazonaws.com
+    - https://${module.s3-storage.data_s3_bucket_name}.s3.amazonaws.com
   alternateDomain: ""
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
