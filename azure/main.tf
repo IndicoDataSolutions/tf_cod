@@ -277,7 +277,7 @@ module "storage" {
     azurerm_resource_group.cod-cluster
   ]
   source                        = "app.terraform.io/indico/indico-azure-blob/mod"
-  version                       = "1.1.1"
+  version                       = "1.2.0"
   label                         = var.label
   region                        = var.region
   resource_group_name           = local.resource_group_name
@@ -288,6 +288,7 @@ module "storage" {
   fileshare_name_override       = var.fileshare_name_override
   blob_store_name_override      = var.blob_store_name_override
   crunchy_backup_name_override  = var.crunchy_backup_name_override
+  allowed_origins               = ["https://${local.dns_name}"]
 }
 
 resource "azurerm_user_assigned_identity" "cluster_dns" {
