@@ -734,7 +734,7 @@ aws-node-termination:
   enabled: false 
 app-edge:
   cspApprovedSources:
-    - ${module.storage.storage_account_name}.blob.core.windows.net
+    - https://${module.storage.storage_account_name}.blob.core.windows.net
 global:
   podLabels:
     "azure.workload.identity/use": "true"
