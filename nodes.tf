@@ -148,7 +148,17 @@ locals {
     }
   }
 
-  default_node_groups = merge((var.insights_enabled ? local.insights_default_node_groups : tomap(null)), (var.ipa_enabled ? local.intake_default_node_groups : tomap(null)))
+  standalone_node_groups = {
+    default-workers = {
+      min_size         = 1
+      max_size         = 3
+      instance_types   = ["m5.xlarge"]
+      type             = "cpu"
+      spot             = false
+      desired_capacity = "0"
+    }
+  }
+  default_node_groups = var.ipa_enabled == false && var.insights_enabled == false ? local.standalone_node_groups : merge((var.insights_enabled ? local.insights_default_node_groups : tomap(null)), (var.ipa_enabled ? local.intake_default_node_groups : tomap(null)))
 
   # This is to avoid terraform errors when the node groups variable is set,
   # as different keys make the objects incompatible for a ternary function. 
