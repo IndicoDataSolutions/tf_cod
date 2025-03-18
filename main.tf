@@ -136,7 +136,7 @@ module "public_networking" {
 }
 
 module "networking" {
-  count                      = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
+  count                      = var.direct_connect == false && var.network_module == "networking" || var.load_environment != "" ? 1 : 0
   source                     = "app.terraform.io/indico/indico-aws-network/mod"
   version                    = "2.2.0"
   label                      = var.label
@@ -163,7 +163,7 @@ module "networking" {
 }
 
 module "sqs_sns" {
-  count                      = var.sqs_sns == true ? 1 : 0
+  count                      = var.sqs_sns == true && var.load_environment == "" ? 1 : 0
   source                     = "app.terraform.io/indico/indico-aws-sqs-sns/mod"
   version                    = "2.0.2"
   region                     = var.region
@@ -176,7 +176,7 @@ module "sqs_sns" {
 }
 
 module "lambda-sns-forwarder" {
-  count                = var.lambda_sns_forwarder_enabled == true ? 1 : 0
+  count                = var.lambda_sns_forwarder_enabled == true && var.load_environment == "" ? 1 : 0
   source               = "app.terraform.io/indico/indico-lambda-sns-forwarder/mod"
   version              = "2.0.1"
   region               = var.region
@@ -199,7 +199,7 @@ module "kms_key" {
   version          = "2.1.2"
   label            = var.label
   additional_tags  = var.additional_tags
-  existing_kms_key = var.existing_kms_key
+  existing_kms_key = var.load_environment == "" ? var.existing_kms_key : local.environment.kms_key_arn
 }
 
 module "security-group" {
@@ -207,11 +207,12 @@ module "security-group" {
   version        = "3.0.0"
   label          = var.label
   vpc_cidr       = var.vpc_cidr
-  vpc_id         = local.network[0].indico_vpc_id
+  vpc_id         = var.load_environment == "" ? local.network[0].indico_vpc_id : local.environment.indico_vpc_id
   network_module = var.network_module
 }
 
 module "s3-storage" {
+  count                              = var.load_environment == "" ? 1 : 0
   source                             = "app.terraform.io/indico/indico-aws-buckets/mod"
   version                            = "4.4.0"
   force_destroy                      = true # allows terraform to destroy non-empty buckets.
@@ -235,6 +236,7 @@ module "s3-storage" {
 
 # This empties the buckets upon delete so terraform doesn't take forever.
 resource "null_resource" "s3-delete-data-bucket" {
+  count = var.load_environment == "" ? 1 : 0
   depends_on = [
     module.s3-storage
   ]
@@ -250,7 +252,7 @@ resource "null_resource" "s3-delete-data-bucket" {
 }
 
 resource "null_resource" "s3-delete-data-pgbackup-bucket" {
-  count = var.include_pgbackup == true ? 1 : 0
+  count = var.include_pgbackup == true && var.load_environment == "" ? 1 : 0
 
   depends_on = [
     module.s3-storage
@@ -267,7 +269,7 @@ resource "null_resource" "s3-delete-data-pgbackup-bucket" {
 }
 
 module "efs-storage" {
-  count              = var.include_efs == true ? 1 : 0
+  count              = var.include_efs == true && var.load_environment == "" ? 1 : 0
   source             = "app.terraform.io/indico/indico-aws-efs/mod"
   version            = "2.0.0"
   label              = var.efs_filesystem_name == "" ? var.label : var.efs_filesystem_name
@@ -279,7 +281,7 @@ module "efs-storage" {
 
 }
 
-
+#We should be able to deprecate this module and use the efs-storage module instead. DEV-13235
 module "efs-storage-local-registry" {
   count              = var.local_registry_enabled == true ? 1 : 0
   source             = "app.terraform.io/indico/indico-aws-efs/mod"
@@ -292,7 +294,7 @@ module "efs-storage-local-registry" {
 }
 
 module "fsx-storage" {
-  count                       = var.include_fsx == true ? 1 : 0
+  count                       = var.include_fsx == true && var.load_environment == "" ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-fsx/mod"
   version                     = "2.0.0"
   label                       = var.label
@@ -366,6 +368,16 @@ moved {
 moved {
   from = module.cluster.aws_iam_role_policy_attachment.additional["IAMReadOnlyAccess"]
   to   = module.iam.module.create_eks_node_role[0].aws_iam_role_policy_attachment.additional_policies[0]
+}
+
+moved {
+  from = module.public_networking # This is so that we may deprecate the public_networking module
+  to   = module.network
+}
+
+moved {
+  from = module.s3-storage
+  to   = module.s3-storage[0]
 }
 
 module "cluster" {
