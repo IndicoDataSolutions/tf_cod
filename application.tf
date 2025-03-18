@@ -1137,6 +1137,12 @@ weaviate:
         secrets:
           AWS_ACCESS_KEY_ID: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
           AWS_SECRET_ACCESS_KEY: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
+rabbitmq:
+  rabbitmq:
+    image:
+      registry: ${var.image_registry}
+    persistence:
+      storageClass: ${var.include_efs ? "indico-sc" : ""}
   EOF
   ]
 
