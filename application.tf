@@ -891,6 +891,8 @@ rabbitmq:
   rabbitmq:
     image:
       registry: ${var.image_registry}
+    persistence:
+      storageClass: ${var.include_efs ? "indico-sc" : ""}
   EOF
   ])
 
