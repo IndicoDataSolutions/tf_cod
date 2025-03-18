@@ -711,6 +711,12 @@ variable "alerting_email_password" {
   description = "alerting_email_password"
 }
 
+variable "alerting_standard_rules" {
+  type        = string
+  default     = ""
+  description = "alerting_standard_rules"
+}
+
 variable "eks_addon_version_guardduty" {
   type        = bool
   default     = true

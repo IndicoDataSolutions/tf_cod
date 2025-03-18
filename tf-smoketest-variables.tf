@@ -119,6 +119,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     alerting_email_host = "${jsonencode(var.alerting_email_host)}"
     alerting_email_username = "${jsonencode(var.alerting_email_username)}"
     alerting_email_password = "${jsonencode(var.alerting_email_password)}"
+    alerting_standard_rules = "${jsonencode(var.alerting_standard_rules)}"
     eks_addon_version_guardduty = "${jsonencode(var.eks_addon_version_guardduty)}"
     use_static_ssl_certificates = "${jsonencode(var.use_static_ssl_certificates)}"
     ssl_static_secret_name = "${jsonencode(var.ssl_static_secret_name)}"
