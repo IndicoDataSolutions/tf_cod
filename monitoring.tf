@@ -100,7 +100,7 @@ alerting:
     integrationKey: ${var.alerting_pagerduty_integration_key}
     integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
   standardRules:
-    enabled: true #note, this doesn't really enable anything, it just allows the rules to be loaded
+    enabled: true
 ${indent(4, base64decode(var.alerting_standard_rules))}
 EOT
   )
