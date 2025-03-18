@@ -101,7 +101,7 @@ alerting:
     integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
   standardRules:
     enabled: true #note, this doesn't really enable anything, it just allows the rules to be loaded
-${indent(4, trimspace(base64decode(var.alerting_standard_rules)))}
+${indent(4, base64decode(var.alerting_standard_rules))}
 EOT
   )
   alertmanager_tls = var.acm_arn == "" ? (<<EOT
