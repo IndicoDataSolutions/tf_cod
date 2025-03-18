@@ -99,7 +99,7 @@ alerting:
     enabled: ${var.alerting_pagerduty_enabled}
     integrationKey: ${var.alerting_pagerduty_integration_key}
     integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
-${local.standard_rules}
+
 EOT
   )
   standard_rules = var.alerting_standard_rules != "" ? (<<EOT
