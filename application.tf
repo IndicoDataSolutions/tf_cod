@@ -510,22 +510,22 @@ storage:
   indicoStorageClass:
     enabled: true
     name: ${var.efs_storage_class_name}
-    ${var.include_fsx ? <<EOT
+    ${var.include_fsx ? <<-EOT
     provisioner: fsx.csi.aws.com
     parameters:
       securityGroupIds: ${local.security_group_id}
       subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}
-EOT
-    : <<EOT
+    EOT
+    : <<-EOT
     provisioner: efs.csi.aws.com
     parameters:
       provisioningMode: efs-ap
-      fileSystemId: "${module.efs-storage[0].efs_filesystem_id}"
+      fileSystemId: ${module.efs-storage[0].efs_filesystem_id}
       directoryPerms: "700"
-      gidRangeStart: "1000" # optional
-      gidRangeEnd: "2000" # optional
-      basePath: "/dynamic_provisioning" # optional
-EOT
+      gidRangeStart: "1000"
+      gidRangeEnd: "2000"
+      basePath: "/dynamic_provisioning"
+    EOT
   }
 secrets:
   clusterIssuer:
