@@ -896,7 +896,7 @@ rabbitmq:
     image:
       registry: ${var.image_registry}
     persistence:
-      storageClass: ${var.include_efs ? "indico-sc" : ""}
+      storageClass: ${var.include_efs ? var.efs_storage_class_name : ""}
   EOF
   ])
 
@@ -1146,7 +1146,7 @@ rabbitmq:
     image:
       registry: ${var.image_registry}
     persistence:
-      storageClass: ${var.include_efs ? "indico-sc" : ""}
+      storageClass: ${var.include_efs ? var.efs_storage_class_name : ""}
   EOF
   ]
 
