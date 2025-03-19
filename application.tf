@@ -20,16 +20,7 @@ locals {
         driver: efs.csi.aws.com
         volumeHandle: "${module.efs-storage[0].efs_filesystem_id}"
     indicoStorageClass:
-      enabled: true
-      name: indico-sc
-      provisioner: efs.csi.aws.com
-      parameters:
-        provisioningMode: efs-ap
-        fileSystemId: "${module.efs-storage[0].efs_filesystem_id}"
-        directoryPerms: "700"
-        gidRangeStart: "1000" # optional
-        gidRangeEnd: "2000" # optional
-        basePath: "/dynamic_provisioning" # optional
+      name: ${var.efs_storage_class_name}
  EOF
   ] : []
   fsx_values = var.include_fsx == true ? [<<EOF
@@ -45,18 +36,11 @@ locals {
           mountname: "${module.fsx-storage[0].fsx_rwx_mount_name}"
         volumeHandle: "${module.fsx-storage[0].fsx_rwx_id}"
     indicoStorageClass:
-      enabled: true
-      name: indico-sc
-      provisioner: fsx.csi.aws.com
-      parameters:
-        securityGroupIds: ${local.security_group_id}
-        subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}
+      name: ${var.efs_storage_class_name}
  EOF
   ] : []
   on_prem_values = var.on_prem_test == true ? [<<EOF
   storage:
-    indicoStorageClass:
-      enabled: false
     existingPVC:
       name: read-write
       namespace: default
@@ -523,6 +507,26 @@ global:
 storage:
   ebsStorageClass:
     enabled: true
+  indicoStorageClass:
+    enabled: true
+    name: ${var.efs_storage_class_name}
+    ${var.include_efs ? <<EOT
+    provisioner: fsx.csi.aws.com
+    parameters:
+      securityGroupIds: ${local.security_group_id}
+      subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}
+EOT
+    : <<EOT
+    provisioner: efs.csi.aws.com
+    parameters:
+      provisioningMode: efs-ap
+      fileSystemId: "${module.efs-storage[0].efs_filesystem_id}"
+      directoryPerms: "700"
+      gidRangeStart: "1000" # optional
+      gidRangeEnd: "2000" # optional
+      basePath: "/dynamic_provisioning" # optional
+EOT
+  }
 secrets:
   clusterIssuer:
     zerossl:
@@ -641,9 +645,9 @@ reflector:
   image:
     repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
   EOF
-  ]
+]
 
-  monitoring_values = var.monitoring_enabled ? [<<EOF
+monitoring_values = var.monitoring_enabled ? [<<EOF
 global:
   host: "${local.dns_name}"
 authentication:
@@ -748,7 +752,7 @@ opentelemetry-collector:
         metrics: null
         logs: null
   EOF
-  ] : []
+] : []
 }
 
 module "indico-common" {
