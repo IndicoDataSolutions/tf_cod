@@ -523,7 +523,13 @@ storage:
       gidRangeEnd: "2000"
       basePath: "/dynamic_provisioning"
 EOF
-  ] : []
+    ] : [<<EOF
+storage:
+  indicoStorageClass:
+    enabled: false
+EOF
+  ]
+
 
   indico_pre_reqs_values = concat(local.indico_storage_class_values, [<<EOF
 global:
@@ -651,9 +657,9 @@ reflector:
   image:
     repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
   EOF
-])
+  ])
 
-monitoring_values = var.monitoring_enabled ? [<<EOF
+  monitoring_values = var.monitoring_enabled ? [<<EOF
 global:
   host: "${local.dns_name}"
 authentication:
