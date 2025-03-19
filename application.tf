@@ -499,24 +499,21 @@ external-secrets:
   EOF
   ]
 
-  indico_pre_reqs_values = [<<EOF
-global:
-  host: ${local.dns_name}
-  image:
-    registry: ${var.image_registry}
+  indico_storage_class_values = var.include_fsx ? [<<EOF
 storage:
-  ebsStorageClass:
-    enabled: true
   indicoStorageClass:
     enabled: true
     name: ${var.efs_storage_class_name}
-    ${var.include_fsx ? <<-EOT
     provisioner: fsx.csi.aws.com
     parameters:
       securityGroupIds: ${local.security_group_id}
       subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}
-    EOT
-    : <<-EOT
+EOF
+    ] : var.include_efs ? [<<EOF
+storage:
+  indicoStorageClass:
+    enabled: true
+    name: ${var.efs_storage_class_name}
     provisioner: efs.csi.aws.com
     parameters:
       provisioningMode: efs-ap
@@ -525,8 +522,17 @@ storage:
       gidRangeStart: "1000"
       gidRangeEnd: "2000"
       basePath: "/dynamic_provisioning"
-    EOT
-  }
+EOF
+  ] : []
+
+  indico_pre_reqs_values = concat(local.indico_storage_class_values, [<<EOF
+global:
+  host: ${local.dns_name}
+  image:
+    registry: ${var.image_registry}
+storage:
+  ebsStorageClass:
+    enabled: true
 secrets:
   clusterIssuer:
     zerossl:
@@ -645,7 +651,7 @@ reflector:
   image:
     repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
   EOF
-]
+])
 
 monitoring_values = var.monitoring_enabled ? [<<EOF
 global:
@@ -752,7 +758,7 @@ opentelemetry-collector:
         metrics: null
         logs: null
   EOF
-] : []
+  ] : []
 }
 
 module "indico-common" {
