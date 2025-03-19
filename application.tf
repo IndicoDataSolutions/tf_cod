@@ -510,7 +510,7 @@ storage:
   indicoStorageClass:
     enabled: true
     name: ${var.efs_storage_class_name}
-    ${var.include_efs ? <<EOT
+    ${var.include_fsx ? <<EOT
     provisioner: fsx.csi.aws.com
     parameters:
       securityGroupIds: ${local.security_group_id}
