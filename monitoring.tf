@@ -104,23 +104,7 @@ EOT
   )
   standard_rules = var.alerting_standard_rules != "" ? (<<EOT
   standardRules:
-    rabbitmqQueueDepth:
-      enabled: true
-      maxQueueDepth: 1000
-      timePeriod: 5m
-    podRestarts:
-      enabled: true
-      timePeriod: 5m
-    criticalPodRestarts:
-      enabled: true
-      timePeriod: 5m
-    submissionFailures:
-      enabled: true
-      failedSubmissionThreshold: 10
-      timePeriod: 5m
-    podMemory:
-      enabled: true
-      timePeriod: 5m
+    ${indent(4, base64decode(var.alerting_standard_rules))}
 EOT
   ) : (<<EOT
     standardRules: {}
