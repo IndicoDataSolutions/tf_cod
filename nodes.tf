@@ -18,6 +18,7 @@ locals {
       spot             = false
       desired_capacity = "0"
       taints           = "--register-with-taints=indico.io/celery=true:NoSchedule"
+      additional_node_labels = ""
     },
     static-workers = {
       min_size         = 1
@@ -26,6 +27,8 @@ locals {
       type             = "cpu"
       spot             = false
       desired_capacity = "0"
+      additional_node_labels = ""
+      taints           = ""
     },
     pdf-workers = {
       min_size         = 0
@@ -35,6 +38,7 @@ locals {
       spot             = false
       desired_capacity = "1"
       taints           = "--register-with-taints=indico.io/pdfextraction=true:NoSchedule"
+      additional_node_labels = ""
     },
     highmem-workers = {
       min_size         = 0
@@ -44,6 +48,7 @@ locals {
       spot             = false
       desired_capacity = "0"
       taints           = "--register-with-taints=indico.io/highmem=true:NoSchedule"
+      additional_node_labels = ""    
     },
     monitoring-workers = {
       min_size         = 1
@@ -53,6 +58,7 @@ locals {
       spot             = false
       desired_capacity = "1"
       taints           = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
+      additional_node_labels = ""
     },
     pgo-workers = {
       min_size         = 1
@@ -62,6 +68,7 @@ locals {
       spot             = false
       desired_capacity = "1"
       taints           = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
+      additional_node_labels = ""
     },
     readapi-servers = {
       min_size         = 0
@@ -71,6 +78,7 @@ locals {
       spot             = false
       desired_capacity = "0"
       taints           = "--register-with-taints=indico.io/readapi-server=true:NoSchedule"
+      additional_node_labels = ""
     },
     readapi-azurite = {
       min_size         = 0
@@ -80,6 +88,7 @@ locals {
       spot             = false
       desired_capacity = "1"
       taints           = "--register-with-taints=indico.io/azurite=true:NoSchedule"
+      additional_node_labels = ""
     }
   }
 
@@ -91,6 +100,8 @@ locals {
       min_size         = 1
       max_size         = 5
       desired_capacity = "3"
+      additional_node_labels = ""
+      taints           = ""
     },
     pgo-workers = {
       type             = "cpu"
@@ -100,6 +111,7 @@ locals {
       max_size         = 2
       desired_capacity = "2"
       taints           = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
+      additional_node_labels = ""
     },
     celery-workers = {
       type             = "cpu"
@@ -109,6 +121,7 @@ locals {
       max_size         = 3
       desired_capacity = "1"
       taints           = "--register-with-taints=indico.io/celery-workers=true:NoSchedule"
+      additional_node_labels = ""
     },
     minio = {
       type             = "cpu"
@@ -118,6 +131,7 @@ locals {
       max_size         = 4
       desired_capacity = "4"
       taints           = "--register-with-taints=indico.io/minio=true:NoSchedule"
+      additional_node_labels = ""
     },
     monitoring-workers = {
       min_size         = 1
@@ -127,6 +141,7 @@ locals {
       spot             = false
       desired_capacity = "1"
       taints           = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
+      additional_node_labels = ""
     },
     weaviate = {
       type             = "cpu"
@@ -136,6 +151,7 @@ locals {
       max_size         = 3
       desired_capacity = "3"
       taints           = "--register-with-taints=indico.io/weaviate=true:NoSchedule"
+      additional_node_labels = ""
     },
     weaviate-workers = {
       type             = "cpu"
@@ -145,6 +161,7 @@ locals {
       max_size         = 4
       desired_capacity = "2"
       taints           = "--register-with-taints=indico.io/weaviate-workers=true:NoSchedule"
+      additional_node_labels = ""
     }
   }
 
@@ -156,8 +173,11 @@ locals {
       type             = "cpu"
       spot             = false
       desired_capacity = "0"
+      additional_node_labels = ""
+      taints           = ""
     }
   }
+
   default_node_groups = (
     var.ipa_enabled == false && var.insights_enabled == false
     ? local.standalone_node_groups
