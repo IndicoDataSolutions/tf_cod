@@ -1456,3 +1456,9 @@ variable "miniobkp_s3_bucket_name_override" {
   default     = null
   description = "The name of the existing S3 bucket to be loaded and used as the minio backup bucket"
 }
+
+variable "indico_storage_class_name" {
+  type        = string
+  default     = "indico-sc"
+  description = "The name of the storage class to use for EFS"
+}

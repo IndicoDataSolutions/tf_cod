@@ -20,16 +20,7 @@ locals {
         driver: efs.csi.aws.com
         volumeHandle: "${module.efs-storage[0].efs_filesystem_id}"
     indicoStorageClass:
-      enabled: true
-      name: indico-sc
-      provisioner: efs.csi.aws.com
-      parameters:
-        provisioningMode: efs-ap
-        fileSystemId: "${module.efs-storage[0].efs_filesystem_id}"
-        directoryPerms: "700"
-        gidRangeStart: "1000" # optional
-        gidRangeEnd: "2000" # optional
-        basePath: "/dynamic_provisioning" # optional
+      name: ${var.indico_storage_class_name}
  EOF
   ] : []
   fsx_values = var.include_fsx == true ? [<<EOF
@@ -45,18 +36,11 @@ locals {
           mountname: "${module.fsx-storage[0].fsx_rwx_mount_name}"
         volumeHandle: "${module.fsx-storage[0].fsx_rwx_id}"
     indicoStorageClass:
-      enabled: true
-      name: indico-sc
-      provisioner: fsx.csi.aws.com
-      parameters:
-        securityGroupIds: ${local.security_group_id}
-        subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}
+      name: ${var.indico_storage_class_name}
  EOF
   ] : []
   on_prem_values = var.on_prem_test == true ? [<<EOF
   storage:
-    indicoStorageClass:
-      enabled: false
     existingPVC:
       name: read-write
       namespace: default
@@ -515,7 +499,39 @@ external-secrets:
   EOF
   ]
 
-  indico_pre_reqs_values = [<<EOF
+  indico_storage_class_values = var.include_fsx ? [<<EOF
+storage:
+  indicoStorageClass:
+    enabled: true
+    name: ${var.indico_storage_class_name}
+    provisioner: fsx.csi.aws.com
+    parameters:
+      securityGroupIds: ${local.security_group_id}
+      subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}
+EOF
+    ] : var.include_efs ? [<<EOF
+storage:
+  indicoStorageClass:
+    enabled: true
+    name: ${var.indico_storage_class_name}
+    provisioner: efs.csi.aws.com
+    parameters:
+      provisioningMode: efs-ap
+      fileSystemId: ${module.efs-storage[0].efs_filesystem_id}
+      directoryPerms: "700"
+      gidRangeStart: "1000"
+      gidRangeEnd: "2000"
+      basePath: "/dynamic_provisioning"
+EOF
+    ] : [<<EOF
+storage:
+  indicoStorageClass:
+    enabled: false
+EOF
+  ]
+
+
+  indico_pre_reqs_values = concat(local.indico_storage_class_values, [<<EOF
 global:
   host: ${local.dns_name}
   image:
@@ -641,7 +657,7 @@ reflector:
   image:
     repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
   EOF
-  ]
+  ])
 
   monitoring_values = var.monitoring_enabled ? [<<EOF
 global:
@@ -891,6 +907,8 @@ rabbitmq:
   rabbitmq:
     image:
       registry: ${var.image_registry}
+    persistence:
+      storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
   EOF
   ])
 
@@ -1135,6 +1153,12 @@ weaviate:
         secrets:
           AWS_ACCESS_KEY_ID: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
           AWS_SECRET_ACCESS_KEY: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
+rabbitmq:
+  rabbitmq:
+    image:
+      registry: ${var.image_registry}
+    persistence:
+      storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
   EOF
   ]
 
