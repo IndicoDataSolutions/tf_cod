@@ -1459,7 +1459,7 @@ variable "miniobkp_s3_bucket_name_override" {
 
 variable "karpenter_enabled" {
   type        = bool
-  default     = true
+  default     = false
   description = "Toggle for enabling karpenter deployment"
 }
 

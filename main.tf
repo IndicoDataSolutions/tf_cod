@@ -313,13 +313,9 @@ module "fsx-storage" {
   fsx_rox_arn                 = var.fsx_rox_arn
 }
 
-locals {
-  cluster_node_policies = concat(var.cluster_node_policies, ["AmazonEKSWorkerNodePolicy", "AmazonEKS_CNI_Policy", "AmazonEC2ContainerRegistryReadOnly", "AmazonSSMManagedInstanceCore"])
-}
-
 module "iam" {
   source  = "app.terraform.io/indico/indico-aws-iam/mod"
-  version = "0.0.12"
+  version = "0.0.13"
 
   # EKS node role
   create_node_role           = var.create_node_role
@@ -350,6 +346,9 @@ module "iam" {
   # Iam flow logs role
   create_vpc_flow_logs_role = var.create_vpc_flow_logs_role
   vpc_flow_logs_role_name   = var.vpc_flow_logs_role_name_override
+  # Karpenter
+  account_id        = data.aws_caller_identity.current.account_id
+  karpenter_enabled = var.karpenter_enabled
 }
 
 moved {
