@@ -107,7 +107,7 @@ EOT
     ${indent(4, base64decode(var.alerting_standard_rules))}
 EOT
   ) : (<<EOT
-    standardRules: {}
+  noExtraConfigs: true
   EOT
   )
   alertmanager_tls = var.acm_arn == "" ? (<<EOT
