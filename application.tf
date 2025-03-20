@@ -20,7 +20,7 @@ locals {
         driver: efs.csi.aws.com
         volumeHandle: "${module.efs-storage[0].efs_filesystem_id}"
     indicoStorageClass:
-      name: ${var.efs_storage_class_name}
+      name: ${var.indico_storage_class_name}
  EOF
   ] : []
   fsx_values = var.include_fsx == true ? [<<EOF
@@ -36,7 +36,7 @@ locals {
           mountname: "${module.fsx-storage[0].fsx_rwx_mount_name}"
         volumeHandle: "${module.fsx-storage[0].fsx_rwx_id}"
     indicoStorageClass:
-      name: ${var.efs_storage_class_name}
+      name: ${var.indico_storage_class_name}
  EOF
   ] : []
   on_prem_values = var.on_prem_test == true ? [<<EOF
@@ -503,7 +503,7 @@ external-secrets:
 storage:
   indicoStorageClass:
     enabled: true
-    name: ${var.efs_storage_class_name}
+    name: ${var.indico_storage_class_name}
     provisioner: fsx.csi.aws.com
     parameters:
       securityGroupIds: ${local.security_group_id}
@@ -513,7 +513,7 @@ EOF
 storage:
   indicoStorageClass:
     enabled: true
-    name: ${var.efs_storage_class_name}
+    name: ${var.indico_storage_class_name}
     provisioner: efs.csi.aws.com
     parameters:
       provisioningMode: efs-ap
@@ -908,7 +908,7 @@ rabbitmq:
     image:
       registry: ${var.image_registry}
     persistence:
-      storageClass: ${var.include_efs ? var.efs_storage_class_name : ""}
+      storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
   EOF
   ])
 
@@ -1158,7 +1158,7 @@ rabbitmq:
     image:
       registry: ${var.image_registry}
     persistence:
-      storageClass: ${var.include_efs ? var.efs_storage_class_name : ""}
+      storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
   EOF
   ]
 
