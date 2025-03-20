@@ -297,9 +297,7 @@ module "karpenter" {
     time_sleep.wait_1_minutes_after_cluster
   ]
   source                    = "./modules/common/karpenter"
-  region                    = var.region
   cluster_name              = var.label
-  account_id                = data.aws_caller_identity.current.account_id
   node_role_arn             = module.iam.node_role_arn
   node_role_name            = module.iam.node_role_name
   k8s_version               = var.k8s_version
