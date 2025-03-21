@@ -323,7 +323,7 @@ locals {
   }
 
   default_node_groups = (
-    var.ipa_enabled == false && var.insights_enabled == false
+    var.ipa_enabled == false && var.insights_enabled == false && var.karpenter_enabled == false
     ? local.standalone_node_groups
     : merge(
       var.insights_enabled ? local.insights_default_node_groups : tomap(null),
@@ -338,7 +338,9 @@ locals {
 
   variable_node_groups = var.node_groups != null && var.karpenter_enabled == false ? var.node_groups : tomap(null)
 
-  node_groups = var.karpenter_enabled ? local.karpenter_node_group : merge(local.default_node_groups_logic, local.variable_node_groups)
+  karpenter_node_group_logic = var.karpenter_enabled ? local.karpenter_node_group : tomap(null)
+
+  node_groups = merge(local.default_node_groups_logic, local.variable_node_groups, local.karpenter_node_group_logic)
 
   default_node_pools = merge((var.insights_enabled ? local.insights_default_node_pool : tomap(null)), (var.ipa_enabled ? local.intake_default_node_pool : tomap(null)))
 
