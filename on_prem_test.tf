@@ -160,7 +160,7 @@ resource "helm_release" "nfs-provider" {
         name: nfs-client
         parameters:
           server: nfs-service.default.svc.cluster.local
-          share: /nfs-storage
+          share: /exports
   EOF
   ]
 }
