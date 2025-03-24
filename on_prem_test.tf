@@ -92,44 +92,44 @@ YAML
 }
 
 
-data "local_file" "nfs_ip" {
-  count      = var.on_prem_test == true ? 1 : 0
-  filename   = "${path.module}/nfs_server_ip.txt"
-  depends_on = ["null_resource.get_nfs_server_ip"]
-}
+# data "local_file" "nfs_ip" {
+#   count      = var.on_prem_test == true ? 1 : 0
+#   filename   = "${path.module}/nfs_server_ip.txt"
+#   depends_on = ["null_resource.get_nfs_server_ip"]
+# }
 
 
-resource "null_resource" "get_nfs_server_ip" {
-  count = var.on_prem_test == true ? 1 : 0
-  depends_on = [
-    module.cluster,
-    kubectl_manifest.nfs_server_service
-  ]
+# resource "null_resource" "get_nfs_server_ip" {
+#   count = var.on_prem_test == true ? 1 : 0
+#   depends_on = [
+#     module.cluster,
+#     kubectl_manifest.nfs_server_service
+#   ]
 
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-  provisioner "local-exec" {
-    command = "curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl"
-  }
+#   triggers = {
+#     always_run = "${timestamp()}"
+#   }
+#   provisioner "local-exec" {
+#     command = "curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl"
+#   }
 
-  provisioner "local-exec" {
-    command = "aws eks update-kubeconfig --name ${var.label} --region ${var.region}"
-  }
+#   provisioner "local-exec" {
+#     command = "aws eks update-kubeconfig --name ${var.label} --region ${var.region}"
+#   }
 
-  provisioner "local-exec" {
-    command = "pwd && ls -lah"
-  }
+#   provisioner "local-exec" {
+#     command = "pwd && ls -lah"
+#   }
 
-  provisioner "local-exec" {
-    command = "./kubectl get service nfs-service -o jsonpath='{.spec.clusterIP}' > ${path.module}/nfs_server_ip.txt"
-  }
+#   provisioner "local-exec" {
+#     command = "./kubectl get service nfs-service -o jsonpath='{.spec.clusterIP}' > ${path.module}/nfs_server_ip.txt"
+#   }
 
-  provisioner "local-exec" {
-    command = "./kubectl get pods --no-headers | grep nfs-server | awk '{print $1}'| xargs -I {} sh -c './kubectl exec {} -- sh -c \"mkdir -p /exports/nfs-storage\"'"
-  }
+#   provisioner "local-exec" {
+#     command = "./kubectl get pods --no-headers | grep nfs-server | awk '{print $1}'| xargs -I {} sh -c './kubectl exec {} -- sh -c \"mkdir -p /exports/nfs-storage\"'"
+#   }
 
-}
+# }
 
 resource "helm_release" "nfs-provider" {
   count      = var.on_prem_test == true ? 1 : 0
@@ -139,8 +139,7 @@ resource "helm_release" "nfs-provider" {
   version    = var.csi_driver_nfs_version
   namespace  = "default"
   depends_on = [
-    module.cluster,
-    data.local_file.nfs_ip
+    module.cluster
   ]
 
   # // prometheus URL
