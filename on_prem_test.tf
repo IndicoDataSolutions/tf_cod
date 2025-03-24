@@ -174,6 +174,17 @@ resource "null_resource" "update_storage_class" {
   triggers = {
     always_run = "${timestamp()}"
   }
+  provisioner "local-exec" {
+    command = "curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl"
+  }
+
+  provisioner "local-exec" {
+    command = "aws eks update-kubeconfig --name ${var.label} --region ${var.region}"
+  }
+
+  provisioner "local-exec" {
+    command = "pwd && ls -lah"
+  }
 
   provisioner "local-exec" {
     command = "./kubectl patch storageclass gp2 -p '{\"metadata\": {\"annotations\":{\"storageclass.kubernetes.io/is-default-class\":\"false\"}}}'"
