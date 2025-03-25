@@ -110,8 +110,8 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
       can(tostring(v.taints)) && length(v.taints) > 0 ?
       [
         {
-          key    = split("=", split(":", trimprefix(v.taints, "--register-with-taints="))[0])[0]
-          value  = split("=", split(":", trimprefix(v.taints, "--register-with-taints="))[0])[1]
+          key    = split(":", trimprefix(v.taints, "--register-with-taints="))[0]
+          value  = try(split("=", split(":", trimprefix(v.taints, "--register-with-taints="))[0])[1], "")
           effect = split(":", trimprefix(v.taints, "--register-with-taints="))[1]
         }
       ] :
