@@ -109,14 +109,13 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
     } : {})
     taints = try(
       can(tostring(v.taints)) ?
-      flatten([
-        for taint in compact(split("--register-with-taints=", v.taints)) :
+      [
         {
-          key    = split("=", split(":", taint)[0])[0]
-          value  = try(split("=", split(":", taint)[0])[1], "")
-          effect = split(":", taint)[1]
+          key    = split("=", split(":", trimprefix(v.taints, "--register-with-taints="))[0])[0]
+          value  = split("=", split(":", trimprefix(v.taints, "--register-with-taints="))[0])[1]
+          effect = split(":", trimprefix(v.taints, "--register-with-taints="))[1]
         }
-      ]) : v.taints,
+      ] : v.taints,
       []
     )
     requirements = concat(
