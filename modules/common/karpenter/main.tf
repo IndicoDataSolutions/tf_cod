@@ -107,19 +107,21 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
         split("=", label)[0] => split("=", label)[1]
     } : {})
     taints = (
-      can(tostring(v.taints)) && v.taints != "" ?
-      [
-        length(regexall("=", split(":", trimprefix(v.taints, "--register-with-taints="))[0])) > 0 ?
-        {
-          key    = split("=", split(":", trimprefix(v.taints, "--register-with-taints="))[0])[0]
-          value  = split("=", split(":", trimprefix(v.taints, "--register-with-taints="))[0])[1]
-          effect = split(":", trimprefix(v.taints, "--register-with-taints="))[1]
-        } :
-        {
-          key    = split(":", trimprefix(v.taints, "--register-with-taints="))[0]
-          effect = split(":", trimprefix(v.taints, "--register-with-taints="))[1]
-        }
-      ] :
+      can(tostring(v.taints)) ?
+      (v.taints != "" ?
+        [
+          length(regexall("=", split(":", trimprefix(v.taints, "--register-with-taints="))[0])) > 0 ?
+          {
+            key    = split("=", split(":", trimprefix(v.taints, "--register-with-taints="))[0])[0]
+            value  = split("=", split(":", trimprefix(v.taints, "--register-with-taints="))[0])[1]
+            effect = split(":", trimprefix(v.taints, "--register-with-taints="))[1]
+          } :
+          {
+            key    = split(":", trimprefix(v.taints, "--register-with-taints="))[0]
+            effect = split(":", trimprefix(v.taints, "--register-with-taints="))[1]
+          }
+        ] : []
+      ) :
       (can(tolist(v.taints)) ? v.taints : [])
     )
     requirements = concat(
