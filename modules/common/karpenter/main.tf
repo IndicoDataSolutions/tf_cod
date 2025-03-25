@@ -42,6 +42,12 @@ locals {
 
   karpenter_node_pools = merge(local.default_node_pools, var.node_pools)
 
+  debug_taints = {
+    for k, v in local.karpenter_node_pools : k => {
+      raw_taints = v.taints
+      is_string  = can(tostring(v.taints))
+    }
+  }
 }
 
 resource "helm_release" "karpenter" {
@@ -107,16 +113,16 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
         for label in split(",", v.additional_node_labels) :
         split("=", label)[0] => split("=", label)[1]
     } : {})
-    taints = try(
+    taints = (
       can(tostring(v.taints)) ?
       [
         {
-          key    = split("=", split(":", trimprefix(v.taints, "--register-with-taints="))[0])[0]
-          value  = split("=", split(":", trimprefix(v.taints, "--register-with-taints="))[0])[1]
-          effect = split(":", trimprefix(v.taints, "--register-with-taints="))[1]
+          key    = "indico.io/monitoring"
+          value  = "true"
+          effect = "NoSchedule"
         }
-      ] : v.taints,
-      []
+      ] :
+      coalesce(v.taints, [])
     )
     requirements = concat(
       [for k3, v3 in v.type == "gpu" ? local.gpu_instance_requirements : local.cpu_instance_requirements : {
