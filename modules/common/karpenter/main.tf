@@ -24,7 +24,7 @@ locals {
       key       = "karpenter.k8s.aws/instance-family"
       operator  = "In"
       values    = ["g4dn"]
-      minValues = 3
+      minValues = 1
     }
   }
   default_node_pools = {
