@@ -23,7 +23,7 @@ locals {
     instance-family = {
       key       = "karpenter.k8s.aws/instance-family"
       operator  = "In"
-      values    = ["g4dn", "g5", "g6"]
+      values    = ["g4dn"]
       minValues = 3
     }
   }

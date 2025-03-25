@@ -182,7 +182,7 @@ locals {
     karpenter = {
       type             = "cpu"
       spot             = false
-      instance_types   = ["t3.medium"]
+      instance_types   = ["c6a.large"]
       min_size         = 1
       max_size         = 1
       desired_capacity = "1"
