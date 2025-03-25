@@ -1480,8 +1480,3 @@ variable "karpenter_version" {
   default     = ""
   description = "Version of the karpenter helm chart"
 }
-
-variable "node_pools" {
-  default     = null
-  description = "User provided overrides to the node pools"
-}
