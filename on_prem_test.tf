@@ -122,7 +122,7 @@ resource "null_resource" "update_nfs_share" {
   }
 
   provisioner "local-exec" {
-    command = "./kubectl get pods --no-headers | grep nfs-server | awk '{print $1}'| xargs -I {} sh -c './kubectl exec {} -- sh -c \"mkdir -p /exports/nfs-storage\"'"
+    command = "./kubectl get pods --no-headers -n default | grep nfs-server | awk '{print $1}'| xargs -I {} sh -c './kubectl exec {} -- sh -c \"mkdir -p /exports/nfs-storage\"' -n default"
   }
 
 }
