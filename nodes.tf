@@ -206,7 +206,9 @@ locals {
 
   variable_node_groups = var.node_groups != null && var.karpenter_enabled == false ? var.node_groups : tomap(null)
 
-  node_groups = var.karpenter_enabled ? local.karpenter_node_group : merge(local.default_node_groups_logic, local.variable_node_groups)
+  karpenter_node_group_logic = var.karpenter_enabled ? local.karpenter_node_group : tomap(null)
+
+  node_groups = merge(local.default_node_groups_logic, local.variable_node_groups, local.karpenter_node_group_logic)
 
   default_node_pools_logic = var.node_groups == null ? local.default_node_groups : tomap(null)
 
