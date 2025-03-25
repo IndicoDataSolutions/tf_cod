@@ -107,7 +107,7 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
         split("=", label)[0] => split("=", label)[1]
     } : {})
     taints = (
-      can(tostring(v.taints)) && length(v.taints) > 0 ?
+      can(tostring(v.taints)) && v.taints != "" ?
       [
         length(regexall("=", split(":", trimprefix(v.taints, "--register-with-taints="))[0])) > 0 ?
         {
@@ -120,7 +120,7 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
           effect = split(":", trimprefix(v.taints, "--register-with-taints="))[1]
         }
       ] :
-      coalesce(v.taints, [])
+      (can(tolist(v.taints)) ? v.taints : [])
     )
     requirements = concat(
       [for k3, v3 in v.type == "gpu" ? local.gpu_instance_requirements : local.cpu_instance_requirements : {
