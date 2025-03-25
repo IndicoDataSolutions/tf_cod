@@ -386,7 +386,7 @@ module "cluster" {
   az_count   = var.az_count
   subnet_ids = flatten([local.network[0].private_subnet_ids])
 
-  node_groups          = var.karpenter_enabled ? local.karpenter_node_group : local.node_groups
+  node_groups          = local.node_groups
   node_role_name       = module.iam.node_role_name
   node_role_arn        = module.iam.node_role_arn
   instance_volume_size = var.instance_volume_size

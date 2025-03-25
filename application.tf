@@ -338,7 +338,7 @@ module "karpenter" {
   instance_volume_size      = var.instance_volume_size
   instance_volume_type      = var.instance_volume_type
   kms_key_id                = module.kms_key.key_arn
-  node_pools                = local.node_groups
+  node_pools                = local.node_pools
 }
 
 # Once (if) the secrets operator is set up, we can deploy the common charts

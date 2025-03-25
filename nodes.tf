@@ -191,7 +191,7 @@ locals {
   }
 
   default_node_groups = (
-    var.ipa_enabled == false && var.insights_enabled == false
+    var.ipa_enabled == false && var.insights_enabled == false && var.karpenter_enabled == false
     ? local.standalone_node_groups
     : merge(
       var.insights_enabled ? local.insights_default_node_groups : tomap(null),
@@ -202,9 +202,15 @@ locals {
   # This is to avoid terraform errors when the node groups variable is set,
   # as different keys make the objects incompatible for a ternary function. 
   # To solve this, we set it to null which matches all types
-  default_node_groups_logic = var.node_groups == null ? local.default_node_groups : tomap(null)
+  default_node_groups_logic = var.node_groups == null && var.karpenter_enabled == false ? local.default_node_groups : tomap(null)
 
-  variable_node_groups = var.node_groups != null ? var.node_groups : tomap(null)
+  variable_node_groups = var.node_groups != null && var.karpenter_enabled == false ? var.node_groups : tomap(null)
 
-  node_groups = merge(local.default_node_groups_logic, local.variable_node_groups)
+  node_groups = var.karpenter_enabled ? local.karpenter_node_group : merge(local.default_node_groups_logic, local.variable_node_groups)
+
+  default_node_pools_logic = var.node_groups == null ? local.default_node_groups : tomap(null)
+
+  variable_node_pools = var.node_groups != null ? var.node_groups : tomap(null)
+
+  node_pools = merge(local.default_node_pools_logic, local.variable_node_pools)
 }
