@@ -105,6 +105,9 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
       try(v.additional_node_labels, "") != "" ? {
         for label in split(",", v.additional_node_labels) :
         split("=", label)[0] => split("=", label)[1]
+      } : {},
+      v.type == "gpu" ? {
+        "k8s.amazonaws.com/accelerator" = "nvidia-tesla-t4"
     } : {})
     taints = (
       can(tostring(v.taints)) ?
