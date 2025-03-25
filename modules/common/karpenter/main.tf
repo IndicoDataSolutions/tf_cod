@@ -102,19 +102,23 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
     labels = merge({
       node_group = k
       node_pool  = k
-      }, try(v.additional_node_labels != null ? {
+      }, try(v.additional_labels, {}),
+      try(v.additional_node_labels, "") != "" ? {
         for label in split(",", v.additional_node_labels) :
         split("=", label)[0] => split("=", label)[1]
-    } : {}), {})
-    taints = try(v.taints != null ? (
+    } : {})
+    taints = try(
       can(tostring(v.taints)) ?
-      [for taint in split("--register-with-taints=", v.taints) :
-        length(regexall("^[^=]+=[^:]+:[^,]+$", taint)) > 0 ? {
+      flatten([
+        for taint in compact(split("--register-with-taints=", v.taints)) :
+        {
           key    = split("=", split(":", taint)[0])[0]
-          value  = split("=", split(":", taint)[0])[1]
+          value  = try(split("=", split(":", taint)[0])[1], "")
           effect = split(":", taint)[1]
-        } : null if length(taint) > 0
-    ] : v.taints) : [])
+        }
+      ]) : v.taints,
+      []
+    )
     requirements = concat(
       [for k3, v3 in v.type == "gpu" ? local.gpu_instance_requirements : local.cpu_instance_requirements : {
         key       = v3.key
