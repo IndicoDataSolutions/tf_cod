@@ -34,13 +34,9 @@ locals {
       taints = []
     }
     monitoring-workers = {
-      type = "cpu"
-      spot = false
-      taints = [{
-        key    = "indico.io/monitoring"
-        value  = "true"
-        effect = "NoSchedule"
-      }]
+      type   = "cpu"
+      spot   = false
+      taints = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
     }
   }
 
@@ -106,8 +102,19 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
     labels = merge({
       node_group = k
       node_pool  = k
-    }, try(v.additional_labels, {}))
-    taints = try(v.taints, [])
+      }, try(v.additional_node_labels != null ? {
+        for label in split(",", v.additional_node_labels) :
+        split("=", label)[0] => split("=", label)[1]
+    } : {}), {})
+    taints = try(v.taints != null ? (
+      can(tostring(v.taints)) ?
+      [for taint in split("--register-with-taints=", v.taints) :
+        length(regexall("^[^=]+=[^:]+:[^,]+$", taint)) > 0 ? {
+          key    = split("=", split(":", taint)[0])[0]
+          value  = split("=", split(":", taint)[0])[1]
+          effect = split(":", taint)[1]
+        } : null if length(taint) > 0
+    ] : v.taints) : [])
     requirements = concat(
       [for k3, v3 in v.type == "gpu" ? local.gpu_instance_requirements : local.cpu_instance_requirements : {
         key       = v3.key
