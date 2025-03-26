@@ -126,7 +126,8 @@ external-dns:
   domainFilters:
     - ${local.dns_zone_name}
 
-  provider: aws
+  provider:
+    name: aws
   env:
     - name: AWS_DEFAULT_REGION
       value: ${var.region}
@@ -155,7 +156,8 @@ external-dns:
   domainFilters:
     - ${local.dns_zone_name}
 
-  provider: aws
+  provider:
+    name: aws
   env:
     - name: AWS_DEFAULT_REGION
       value: ${var.region}
@@ -176,7 +178,8 @@ alternate-external-dns:
     - "--exclude-domains=${var.aws_account}.indico.io"
     - "--aws-assume-role=${var.aws_primary_dns_role_arn}"
 
-  provider: aws
+  provider:
+    name: aws
   env:
     - name: AWS_DEFAULT_REGION
       value: ${var.region}
