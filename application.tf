@@ -1061,7 +1061,7 @@ resource "random_password" "minio-password" {
 }
 
 output "minio-username" {
-  value = "indico"
+  value = "insights"
 }
 
 output "minio-password" {
@@ -1160,7 +1160,7 @@ ingress:
   secretName: indico-ssl-static-cert
 minio:
   storage:
-    accessKey: ${random_password.minio-username.result}
+    accessKey: insights
     secretKey: ${random_password.minio-password.result}
   backup:
     enabled: ${var.include_miniobkp}
@@ -1176,7 +1176,7 @@ weaviate:
       weaviate-backup:
         enabled: true
   backupStorageConfig:
-    accessKey: ${random_password.minio-username.result}
+    accessKey: insights
     secretKey: ${random_password.minio-password.result}
     url: http://minio-tenant-hl.insights.svc.cluster.local:9000
   weaviate:
@@ -1190,7 +1190,7 @@ weaviate:
         envconfig:
           BACKUP_S3_ENDPOINT: minio-tenant-hl.insights.svc.cluster.local:9000
         secrets:
-          AWS_ACCESS_KEY_ID: ${random_password.minio-username.result}
+          AWS_ACCESS_KEY_ID: insights
           AWS_SECRET_ACCESS_KEY: ${random_password.minio-password.result}
 rabbitmq:
   rabbitmq:
