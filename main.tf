@@ -320,7 +320,7 @@ module "fsx-storage" {
 
 module "iam" {
   source  = "app.terraform.io/indico/indico-aws-iam/mod"
-  version = "0.0.12"
+  version = "0.0.13"
 
   # EKS node role
   create_node_role           = var.create_node_role
@@ -351,6 +351,9 @@ module "iam" {
   # Iam flow logs role
   create_vpc_flow_logs_role = var.create_vpc_flow_logs_role
   vpc_flow_logs_role_name   = var.vpc_flow_logs_role_name_override
+  #Karpenter
+  karpenter_enabled = var.karpenter_enabled
+  account_id        = data.aws_caller_identity.current.account_id
 }
 
 moved {

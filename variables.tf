@@ -1468,3 +1468,15 @@ variable "indico_storage_class_name" {
   default     = "indico-sc"
   description = "The name of the storage class to use for EFS"
 }
+
+variable "karpenter_enabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling karpenter deployment"
+}
+
+variable "karpenter_version" {
+  type        = string
+  default     = ""
+  description = "Version of the karpenter helm chart"
+}
