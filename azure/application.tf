@@ -234,7 +234,8 @@ external-dns:
   domainFilters:
     - ${var.account}.${var.domain_suffix}.
 
-  provider: azure
+  provider:
+    name: azure
   
   extraVolumes: 
     - name: azure-config
