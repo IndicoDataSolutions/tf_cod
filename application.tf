@@ -321,6 +321,29 @@ YAML
   }
 }
 
+module "karpenter" {
+  count = var.karpenter_enabled == true ? 1 : 0
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
+  source                    = "./modules/common/karpenter"
+  cluster_name              = var.label
+  node_role_arn             = module.iam.node_role_arn
+  node_role_name            = module.iam.node_role_name
+  k8s_version               = var.k8s_version
+  az_count                  = var.az_count
+  subnet_ids                = flatten([local.network[0].private_subnet_ids])
+  cluster_security_group_id = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  helm_registry             = var.ipa_repo
+  karpenter_version         = var.karpenter_version
+  default_tags              = var.default_tags
+  instance_volume_size      = var.instance_volume_size
+  instance_volume_type      = var.instance_volume_type
+  kms_key_id                = module.kms_key.key_arn
+  node_pools                = local.node_pools
+}
+
 # Once (if) the secrets operator is set up, we can deploy the common charts
 locals {
   indico_crds_values = [<<EOF
@@ -617,7 +640,7 @@ aws-load-balancer-controller:
     vpcId: ${local.network[0].indico_vpc_id}
     region: ${var.region}
 cluster-autoscaler:
-  enabled: true
+  enabled: ${var.karpenter_enabled == false ? true : false}
   cluster-autoscaler:
     awsRegion: ${var.region}
     image:
@@ -775,7 +798,8 @@ module "indico-common" {
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
     module.secrets-operator-setup,
-    kubectl_manifest.gp2-storageclass
+    kubectl_manifest.gp2-storageclass,
+    module.karpenter
   ]
   source                           = "./modules/common/indico-common"
   argo_enabled                     = var.argo_enabled
