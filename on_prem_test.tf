@@ -92,15 +92,7 @@ spec:
 YAML
 }
 
-
-data "local_file" "nfs_ip" {
-  count      = var.on_prem_test == true ? 1 : 0
-  filename   = "${path.module}/nfs_server_ip.txt"
-  depends_on = [null_resource.get_nfs_server_ip]
-}
-
-
-resource "null_resource" "get_nfs_server_ip" {
+resource "null_resource" "update_nfs_share" {
   count = var.on_prem_test == true ? 1 : 0
   depends_on = [
     module.cluster,
@@ -124,11 +116,7 @@ resource "null_resource" "get_nfs_server_ip" {
   }
 
   provisioner "local-exec" {
-    command = "./kubectl get service nfs-service -o jsonpath='{.spec.clusterIP}' > ${path.module}/nfs_server_ip.txt"
-  }
-
-  provisioner "local-exec" {
-    command = "./kubectl get pods --no-headers | grep nfs-server | awk '{print $1}'| xargs -I {} sh -c './kubectl exec {} -- sh -c \"mkdir -p /exports/nfs-storage\"'"
+    command = "./kubectl get pods --no-headers -n default | grep nfs-server | awk '{print $1}'| xargs -I {} sh -c './kubectl exec  -n default {} -- sh -c \"mkdir -p /exports/nfs-storage\"'"
   }
 
 }
@@ -143,6 +131,7 @@ resource "helm_release" "nfs-provider" {
   depends_on = [
     module.cluster,
     kubectl_manifest.nfs_server_service,
+    null_resource.update_nfs_share,
     time_sleep.wait_1_minutes_after_cluster
   ]
 
