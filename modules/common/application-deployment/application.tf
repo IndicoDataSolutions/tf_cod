@@ -42,6 +42,10 @@ spec:
       jsonPointers:
         - /spec/replicas
       kind: Deployment
+    - group: apps
+      kind: Deployment
+      jqPathExpressions:
+      - .spec.template.spec.containers[].env[] | select((.name | contains("STAKATER_")))
   destination:
     server: ${var.argo_server}
     namespace: ${var.namespace}
