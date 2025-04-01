@@ -334,7 +334,7 @@ module "karpenter" {
   k8s_version               = var.k8s_version
   az_count                  = var.az_count
   subnet_ids                = flatten([local.network[0].private_subnet_ids])
-  cluster_security_group_id = var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  cluster_security_group_id = distinct(compact(concat([module.indico_cluster.node_security_group_id], var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [], [module.indico_cluster.cluster_security_group_id])))
   helm_registry             = var.ipa_repo
   karpenter_version         = var.karpenter_version
   default_tags              = var.default_tags
