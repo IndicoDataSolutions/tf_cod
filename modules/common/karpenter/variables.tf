@@ -30,7 +30,7 @@ variable "subnet_ids" {
 }
 
 variable "cluster_security_group_id" {
-  type = string
+  type = list(string)
 }
 
 variable "helm_registry" {

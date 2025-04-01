@@ -78,7 +78,7 @@ ${yamlencode([for k, v in local.node_classes : {
     clusterName      = var.cluster_name
     amiIds           = [v.ami_id]
     subnetIds        = local.node_subnet_ids
-    securityGroupIds = [var.cluster_security_group_id]
+    securityGroupIds = var.cluster_security_group_id
     tags             = var.default_tags
     blockDeviceMappings = [{
       deviceName = "/dev/xvda"
