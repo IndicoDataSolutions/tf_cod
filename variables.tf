@@ -576,11 +576,6 @@ variable "pre-reqs-values-yaml-b64" {
   default = "Cg=="
 }
 
-variable "enable_k8s_dashboard" {
-  type    = bool
-  default = true
-}
-
 variable "use_acm" {
   type        = bool
   default     = false
