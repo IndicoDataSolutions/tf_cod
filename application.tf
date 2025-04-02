@@ -1270,7 +1270,7 @@ module "additional_application" {
   k8s_version            = var.k8s_version
   release_name           = each.value.name
   terraform_helm_values  = ""
-  helm_values            = indent(12, trimspace(base64decode(each.value.values)))
+  helm_values            = trimspace(base64decode(each.value.values))
 }
 
 
