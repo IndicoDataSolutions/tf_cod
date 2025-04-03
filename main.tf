@@ -137,31 +137,6 @@ resource "aws_key_pair" "kp" {
 #   s3_endpoint_enabled  = var.s3_endpoint_enabled
 # }
 
-moved {
-  from = module.public_networking[0]
-  to   = module.networking[0]
-}
-
-# If you have specific resources that need individual moves, you might also need:
-moved {
-  from = module.public_networking.aws_vpc.main[0]
-  to   = module.networking.aws_vpc.main[0]
-}
-
-moved {
-  from = module.public_networking.aws_subnet.public[0]
-  to   = module.networking.aws_subnet.public[0]
-}
-
-moved {
-  from = module.public_networking.aws_internet_gateway.main[0]
-  to   = module.networking.aws_internet_gateway.main[0]
-}
-
-moved {
-  from = module.public_networking.aws_route_table.public[0]
-  to   = module.networking.aws_route_table.public[0]
-}
 
 module "networking" {
   count                      = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
