@@ -149,8 +149,8 @@ moved {
 }
 
 moved {
-  from = module.public_networking.aws_subnet.public[*]
-  to   = module.networking.aws_subnet.public[*]
+  from = module.public_networking.aws_subnet.public
+  to   = module.networking.aws_subnet.public
 }
 
 moved {
