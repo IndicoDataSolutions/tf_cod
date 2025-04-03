@@ -93,12 +93,12 @@ locals {
   }
 
   insights_default_node_groups = {
-    general = {
+    static-workers = {
       type                   = "cpu"
       spot                   = false
       instance_types         = ["m5a.xlarge"]
       min_size               = 1
-      max_size               = 5
+      max_size               = 10
       desired_capacity       = "3"
       additional_node_labels = ""
       taints                 = ""
@@ -126,7 +126,7 @@ locals {
     minio = {
       type                   = "cpu"
       spot                   = false
-      instance_types         = ["t3a.xlarge"]
+      instance_types         = ["m5.xlarge"]
       min_size               = 1
       max_size               = 4
       desired_capacity       = "4"
