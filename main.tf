@@ -99,7 +99,8 @@ data "aws_caller_identity" "current" {}
 
 # define the networking module we're using locally
 locals {
-  network = var.network_module == "public_networking" ? module.public_networking : module.networking
+  # network = var.network_module == "public_networking" ? module.public_networking : module.networking
+  network = module.networking
 
   argo_app_name           = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
   argo_smoketest_app_name = lower("${var.aws_account}.${var.region}.${var.label}-smoketest")
@@ -122,23 +123,50 @@ resource "aws_key_pair" "kp" {
   public_key = tls_private_key.pk.public_key_openssh
 }
 
-module "public_networking" {
-  count                = var.direct_connect == false && var.network_module == "public_networking" ? 1 : 0
-  source               = "app.terraform.io/indico/indico-aws-network/mod"
-  version              = "1.2.2"
-  label                = var.label
-  vpc_cidr             = var.vpc_cidr
-  private_subnet_cidrs = var.private_subnet_cidrs
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  subnet_az_zones      = var.subnet_az_zones
-  region               = var.region
-  s3_endpoint_enabled  = var.s3_endpoint_enabled
+# Deprecated module [DEV-13340]
+# module "public_networking" {
+#   count                = var.direct_connect == false && var.network_module == "public_networking" ? 1 : 0
+#   source               = "app.terraform.io/indico/indico-aws-network/mod"
+#   version              = "1.2.2"
+#   label                = var.label
+#   vpc_cidr             = var.vpc_cidr
+#   private_subnet_cidrs = var.private_subnet_cidrs
+#   public_subnet_cidrs  = var.public_subnet_cidrs
+#   subnet_az_zones      = var.subnet_az_zones
+#   region               = var.region
+#   s3_endpoint_enabled  = var.s3_endpoint_enabled
+# }
+
+moved {
+  from = module.public_networking
+  to   = module.networking
+}
+
+# If you have specific resources that need individual moves, you might also need:
+moved {
+  from = module.public_networking.aws_vpc.main
+  to   = module.networking.aws_vpc.main
+}
+
+moved {
+  from = module.public_networking.aws_subnet.public[*]
+  to   = module.networking.aws_subnet.public[*]
+}
+
+moved {
+  from = module.public_networking.aws_internet_gateway.main
+  to   = module.networking.aws_internet_gateway.main
+}
+
+moved {
+  from = module.public_networking.aws_route_table.public
+  to   = module.networking.aws_route_table.public
 }
 
 module "networking" {
   count                      = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
   source                     = "app.terraform.io/indico/indico-aws-network/mod"
-  version                    = "2.2.0"
+  version                    = "2.3.0"
   label                      = var.label
   vpc_cidr                   = var.vpc_cidr
   private_subnet_cidrs       = var.private_subnet_cidrs

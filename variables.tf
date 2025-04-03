@@ -979,6 +979,12 @@ variable "s3_endpoint_enabled" {
   description = "If set to true, an S3 VPC endpoint will be created. If this variable is set, the `region` variable must also be set"
 }
 
+variable "gateway_vpc_endpoints_enabled" {
+  type        = bool
+  default     = false
+  description = "If set to true, gateway VPC endpoints will be created. Note, this will increase network costs and generally is only needed for private clusters."
+}
+
 variable "image_registry" {
   type        = string
   default     = "harbor.devops.indico.io"
