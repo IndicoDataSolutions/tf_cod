@@ -126,5 +126,5 @@ output "minio-username" {
 
 output "minio-password" {
   sensitive = true
-  value     = random_password.minio-password.result
+  value     = var.insights_enabled ? random_password.minio-password.result : ""
 }
