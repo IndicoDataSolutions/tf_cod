@@ -43,3 +43,12 @@ data "external" "git_information" {
   program = ["sh", "${path.module}/get_sha.sh"]
 }
 
+output "minio-username" {
+  value = "insights"
+}
+
+output "minio-password" {
+  sensitive = true
+  value     = var.insights_enabled ? random_password.minio-password.result : ""
+}
+

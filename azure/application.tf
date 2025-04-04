@@ -826,17 +826,9 @@ module "intake_smoketests" {
 }
 
 resource "random_password" "minio-password" {
+  count   = var.insights_enabled ? 1 : 0
   length  = 16
   special = false
-}
-
-output "minio-username" {
-  value = "insights"
-}
-
-output "minio-password" {
-  sensitive = true
-  value     = random_password.minio-password.result
 }
 
 locals {
