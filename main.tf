@@ -139,7 +139,7 @@ resource "aws_key_pair" "kp" {
 
 
 module "networking" {
-  count                      = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
+  count                      = var.network_module == "public_networking" || var.network_module == "networking" ? 1 : 0 #This is now always true, but we keep the check for backwards compatibility
   source                     = "app.terraform.io/indico/indico-aws-network/mod"
   version                    = "2.3.0"
   label                      = var.label
