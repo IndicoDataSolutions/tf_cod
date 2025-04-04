@@ -1153,7 +1153,7 @@ ingress:
 minio:
   storage:
     accessKey: insights
-    secretKey: ${random_password.minio-password.result}
+    secretKey: ${var.insights_enabled ? random_password[0].minio-password.result : ""}
   backup:
     enabled: ${var.include_miniobkp}
     schedule: "0 4 * * 2" # This schedules the job to run at 4:00 AM every Tuesday
@@ -1169,7 +1169,7 @@ weaviate:
         enabled: true
   backupStorageConfig:
     accessKey: insights
-    secretKey: ${random_password.minio-password.result}
+    secretKey: ${var.insights_enabled ? random_password[0].minio-password.result : ""}
     url: http://minio-tenant-hl.insights.svc.cluster.local:9000
   weaviate:
     env:
@@ -1183,7 +1183,7 @@ weaviate:
           BACKUP_S3_ENDPOINT: minio-tenant-hl.insights.svc.cluster.local:9000
         secrets:
           AWS_ACCESS_KEY_ID: insights
-          AWS_SECRET_ACCESS_KEY: ${random_password.minio-password.result}
+          AWS_SECRET_ACCESS_KEY: ${var.insights_enabled ? random_password[0].minio-password.result : ""}
 rabbitmq:
   rabbitmq:
     image:
