@@ -42,24 +42,3 @@ moved {
   from = helm_release.monitoring[0]
   to   = module.indico-common.helm_release.monitoring[0]
 }
-
-moved {
-  from = module.public_networking[0]
-  to   = module.networking[0]
-}
-
-# # If you have specific resources that need individual moves, you might also need:
-# moved {
-#   from = module.public_networking.indico_vpc_id
-#   to   = module.networking.indico_vpc_id
-# }
-
-# moved {
-#   from = module.public_networking.private_subnet_ids
-#   to   = module.networking.private_subnet_ids
-# }
-
-# moved {
-#   from = module.public_networking.private_subnet_ids
-#   to   = module.networking.private_subnet_ids
-# }
