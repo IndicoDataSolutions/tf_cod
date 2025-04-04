@@ -56,7 +56,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     ipa_smoketest_slack_channel = "${jsonencode(var.ipa_smoketest_slack_channel)}"
     ipa_smoketest_enabled = "${jsonencode(var.ipa_smoketest_enabled)}"
     admin_group_name = "${jsonencode(var.admin_group_name)}"
-    enable_k8s_dashboard = "${jsonencode(var.enable_k8s_dashboard)}"
     snapshots_resource_group_name = "${jsonencode(var.snapshots_resource_group_name)}"
     name = "${jsonencode(var.name)}"
     cod_snapshot_restore_version = "${jsonencode(var.cod_snapshot_restore_version)}"
