@@ -1055,6 +1055,12 @@ module "intake_smoketests" {
   helm_values            = indent(10, trimspace(local.smoketests_values))
 }
 
+resource "random_password" "minio-password" {
+  count   = var.insights_enabled ? 1 : 0
+  length  = 16
+  special = false
+}
+
 locals {
   insights_pre_reqs_values = [<<EOF
 crunchy-postgres:
@@ -1144,14 +1150,10 @@ crunchy-postgres:
 ingress:
   useStaticCertificate: false
   secretName: indico-ssl-static-cert
-  tls.crt: #base64 encoded value of certificate chain
-  tls.key: #base64 encoded value of certificate key
 minio:
-  topology:
-    volumeSize: 128Gi
   storage:
-    accessKey: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
-    secretKey: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
+    accessKey: insights
+    secretKey: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
   backup:
     enabled: ${var.include_miniobkp}
     schedule: "0 4 * * 2" # This schedules the job to run at 4:00 AM every Tuesday
@@ -1166,20 +1168,22 @@ weaviate:
       weaviate-backup:
         enabled: true
   backupStorageConfig:
-    accessKey: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
-    secretKey: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
+    accessKey: insights
+    secretKey: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
     url: http://minio-tenant-hl.insights.svc.cluster.local:9000
   weaviate:
     env:
-      GOMEMLIMIT: "31GiB" # 1 less than the hard limit on the used nodes 
+      # 1 less than the hard limit of the weaviate node group type
+      GOMEMLIMIT: "31GiB"
+    # TODO: switch this to a dedicated weaviate backup bucket
     backups:
       s3:
         enabled: true
         envconfig:
           BACKUP_S3_ENDPOINT: minio-tenant-hl.insights.svc.cluster.local:9000
         secrets:
-          AWS_ACCESS_KEY_ID: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
-          AWS_SECRET_ACCESS_KEY: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
+          AWS_ACCESS_KEY_ID: insights
+          AWS_SECRET_ACCESS_KEY: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
 rabbitmq:
   rabbitmq:
     image:
@@ -1194,15 +1198,6 @@ global:
   host: ${lower("${var.label}.${var.region}.${var.aws_account}.indico.io")}
   features:
     askMyDocument: true
-insights-edge:
-  additionalAllowedOrigins:
-    - https://local.indico.io:1234
-server:
-  services:
-    lagoon:
-      env:
-        FIELD_AUTOCONFIRM_CONFIDENCE: 0.8
-        FIELD_CONFIG_PATH: "fields_config.yaml"
 ask-my-docs:
   llmConfig:
     llm: indico-azure-instance
@@ -1349,7 +1344,7 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
     environment = {
       HARBOR_API_TOKEN = jsondecode(data.vault_kv_secret_v2.harbor-api-token[0].data_json)["bearer_token"]
     }
-    command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+    command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${replace(data.external.git_information.result.branch, "/", "-")}-${substr(data.external.git_information.result.sha, 0, 8)}"
   }
 }
 
@@ -1359,7 +1354,7 @@ output "harbor-api-token" {
 }
 
 output "smoketest_chart_version" {
-  value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+  value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${replace(data.external.git_information.result.branch, "/", "-")}-${substr(data.external.git_information.result.sha, 0, 8)}"
 }
 
 data "vault_kv_secret_v2" "account-robot-credentials" {
