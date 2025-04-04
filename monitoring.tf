@@ -106,7 +106,7 @@ EOT
   standardRules:
     ${indent(4, base64decode(var.alerting_standard_rules))}
 EOT
-  ) : (<<EOT
+    ) : (<<EOT
   noExtraConfigs: true
   EOT
   )

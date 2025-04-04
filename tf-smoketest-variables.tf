@@ -159,6 +159,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     sg_tag_name = "${jsonencode(var.sg_tag_name)}"
     sg_tag_value = "${jsonencode(var.sg_tag_value)}"
     s3_endpoint_enabled = "${jsonencode(var.s3_endpoint_enabled)}"
+    gateway_vpc_endpoints_enabled = "${jsonencode(var.gateway_vpc_endpoints_enabled)}"
     image_registry = "${jsonencode(var.image_registry)}"
     secrets_operator_enabled = "${jsonencode(var.secrets_operator_enabled)}"
     vault_secrets_operator_version = "${jsonencode(var.vault_secrets_operator_version)}"
@@ -240,6 +241,9 @@ resource "kubernetes_config_map" "terraform-variables" {
     indico_pre_reqs_values_yaml_b64 = "${jsonencode(var.indico-pre-reqs-values-yaml-b64)}"
     include_miniobkp = "${jsonencode(var.include_miniobkp)}"
     miniobkp_s3_bucket_name_override = "${jsonencode(var.miniobkp_s3_bucket_name_override)}"
+    indico_storage_class_name = "${jsonencode(var.indico_storage_class_name)}"
+    karpenter_enabled = "${jsonencode(var.karpenter_enabled)}"
+    karpenter_version = "${jsonencode(var.karpenter_version)}"
 
     }
   }
