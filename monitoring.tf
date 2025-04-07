@@ -24,7 +24,7 @@ locals {
   enableHttp   = var.acm_arn != "" || var.use_nlb == true ? false : true
   loadbalancer_annotation_config = var.create_nginx_ingress_security_group == true && var.nginx_ingress_allowed_cidrs != [] ? (<<EOT
     annotations:
-      service.beta.kubernetes.io/aws-load-balancer-security-groups: "${local.nginx_ingress_security_group_id}"
+      service.beta.kubernetes.io/aws-load-balancer-security-groups: "${local.network[0].nginx_ingress_security_group_id}"
   EOT
   ) : (<<EOT
     annotations: {}
