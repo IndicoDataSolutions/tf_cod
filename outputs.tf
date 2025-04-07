@@ -130,11 +130,11 @@ output "minio-password" {
 }
 
 output "nginx_ingress_security_group_id" {
-  value = var.create_nginx_ingress_security_group ? aws_security_group.nginx_ingress[0].id : ""
+  value = var.create_nginx_ingress_security_group &&var.network_module == "networking" && var.network_type == "create" ? local.network[0].nginx_ingress_security_group_id : ""
 }
 
 output "nat_gateway_eips" {
-  value = var.network_module == "networking" && var.network_type == "create" ? module.networking[0].nat_gateway_eips : "" 
+  value = var.network_module == "networking" && var.network_type == "create" ? local.network[0].nat_gateway_eips : "" 
 }
 
 output "nginx_ingress_allowed_cidrs" {
