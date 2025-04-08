@@ -237,7 +237,7 @@ locals {
 
   kube_prometheus_stack_enabled = true
 
-  indico_storage_class_name = "azurefile"
+  indico_storage_class_name = "managed-csi"
   ipa_version               = var.ipa_version
   argo_branch               = var.argo_branch
   argo_path                 = var.argo_path
