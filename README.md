@@ -261,7 +261,7 @@
 | <a name="input_is_alternate_account_domain"></a> [is\_alternate\_account\_domain](#input\_is\_alternate\_account\_domain) | domain name is controlled by a different aws account | `string` | `"false"` | no |
 | <a name="input_is_aws"></a> [is\_aws](#input\_is\_aws) | n/a | `bool` | `true` | no |
 | <a name="input_is_azure"></a> [is\_azure](#input\_is\_azure) | n/a | `bool` | `false` | no |
-| <a name="input_k8s_version"></a> [k8s\_version](#input\_k8s\_version) | The EKS version to use | `string` | `"1.31"` | no |
+| <a name="input_k8s_version"></a> [k8s\_version](#input\_k8s\_version) | The EKS version to use | `string` | `"1.32"` | no |
 | <a name="input_keda_version"></a> [keda\_version](#input\_keda\_version) | n/a | `string` | `"2.15.2"` | no |
 | <a name="input_keycloak_enabled"></a> [keycloak\_enabled](#input\_keycloak\_enabled) | n/a | `bool` | `true` | no |
 | <a name="input_kms_encrypt_secrets"></a> [kms\_encrypt\_secrets](#input\_kms\_encrypt\_secrets) | Encrypt EKS secrets with KMS | `bool` | `true` | no |
