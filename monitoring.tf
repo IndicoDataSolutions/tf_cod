@@ -23,11 +23,11 @@ locals {
   backend_port = var.acm_arn != "" ? "http" : "https"
   enableHttp   = var.acm_arn != "" || var.use_nlb == true ? false : true
   loadbalancer_annotation_config = var.create_nginx_ingress_security_group == true && var.nginx_ingress_allowed_cidrs != [] ? (<<EOT
-          annotations:
-            service.beta.kubernetes.io/aws-load-balancer-security-groups: "${local.network[0].nginx_ingress_security_group_id}"
+annotations:
+  service.beta.kubernetes.io/aws-load-balancer-security-groups: "${local.network[0].nginx_ingress_security_group_id}"
   EOT
   ) : (<<EOT
-          annotations: {}
+annotations: {}
   EOT
   )
   lb_config    = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
@@ -55,7 +55,7 @@ locals {
     ) : (<<EOT
       external:
         enabled: ${var.network_allow_public}
-          ${local.loadbalancer_annotation_config}
+          ${indent(10, local.loadbalancer_annotation_config)}
       internal:
         enabled: ${local.internal_elb}
         annotations:
