@@ -53,9 +53,9 @@ annotations: {}
           service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
   EOT
     ) : (<<EOT
+      ${indent(6, local.loadbalancer_annotation_config)}
       external:
         enabled: ${var.network_allow_public}
-        ${indent(8, local.loadbalancer_annotation_config)}
       internal:
         enabled: ${local.internal_elb}
         annotations:
