@@ -32,6 +32,7 @@ annotations: {}
   )
   lb_config    = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
   loadbalancer_config = var.use_nlb == true ? (<<EOT
+      ${indent(6, local.loadbalancer_annotation_config)}
       external:
         enabled: ${var.network_allow_public}
         annotations:
@@ -65,6 +66,7 @@ annotations: {}
   EOT
   )
   acm_loadbalancer_config = (<<EOT
+      ${indent(6, local.loadbalancer_annotation_config)}
       external:
         enabled: ${var.network_allow_public}
         annotations:
