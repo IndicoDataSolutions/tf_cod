@@ -1486,3 +1486,15 @@ variable "karpenter_version" {
   default     = ""
   description = "Version of the karpenter helm chart"
 }
+
+variable "nginx_ingress_allowed_cidrs" {
+  description = "List of CIDR blocks allowed to access nginx ingress"
+  type        = list(string)
+  default     = [] # Default value matches current static configuration
+}
+
+variable "create_nginx_ingress_security_group" {
+  type        = bool
+  default     = false
+  description = "If enabled this will create a security group for the nginx ingress controller"
+}

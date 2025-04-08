@@ -140,31 +140,33 @@ module "public_networking" {
 
 
 module "networking" {
-  count                         = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
-  source                        = "app.terraform.io/indico/indico-aws-network/mod"
-  version                       = "2.3.0"
-  label                         = var.label
-  vpc_cidr                      = var.vpc_cidr
-  private_subnet_cidrs          = var.private_subnet_cidrs
-  public_subnet_cidrs           = var.public_subnet_cidrs
-  subnet_az_zones               = var.subnet_az_zones
-  region                        = var.region
-  allow_public                  = var.network_allow_public
-  network_type                  = var.network_type
-  load_vpc_id                   = var.load_vpc_id
-  private_subnet_tag_name       = var.private_subnet_tag_name
-  private_subnet_tag_value      = var.private_subnet_tag_value
-  public_subnet_tag_name        = var.public_subnet_tag_name
-  public_subnet_tag_value       = var.public_subnet_tag_value
-  sg_tag_name                   = var.sg_tag_name
-  sg_tag_value                  = var.sg_tag_value
-  enable_vpc_flow_logs          = var.enable_vpc_flow_logs
-  vpc_flow_logs_iam_role_arn    = var.vpc_flow_logs_iam_role_arn != "" ? var.vpc_flow_logs_iam_role_arn : var.enable_vpc_flow_logs ? module.iam.vpc_flow_logs_role_arn : ""
-  enable_firewall               = var.enable_firewall
-  firewall_subnet_cidrs         = var.firewall_subnet_cidrs
-  firewall_allow_list           = var.firewall_allow_list
-  s3_endpoint_enabled           = var.s3_endpoint_enabled
-  gateway_vpc_endpoints_enabled = var.gateway_vpc_endpoints_enabled
+  count                               = var.direct_connect == false && var.network_module == "networking" ? 1 : 0
+  source                              = "app.terraform.io/indico/indico-aws-network/mod"
+  version                             = "2.4.0"
+  label                               = var.label
+  vpc_cidr                            = var.vpc_cidr
+  private_subnet_cidrs                = var.private_subnet_cidrs
+  public_subnet_cidrs                 = var.public_subnet_cidrs
+  subnet_az_zones                     = var.subnet_az_zones
+  region                              = var.region
+  allow_public                        = var.network_allow_public
+  network_type                        = var.network_type
+  load_vpc_id                         = var.load_vpc_id
+  private_subnet_tag_name             = var.private_subnet_tag_name
+  private_subnet_tag_value            = var.private_subnet_tag_value
+  public_subnet_tag_name              = var.public_subnet_tag_name
+  public_subnet_tag_value             = var.public_subnet_tag_value
+  sg_tag_name                         = var.sg_tag_name
+  sg_tag_value                        = var.sg_tag_value
+  enable_vpc_flow_logs                = var.enable_vpc_flow_logs
+  vpc_flow_logs_iam_role_arn          = var.vpc_flow_logs_iam_role_arn != "" ? var.vpc_flow_logs_iam_role_arn : var.enable_vpc_flow_logs ? module.iam.vpc_flow_logs_role_arn : ""
+  enable_firewall                     = var.enable_firewall
+  firewall_subnet_cidrs               = var.firewall_subnet_cidrs
+  firewall_allow_list                 = var.firewall_allow_list
+  s3_endpoint_enabled                 = var.s3_endpoint_enabled
+  gateway_vpc_endpoints_enabled       = var.gateway_vpc_endpoints_enabled
+  create_nginx_ingress_security_group = var.create_nginx_ingress_security_group
+  nginx_ingress_allowed_cidrs         = var.nginx_ingress_allowed_cidrs
 }
 
 module "sqs_sns" {

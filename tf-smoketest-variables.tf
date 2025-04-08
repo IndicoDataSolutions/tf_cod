@@ -244,6 +244,8 @@ resource "kubernetes_config_map" "terraform-variables" {
     indico_storage_class_name = "${jsonencode(var.indico_storage_class_name)}"
     karpenter_enabled = "${jsonencode(var.karpenter_enabled)}"
     karpenter_version = "${jsonencode(var.karpenter_version)}"
+    nginx_ingress_allowed_cidrs = "${jsonencode(var.nginx_ingress_allowed_cidrs)}"
+    create_nginx_ingress_security_group = "${jsonencode(var.create_nginx_ingress_security_group)}"
 
     }
   }
