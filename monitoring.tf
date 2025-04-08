@@ -55,7 +55,7 @@ annotations: {}
     ) : (<<EOT
       external:
         enabled: ${var.network_allow_public}
-          ${indent(10, local.loadbalancer_annotation_config)}
+        ${indent(8, local.loadbalancer_annotation_config)}
       internal:
         enabled: ${local.internal_elb}
         annotations:
