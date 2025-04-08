@@ -615,19 +615,22 @@ storage:
     enabled: false
     name: "${local.indico_storage_class_name}"
   pvcSpec:
-    azureFile:
-      readOnly: false
-      secretName: "azure-storage-key"
-      secretNamespace: null
-      shareName: ${module.storage.fileshare_name}
+    csi:
+      driver: file.csi.azure.com
+      nodeStageSecretRef:
+        name: "azure-storage-key"
+        namespace: default
+      volumeAttributes:
+        shareName: ${module.storage.fileshare_name}
     mountOptions:
       - dir_mode=0777
       - file_mode=0777
       - uid=0
       - gid=0
-      - nobrl
+      - mfsymlinks
+      - cache=strict
       - nosharesock
-    csi: null
+      - nobrl
     persistentVolumeReclaimPolicy: Retain
     volumeMode: Filesystem
 
