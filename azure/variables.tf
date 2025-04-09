@@ -134,7 +134,7 @@ variable "argo_github_team_owner" {
 
 variable "ipa_repo" {
   type    = string
-  default = "https://harbor.devops.indico.io/chartrepo/indico-charts-dev"
+  default = "oci://harbor.devops.indico.io/indico-charts"
 }
 
 variable "ipa_version" {
