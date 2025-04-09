@@ -384,7 +384,7 @@ variable "argo_github_team_owner" {
 
 variable "ipa_repo" {
   type    = string
-  default = "https://harbor.devops.indico.io/chartrepo/indico-charts"
+  default = "oci://harbor.devops.indico.io/indico-charts"
 }
 
 variable "ipa_version" {
@@ -574,11 +574,6 @@ variable "crds-values-yaml-b64" {
 
 variable "pre-reqs-values-yaml-b64" {
   default = "Cg=="
-}
-
-variable "enable_k8s_dashboard" {
-  type    = bool
-  default = true
 }
 
 variable "use_acm" {
