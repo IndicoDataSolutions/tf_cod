@@ -175,7 +175,7 @@ module "sqs_sns" {
   version                    = "2.0.2"
   region                     = var.region
   label                      = var.label
-  kms_master_key_id          = module.kms_key.key.id
+  kms_master_key_id          = local.environment_kms_key_key_id
   sqs_sns_type               = var.sqs_sns_type
   ipa_sns_topic_name         = var.ipa_sns_topic_name
   ipa_sqs_queue_name         = var.ipa_sqs_queue_name
@@ -202,11 +202,12 @@ module "lambda-sns-forwarder" {
 }
 
 module "kms_key" {
+  count            = var.load_environment == "" ? 1 : 0
   source           = "app.terraform.io/indico/indico-aws-kms/mod"
   version          = "2.1.2"
   label            = var.label
   additional_tags  = var.additional_tags
-  existing_kms_key = var.load_environment == "" ? var.existing_kms_key : local.environment_kms_key_arn
+  existing_kms_key = var.existing_kms_key
 }
 
 module "security-group" {
@@ -224,7 +225,7 @@ module "s3-storage" {
   version                            = "4.4.0"
   force_destroy                      = true # allows terraform to destroy non-empty buckets.
   label                              = var.label
-  kms_key_arn                        = module.kms_key.key.arn
+  kms_key_arn                        = local.environment_kms_key_arn
   submission_expiry                  = var.submission_expiry
   uploads_expiry                     = var.uploads_expiry
   include_rox                        = var.include_rox
@@ -312,7 +313,7 @@ module "fsx-storage" {
   security_group_id           = var.network_module == "networking" ? local.environment_all_subnets_sg_id : module.security-group.all_subnets_sg_id
   data_bucket                 = local.environment_data_s3_bucket_name
   api_models_bucket           = local.environment_api_models_s3_bucket_name
-  kms_key                     = module.kms_key.key
+  kms_key                     = local.environment_kms_key_key
   per_unit_storage_throughput = var.per_unit_storage_throughput
   deployment_type             = var.fsx_deployment_type
   include_rox                 = var.include_rox
@@ -383,8 +384,8 @@ module "cluster" {
   subnet_ids = flatten([local.environment_private_subnet_ids])
 
   node_groups          = local.node_groups
-  node_role_name       = module.iam.node_role_name
-  node_role_arn        = local.environment_node_role_name
+  node_role_name       = local.environment_node_role_name
+  node_role_arn        = local.environment_node_role_arn
   instance_volume_size = var.instance_volume_size
   instance_volume_type = var.instance_volume_type
 

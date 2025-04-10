@@ -59,11 +59,38 @@ moved {
 }
 
 moved {
-  from = module.public_networking # This is so that we may deprecate the public_networking module
-  to   = module.network
-}
-
-moved {
   from = module.s3-storage
   to   = module.s3-storage[0]
 }
+
+moved {
+  from = module.fsx-storage
+  to   = module.fsx-storage[0]
+}
+
+moved {
+  from = module.efs-storage
+  to   = module.efs-storage[0]
+}
+
+moved {
+  from = module.iam
+  to   = module.iam[0]
+}
+
+moved {
+  from = module.network
+  to   = module.network[0]
+}
+
+moved {
+  from = module.kms_key
+  to   = module.kms_key[0]
+}
+
+
+moved {
+  from = module.sqs_sns
+  to   = module.sqs_sns[0]
+}
+
