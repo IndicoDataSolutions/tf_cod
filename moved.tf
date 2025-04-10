@@ -42,3 +42,28 @@ moved {
   from = helm_release.monitoring[0]
   to   = module.indico-common.helm_release.monitoring[0]
 }
+
+moved {
+  from = module.cluster.aws_iam_role_policy_attachment.ebs_cluster_policy
+  to   = module.iam.module.create_eks_node_role[0].aws_iam_role_policy_attachment.attachments[0]
+}
+
+moved {
+  from = module.cluster.aws_iam_role_policy_attachment.additional_cluster_policy
+  to   = module.iam.module.create_eks_node_role[0].aws_iam_role_policy_attachment.attachments[1]
+}
+
+moved {
+  from = module.cluster.aws_iam_role_policy_attachment.additional["IAMReadOnlyAccess"]
+  to   = module.iam.module.create_eks_node_role[0].aws_iam_role_policy_attachment.additional_policies[0]
+}
+
+moved {
+  from = module.public_networking # This is so that we may deprecate the public_networking module
+  to   = module.network
+}
+
+moved {
+  from = module.s3-storage
+  to   = module.s3-storage[0]
+}
