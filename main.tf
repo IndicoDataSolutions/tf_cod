@@ -159,7 +159,7 @@ module "networking" {
   sg_tag_name                         = var.sg_tag_name
   sg_tag_value                        = var.sg_tag_value
   enable_vpc_flow_logs                = var.enable_vpc_flow_logs
-  vpc_flow_logs_iam_role_arn          = var.vpc_flow_logs_iam_role_arn != "" ? var.vpc_flow_logs_iam_role_arn : var.enable_vpc_flow_logs ? local.environment.vpc_flow_logs_role_arn : ""
+  vpc_flow_logs_iam_role_arn          = var.vpc_flow_logs_iam_role_arn != "" ? var.vpc_flow_logs_iam_role_arn : var.enable_vpc_flow_logs ? local.environment_vpc_flow_logs_role_arn : ""
   enable_firewall                     = var.enable_firewall
   firewall_subnet_cidrs               = var.firewall_subnet_cidrs
   firewall_allow_list                 = var.firewall_allow_list
@@ -188,10 +188,10 @@ module "lambda-sns-forwarder" {
   version              = "2.0.1"
   region               = var.region
   label                = var.label
-  subnet_ids           = flatten([local.environment.private_subnet_ids])
-  security_group_id    = var.network_module == "networking" ? local.environment.all_subnets_sg_id : module.security-group.all_subnets_sg_id
-  kms_key              = local.environment.kms_key_arn
-  sns_arn              = var.lambda_sns_forwarder_topic_arn == "" ? local.environment.indico_ipa_topic_arn : var.lambda_sns_forwarder_topic_arn
+  subnet_ids           = flatten([local.environment_private_subnet_ids])
+  security_group_id    = var.network_module == "networking" ? local.environment_all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  kms_key              = local.environment_kms_key_arn
+  sns_arn              = var.lambda_sns_forwarder_topic_arn == "" ? local.environment_indico_ipa_topic_arn : var.lambda_sns_forwarder_topic_arn
   destination_endpoint = var.lambda_sns_forwarder_destination_endpoint
   github_organization  = var.lambda_sns_forwarder_github_organization
   github_repository    = var.lambda_sns_forwarder_github_repository
@@ -206,7 +206,7 @@ module "kms_key" {
   version          = "2.1.2"
   label            = var.label
   additional_tags  = var.additional_tags
-  existing_kms_key = var.load_environment == "" ? var.existing_kms_key : local.environment.kms_key_arn
+  existing_kms_key = var.load_environment == "" ? var.existing_kms_key : local.environment_kms_key_arn
 }
 
 module "security-group" {
@@ -214,7 +214,7 @@ module "security-group" {
   version        = "3.0.0"
   label          = var.label
   vpc_cidr       = var.vpc_cidr
-  vpc_id         = local.environment.indico_vpc_id
+  vpc_id         = local.environment_indico_vpc_id
   network_module = var.network_module
 }
 
@@ -229,7 +229,7 @@ module "s3-storage" {
   uploads_expiry                     = var.uploads_expiry
   include_rox                        = var.include_rox
   enable_backup                      = var.enable_s3_backup
-  backup_role_arn                    = var.enable_s3_backup ? local.environment.s3_backup_role_arn : ""
+  backup_role_arn                    = var.enable_s3_backup ? local.environment_s3_backup_role_arn : ""
   enable_access_logging              = var.enable_s3_access_logging
   bucket_type                        = var.bucket_type
   data_s3_bucket_name_override       = var.data_s3_bucket_name_override
@@ -249,7 +249,7 @@ resource "null_resource" "s3-delete-data-bucket" {
   ]
 
   triggers = {
-    data_bucket_name = local.environment.data_s3_bucket_name
+    data_bucket_name = local.environment_data_s3_bucket_name
   }
 
   provisioner "local-exec" {
@@ -266,7 +266,7 @@ resource "null_resource" "s3-delete-data-pgbackup-bucket" {
   ]
 
   triggers = {
-    pg_backup_bucket_name = local.environment.data_s3_bucket_name
+    pg_backup_bucket_name = local.environment_data_s3_bucket_name
   }
 
   provisioner "local-exec" {
@@ -282,9 +282,9 @@ module "efs-storage" {
   label              = var.efs_filesystem_name == "" ? var.label : var.efs_filesystem_name
   efs_type           = var.efs_type
   additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage" })
-  security_groups    = var.network_module == "networking" ? [local.environment.all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
-  private_subnet_ids = flatten([local.environment.private_subnet_ids])
-  kms_key_arn        = local.environment.kms_key_arn
+  security_groups    = var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
+  private_subnet_ids = flatten([local.environment_private_subnet_ids])
+  kms_key_arn        = local.environment_kms_key_arn
 
 }
 
@@ -295,9 +295,9 @@ module "efs-storage-local-registry" {
   version            = "0.0.1"
   label              = "${var.label}-local-registry"
   additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage-local-registry" })
-  security_groups    = var.network_module == "networking" ? [local.environment.all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
-  private_subnet_ids = flatten([local.environment.private_subnet_ids])
-  kms_key_arn        = local.environment.kms_key_arn
+  security_groups    = var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
+  private_subnet_ids = flatten([local.environment_private_subnet_ids])
+  kms_key_arn        = local.environment_kms_key_arn
 }
 
 module "fsx-storage" {
@@ -308,10 +308,10 @@ module "fsx-storage" {
   additional_tags             = var.additional_tags
   region                      = var.region
   storage_capacity            = var.storage_capacity
-  subnet_id                   = local.environment.private_subnet_ids[0]
-  security_group_id           = var.network_module == "networking" ? local.environment.all_subnets_sg_id : module.security-group.all_subnets_sg_id
-  data_bucket                 = local.environment.data_s3_bucket_name
-  api_models_bucket           = local.environment.api_models_s3_bucket_name
+  subnet_id                   = local.environment_private_subnet_ids[0]
+  security_group_id           = var.network_module == "networking" ? local.environment_all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  data_bucket                 = local.environment_data_s3_bucket_name
+  api_models_bucket           = local.environment_api_models_s3_bucket_name
   kms_key                     = module.kms_key.key
   per_unit_storage_throughput = var.per_unit_storage_throughput
   deployment_type             = var.fsx_deployment_type
@@ -339,10 +339,10 @@ module "iam" {
   region                     = var.region
   cluster_node_policies      = var.cluster_node_policies
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
-  efs_filesystem_id          = [var.include_efs == true ? local.environment.efs_filesystem_id : ""]
+  efs_filesystem_id          = [var.include_efs == true ? local.environment_efs_filesystem_id : ""]
   fsx_arns                   = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
-  s3_buckets                 = compact([local.environment.data_s3_bucket_name, var.include_pgbackup ? local.environment.data_s3_bucket_name : "", var.include_rox ? local.environment.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "", var.include_miniobkp && var.insights_enabled ? local.environment.data_s3_bucket_name : ""])
-  kms_key_arn                = local.environment.kms_key_arn
+  s3_buckets                 = compact([local.environment_data_s3_bucket_name, var.include_pgbackup ? local.environment_data_s3_bucket_name : "", var.include_rox ? local.environment_api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "", var.include_miniobkp && var.insights_enabled ? local.environment_data_s3_bucket_name : ""])
+  kms_key_arn                = local.environment_kms_key_arn
   # EKS cluster role
   create_cluster_iam_role = var.create_eks_cluster_role
   eks_cluster_iam_role    = var.eks_cluster_iam_role_name_override == null ? (var.create_eks_cluster_role ? "eks-cluster-${var.label}-${var.region}" : null) : var.eks_cluster_iam_role_name_override
@@ -376,15 +376,15 @@ module "cluster" {
   default_tags         = merge(coalesce(var.default_tags, {}), coalesce(var.additional_tags, {}))
   cluster_iam_role_arn = local.cluster_iam_role_arn
   generate_kms_key     = var.create_eks_cluster_role ? false : true #Once the cluster is created, we cannot change the kms key.
-  kms_key_arn          = local.environment.kms_key_arn
+  kms_key_arn          = local.environment_kms_key_arn
 
-  vpc_id     = local.environment.indico_vpc_id
+  vpc_id     = local.environment_indico_vpc_id
   az_count   = var.az_count
-  subnet_ids = flatten([local.environment.private_subnet_ids])
+  subnet_ids = flatten([local.environment_private_subnet_ids])
 
   node_groups          = local.node_groups
   node_role_name       = module.iam.node_role_name
-  node_role_arn        = local.environment.node_role_name
+  node_role_arn        = local.environment_node_role_name
   instance_volume_size = var.instance_volume_size
   instance_volume_type = var.instance_volume_type
 
@@ -393,8 +393,8 @@ module "cluster" {
   public_endpoint_enabled  = var.cluster_api_endpoint_public == true ? true : false
   private_endpoint_enabled = var.network_allow_public == true ? false : true
 
-  cluster_security_group_id             = var.network_module == "networking" ? local.environment.all_subnets_sg_id : module.security-group.all_subnets_sg_id
-  cluster_additional_security_group_ids = var.network_module == "networking" ? [local.environment.all_subnets_sg_id] : []
+  cluster_security_group_id             = var.network_module == "networking" ? local.environment_all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  cluster_additional_security_group_ids = var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : []
 }
 
 resource "time_sleep" "wait_1_minutes_after_cluster" {
@@ -546,7 +546,7 @@ module "argo-registration" {
 }
 
 locals {
-  security_group_id = var.include_fsx == true ? tolist(local.environment.fsx_rwx_security_group_ids)[0] : ""
+  security_group_id = var.include_fsx == true ? tolist(local.environment_fsx_rwx_security_group_ids)[0] : ""
   cluster_name      = var.label
   dns_zone_name     = var.dns_zone_name == "" ? lower("${var.aws_account}.${var.domain_suffix}") : var.dns_zone_name
   dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${local.dns_zone_name}") : var.domain_host
