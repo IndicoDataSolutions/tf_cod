@@ -192,7 +192,7 @@ variable "cluster_name" {
 
 variable "k8s_version" {
   type        = string
-  default     = "1.31"
+  default     = "1.32"
   description = "The EKS version to use"
 }
 
@@ -384,7 +384,7 @@ variable "argo_github_team_owner" {
 
 variable "ipa_repo" {
   type    = string
-  default = "https://harbor.devops.indico.io/chartrepo/indico-charts"
+  default = "oci://harbor.devops.indico.io/indico-charts"
 }
 
 variable "ipa_version" {
@@ -576,11 +576,6 @@ variable "pre-reqs-values-yaml-b64" {
   default = "Cg=="
 }
 
-variable "enable_k8s_dashboard" {
-  type    = bool
-  default = true
-}
-
 variable "use_acm" {
   type        = bool
   default     = false
@@ -709,6 +704,12 @@ variable "alerting_email_password" {
   type        = string
   default     = "blank"
   description = "alerting_email_password"
+}
+
+variable "alerting_standard_rules" {
+  type        = string
+  default     = ""
+  description = "alerting_standard_rules"
 }
 
 variable "eks_addon_version_guardduty" {
@@ -971,6 +972,12 @@ variable "s3_endpoint_enabled" {
   type        = bool
   default     = false
   description = "If set to true, an S3 VPC endpoint will be created. If this variable is set, the `region` variable must also be set"
+}
+
+variable "gateway_vpc_endpoints_enabled" {
+  type        = bool
+  default     = false
+  description = "If set to true, gateway VPC endpoints will be created. Note, this will increase network costs and generally is only needed for private clusters."
 }
 
 variable "image_registry" {
@@ -1461,4 +1468,34 @@ variable "load_environment" {
   type        = string
   default     = ""
   description = "The environment to load the cluster from"
+}
+
+variable "indico_storage_class_name" {
+  type        = string
+  default     = "indico-sc"
+  description = "The name of the storage class to use for EFS"
+}
+
+variable "karpenter_enabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling karpenter deployment"
+}
+
+variable "karpenter_version" {
+  type        = string
+  default     = ""
+  description = "Version of the karpenter helm chart"
+}
+
+variable "nginx_ingress_allowed_cidrs" {
+  description = "List of CIDR blocks allowed to access nginx ingress"
+  type        = list(string)
+  default     = [] # Default value matches current static configuration
+}
+
+variable "create_nginx_ingress_security_group" {
+  type        = bool
+  default     = false
+  description = "If enabled this will create a security group for the nginx ingress controller"
 }

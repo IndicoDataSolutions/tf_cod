@@ -96,7 +96,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     performance_bucket = "${jsonencode(var.performance_bucket)}"
     crds_values_yaml_b64 = "${jsonencode(var.crds-values-yaml-b64)}"
     pre_reqs_values_yaml_b64 = "${jsonencode(var.pre-reqs-values-yaml-b64)}"
-    enable_k8s_dashboard = "${jsonencode(var.enable_k8s_dashboard)}"
     use_acm = "${jsonencode(var.use_acm)}"
     acm_arn = "${jsonencode(var.acm_arn)}"
     enable_waf = "${jsonencode(var.enable_waf)}"
@@ -119,6 +118,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     alerting_email_host = "${jsonencode(var.alerting_email_host)}"
     alerting_email_username = "${jsonencode(var.alerting_email_username)}"
     alerting_email_password = "${jsonencode(var.alerting_email_password)}"
+    alerting_standard_rules = "${jsonencode(var.alerting_standard_rules)}"
     eks_addon_version_guardduty = "${jsonencode(var.eks_addon_version_guardduty)}"
     use_static_ssl_certificates = "${jsonencode(var.use_static_ssl_certificates)}"
     ssl_static_secret_name = "${jsonencode(var.ssl_static_secret_name)}"
@@ -158,6 +158,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     sg_tag_name = "${jsonencode(var.sg_tag_name)}"
     sg_tag_value = "${jsonencode(var.sg_tag_value)}"
     s3_endpoint_enabled = "${jsonencode(var.s3_endpoint_enabled)}"
+    gateway_vpc_endpoints_enabled = "${jsonencode(var.gateway_vpc_endpoints_enabled)}"
     image_registry = "${jsonencode(var.image_registry)}"
     secrets_operator_enabled = "${jsonencode(var.secrets_operator_enabled)}"
     vault_secrets_operator_version = "${jsonencode(var.vault_secrets_operator_version)}"
@@ -240,6 +241,11 @@ resource "kubernetes_config_map" "terraform-variables" {
     include_miniobkp = "${jsonencode(var.include_miniobkp)}"
     miniobkp_s3_bucket_name_override = "${jsonencode(var.miniobkp_s3_bucket_name_override)}"
     load_environment = "${jsonencode(var.load_environment)}"
+    indico_storage_class_name = "${jsonencode(var.indico_storage_class_name)}"
+    karpenter_enabled = "${jsonencode(var.karpenter_enabled)}"
+    karpenter_version = "${jsonencode(var.karpenter_version)}"
+    nginx_ingress_allowed_cidrs = "${jsonencode(var.nginx_ingress_allowed_cidrs)}"
+    create_nginx_ingress_security_group = "${jsonencode(var.create_nginx_ingress_security_group)}"
 
     }
   }

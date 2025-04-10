@@ -101,6 +101,7 @@ data "aws_caller_identity" "current" {}
 locals {
   network = var.network_module == "public_networking" ? module.public_networking : module.networking
 
+
   argo_app_name           = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
   argo_smoketest_app_name = lower("${var.aws_account}.${var.region}.${var.label}-smoketest")
   argo_cluster_name       = "${var.aws_account}.${var.region}.${var.label}"
@@ -122,44 +123,50 @@ resource "aws_key_pair" "kp" {
   public_key = tls_private_key.pk.public_key_openssh
 }
 
+
 module "public_networking" {
-  count                = var.direct_connect == false && var.network_module == "public_networking" ? 1 : 0
-  source               = "app.terraform.io/indico/indico-aws-network/mod"
-  version              = "1.2.2"
-  label                = var.label
-  vpc_cidr             = var.vpc_cidr
-  private_subnet_cidrs = var.private_subnet_cidrs
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  subnet_az_zones      = var.subnet_az_zones
-  region               = var.region
-  s3_endpoint_enabled  = var.s3_endpoint_enabled
+  count                         = var.direct_connect == false && var.network_module == "public_networking" ? 1 : 0
+  source                        = "app.terraform.io/indico/indico-aws-network/mod"
+  version                       = "1.2.3"
+  label                         = var.label
+  vpc_cidr                      = var.vpc_cidr
+  private_subnet_cidrs          = var.private_subnet_cidrs
+  public_subnet_cidrs           = var.public_subnet_cidrs
+  subnet_az_zones               = var.subnet_az_zones
+  region                        = var.region
+  s3_endpoint_enabled           = var.s3_endpoint_enabled
+  gateway_vpc_endpoints_enabled = var.gateway_vpc_endpoints_enabled
 }
 
+
 module "networking" {
-  count                      = var.direct_connect == false && var.network_module == "networking" || var.load_environment != "" ? 1 : 0
-  source                     = "app.terraform.io/indico/indico-aws-network/mod"
-  version                    = "2.2.0"
-  label                      = var.label
-  vpc_cidr                   = var.vpc_cidr
-  private_subnet_cidrs       = var.private_subnet_cidrs
-  public_subnet_cidrs        = var.public_subnet_cidrs
-  subnet_az_zones            = var.subnet_az_zones
-  region                     = var.region
-  allow_public               = var.network_allow_public
-  network_type               = var.network_type
-  load_vpc_id                = var.load_vpc_id
-  private_subnet_tag_name    = var.private_subnet_tag_name
-  private_subnet_tag_value   = var.private_subnet_tag_value
-  public_subnet_tag_name     = var.public_subnet_tag_name
-  public_subnet_tag_value    = var.public_subnet_tag_value
-  sg_tag_name                = var.sg_tag_name
-  sg_tag_value               = var.sg_tag_value
-  enable_vpc_flow_logs       = var.enable_vpc_flow_logs
-  vpc_flow_logs_iam_role_arn = var.vpc_flow_logs_iam_role_arn != "" ? var.vpc_flow_logs_iam_role_arn : var.enable_vpc_flow_logs ? module.iam.vpc_flow_logs_role_arn : ""
-  enable_firewall            = var.enable_firewall
-  firewall_subnet_cidrs      = var.firewall_subnet_cidrs
-  firewall_allow_list        = var.firewall_allow_list
-  s3_endpoint_enabled        = var.s3_endpoint_enabled
+  count                               = var.direct_connect == false && var.network_module == "networking" || var.load_environment != "" ? 1 : 0
+  source                              = "app.terraform.io/indico/indico-aws-network/mod"
+  version                             = "2.4.0"
+  label                               = var.label
+  vpc_cidr                            = var.vpc_cidr
+  private_subnet_cidrs                = var.private_subnet_cidrs
+  public_subnet_cidrs                 = var.public_subnet_cidrs
+  subnet_az_zones                     = var.subnet_az_zones
+  region                              = var.region
+  allow_public                        = var.network_allow_public
+  network_type                        = var.network_type
+  load_vpc_id                         = var.load_vpc_id
+  private_subnet_tag_name             = var.private_subnet_tag_name
+  private_subnet_tag_value            = var.private_subnet_tag_value
+  public_subnet_tag_name              = var.public_subnet_tag_name
+  public_subnet_tag_value             = var.public_subnet_tag_value
+  sg_tag_name                         = var.sg_tag_name
+  sg_tag_value                        = var.sg_tag_value
+  enable_vpc_flow_logs                = var.enable_vpc_flow_logs
+  vpc_flow_logs_iam_role_arn          = var.vpc_flow_logs_iam_role_arn != "" ? var.vpc_flow_logs_iam_role_arn : var.enable_vpc_flow_logs ? module.iam.vpc_flow_logs_role_arn : ""
+  enable_firewall                     = var.enable_firewall
+  firewall_subnet_cidrs               = var.firewall_subnet_cidrs
+  firewall_allow_list                 = var.firewall_allow_list
+  s3_endpoint_enabled                 = var.s3_endpoint_enabled
+  gateway_vpc_endpoints_enabled       = var.gateway_vpc_endpoints_enabled
+  create_nginx_ingress_security_group = var.create_nginx_ingress_security_group
+  nginx_ingress_allowed_cidrs         = var.nginx_ingress_allowed_cidrs
 }
 
 module "sqs_sns" {
@@ -322,7 +329,7 @@ module "fsx-storage" {
 
 module "iam" {
   source  = "app.terraform.io/indico/indico-aws-iam/mod"
-  version = "0.0.12"
+  version = "0.0.14"
 
   # EKS node role
   create_node_role           = var.create_node_role
@@ -353,6 +360,9 @@ module "iam" {
   # Iam flow logs role
   create_vpc_flow_logs_role = var.create_vpc_flow_logs_role
   vpc_flow_logs_role_name   = var.vpc_flow_logs_role_name_override
+  #Karpenter
+  karpenter_enabled = var.karpenter_enabled
+  account_id        = data.aws_caller_identity.current.account_id
 }
 
 moved {
@@ -382,7 +392,7 @@ moved {
 
 module "cluster" {
   source               = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version              = "9.0.34"
+  version              = "9.0.35"
   label                = var.label
   region               = var.region
   cluster_version      = var.k8s_version

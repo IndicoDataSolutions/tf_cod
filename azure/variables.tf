@@ -134,7 +134,7 @@ variable "argo_github_team_owner" {
 
 variable "ipa_repo" {
   type    = string
-  default = "https://harbor.devops.indico.io/chartrepo/indico-charts-dev"
+  default = "oci://harbor.devops.indico.io/indico-charts"
 }
 
 variable "ipa_version" {
@@ -206,7 +206,7 @@ variable "svp_client_secret" {
 
 variable "k8s_version" {
   type        = string
-  default     = "1.31"
+  default     = "1.32"
   description = "The version of the kubernetes cluster"
 }
 
@@ -307,11 +307,6 @@ variable "admin_group_name" {
   type        = string
   default     = "DevOps"
   description = "Name of group that will own the cluster"
-}
-
-variable "enable_k8s_dashboard" {
-  type    = bool
-  default = true
 }
 
 variable "snapshots_resource_group_name" {

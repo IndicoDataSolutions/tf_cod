@@ -20,16 +20,7 @@ locals {
         driver: efs.csi.aws.com
         volumeHandle: "${module.efs-storage[0].efs_filesystem_id}"
     indicoStorageClass:
-      enabled: true
-      name: indico-sc
-      provisioner: efs.csi.aws.com
-      parameters:
-        provisioningMode: efs-ap
-        fileSystemId: "${module.efs-storage[0].efs_filesystem_id}"
-        directoryPerms: "700"
-        gidRangeStart: "1000" # optional
-        gidRangeEnd: "2000" # optional
-        basePath: "/dynamic_provisioning" # optional
+      name: ${var.indico_storage_class_name}
  EOF
   ] : []
   fsx_values = var.include_fsx == true ? [<<EOF
@@ -45,18 +36,11 @@ locals {
           mountname: "${module.fsx-storage[0].fsx_rwx_mount_name}"
         volumeHandle: "${module.fsx-storage[0].fsx_rwx_id}"
     indicoStorageClass:
-      enabled: true
-      name: indico-sc
-      provisioner: fsx.csi.aws.com
-      parameters:
-        securityGroupIds: ${local.security_group_id}
-        subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}
+      name: ${var.indico_storage_class_name}
  EOF
   ] : []
   on_prem_values = var.on_prem_test == true ? [<<EOF
   storage:
-    indicoStorageClass:
-      enabled: false
     existingPVC:
       name: read-write
       namespace: default
@@ -142,7 +126,8 @@ external-dns:
   domainFilters:
     - ${local.dns_zone_name}
 
-  provider: aws
+  provider:
+    name: aws
   env:
     - name: AWS_DEFAULT_REGION
       value: ${var.region}
@@ -171,7 +156,8 @@ external-dns:
   domainFilters:
     - ${local.dns_zone_name}
 
-  provider: aws
+  provider:
+    name: aws
   env:
     - name: AWS_DEFAULT_REGION
       value: ${var.region}
@@ -192,7 +178,8 @@ alternate-external-dns:
     - "--exclude-domains=${var.aws_account}.indico.io"
     - "--aws-assume-role=${var.aws_primary_dns_role_arn}"
 
-  provider: aws
+  provider:
+    name: aws
   env:
     - name: AWS_DEFAULT_REGION
       value: ${var.region}
@@ -332,6 +319,29 @@ YAML
       yaml_body
     ]
   }
+}
+
+module "karpenter" {
+  count = var.karpenter_enabled == true ? 1 : 0
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
+  source               = "./modules/common/karpenter"
+  cluster_name         = var.label
+  node_role_arn        = module.iam.node_role_arn
+  node_role_name       = module.iam.node_role_name
+  k8s_version          = var.k8s_version
+  az_count             = var.az_count
+  subnet_ids           = flatten([local.network[0].private_subnet_ids])
+  security_group_ids   = distinct(compact(concat([module.cluster.node_security_group_id], var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [], [module.cluster.cluster_security_group_id])))
+  helm_registry        = var.ipa_repo
+  karpenter_version    = var.karpenter_version
+  default_tags         = var.default_tags
+  instance_volume_size = var.instance_volume_size
+  instance_volume_type = var.instance_volume_type
+  kms_key_id           = module.kms_key.key_arn
+  node_pools           = local.node_pools
 }
 
 # Once (if) the secrets operator is set up, we can deploy the common charts
@@ -515,7 +525,39 @@ external-secrets:
   EOF
   ]
 
-  indico_pre_reqs_values = [<<EOF
+  indico_storage_class_values = var.include_fsx ? [<<EOF
+storage:
+  indicoStorageClass:
+    enabled: true
+    name: ${var.indico_storage_class_name}
+    provisioner: fsx.csi.aws.com
+    parameters:
+      securityGroupIds: ${local.security_group_id}
+      subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}
+EOF
+    ] : var.include_efs ? [<<EOF
+storage:
+  indicoStorageClass:
+    enabled: true
+    name: ${var.indico_storage_class_name}
+    provisioner: efs.csi.aws.com
+    parameters:
+      provisioningMode: efs-ap
+      fileSystemId: ${module.efs-storage[0].efs_filesystem_id}
+      directoryPerms: "700"
+      gidRangeStart: "1000"
+      gidRangeEnd: "2000"
+      basePath: "/dynamic_provisioning"
+EOF
+    ] : [<<EOF
+storage:
+  indicoStorageClass:
+    enabled: false
+EOF
+  ]
+
+
+  indico_pre_reqs_values = concat(local.indico_storage_class_values, [<<EOF
 global:
   host: ${local.dns_name}
   image:
@@ -598,7 +640,7 @@ aws-load-balancer-controller:
     vpcId: ${local.network[0].indico_vpc_id}
     region: ${var.region}
 cluster-autoscaler:
-  enabled: true
+  enabled: ${var.karpenter_enabled == false ? true : false}
   cluster-autoscaler:
     awsRegion: ${var.region}
     image:
@@ -641,7 +683,7 @@ reflector:
   image:
     repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
   EOF
-  ]
+  ])
 
   monitoring_values = var.monitoring_enabled ? [<<EOF
 global:
@@ -756,7 +798,8 @@ module "indico-common" {
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
     module.secrets-operator-setup,
-    kubectl_manifest.gp2-storageclass
+    kubectl_manifest.gp2-storageclass,
+    module.karpenter
   ]
   source                           = "./modules/common/indico-common"
   argo_enabled                     = var.argo_enabled
@@ -781,6 +824,108 @@ module "indico-common" {
 
 # With the common charts are installed, we can then move on to installing intake and/or insights
 locals {
+  internal_elb = var.network_allow_public == false ? true : false
+  backend_port = var.acm_arn != "" ? "http" : "https"
+  enableHttp   = var.acm_arn != "" || var.use_nlb == true ? false : true
+  loadbalancer_annotation_config = var.create_nginx_ingress_security_group == true && var.nginx_ingress_allowed_cidrs != [] ? (<<EOT
+annotations:
+  service.beta.kubernetes.io/aws-load-balancer-security-groups: "${local.network[0].nginx_ingress_security_group_id}"
+  EOT
+  ) : (<<EOT
+annotations: {}
+  EOT
+  )
+  lb_config    = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
+  loadbalancer_config = var.use_nlb == true ? (<<EOT
+      ${indent(6, local.loadbalancer_annotation_config)}
+      external:
+        enabled: ${var.network_allow_public}
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
+          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+      internal:
+        enabled: ${local.internal_elb}
+        annotations:
+          # Create internal NLB
+          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
+          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
+  EOT
+    ) : (<<EOT
+      ${indent(6, local.loadbalancer_annotation_config)}
+      external:
+        enabled: ${var.network_allow_public}
+      internal:
+        enabled: ${local.internal_elb}
+        annotations:
+          # Create internal ELB
+          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
+  EOT
+  )
+  acm_loadbalancer_config = (<<EOT
+      ${indent(6, local.loadbalancer_annotation_config)}
+      external:
+        enabled: ${var.network_allow_public}
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
+          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+      internal:
+        enabled: ${local.internal_elb}
+        annotations:
+          # Create internal NLB
+          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
+          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+          service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "${var.acm_arn}"
+          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
+  EOT
+  )
+  alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
+noExtraConfigs: true
+  EOT
+    ) : (<<EOT
+alerting:
+  enabled: true
+  email:
+    enabled: ${var.alerting_email_enabled}
+    smarthost: '${var.alerting_email_host}'
+    from: '${var.alerting_email_from}'
+    auth_username: '${var.alerting_email_username}'
+    auth_password: '${var.alerting_email_password}'
+    targetEmail: "${var.alerting_email_to}"
+  slack:
+    enabled: ${var.alerting_slack_enabled}
+    apiUrl: ${var.alerting_slack_token}
+    channel: ${var.alerting_slack_channel}
+  pagerDuty:
+    enabled: ${var.alerting_pagerduty_enabled}
+    integrationKey: ${var.alerting_pagerduty_integration_key}
+    integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
+${local.standard_rules}
+EOT
+  )
+  standard_rules = var.alerting_standard_rules != "" ? (<<EOT
+  standardRules:
+    ${indent(4, base64decode(var.alerting_standard_rules))}
+EOT
+    ) : (<<EOT
+  noExtraConfigs: true
+  EOT
+  )
   ipa_pre_reqs_values = concat(local.storage_spec, [<<EOF
 global:
   image:
@@ -891,6 +1036,8 @@ rabbitmq:
   rabbitmq:
     image:
       registry: ${var.image_registry}
+    persistence:
+      storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
   EOF
   ])
 
@@ -1010,6 +1157,12 @@ module "intake_smoketests" {
   helm_values            = indent(10, trimspace(local.smoketests_values))
 }
 
+resource "random_password" "minio-password" {
+  count   = var.insights_enabled ? 1 : 0
+  length  = 16
+  special = false
+}
+
 locals {
   insights_pre_reqs_values = [<<EOF
 crunchy-postgres:
@@ -1099,14 +1252,10 @@ crunchy-postgres:
 ingress:
   useStaticCertificate: false
   secretName: indico-ssl-static-cert
-  tls.crt: #base64 encoded value of certificate chain
-  tls.key: #base64 encoded value of certificate key
 minio:
-  topology:
-    volumeSize: 128Gi
   storage:
-    accessKey: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
-    secretKey: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
+    accessKey: insights
+    secretKey: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
   backup:
     enabled: ${var.include_miniobkp}
     schedule: "0 4 * * 2" # This schedules the job to run at 4:00 AM every Tuesday
@@ -1121,20 +1270,28 @@ weaviate:
       weaviate-backup:
         enabled: true
   backupStorageConfig:
-    accessKey: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
-    secretKey: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
+    accessKey: insights
+    secretKey: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
     url: http://minio-tenant-hl.insights.svc.cluster.local:9000
   weaviate:
     env:
-      GOMEMLIMIT: "31GiB" # 1 less than the hard limit on the used nodes 
+      # 1 less than the hard limit of the weaviate node group type
+      GOMEMLIMIT: "31GiB"
+    # TODO: switch this to a dedicated weaviate backup bucket
     backups:
       s3:
         enabled: true
         envconfig:
           BACKUP_S3_ENDPOINT: minio-tenant-hl.insights.svc.cluster.local:9000
         secrets:
-          AWS_ACCESS_KEY_ID: <path:tools/argo/data/indico-dev/ins-dev/storage#access_key_id>
-          AWS_SECRET_ACCESS_KEY: <path:tools/argo/data/indico-dev/ins-dev/storage#secret_access_key>
+          AWS_ACCESS_KEY_ID: insights
+          AWS_SECRET_ACCESS_KEY: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
+rabbitmq:
+  rabbitmq:
+    image:
+      registry: ${var.image_registry}
+    persistence:
+      storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
   EOF
   ]
 
@@ -1143,15 +1300,6 @@ global:
   host: ${lower("${var.label}.${var.region}.${var.aws_account}.indico.io")}
   features:
     askMyDocument: true
-insights-edge:
-  additionalAllowedOrigins:
-    - https://local.indico.io:1234
-server:
-  services:
-    lagoon:
-      env:
-        FIELD_AUTOCONFIRM_CONFIDENCE: 0.8
-        FIELD_CONFIG_PATH: "fields_config.yaml"
 ask-my-docs:
   llmConfig:
     llm: indico-azure-instance
@@ -1298,7 +1446,7 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
     environment = {
       HARBOR_API_TOKEN = jsondecode(data.vault_kv_secret_v2.harbor-api-token[0].data_json)["bearer_token"]
     }
-    command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+    command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${replace(data.external.git_information.result.branch, "/", "-")}-${substr(data.external.git_information.result.sha, 0, 8)}"
   }
 }
 
@@ -1308,7 +1456,7 @@ output "harbor-api-token" {
 }
 
 output "smoketest_chart_version" {
-  value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
+  value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${replace(data.external.git_information.result.branch, "/", "-")}-${substr(data.external.git_information.result.sha, 0, 8)}"
 }
 
 data "vault_kv_secret_v2" "account-robot-credentials" {

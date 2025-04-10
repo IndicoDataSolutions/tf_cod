@@ -42,6 +42,10 @@ spec:
       jsonPointers:
         - /spec/replicas
       kind: Deployment
+    - group: apps
+      kind: Deployment
+      jqPathExpressions:
+      - .spec.template.spec.containers[].env[] | select((.name | contains("STAKATER_")))
   destination:
     server: ${var.argo_server}
     namespace: ${var.namespace}
@@ -54,7 +58,7 @@ spec:
       - ServerSideApply=true
   source:
     chart: ${var.chart_name}
-    repoURL: ${var.chart_repo}
+    repoURL: ${replace(var.chart_repo, "oci://", "")}
     targetRevision: ${var.chart_version}
     plugin:
       name: argocd-vault-plugin-helm-values-expand-no-build

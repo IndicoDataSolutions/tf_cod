@@ -1,5 +1,5 @@
 locals {
-  internal_elb = var.network_allow_public == false ? true : false
+  
   # thanos_config = var.thanos_enabled == true ? (<<EOT
   #     thanos: # this is the one being used
   #       blockSize: 5m
@@ -20,87 +20,7 @@ locals {
   EOT
   )
 
-  backend_port = var.acm_arn != "" ? "http" : "https"
-  enableHttp   = var.acm_arn != "" || var.use_nlb == true ? false : true
-  lb_config    = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
-  loadbalancer_config = var.use_nlb == true ? (<<EOT
-      external:
-        enabled: ${var.network_allow_public}
-        annotations:
-          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
-          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
-          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
-          service.beta.kubernetes.io/aws-load-balancer-type: nlb
-          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
-      internal:
-        enabled: ${local.internal_elb}
-        annotations:
-          # Create internal NLB
-          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
-          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
-          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
-          service.beta.kubernetes.io/aws-load-balancer-type: nlb
-          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
-          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
-  EOT
-    ) : (<<EOT
-      external:
-        enabled: ${var.network_allow_public}
-      internal:
-        enabled: ${local.internal_elb}
-        annotations:
-          # Create internal ELB
-          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
-  EOT
-  )
-  acm_loadbalancer_config = (<<EOT
-      external:
-        enabled: ${var.network_allow_public}
-        annotations:
-          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
-          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
-          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
-          service.beta.kubernetes.io/aws-load-balancer-type: nlb
-          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
-      internal:
-        enabled: ${local.internal_elb}
-        annotations:
-          # Create internal NLB
-          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
-          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
-          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
-          service.beta.kubernetes.io/aws-load-balancer-type: nlb
-          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
-          service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "${var.acm_arn}"
-          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
-  EOT
-  )
-  alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
-noExtraConfigs: true
-  EOT
-    ) : (<<EOT
-alerting:
-  enabled: true
-  email:
-    enabled: ${var.alerting_email_enabled}
-    smarthost: '${var.alerting_email_host}'
-    from: '${var.alerting_email_from}'
-    auth_username: '${var.alerting_email_username}'
-    auth_password: '${var.alerting_email_password}'
-    targetEmail: "${var.alerting_email_to}"
-  slack:
-    enabled: ${var.alerting_slack_enabled}
-    apiUrl: ${var.alerting_slack_token}
-    channel: ${var.alerting_slack_channel}
-  pagerDuty:
-    enabled: ${var.alerting_pagerduty_enabled}
-    integrationKey: ${var.alerting_pagerduty_integration_key}
-    integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
-EOT
-  )
+  
   alertmanager_tls = var.acm_arn == "" ? (<<EOT
       tls:
         - secretName: ${var.ssl_static_secret_name}
