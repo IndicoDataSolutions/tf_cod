@@ -108,11 +108,11 @@ output "kms_key_arn" {
   value = local.environment_kms_key_arn
 }
 
-output "kms_key" {
+output "kms_key_key" {
   value = local.environment_kms_key_key
 }
 
-output "kms_key_id" {
+output "kms_key_key_id" {
   value = local.environment_kms_key_key_id
 }
 
