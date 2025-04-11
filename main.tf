@@ -140,7 +140,7 @@ module "public_networking" {
 
 
 module "networking" {
-  count                               = var.direct_connect == false && var.network_module == "networking" || var.load_environment != "" ? 1 : 0
+  count                               = var.direct_connect == false && var.network_module == "networking" || var.load_environment == "" ? 1 : 0
   source                              = "app.terraform.io/indico/indico-aws-network/mod"
   version                             = "2.4.0"
   label                               = var.label

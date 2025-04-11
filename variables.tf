@@ -1028,7 +1028,7 @@ variable "readapi_customer" {
 
 variable "create_guardduty_vpc_endpoint" {
   type        = bool
-  default     = true
+  default     = false
   description = "If true this will create a vpc endpoint for guardduty."
 }
 
