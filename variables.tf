@@ -399,7 +399,7 @@ variable "ipa_smoketest_values" {
 
 variable "ipa_smoketest_repo" {
   type    = string
-  default = "oci://https://harbor.devops.indico.io/chartrepo/indico-charts"
+  default = "oci://harbor.devops.indico.io/indico-charts"
 }
 
 variable "ipa_smoketest_version" {
