@@ -367,13 +367,7 @@ module "iam" {
   account_id        = data.aws_caller_identity.current.account_id
 }
 
-resource "time_sleep" "wait_for_iam" {
-  depends_on = [module.iam]
-  create_duration = "1m"
-}
-
 module "cluster" {
-  depends_on = [time_sleep.wait_for_iam]
   source               = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
   version              = "9.0.35"
   label                = var.label
