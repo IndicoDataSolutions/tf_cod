@@ -34,6 +34,7 @@ locals {
   environment_fsx_rwx_volume_handle           = var.load_environment == "" ? var.include_fsx == true ? module.fsx-storage[0].fsx_rwx_id : "null" : data.terraform_remote_state.environment[0].outputs.fsx_storage_fsx_rwx_volume_handle
   environment_fsx_rwx_dns_name                = var.load_environment == "" ? var.include_fsx == true ? module.fsx-storage[0].fsx_rwx_dns_name : "null" : data.terraform_remote_state.environment[0].outputs.fsx_storage_fsx_rwx_dns_name
   environment_fsx_rox_id                      = var.load_environment == "" ? var.include_fsx == true ? module.fsx-storage[0].fsx_rox_id : "null" : data.terraform_remote_state.environment[0].outputs.fsx_rox_id
+  environment_fsx_rox_arn                     = var.load_environment == "" ? var.include_fsx == true ? module.fsx-storage[0].fsx_rox_arn : "null" : data.terraform_remote_state.environment[0].outputs.fsx_rox_arn
   environment_cluster_role_name               = var.load_environment == "" ? coalesce(module.iam[0].cluster_role_name, "null") : data.terraform_remote_state.environment[0].outputs.cluster_role_name
   environment_cluster_role_arn                = var.load_environment == "" ? coalesce(module.iam[0].cluster_role_arn, "null") : data.terraform_remote_state.environment[0].outputs.cluster_role_arn
   environment_node_role_name                  = var.load_environment == "" ? coalesce(module.iam[0].node_role_name, "null") : data.terraform_remote_state.environment[0].outputs.node_role_name
