@@ -341,7 +341,7 @@ module "iam" {
   cluster_node_policies      = var.cluster_node_policies
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
   efs_filesystem_id          = [var.include_efs == true ? local.environment_efs_filesystem_id : ""]
-  fsx_arns                   = [var.include_rox ? local.environment_fsx_rox.arn : "", var.include_fsx == true ? local.environment_fsx_rwx_arn : ""]
+  fsx_arns                   = [var.include_rox ? local.environment_fsx_rox_arn : "", var.include_fsx == true ? local.environment_fsx_rwx_arn : ""]
   s3_buckets                 = compact([local.environment_data_s3_bucket_name, var.include_pgbackup ? local.environment_data_s3_bucket_name : "", var.include_rox ? local.environment_api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "", var.include_miniobkp && var.insights_enabled ? local.environment_data_s3_bucket_name : ""])
   kms_key_arn                = local.environment_kms_key_arn
   # EKS cluster role
