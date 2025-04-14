@@ -192,6 +192,11 @@ output "fsx_rox_id" {
   value       = local.environment_fsx_rox_id
 }
 
+output "fsx_rox_arn" {
+  description = "ARN of the read only filesystem"
+  value       = local.environment_fsx_rox_arn
+}
+
 ## IAM outputs
 
 output "cluster_role_name" {
