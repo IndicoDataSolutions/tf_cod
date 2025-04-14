@@ -341,7 +341,7 @@ module "iam" {
   cluster_node_policies      = var.cluster_node_policies
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
   efs_filesystem_id          = [var.include_efs == true ? local.environment_efs_filesystem_id : ""]
-  fsx_arns                   = [var.include_rox ? module.fsx-storage[0].fsx-rox.arn : "", var.include_fsx == true ? module.fsx-storage[0].fsx-rwx.arn : ""]
+  fsx_arns                   = [var.include_rox ? local.environment_fsx-rox.arn : "", var.include_fsx == true ? local.environment_fsx-rwx.arn : ""]
   s3_buckets                 = compact([local.environment_data_s3_bucket_name, var.include_pgbackup ? local.environment_data_s3_bucket_name : "", var.include_rox ? local.environment_api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "", var.include_miniobkp && var.insights_enabled ? local.environment_data_s3_bucket_name : ""])
   kms_key_arn                = local.environment_kms_key_arn
   # EKS cluster role
@@ -367,15 +367,20 @@ module "iam" {
   account_id        = data.aws_caller_identity.current.account_id
 }
 
+resource "time_sleep" "wait_for_iam" {
+  depends_on = [module.iam]
+  create_duration = "1m"
+}
 
 module "cluster" {
+  depends_on = [time_sleep.wait_for_iam]
   source               = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
   version              = "9.0.35"
   label                = var.label
   region               = var.region
   cluster_version      = var.k8s_version
   default_tags         = merge(coalesce(var.default_tags, {}), coalesce(var.additional_tags, {}))
-  cluster_iam_role_arn = local.cluster_iam_role_arn
+  cluster_iam_role_arn = local.environment_cluster_role_arn == "null" ? null : local.environment_cluster_role_arn
   generate_kms_key     = var.create_eks_cluster_role ? false : true #Once the cluster is created, we cannot change the kms key.
   kms_key_arn          = local.environment_kms_key_arn
 
