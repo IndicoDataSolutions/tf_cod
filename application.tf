@@ -1494,7 +1494,7 @@ resource "kubernetes_storage_class_v1" "local-registry" {
 resource "aws_efs_access_point" "local-registry" {
   count = var.local_registry_enabled == true ? 1 : 0
 
-  depends_on = [module.efs-storage-local-registry[0]]
+  depends_on = [module.efs-storage[0]]
 
   root_directory {
     path = "/registry"
@@ -1509,7 +1509,7 @@ resource "aws_efs_access_point" "local-registry" {
     gid = 1000
     uid = 1000
   }
-  file_system_id = module.efs-storage-local-registry[0].efs_filesystem_id
+  file_system_id = local.environment_efs_filesystem_id
 }
 
 
@@ -1540,7 +1540,7 @@ resource "kubernetes_persistent_volume_claim" "local-registry" {
 resource "kubernetes_persistent_volume" "local-registry" {
 
   depends_on = [
-    module.efs-storage-local-registry[0]
+    module.efs-storage[0]
   ]
 
   count = var.local_registry_enabled == true ? 1 : 0
@@ -1560,7 +1560,7 @@ resource "kubernetes_persistent_volume" "local-registry" {
     persistent_volume_source {
       csi {
         driver        = "efs.csi.aws.com"
-        volume_handle = "${module.efs-storage-local-registry[0].efs_filesystem_id}::${aws_efs_access_point.local-registry[0].id}"
+        volume_handle = "${local.environment_efs_filesystem_id}::${aws_efs_access_point.local-registry[0].id}"
       }
     }
   }

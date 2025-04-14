@@ -289,18 +289,6 @@ module "efs-storage" {
 
 }
 
-#We should be able to deprecate this module and use the efs-storage module instead. DEV-13235
-module "efs-storage-local-registry" {
-  count              = var.local_registry_enabled == true ? 1 : 0
-  source             = "app.terraform.io/indico/indico-aws-efs/mod"
-  version            = "0.0.1"
-  label              = "${var.label}-local-registry"
-  additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage-local-registry" })
-  security_groups    = var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
-  private_subnet_ids = flatten([local.environment_private_subnet_ids])
-  kms_key_arn        = local.environment_kms_key_arn
-}
-
 module "fsx-storage" {
   count                       = var.include_fsx == true && var.load_environment == "" ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-fsx/mod"
