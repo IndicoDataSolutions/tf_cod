@@ -1021,7 +1021,7 @@ crunchy-postgres:
       repos:
       - name: repo1
         s3:
-          bucket: ${local.environment_data_s3_bucket_name}
+          bucket: ${local.environment_pgbackup_s3_bucket_name}
           endpoint: s3.${var.region}.amazonaws.com
           region: ${var.region}
         schedules:
@@ -1230,7 +1230,7 @@ crunchy-postgres:
       repos:
       - name: repo2
         s3:
-          bucket: ${local.environment_data_s3_bucket_name}
+          bucket: ${local.environment_pgbackup_s3_bucket_name}
           endpoint: s3.${var.region}.amazonaws.com
           region: ${var.region}
         schedules:
@@ -1263,7 +1263,7 @@ minio:
     image:
       repository: harbor.devops.indico.io/docker.io/amazon/aws-cli
       tag: 2.22.4
-    awsBucket: ${local.environment_data_s3_bucket_name}
+    awsBucket: ${local.environment_miniobkp_s3_bucket_name}
 weaviate:
   cronjob:
     services:
