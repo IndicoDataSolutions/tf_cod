@@ -329,7 +329,7 @@ module "karpenter" {
   ]
   source               = "./modules/common/karpenter"
   cluster_name         = var.label
-  node_role_arn        = local.environment_node_role_name
+  node_role_arn        = local.environment_node_role_arn
   node_role_name       = local.environment_node_role_name
   k8s_version          = var.k8s_version
   az_count             = var.az_count
@@ -827,7 +827,7 @@ locals {
   internal_elb = var.network_allow_public == false ? true : false
   backend_port = var.acm_arn != "" ? "http" : "https"
   enableHttp   = var.acm_arn != "" || var.use_nlb == true ? false : true
-  loadbalancer_annotation_config = var.create_nginx_ingress_security_group == true && var.nginx_ingress_allowed_cidrs != [] ? (<<EOT
+  loadbalancer_annotation_config = var.create_nginx_ingress_security_group == true && local.environment_nginx_ingress_allowed_cidrs != [] ? (<<EOT
 annotations:
   service.beta.kubernetes.io/aws-load-balancer-security-groups: "${local.environment_nginx_ingress_security_group_id}"
   EOT
