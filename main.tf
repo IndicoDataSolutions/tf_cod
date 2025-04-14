@@ -381,7 +381,7 @@ module "cluster" {
   public_endpoint_enabled  = var.cluster_api_endpoint_public == true ? true : false
   private_endpoint_enabled = var.network_allow_public == true ? false : true
 
-  cluster_security_group_id             = var.network_module == "networking" ? local.environment_all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  cluster_security_group_id             = local.environment_all_subnets_sg_id
   cluster_additional_security_group_ids = var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : []
 }
 
