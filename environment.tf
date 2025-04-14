@@ -13,7 +13,7 @@ locals {
   environment_indico_vpc_id                   = var.load_environment == "" ? local.network[0].indico_vpc_id : data.terraform_remote_state.environment[0].outputs.indico_vpc_id
   environment_private_subnet_ids              = var.load_environment == "" ? local.network[0].private_subnet_ids : data.terraform_remote_state.environment[0].outputs.private_subnet_ids
   environment_public_subnet_ids               = var.load_environment == "" ? local.network[0].public_subnet_ids : data.terraform_remote_state.environment[0].outputs.public_subnet_ids
-  environment_all_subnets_sg_id               = var.load_environment == "" ? local.network[0].all_subnets_sg_id : data.terraform_remote_state.environment[0].outputs.all_subnets_sg_id
+  environment_all_subnets_sg_id               = var.load_environment == "" ? var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id : data.terraform_remote_state.environment[0].outputs.all_subnets_sg_id : data.terraform_remote_state.environment[0].outputs.all_subnets_sg_id
   environment_indico_ipa_topic_arn            = var.load_environment == "" ? var.sqs_sns == true ? module.sqs_sns[0].indico_ipa_topic_arn : "null" : data.terraform_remote_state.environment[0].outputs.indico_ipa_topic_arn
   environment_indico_ipa_queue_arn            = var.load_environment == "" ? var.sqs_sns == true ? module.sqs_sns[0].indico_ipa_queue_arn : "null" : data.terraform_remote_state.environment[0].outputs.indico_ipa_queue_arn
   environment_indico_sqs_sns_policy_name      = var.load_environment == "" ? var.sqs_sns == true ? module.sqs_sns[0].indico_sqs_sns_policy_name : "null" : data.terraform_remote_state.environment[0].outputs.indico_sqs_sns_policy_name
