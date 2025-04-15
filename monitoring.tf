@@ -1,5 +1,5 @@
 locals {
-  
+
   # thanos_config = var.thanos_enabled == true ? (<<EOT
   #     thanos: # this is the one being used
   #       blockSize: 5m
@@ -20,7 +20,7 @@ locals {
   EOT
   )
 
-  
+
   alertmanager_tls = var.acm_arn == "" ? (<<EOT
       tls:
         - secretName: ${var.ssl_static_secret_name}

@@ -1464,6 +1464,12 @@ variable "miniobkp_s3_bucket_name_override" {
   description = "The name of the existing S3 bucket to be loaded and used as the minio backup bucket"
 }
 
+variable "load_environment" {
+  type        = string
+  default     = ""
+  description = "The environment to load the cluster from"
+}
+
 variable "indico_storage_class_name" {
   type        = string
   default     = "indico-sc"

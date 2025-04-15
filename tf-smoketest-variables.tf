@@ -240,6 +240,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     indico_pre_reqs_values_yaml_b64 = "${jsonencode(var.indico-pre-reqs-values-yaml-b64)}"
     include_miniobkp = "${jsonencode(var.include_miniobkp)}"
     miniobkp_s3_bucket_name_override = "${jsonencode(var.miniobkp_s3_bucket_name_override)}"
+    load_environment = "${jsonencode(var.load_environment)}"
     indico_storage_class_name = "${jsonencode(var.indico_storage_class_name)}"
     karpenter_enabled = "${jsonencode(var.karpenter_enabled)}"
     karpenter_version = "${jsonencode(var.karpenter_version)}"

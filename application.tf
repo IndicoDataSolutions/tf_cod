@@ -18,7 +18,7 @@ locals {
       mountOptions: []
       csi:
         driver: efs.csi.aws.com
-        volumeHandle: "${module.efs-storage[0].efs_filesystem_id}"
+        volumeHandle: "${local.environment_efs_filesystem_id}"
     indicoStorageClass:
       name: ${var.indico_storage_class_name}
  EOF
@@ -32,9 +32,9 @@ locals {
       csi:
         driver: fsx.csi.aws.com
         volumeAttributes:
-          dnsname: "${module.fsx-storage[0].fsx_rwx_dns_name}"
-          mountname: "${module.fsx-storage[0].fsx_rwx_mount_name}"
-        volumeHandle: "${module.fsx-storage[0].fsx_rwx_id}"
+          dnsname: "${local.environment_fsx_rwx_dns_name}"
+          mountname: "${local.environment_fsx_rwx_mount_name}"
+        volumeHandle: "${local.environment_fsx_rwx_id}"
     indicoStorageClass:
       name: ${var.indico_storage_class_name}
  EOF
@@ -59,8 +59,8 @@ app-edge:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
   alternateDomain: ""
   cspApprovedSources:
-    - ${module.s3-storage.data_s3_bucket_name}.s3.${var.region}.amazonaws.com
-    - ${module.s3-storage.data_s3_bucket_name}.s3.amazonaws.com
+    - ${local.environment_data_s3_bucket_name}.s3.${var.region}.amazonaws.com
+    - ${local.environment_data_s3_bucket_name}.s3.amazonaws.com
   service:
     type: "NodePort"
     ports:
@@ -83,7 +83,7 @@ app-edge:
           hosts:
             - ${local.dns_name}
       alb:
-        publicSubnets: ${join(",", local.network[0].public_subnet_ids)}
+        publicSubnets: ${join(",", local.environment_public_subnet_ids)}
         wafArn: ${aws_wafv2_web_acl.wafv2-acl[0].arn}
         acmArn: ${local.acm_arn}
       service:
@@ -98,8 +98,8 @@ app-edge:
     ) : (<<EOT
 app-edge:
   cspApprovedSources:
-    - ${module.s3-storage.data_s3_bucket_name}.s3.${var.region}.amazonaws.com
-    - ${module.s3-storage.data_s3_bucket_name}.s3.amazonaws.com
+    - ${local.environment_data_s3_bucket_name}.s3.${var.region}.amazonaws.com
+    - ${local.environment_data_s3_bucket_name}.s3.amazonaws.com
   alternateDomain: ""
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
@@ -329,18 +329,18 @@ module "karpenter" {
   ]
   source               = "./modules/common/karpenter"
   cluster_name         = var.label
-  node_role_arn        = module.iam.node_role_arn
-  node_role_name       = module.iam.node_role_name
+  node_role_arn        = local.environment_node_role_arn
+  node_role_name       = local.environment_node_role_name
   k8s_version          = var.k8s_version
   az_count             = var.az_count
-  subnet_ids           = flatten([local.network[0].private_subnet_ids])
-  security_group_ids   = distinct(compact(concat([module.cluster.node_security_group_id], var.network_module == "networking" ? [local.network[0].all_subnets_sg_id] : [], [module.cluster.cluster_security_group_id])))
+  subnet_ids           = flatten([local.environment_private_subnet_ids])
+  security_group_ids   = distinct(compact(concat([module.cluster.node_security_group_id], var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : [], [module.cluster.cluster_security_group_id])))
   helm_registry        = var.ipa_repo
   karpenter_version    = var.karpenter_version
   default_tags         = var.default_tags
   instance_volume_size = var.instance_volume_size
   instance_volume_type = var.instance_volume_type
-  kms_key_id           = module.kms_key.key_arn
+  kms_key_id           = local.environment_kms_key_arn
   node_pools           = local.node_pools
 }
 
@@ -533,7 +533,7 @@ storage:
     provisioner: fsx.csi.aws.com
     parameters:
       securityGroupIds: ${local.security_group_id}
-      subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}
+      subnetId: ${local.environment_fsx_rwx_subnet_id}
 EOF
     ] : var.include_efs ? [<<EOF
 storage:
@@ -543,7 +543,7 @@ storage:
     provisioner: efs.csi.aws.com
     parameters:
       provisioningMode: efs-ap
-      fileSystemId: ${module.efs-storage[0].efs_filesystem_id}
+      fileSystemId: ${local.environment_efs_filesystem_id}
       directoryPerms: "700"
       gidRangeStart: "1000"
       gidRangeEnd: "2000"
@@ -637,7 +637,7 @@ aws-load-balancer-controller:
   enabled: ${var.use_acm}
   aws-load-balancer-controller:
     clusterName: ${var.label}
-    vpcId: ${local.network[0].indico_vpc_id}
+    vpcId: ${local.environment_indico_vpc_id}
     region: ${var.region}
 cluster-autoscaler:
   enabled: ${var.karpenter_enabled == false ? true : false}
@@ -827,15 +827,15 @@ locals {
   internal_elb = var.network_allow_public == false ? true : false
   backend_port = var.acm_arn != "" ? "http" : "https"
   enableHttp   = var.acm_arn != "" || var.use_nlb == true ? false : true
-  loadbalancer_annotation_config = var.create_nginx_ingress_security_group == true && var.nginx_ingress_allowed_cidrs != [] ? (<<EOT
+  loadbalancer_annotation_config = var.create_nginx_ingress_security_group == true && local.environment_nginx_ingress_allowed_cidrs != [] ? (<<EOT
 annotations:
-  service.beta.kubernetes.io/aws-load-balancer-security-groups: "${local.network[0].nginx_ingress_security_group_id}"
+  service.beta.kubernetes.io/aws-load-balancer-security-groups: "${local.environment_nginx_ingress_security_group_id}"
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
 annotations: {}
   EOT
   )
-  lb_config    = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
+  lb_config = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
   loadbalancer_config = var.use_nlb == true ? (<<EOT
       ${indent(6, local.loadbalancer_annotation_config)}
       external:
@@ -856,7 +856,7 @@ annotations: {}
           service.beta.kubernetes.io/aws-load-balancer-type: nlb
           service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
           service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}"
   EOT
     ) : (<<EOT
       ${indent(6, local.loadbalancer_annotation_config)}
@@ -867,7 +867,7 @@ annotations: {}
         annotations:
           # Create internal ELB
           service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}"
   EOT
   )
   acm_loadbalancer_config = (<<EOT
@@ -891,7 +891,7 @@ annotations: {}
           service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
           service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "${var.acm_arn}"
           service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.network[0].public_subnet_ids) : join(", ", local.network[0].private_subnet_ids)}"
+          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}"
   EOT
   )
   alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
@@ -1016,12 +1016,12 @@ crunchy-postgres:
         repo1-path: /pgbackrest/postgres-data/repo1
         repo1-retention-full: '5'
         repo1-s3-key-type: auto
-        repo1-s3-kms-key-id: "${module.kms_key.key_arn}"
-        repo1-s3-role: ${module.iam.node_role_name}
+        repo1-s3-kms-key-id: "${local.environment_kms_key_arn}"
+        repo1-s3-role: ${local.environment_node_role_name}
       repos:
       - name: repo1
         s3:
-          bucket: ${module.s3-storage.pgbackup_s3_bucket_name}
+          bucket: ${local.environment_pgbackup_s3_bucket_name}
           endpoint: s3.${var.region}.amazonaws.com
           region: ${var.region}
         schedules:
@@ -1225,12 +1225,12 @@ crunchy-postgres:
         repo2-path: /pgbackrest/postgres-insights/repo2
         repo2-retention-full: '5'
         repo2-s3-key-type: auto
-        repo2-s3-kms-key-id: "${module.kms_key.key_arn}"
-        repo2-s3-role: ${module.iam.node_role_name}
+        repo2-s3-kms-key-id: "${local.environment_kms_key_arn}"
+        repo2-s3-role: ${local.environment_node_role_name}
       repos:
       - name: repo2
         s3:
-          bucket: ${module.s3-storage.pgbackup_s3_bucket_name}
+          bucket: ${local.environment_pgbackup_s3_bucket_name}
           endpoint: s3.${var.region}.amazonaws.com
           region: ${var.region}
         schedules:
@@ -1263,7 +1263,7 @@ minio:
     image:
       repository: harbor.devops.indico.io/docker.io/amazon/aws-cli
       tag: 2.22.4
-    awsBucket: ${module.s3-storage.miniobkp_s3_bucket_name}
+    awsBucket: ${local.environment_miniobkp_s3_bucket_name}
 weaviate:
   cronjob:
     services:
@@ -1494,7 +1494,7 @@ resource "kubernetes_storage_class_v1" "local-registry" {
 resource "aws_efs_access_point" "local-registry" {
   count = var.local_registry_enabled == true ? 1 : 0
 
-  depends_on = [module.efs-storage-local-registry[0]]
+  depends_on = [module.efs-storage[0]]
 
   root_directory {
     path = "/registry"
@@ -1509,7 +1509,7 @@ resource "aws_efs_access_point" "local-registry" {
     gid = 1000
     uid = 1000
   }
-  file_system_id = module.efs-storage-local-registry[0].efs_filesystem_id
+  file_system_id = local.environment_efs_filesystem_id
 }
 
 
@@ -1540,7 +1540,7 @@ resource "kubernetes_persistent_volume_claim" "local-registry" {
 resource "kubernetes_persistent_volume" "local-registry" {
 
   depends_on = [
-    module.efs-storage-local-registry[0]
+    module.efs-storage[0]
   ]
 
   count = var.local_registry_enabled == true ? 1 : 0
@@ -1560,7 +1560,7 @@ resource "kubernetes_persistent_volume" "local-registry" {
     persistent_volume_source {
       csi {
         driver        = "efs.csi.aws.com"
-        volume_handle = "${module.efs-storage-local-registry[0].efs_filesystem_id}::${aws_efs_access_point.local-registry[0].id}"
+        volume_handle = "${local.environment_efs_filesystem_id}::${aws_efs_access_point.local-registry[0].id}"
       }
     }
   }
