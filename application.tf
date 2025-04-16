@@ -1449,6 +1449,7 @@ resource "helm_release" "local-registry" {
   wait             = false
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
+  max_history      = 10
   values = [<<EOF
 cert-manager:
   enabled: false

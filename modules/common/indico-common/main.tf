@@ -48,6 +48,7 @@ resource "helm_release" "indico_crds" {
   version          = var.indico_crds_version
   wait             = true
   timeout          = "1800" # 30 minutes
+  max_history      = 10
 
   values = concat(var.indico_crds_values_overrides, [<<EOT
 ${var.argo_enabled == true ? data.github_repository_file.data_crds_values[0].content : base64decode(var.indico_crds_values_yaml_b64)}
@@ -106,6 +107,7 @@ resource "helm_release" "indico_pre_requisites" {
   wait             = false
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
+  max_history      = 10
 
   values = concat(var.indico_pre_reqs_values_overrides, [<<EOT
 ${var.argo_enabled == true ? data.github_repository_file.data_pre_reqs_values[0].content : base64decode(var.indico_pre_reqs_values_yaml_b64)}
@@ -127,6 +129,7 @@ resource "helm_release" "monitoring" {
   version          = var.monitoring_version
   wait             = false
   timeout          = "1800" # 30 minutes
+  max_history      = 10
 
   values = var.monitoring_values
 }

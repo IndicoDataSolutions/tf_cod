@@ -50,6 +50,7 @@ resource "helm_release" "ins_pre_requisites" {
   wait             = false
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
+  max_history      = 10
 
   values = concat(var.ins_pre_reqs_values_overrides, [<<EOT
 ${var.argo_enabled == true ? data.github_repository_file.data_pre_reqs_values[0].content : base64decode(var.pre_reqs_values_yaml_b64)}

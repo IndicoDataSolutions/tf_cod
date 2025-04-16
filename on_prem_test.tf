@@ -134,12 +134,13 @@ resource "null_resource" "get_nfs_server_ip" {
 }
 
 resource "helm_release" "nfs-provider" {
-  count      = var.on_prem_test == true ? 1 : 0
-  name       = "csi-driver-nfs"
-  repository = var.ipa_repo
-  chart      = "csi-driver-nfs"
-  version    = var.csi_driver_nfs_version
-  namespace  = "default"
+  count       = var.on_prem_test == true ? 1 : 0
+  name        = "csi-driver-nfs"
+  repository  = var.ipa_repo
+  chart       = "csi-driver-nfs"
+  version     = var.csi_driver_nfs_version
+  namespace   = "default"
+  max_history = 10
   depends_on = [
     module.cluster,
     kubectl_manifest.nfs_server_service,

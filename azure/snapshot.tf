@@ -34,6 +34,7 @@ resource "helm_release" "cod-snapshot-restore" {
   wait             = true
   timeout          = "3600" # 120 minutes
   disable_webhooks = false
+  max_history      = 10
 
   values = [<<EOF
 image:

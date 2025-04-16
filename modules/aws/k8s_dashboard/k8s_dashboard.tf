@@ -152,6 +152,7 @@ resource "helm_release" "k8s-dashboard" {
   version          = var.k8s_dashboard_chart_version
   timeout          = 600   # 10 minutes
   wait             = false # don't bother to wait
+  max_history      = 10
 
   values = [
     <<EOF

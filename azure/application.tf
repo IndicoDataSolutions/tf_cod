@@ -439,6 +439,7 @@ resource "helm_release" "crunchy-postgres" {
   version          = "0.3.0"
   timeout          = "600" # 10 minutes
   wait             = true
+  max_history      = 10
 
   values = [<<EOF
   enabled: true
