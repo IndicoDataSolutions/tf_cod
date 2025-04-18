@@ -527,6 +527,13 @@ external-secrets:
 
   indico_storage_class_values = var.include_fsx ? [<<EOF
 storage:
+  pvcSpec:
+    csi:
+      driver: fsx.csi.aws.com
+      volumeAttributes:
+        dnsname: "${local.environment_fsx_rwx_dns_name}"
+        mountname: "${local.environment_fsx_rwx_mount_name}"
+      volumeHandle: "${local.environment_fsx_rwx_id}"
   indicoStorageClass:
     enabled: true
     name: ${var.indico_storage_class_name}
@@ -537,6 +544,12 @@ storage:
 EOF
     ] : var.include_efs ? [<<EOF
 storage:
+  pvcSpec:
+    volumeMode: Filesystem
+    mountOptions: []
+    csi:
+      driver: efs.csi.aws.com
+      volumeHandle: "${local.environment_efs_filesystem_id}"
   indicoStorageClass:
     enabled: true
     name: ${var.indico_storage_class_name}
