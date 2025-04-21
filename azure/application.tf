@@ -94,9 +94,6 @@ resource "kubernetes_namespace" "indico" {
 
 locals {
   indico_crds_values = [<<EOF
-migrations:
-  vaultSecretsOperator:
-    updateCRDs: ${var.secrets_operator_enabled}
 aws-ebs-csi-driver:
   enabled: false
 cert-manager: 
@@ -186,6 +183,11 @@ global:
   host: ${local.dns_name}
   image:
     registry: ${var.image_registry}
+migrations:
+  vaultSecretsOperator:
+    updateCRDs: ${var.secrets_operator_enabled}
+  crunchyPgo:
+    updateCRDs: ${var.ipa_enabled || var.insights_enabled}
 storage:
   ebsStorageClass:
     enabled: false

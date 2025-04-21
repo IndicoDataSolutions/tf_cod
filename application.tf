@@ -520,13 +520,6 @@ external-secrets:
 
   indico_storage_class_values = var.include_fsx ? [<<EOF
 storage:
-  pvcSpec:
-    csi:
-      driver: fsx.csi.aws.com
-      volumeAttributes:
-        dnsname: "${local.environment_fsx_rwx_dns_name}"
-        mountname: "${local.environment_fsx_rwx_mount_name}"
-      volumeHandle: "${local.environment_fsx_rwx_id}"
   indicoStorageClass:
     enabled: true
     name: ${var.indico_storage_class_name}
@@ -537,12 +530,6 @@ storage:
 EOF
     ] : var.include_efs ? [<<EOF
 storage:
-  pvcSpec:
-    volumeMode: Filesystem
-    mountOptions: []
-    csi:
-      driver: efs.csi.aws.com
-      volumeHandle: "${local.environment_efs_filesystem_id}"
   indicoStorageClass:
     enabled: true
     name: ${var.indico_storage_class_name}
@@ -568,8 +555,6 @@ global:
   host: ${local.dns_name}
   image:
     registry: ${var.image_registry}
-crunchy-pgo:
-  enabled: ${var.ipa_enabled || var.insights_enabled}
 migrations:
   enabled: ${var.ipa_enabled || var.insights_enabled}
   image:
@@ -578,6 +563,8 @@ migrations:
     updateCRDs: ${var.secrets_operator_enabled}
   opentelemetryOperator:
     updateCRDs: ${var.monitoring_enabled}
+  crunchyPgo:
+    updateCRDs: ${var.ipa_enabled || var.insights_enabled}
 storage:
   ebsStorageClass:
     enabled: true
