@@ -571,6 +571,7 @@ global:
 crunchy-pgo:
   enabled: ${var.ipa_enabled || var.insights_enabled}
 migrations:
+  enabled: ${var.ipa_enabled || var.insights_enabled}
   image:
     registry: ${var.image_registry}
   vaultSecretsOperator:
