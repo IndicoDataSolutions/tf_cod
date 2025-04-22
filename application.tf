@@ -549,6 +549,16 @@ storage:
       gidRangeEnd: "2000"
       basePath: "/dynamic_provisioning"
 EOF
+    ] : var.on_prem_test == true ? [<<EOF
+storage:
+  existingPVC:
+    name: read-write
+    namespace: default
+  onprem:
+    enabled: true
+    storageClass: nfs-client
+    size: 100Gi
+EOF
     ] : [<<EOF
 storage:
   indicoStorageClass:
