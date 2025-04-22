@@ -346,7 +346,7 @@ module "karpenter" {
 
 # Once (if) the secrets operator is set up, we can deploy the common charts
 locals {
-  indico_crds_values = [<<EOF
+  indico_crds_values = concat(local.indico_storage_class_values, [<<EOF
 migrations:
   image:
     registry: ${var.image_registry}
@@ -523,7 +523,7 @@ external-secrets:
     image:
       repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
   EOF
-  ]
+  ])
 
   indico_storage_class_values = var.include_fsx ? [<<EOF
 storage:
