@@ -10,6 +10,12 @@ variable "helm_repository" {
   default     = "https://app.harness.io/storage/harness-download/delegate-helm-chart/"
 }
 
+variable "delegate_version" {
+  description = "The version of the Harness delegate to use."
+  type        = string
+  default     = "1.0.23"
+}
+
 variable "namespace" {
   description = "The namespace to deploy the Harness delegate to."
   type        = string
@@ -72,14 +78,14 @@ variable "proxy_user" {
   description = "The proxy user to use for the Harness delegate."
   type        = string
   // sensitive = true
-  default     = ""
+  default = ""
 }
 
 variable "proxy_password" {
   description = "The proxy password to use for the Harness delegate."
   type        = string
   // sensitive = true
-  default     = ""
+  default = ""
 }
 
 variable "proxy_host" {
