@@ -31,12 +31,33 @@ locals {
     memory              = 4096,
     autoscaling = {
       enabled                           = true,
-      min                               = 1,
+      min                               = 2,
       max                               = 4,
       targetMemoryUtilizationPercentage = 80
     }
     delegateAnnotations = {
       "cluster-autoscaler.kubernetes.io/safe-to-evict" : "false"
+    }
+    affinity = {
+      podAntiAffinity = {
+        preferredDuringSchedulingIgnoredDuringExecution = [
+          {
+            weight = 100
+            podAffinityTerm = {
+              labelSelector = {
+                matchExpressions = [
+                  {
+                    key      = "app.kubernetes.io/name"
+                    operator = "In"
+                    values   = [var.delegate_name]
+                  }
+                ]
+              }
+              topologyKey = "kubernetes.io/hostname"
+            }
+          }
+        ]
+      }
     }
   })
 }
