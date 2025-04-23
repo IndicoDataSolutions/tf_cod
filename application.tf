@@ -1070,7 +1070,7 @@ celery-flower:
 aws-node-termination:
   aws-node-termination-handler:
     image:
-      repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/aws-node-termination-handler
+      repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/public.ecr.aws/aws-ec2/aws-node-termination-handler
 nvidia-device-plugin:
   nvidia-device-plugin:
     image:
