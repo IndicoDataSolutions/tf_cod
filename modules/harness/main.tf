@@ -17,7 +17,6 @@ locals {
     namespace           = var.namespace,
     delegateName        = var.delegate_name,
     delegateDockerImage = var.delegate_image,
-    replicas            = var.replicas,
     upgrader            = { enabled = var.upgrader_enabled }
     nextGen             = var.next_gen,
     proxyUser           = var.proxy_user,
@@ -27,7 +26,15 @@ locals {
     proxyScheme         = var.proxy_scheme,
     noProxy             = var.no_proxy,
     initScript          = var.init_script,
-    deployMode          = var.deploy_mode
+    deployMode          = var.deploy_mode,
+    cpu                 = 2,
+    memory              = 4096,
+    autoscaling = {
+      enabled                           = true,
+      min                               = 1,
+      max                               = 4,
+      targetMemoryUtilizationPercentage = 80
+    }
   })
 }
 
