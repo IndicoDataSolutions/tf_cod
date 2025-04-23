@@ -38,27 +38,6 @@ locals {
     delegateAnnotations = {
       "cluster-autoscaler.kubernetes.io/safe-to-evict" : "false"
     }
-    affinity = {
-      podAntiAffinity = {
-        preferredDuringSchedulingIgnoredDuringExecution = [
-          {
-            weight = 100
-            podAffinityTerm = {
-              labelSelector = {
-                matchExpressions = [
-                  {
-                    key      = "app.kubernetes.io/name"
-                    operator = "Contains"
-                    values   = ["harness-delegate"]
-                  }
-                ]
-              }
-              topologyKey = "kubernetes.io/hostname"
-            }
-          }
-        ]
-      }
-    }
   })
 }
 
