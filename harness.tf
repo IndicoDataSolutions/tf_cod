@@ -12,7 +12,7 @@ module "harness_delegate" {
   delegate_token   = jsondecode(data.vault_kv_secret_v2.delegate_secrets[0].data_json)["DELEGATE_TOKEN"]
   delegate_name    = "${var.cluster_name}-harness-delegate"
   namespace        = "harness-delegate-ng"
-  manager_endpoint = "https://app.harness.io"
+  manager_endpoint = "https://app.harness.io/gratis"
   delegate_image   = jsondecode(data.vault_kv_secret_v2.delegate_secrets[0].data_json)["DELEGATE_IMAGE"]
   replicas         = var.harness_delegate_replicas
   upgrader_enabled = true
