@@ -108,7 +108,7 @@ ${local.alertmanager_tls}
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
 ${local.thanos_config}
       nodeSelector:
-        node_group: static-workers
+        node_group: monitoring-workers
     ingress:
       enabled: true
       ingressClassName: nginx
@@ -197,7 +197,7 @@ tempo:
         clusterFullName: ${lower("${var.aws_account}-${var.region}-${var.name}")}
 ${local.thanos_config}
       nodeSelector:
-        node_group: static-workers
+        node_group: monitoring-workers
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
