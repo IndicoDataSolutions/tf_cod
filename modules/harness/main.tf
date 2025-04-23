@@ -35,6 +35,9 @@ locals {
       max                               = 4,
       targetMemoryUtilizationPercentage = 80
     }
+    delegateAnnotations = {
+      "cluster-autoscaler.kubernetes.io/safe-to-evict" : "false"
+    }
   })
 }
 
