@@ -3,7 +3,8 @@ module "harness_delegate" {
 
   depends_on = [
     module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
+    time_sleep.wait_1_minutes_after_cluster,
+    module.indico-common
   ]
 
   source = "./modules/harness"
