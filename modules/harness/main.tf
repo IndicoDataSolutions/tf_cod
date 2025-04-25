@@ -31,8 +31,8 @@ locals {
     memory              = 4096,
     autoscaling = {
       enabled                           = true,
-      min                               = 2,
-      max                               = 4,
+      minReplicas                       = 2,
+      maxReplicas                       = 4,
       targetMemoryUtilizationPercentage = 80
     }
     delegateAnnotations = {
