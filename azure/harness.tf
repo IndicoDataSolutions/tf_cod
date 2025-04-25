@@ -2,7 +2,8 @@ module "harness_delegate" {
   count = var.harness_delegate && strcontains(lower(var.account), "indico") ? 1 : 0
 
   depends_on = [
-    module.cluster
+    module.cluster,
+    module.indico-common
   ]
 
   source = "../modules/harness"
