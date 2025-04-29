@@ -523,7 +523,6 @@ external-secrets:
     image:
       repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
 trust-manager:
-  enabled: true
   image:
     repository: ${var.image_registry}/quay.io/jetstack/trust-manager
   defaultPackageImage:
