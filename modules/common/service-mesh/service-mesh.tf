@@ -1,4 +1,15 @@
 # This module is used to deploy the service mesh to the cluster.
+
+terraform {
+  required_providers {
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+    }
+  }
+}
 # Create secrets for the service mesh.
 resource "kubectl_manifest" "linkerd-issuer-secret" {
   depends_on = [helm_release.linkerd-crds]

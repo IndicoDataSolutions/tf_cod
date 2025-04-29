@@ -825,10 +825,6 @@ module "indico-common" {
   monitoring_enabled               = var.monitoring_enabled
   monitoring_values                = local.monitoring_values
   monitoring_version               = var.monitoring_version
-  linkerd_crds_values              = local.linkerd_crds_values
-  linkerd_control_plane_values     = local.linkerd_control_plane_values
-  linkerd_viz_values               = local.linkerd_viz_values
-  linkerd_multicluster_values      = local.linkerd_multicluster_values
 }
 
 
