@@ -1499,3 +1499,38 @@ variable "create_nginx_ingress_security_group" {
   default     = false
   description = "If enabled this will create a security group for the nginx ingress controller"
 }
+
+variable "enable_service_mesh" {
+  type        = bool
+  default     = true
+  description = "Toggle for enabling service mesh deployment"
+}
+
+variable "linkerd_control_plane_version" {
+  type        = string
+  default     = "0.0.1"
+  description = "Version of the linkerd control plane"
+}
+
+variable "linkerd_crds_version" {
+  type        = string
+  default     = "0.0.1"
+  description = "Version for the linkerd crds"
+}
+
+variable "linkerd_viz_version" {
+  type        = string
+  default     = "0.0.1"
+  description = "Version for the linkerd viz"
+}
+
+variable "linkerd_multicluster_version" {
+  type        = string
+  default     = "0.0.1"
+  description = "Version for the linkerd multicluster"
+}
+
+
+
+
+

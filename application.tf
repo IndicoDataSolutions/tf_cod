@@ -522,6 +522,12 @@ external-secrets:
   certController:
     image:
       repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+trust-manager:
+  enabled: true
+  image:
+    repository: ${var.image_registry}/quay.io/jetstack/trust-manager
+  defaultPackageImage:
+    repository: ${var.image_registry}/quay.io/jetstack/trust-pkg-debian-bookworm
   EOF
   ]
 
@@ -791,6 +797,7 @@ opentelemetry-collector:
         logs: null
   EOF
   ] : []
+
 }
 
 module "indico-common" {
@@ -818,6 +825,10 @@ module "indico-common" {
   monitoring_enabled               = var.monitoring_enabled
   monitoring_values                = local.monitoring_values
   monitoring_version               = var.monitoring_version
+  linkerd_crds_values              = local.linkerd_crds_values
+  linkerd_control_plane_values     = local.linkerd_control_plane_values
+  linkerd_viz_values               = local.linkerd_viz_values
+  linkerd_multicluster_values      = local.linkerd_multicluster_values
 }
 
 
@@ -1729,4 +1740,84 @@ resource "kubernetes_secret" "issuer-secret" {
   data = {
     "secret-access-key" = var.aws_secret_key
   }
+}
+
+# Service mesh
+locals {
+
+  linkerd_crds_values = var.enable_service_mesh ? [<<EOF
+linkerd-crds:
+  enabled: true
+EOF
+  ] : []
+
+  linkerd_control_plane_values = var.enable_service_mesh ? [<<EOF
+linkerd-control-plane:
+  enabled: true
+  imagePullSecrets:
+    - name: harbor-pull-secret
+  controllerImage: ${var.image_registry}/cr.l5d.io/linkerd/controller
+  policyController:
+    name: ${var.image_registry}/cr.l5d.io/linkerd/policy-controller
+  proxy:
+    name: ${var.image_registry}/cr.l5d.io/linkerd/proxy
+  proxyInit:
+    name: ${var.image_registry}/cr.l5d.io/linkerd/proxy-init
+  debugContainer:
+    name: ${var.image_registry}/cr.l5d.io/linkerd/debug
+  identity:
+    externalCA: true
+    issuer:
+      scheme: kubernetes.io/tls
+EOF
+  ] : []
+
+  linkerd_viz_values = var.enable_service_mesh ? [<<EOF
+linkerd-viz:
+  enabled: true
+  defaultRegistry: ${var.image_registry}/cr.l5d.io/linkerd
+  imagePullSecrets:
+    - name: harbor-pull-secret
+EOF
+  ] : []
+
+  linkerd_multicluster_values = var.enable_service_mesh ? [<<EOF
+linkerd-multicluster:
+  enabled: true
+  imagePullSecrets:
+    - name: harbor-pull-secret
+  pauseImage: ${var.image_registry}/gcr.io/google_containers/pause:3.2
+  namespaceMetadata:
+    registry: ${var.image_registry}/cr.l5d.io/linkerd
+  localServiceMirror:
+    image:
+      name: ${var.image_registry}/cr.l5d.io/linkerd/controller
+  controllerDefaults:
+    image:
+      name: ${var.image_registry}/cr.l5d.io/linkerd/controller
+EOF
+  ] : []
+
+}
+
+module "service-mesh" {
+  depends_on = [
+    module.indico-common,
+    module.intake,
+    module.insights
+  ]
+  source                        = "./modules/common/service-mesh"
+  count                         = var.enable_service_mesh ? 1 : 0
+  namespace                     = "indico"
+  service_mesh_namespace        = "linkerd"
+  linkerd_crds_version          = var.linkerd_crds_version
+  linkerd_control_plane_version = var.linkerd_control_plane_version
+  linkerd_viz_version           = var.linkerd_viz_version
+  linkerd_multicluster_version  = var.linkerd_multicluster_version
+  helm_registry                 = var.ipa_repo
+  load_environment              = var.load_environment
+  account_name                  = var.aws_account
+  label                         = var.label
+  image_registry                = var.image_registry
+  insights_enabled              = var.insights_enabled
 }
