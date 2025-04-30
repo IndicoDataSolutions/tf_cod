@@ -1208,6 +1208,12 @@ variable "create_eks_cluster_role" {
   description = "Flag to create or load eks cluster role."
 }
 
+variable "generate_eks_kms_key" {
+  type        = bool
+  default     = true
+  description = "Flag to create or load eks kms key."
+}
+
 variable "eks_cluster_iam_role_name_override" {
   type        = string
   default     = null

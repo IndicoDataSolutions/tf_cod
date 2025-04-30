@@ -138,7 +138,7 @@ module "public_networking" {
 
 
 module "networking" {
-  count                               = var.direct_connect == false && var.network_module == "networking" &&var.load_environment == "" ? 1 : 0
+  count                               = var.direct_connect == false && var.network_module == "networking" && var.load_environment == "" ? 1 : 0
   source                              = "app.terraform.io/indico/indico-aws-network/mod"
   version                             = "2.4.0"
   label                               = var.label
@@ -361,7 +361,7 @@ module "cluster" {
   cluster_version      = var.k8s_version
   default_tags         = merge(coalesce(var.default_tags, {}), coalesce(var.additional_tags, {}))
   cluster_iam_role_arn = local.environment_cluster_role_arn == "null" ? null : local.environment_cluster_role_arn
-  generate_kms_key     = var.create_eks_cluster_role ? false : true #Once the cluster is created, we cannot change the kms key.
+  generate_kms_key     = var.generate_eks_kms_key #Once the cluster is created, we cannot change the kms key.
   kms_key_arn          = local.environment_kms_key_arn
 
   vpc_id     = local.environment_indico_vpc_id
