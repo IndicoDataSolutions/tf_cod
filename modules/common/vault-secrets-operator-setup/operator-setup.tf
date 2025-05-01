@@ -69,7 +69,7 @@ path "customer-Indico-Devops/data/thanos-storage" {
   capabilities = ["read", "list"]
 }
 path "customer-${var.account}/*" {
-  capabilities = ["read", "list", "write", "update"]
+  capabilities = ["read", "list", "create", "update", "patch"]
 }
 
 EOT
