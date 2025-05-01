@@ -202,7 +202,7 @@ module "lambda-sns-forwarder" {
 module "kms_key" {
   count            = var.load_environment == "" ? 1 : 0
   source           = "app.terraform.io/indico/indico-aws-kms/mod"
-  version          = "2.1.2"
+  version          = "2.1.3"
   label            = var.label
   additional_tags  = var.additional_tags
   existing_kms_key = var.existing_kms_key
