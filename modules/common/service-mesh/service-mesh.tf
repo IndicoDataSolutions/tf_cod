@@ -28,6 +28,7 @@ resource "kubectl_manifest" "linkerd-issuer-secret" {
       destination:
         annotations:
           reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
           reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "${var.service_mesh_namespace}"
         create: true
         name: linkerd-identity-issuer
