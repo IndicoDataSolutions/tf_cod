@@ -1812,6 +1812,10 @@ module "service-mesh" {
   linkerd_control_plane_version = var.linkerd_control_plane_version
   linkerd_viz_version           = var.linkerd_viz_version
   linkerd_multicluster_version  = var.linkerd_multicluster_version
+  linkerd_crds_values           = local.linkerd_crds_values
+  linkerd_control_plane_values  = local.linkerd_control_plane_values
+  linkerd_viz_values            = local.linkerd_viz_values
+  linkerd_multicluster_values   = local.linkerd_multicluster_values
   helm_registry                 = var.ipa_repo
   load_environment              = var.load_environment
   account_name                  = var.aws_account
