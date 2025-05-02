@@ -281,6 +281,7 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 # (what level of permission does this require? Are we giving customers admin credentials?) 
 # The auth backend they create is named <account>-<region>-<cluster-name>, so we can make 
 # sure their credentials only have access to create <account>-* k8s auth methods
+# Note: this module is used to pull secrets from hashicorp vault. It is also used by the external-secrets operator to push secrets to hashicorp vault.
 module "secrets-operator-setup" {
   depends_on = [
     module.cluster,
@@ -294,6 +295,7 @@ module "secrets-operator-setup" {
   region          = var.region
   name            = var.label
   kubernetes_host = module.cluster.kubernetes_host
+  audience        = ""
 }
 
 resource "kubectl_manifest" "gp2-storageclass" {
