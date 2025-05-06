@@ -783,7 +783,6 @@ module "indico-common" {
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
     module.secrets-operator-setup,
-    kubectl_manifest.gp2-storageclass,
     module.karpenter
   ]
   source                           = "./modules/common/indico-common"
