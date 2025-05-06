@@ -6,7 +6,7 @@ locals {
   the_domain            = local.the_splits[local.the_length - 2]
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
   enable_external_dns   = var.use_static_ssl_certificates == false ? true : false
-  storage_class         = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
+  storage_class         = var.on_prem_test == false ? "encrypted-gp3" : "nfs-client"
   acm_arn               = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
   efs_values = var.include_efs == true ? [<<EOF
   storage:
@@ -307,7 +307,7 @@ kind: StorageClass
 metadata:
   name: gp2
   annotations:
-    storageclass.kubernetes.io/is-default-class: "true"
+    storageclass.kubernetes.io/is-default-class: "false"
 parameters:
   fsType: ext4
   type: gp2
