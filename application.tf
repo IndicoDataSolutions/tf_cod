@@ -296,26 +296,6 @@ module "secrets-operator-setup" {
   kubernetes_host = module.cluster.kubernetes_host
 }
 
-resource "kubectl_manifest" "gp2-storageclass" {
-  depends_on = [
-    module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
-  ]
-  yaml_body = <<YAML
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: gp2
-  annotations:
-    storageclass.kubernetes.io/is-default-class: "false"
-parameters:
-  fsType: ext4
-  type: gp2
-provisioner: kubernetes.io/aws-ebs
-volumeBindingMode: WaitForFirstConsumer
-YAML
-}
-
 module "karpenter" {
   count = var.karpenter_enabled == true ? 1 : 0
   depends_on = [
