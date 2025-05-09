@@ -1058,7 +1058,7 @@ variable "instance_volume_size" {
 
 variable "instance_volume_type" {
   type        = string
-  default     = "gp2"
+  default     = "gp3"
   description = "The type of EBS volume to attach to the cluster nodes"
 }
 

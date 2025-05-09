@@ -6,7 +6,7 @@ locals {
   the_domain            = local.the_splits[local.the_length - 2]
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
   enable_external_dns   = var.use_static_ssl_certificates == false ? true : false
-  storage_class         = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
+  storage_class         = var.on_prem_test == false ? "encrypted-gp3" : "nfs-client"
   acm_arn               = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
   efs_values = var.include_efs == true ? [<<EOF
   storage:
@@ -294,31 +294,6 @@ module "secrets-operator-setup" {
   region          = var.region
   name            = var.label
   kubernetes_host = module.cluster.kubernetes_host
-}
-
-resource "kubectl_manifest" "gp2-storageclass" {
-  depends_on = [
-    module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
-  ]
-  yaml_body = <<YAML
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: gp2
-  annotations:
-    storageclass.kubernetes.io/is-default-class: "true"
-parameters:
-  fsType: ext4
-  type: gp2
-provisioner: kubernetes.io/aws-ebs
-volumeBindingMode: WaitForFirstConsumer
-YAML
-  lifecycle {
-    ignore_changes = [
-      yaml_body
-    ]
-  }
 }
 
 module "karpenter" {
@@ -808,7 +783,6 @@ module "indico-common" {
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
     module.secrets-operator-setup,
-    kubectl_manifest.gp2-storageclass,
     module.karpenter
   ]
   source                           = "./modules/common/indico-common"
