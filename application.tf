@@ -704,7 +704,7 @@ externalSecretStore:
   enabled: ${var.secrets_operator_enabled}
   vaultAddress: ${var.vault_address}
   vaultMountPath: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
-  vaultPath: customer-${var.account}
+  vaultPath: customer-${var.aws_account}
   vaultRole: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
   vaultServiceAccount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
   vaultSecretName: "vault-auth"
