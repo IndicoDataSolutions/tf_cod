@@ -1530,6 +1530,13 @@ variable "linkerd_multicluster_version" {
   description = "Version for the linkerd multicluster"
 }
 
+variable "enable_data_application_cluster_separation" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling data application cluster separation"
+}
+
+
 
 
 

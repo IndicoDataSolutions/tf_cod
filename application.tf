@@ -55,6 +55,9 @@ locals {
 
   alb_ipa_values = var.enable_waf == true ? (<<EOT
 app-edge:
+  applicationCluster:
+    enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+  backendService: ${var.enable_data_application_cluster_separation ? "app-edge-application-cluster" : "app-edge"}
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
   alternateDomain: ""
@@ -87,7 +90,7 @@ app-edge:
         wafArn: ${aws_wafv2_web_acl.wafv2-acl[0].arn}
         acmArn: ${local.acm_arn}
       service:
-        name: app-edge
+        name: ${var.enable_data_application_cluster_separation ? "app-edge-application-cluster" : "app-edge"}
         port: 8080
       hosts:
         - host: ${local.dns_name}
@@ -97,6 +100,9 @@ app-edge:
   EOT
     ) : (<<EOT
 app-edge:
+  applicationCluster:
+    enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+  backendService: ${var.enable_data_application_cluster_separation ? "app-edge-application-cluster" : "app-edge"}
   cspApprovedSources:
     - ${local.environment_data_s3_bucket_name}.s3.${var.region}.amazonaws.com
     - ${local.environment_data_s3_bucket_name}.s3.amazonaws.com
@@ -236,6 +242,8 @@ EOT
   )
   dns01RecursiveNameserversOnly = var.network_allow_public == true ? false : true
   dns01RecursiveNameservers     = var.network_allow_public == true ? "" : "kube-dns.kube-system.svc.cluster.local:53"
+
+
 }
 
 data "github_repository" "argo-github-repo" {
@@ -692,6 +700,14 @@ ${local.lb_config}
 reflector:
   image:
     repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
+externalSecretStore:
+  enabled: ${var.secrets_operator_enabled}
+  vaultAddress: ${var.vault_address}
+  vaultMountPath: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+  vaultPath: ${local.customer_vault_mount_path}
+  vaultRole: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+  vaultServiceAccount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+  vaultSecretName: "vault-auth"
   EOF
   ])
 
@@ -976,6 +992,10 @@ crunchy-postgres:
     metadata:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
+    service:
+      metadata:
+        labels:
+          mirror.linkerd.io/exported: "remote-discovery"
     instances:
     - affinity:
         nodeAffinity:
@@ -1049,6 +1069,11 @@ rabbitmq:
       registry: ${var.image_registry}
     persistence:
       storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
+externalSecretStore:
+  enabled: ${var.secrets_operator_enabled}
+  loadEnvironment:
+    enabled: ${var.load_environment == "" ? "false" : "true" }
+    environment: ${var.load_environment == "" ? var.label : var.load_environment}
   EOF
   ])
 
@@ -1083,6 +1108,7 @@ reloader:
         image:
           name: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/stakater/reloader
 kafka-strimzi:
+  enabled: ${var.load_environment == "" ? "true" : "false" }
   strimzi-kafka-operator: 
     defaultImageRegistry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/strimzi-proxy
   kafkacat:
@@ -1094,8 +1120,96 @@ kafka-strimzi:
   kafkaConnect:
     image:
       registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
+worker:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+server:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+rainbow-nginx:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+readapi:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+migrations:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+${local.faust_worker_settings}
 ${local.alb_ipa_values}
+cronjob:
+  enabled: true
+  services:
+    kafka-connect-supervisor:
+      enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
+    meteor-refresh:
+      enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
+    rainbow-cleaner-submissions:
+      enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+    rainbow-cleaner-uploads:
+      enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+    service-account-generator:
+      enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+externalSecretStore:
+  enabled: ${var.secrets_operator_enabled}
+  loadEnvironment:
+    enabled: ${var.load_environment == "" ? "false" : "true"}
+    environment: ${var.load_environment == "" ? var.label : var.load_environment}
   EOF
+
+  faust_worker_settings = var.enable_data_application_cluster_separation ? var.load_environment == "" ? (<<EOF
+faust-worker:
+  enabled: true
+  volumeMounts:
+    - mountPath: /mnt/submission
+      name: meteor-data
+      subPath: rainbow/submission
+
+    - mountPath: /mnt/data/
+      name: meteor-data
+      subPath: meteor
+
+  volumes:
+    - name: meteor-data
+      persistentVolumeClaim:
+        claimName: read-write
+
+  services:
+    meteor-worker:
+      app: meteor
+      command: [scripts/worker_entrypoint.sh]
+      enabled: true
+      livenessProbe:
+        initialDelaySeconds: 15
+        periodSeconds: 10
+        command:
+          httpGet:
+            path: /live
+            port: 6066
+      readinessProbe:
+        initialDelaySeconds: 15
+        timeoutSeconds: 5
+        periodSeconds: 15
+        command:
+          httpGet:
+            path: /ready
+            port: 6066
+      image:
+        repository: meteor
+      env:
+        POSTGRES_APP_SCHEMA: public
+        POSTGRES_DB_SCHEMA: public
+        SCHEMA_REGISTRY_URL: http://schema-registry-svc:8081
+        BOOTSTRAP_SERVERS: kafka-kafka-bootstrap:9092
+        SAME_DIR: 'True'
+        SUNBOW_HOST: 'http://sunbow-application-cluster:5000'
+        DOCTOR_HOST: 'http://doctor-application-cluster:5000'
+        NOCT_HOST: 'http://noct-application-cluster:5000'
+EOF
+) : (<<EOF
+faust-worker:
+  enabled: false
+EOF
+) : (<<EOF
+faust-worker:
+  enabled: true
+EOF
+)
 }
 
 module "intake" {
