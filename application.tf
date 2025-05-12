@@ -57,7 +57,7 @@ locals {
 app-edge:
   applicationCluster:
     enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
-  backendService: ${var.enable_data_application_cluster_separation ? "app-edge-application-cluster" : "app-edge"}
+  backendServiceName: ${var.enable_data_application_cluster_separation ? "app-edge-application-cluster" : "app-edge"}
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
   alternateDomain: ""
@@ -102,7 +102,7 @@ app-edge:
 app-edge:
   applicationCluster:
     enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
-  backendService: ${var.enable_data_application_cluster_separation ? "app-edge-application-cluster" : "app-edge"}
+  backendServiceName: ${var.enable_data_application_cluster_separation ? "app-edge-application-cluster" : "app-edge"}
   cspApprovedSources:
     - ${local.environment_data_s3_bucket_name}.s3.${var.region}.amazonaws.com
     - ${local.environment_data_s3_bucket_name}.s3.amazonaws.com
