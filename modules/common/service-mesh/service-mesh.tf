@@ -23,7 +23,7 @@ resource "kubectl_manifest" "linkerd-issuer-secret" {
       type: "kv-v2"
       namespace: ${var.namespace}
       mount: customer-${var.account_name}
-      path: environments/${var.load_environment == "" ? var.environment : var.load_environment}/issuer
+      path: environments/${var.load_environment == "" ? var.environment : lower(var.load_environment)}/issuer
       refreshAfter: 60s
       destination:
         annotations:
