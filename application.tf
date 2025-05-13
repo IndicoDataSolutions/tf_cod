@@ -1879,6 +1879,7 @@ linkerd-control-plane:
   policyController:
     name: ${var.image_registry}/cr.l5d.io/linkerd/policy-controller
   proxy:
+    nativeSidecar: true
     name: ${var.image_registry}/cr.l5d.io/linkerd/proxy
   proxyInit:
     name: ${var.image_registry}/cr.l5d.io/linkerd/proxy-init
