@@ -304,7 +304,7 @@ module "secrets-operator-setup" {
   name            = var.label
   kubernetes_host = module.cluster.kubernetes_host
   audience        = ""
-  environment     = var.load_environment == "" ? local.environment : var.load_environment
+  environment     = var.load_environment == "" ? local.environment : lower(var.load_environment)
 }
 
 resource "kubectl_manifest" "gp2-storageclass" {
@@ -1074,7 +1074,7 @@ externalSecretStore:
   enabled: ${var.secrets_operator_enabled}
   loadEnvironment:
     enabled: ${var.load_environment == "" ? "false" : "true" }
-    environment: ${var.load_environment == "" ? local.environment : var.load_environment}
+    environment: ${var.load_environment == "" ? local.environment : lower(var.load_environment)}
   EOF
   ])
 
@@ -1155,7 +1155,7 @@ externalSecretStore:
   enabled: ${var.secrets_operator_enabled}
   loadEnvironment:
     enabled: ${var.load_environment == "" ? "false" : "true"}
-    environment: ${var.load_environment == "" ? local.environment : var.load_environment}
+    environment: ${var.load_environment == "" ? local.environment : lower(var.load_environment)}
   EOF
 
   faust_worker_settings = var.enable_data_application_cluster_separation ? var.load_environment == "" ? (<<EOF
