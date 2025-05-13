@@ -72,7 +72,7 @@ path "customer-${var.account}/*" {
   capabilities = ["read", "list", "create", "update", "patch", "delete"]
 }
 
-path "customer-${var.account}/environments/${var.name}/*" {
+path "customer-${var.account}/environments/${var.environment}/*" {
   capabilities = ["read", "list", "create", "update", "patch", "delete"]
 }
 

@@ -304,6 +304,7 @@ module "secrets-operator-setup" {
   name            = var.label
   kubernetes_host = module.cluster.kubernetes_host
   audience        = ""
+  environment     = var.load_environment == "" ? local.environment : var.load_environment
 }
 
 resource "kubectl_manifest" "gp2-storageclass" {
@@ -1073,7 +1074,7 @@ externalSecretStore:
   enabled: ${var.secrets_operator_enabled}
   loadEnvironment:
     enabled: ${var.load_environment == "" ? "false" : "true" }
-    environment: ${var.load_environment == "" ? var.label : var.load_environment}
+    environment: ${var.load_environment == "" ? local.environment : var.load_environment}
   EOF
   ])
 
@@ -1154,7 +1155,7 @@ externalSecretStore:
   enabled: ${var.secrets_operator_enabled}
   loadEnvironment:
     enabled: ${var.load_environment == "" ? "false" : "true"}
-    environment: ${var.load_environment == "" ? var.label : var.load_environment}
+    environment: ${var.load_environment == "" ? local.environment : var.load_environment}
   EOF
 
   faust_worker_settings = var.enable_data_application_cluster_separation ? var.load_environment == "" ? (<<EOF
@@ -1939,6 +1940,7 @@ module "service-mesh" {
   linkerd_multicluster_values   = local.linkerd_multicluster_values
   helm_registry                 = var.ipa_repo
   load_environment              = var.load_environment
+  environment                   = local.environment
   account_name                  = var.aws_account
   label                         = var.label
   image_registry                = var.image_registry

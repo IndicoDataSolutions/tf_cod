@@ -109,6 +109,7 @@ locals {
   chart_version_parts = split("-", var.ipa_version)
   chart_suffix        = trimprefix(var.ipa_version, local.chart_version_parts[0])
 
+  environment = var.load_environment == "" ? lower("${var.aws_account}-${var.region}-${var.label}") : var.load_environment
 }
 
 resource "tls_private_key" "pk" {

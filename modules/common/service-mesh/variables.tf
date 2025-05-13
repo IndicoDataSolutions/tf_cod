@@ -90,4 +90,8 @@ variable "insights_enabled" {
   description = "Toggle for enabling insights"
 }
 
+variable "environment" {
+  type        = string
+  description = "Environment for the service mesh"
+}
 
