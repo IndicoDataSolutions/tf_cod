@@ -978,16 +978,18 @@ apiModels:
     registry: ${var.image_registry}
 secrets:
   rabbitmq:
-    create: true
+    create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   general:
-    create: true
-
+    create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
+  fernet:
+    create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
 celery-backend:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   redis:
     global:
       imageRegistry: ${var.image_registry}
 crunchy-postgres:
-  enabled: true
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   postgres-data:
     enabled: true
     metadata:
@@ -1065,6 +1067,7 @@ crunchy-postgres:
             cpu: 1000m
             memory: 3000Mi
 rabbitmq:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   rabbitmq:
     image:
       registry: ${var.image_registry}
@@ -1083,11 +1086,6 @@ global:
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
 ${local.local_registry_tf_cod_values}
-secrets:
-  general:
-    create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
-  fernet:
-    create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
 runtime-scanner:
   enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
   image:
@@ -1104,6 +1102,7 @@ aws-node-termination:
     image:
       repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/public.ecr.aws/aws-ec2/aws-node-termination-handler
 nvidia-device-plugin:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
   nvidia-device-plugin:
     image:
       repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/public-nvcr-proxy/nvidia/k8s-device-plugin
