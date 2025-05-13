@@ -978,13 +978,13 @@ apiModels:
     registry: ${var.image_registry}
 secrets:
   rabbitmq:
-    create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
+    create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
   general:
     create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   fernet:
     create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
 celery-backend:
-  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
   redis:
     global:
       imageRegistry: ${var.image_registry}
@@ -1067,7 +1067,7 @@ crunchy-postgres:
             cpu: 1000m
             memory: 3000Mi
 rabbitmq:
-  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
   rabbitmq:
     image:
       registry: ${var.image_registry}
