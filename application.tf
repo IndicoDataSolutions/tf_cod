@@ -1134,7 +1134,7 @@ rainbow-nginx:
 readapi:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
 migrations:
-  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+  enable: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
 ${local.faust_worker_settings}
 ${local.alb_ipa_values}
 cronjob:
