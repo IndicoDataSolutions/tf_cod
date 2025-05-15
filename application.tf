@@ -1906,7 +1906,8 @@ linkerd-multicluster:
   enabled: true
   imagePullSecrets:
     - name: harbor-pull-secret
-  pauseImage: ${var.image_registry}/gcr.io/google_containers/pause:3.2
+  gateway:
+    pauseImage: ${var.image_registry}/gcr.io/google_containers/pause:3.2
   namespaceMetadata:
     registry: ${var.image_registry}/cr.l5d.io/linkerd
   localServiceMirror:
