@@ -97,6 +97,7 @@ resource "helm_release" "linkerd-multicluster" {
   repository = var.helm_registry
   version    = var.linkerd_multicluster_version
   values     = var.linkerd_multicluster_values
+  upgrade_install = true
 }
 
 resource "kubernetes_annotations" "default-ns-annotation" {
