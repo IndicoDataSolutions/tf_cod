@@ -93,7 +93,8 @@ resource "helm_release" "linkerd-multicluster" {
   depends_on = [helm_release.linkerd-control-plane]
   name       = "linkerd-multicluster"
   chart      = "linkerd-multicluster"
-  namespace  = var.service_mesh_namespace
+  namespace  = "linkerd-multicluster"
+  create_namespace = true
   repository = var.helm_registry
   version    = var.linkerd_multicluster_version
   values     = var.linkerd_multicluster_values
