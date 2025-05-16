@@ -55,8 +55,9 @@ locals {
 
   alb_ipa_values = var.enable_waf == true ? (<<EOT
 app-edge:
-  labels:
-    mirror.linkerd.io/exported: remote-discovery
+  service:
+    labels:
+      mirror.linkerd.io/exported: remote-discovery
   applicationCluster:
     enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
   backendServiceName: ${var.enable_data_application_cluster_separation ? "app-edge-application-cluster" : "app-edge"}
@@ -102,8 +103,9 @@ app-edge:
   EOT
     ) : (<<EOT
 app-edge:
-  labels:
-    mirror.linkerd.io/exported: remote-discovery
+  service:
+    labels:
+      mirror.linkerd.io/exported: remote-discovery
   applicationCluster:
     enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
   backendServiceName: ${var.enable_data_application_cluster_separation ? "app-edge-application-cluster" : "app-edge"}
@@ -1133,8 +1135,9 @@ worker:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
 server:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
-  labels:
-    mirror.linkerd.io/exported: remote-discovery
+  service:
+    labels:
+      mirror.linkerd.io/exported: remote-discovery
 rainbow-nginx:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
 readapi:
