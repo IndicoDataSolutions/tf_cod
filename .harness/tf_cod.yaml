@@ -44,7 +44,7 @@ pipeline:
                       export PATH=${CWD}:${PATH}
                       helm version
                       helm plugin install https://github.com/chartmuseum/helm-push --version 0
-                      helm repo add --username $USERNAME --password $PASSWORD harborprod https://harbor.devops.indico.io/chartrepo/indico-charts
+                      helm repo add --username $CM_USERNAME --password $CM_PASSWORD harborprod https://harbor.devops.indico.io/chartrepo/indico-charts
                       cd smoketests
                       export DRONE_TAG=<+<+codebase.tag>?<+codebase.tag>:"">
                       ./upload-charts.sh "<+<+codebase.branch>?<+codebase.branch>:<+codebase.tag>>-<+codebase.commitSha.substring(0,8)>"
