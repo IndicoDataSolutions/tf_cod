@@ -1570,7 +1570,8 @@ resource "argocd_application" "ipa" {
 }
 
 resource "null_resource" "wait-for-tf-cod-chart-build" {
-  count = var.argo_enabled == true ? 1 : 0
+  count = 0 # This is being disabled because the terraform smoketest is not currently being used.
+  #  count = var.argo_enabled == true ? 1 : 0
 
   depends_on = [
     module.intake,
