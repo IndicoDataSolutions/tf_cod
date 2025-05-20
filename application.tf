@@ -1927,6 +1927,14 @@ linkerd-multicluster:
   controllerDefaults:
     image:
       name: ${var.image_registry}/cr.l5d.io/linkerd/controller
+  controllers:
+    - link:
+        ref:
+          name: ${var.load_environment == "" ? "application-cluster" : "data-cluster" }
+      logLevel: debug
+      gateway:
+        enabled: false
+      replicas: 2
 EOF
   ] : []
 
