@@ -355,7 +355,7 @@ module "iam" {
 
 module "cluster" {
   source               = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version              = "9.0.35"
+  version              = "9.0.36"
   label                = var.label
   region               = var.region
   cluster_version      = var.k8s_version
@@ -381,6 +381,7 @@ module "cluster" {
 
   cluster_security_group_id             = local.environment_all_subnets_sg_id
   cluster_additional_security_group_ids = var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : []
+  http_tokens                           = var.http_tokens
 }
 
 resource "time_sleep" "wait_1_minutes_after_cluster" {
