@@ -13,7 +13,7 @@ terraform {
 }
 
 resource "github_repository_file" "crds_values_yaml" {
-  count               = var.argo_enabled == true ? 1 : 0
+  count               = 1
   repository          = var.github_repo_name
   branch              = var.github_repo_branch
   file                = "${var.github_file_path}/helm/indico-crds-values.values"
@@ -29,7 +29,7 @@ resource "github_repository_file" "crds_values_yaml" {
 }
 
 data "github_repository_file" "data_crds_values" {
-  count = var.argo_enabled == true ? 1 : 0
+  count = 1
   depends_on = [
     github_repository_file.crds_values_yaml
   ]
@@ -64,7 +64,7 @@ resource "time_sleep" "wait_1_minutes_after_crds" {
 
 # Operator installed, on to pre-reqs
 resource "github_repository_file" "pre_reqs_values_yaml" {
-  count               = var.argo_enabled == true ? 1 : 0
+  count               = 1
   repository          = var.github_repo_name
   branch              = var.github_repo_branch
   file                = "${var.github_file_path}/helm/indico-pre-reqs-values.values"
@@ -80,7 +80,7 @@ resource "github_repository_file" "pre_reqs_values_yaml" {
 }
 
 data "github_repository_file" "data_pre_reqs_values" {
-  count = var.argo_enabled == true ? 1 : 0
+  count = 1
 
   depends_on = [
     github_repository_file.pre_reqs_values_yaml
