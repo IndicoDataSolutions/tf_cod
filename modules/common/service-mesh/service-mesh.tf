@@ -112,17 +112,7 @@ resource "kubernetes_annotations" "default-ns-annotation" {
   }
 }
 
-resource "kubernetes_annotations" "indico-ns-annotation" {
-  depends_on = [helm_release.linkerd-control-plane]
-  api_version = "v1"
-  kind = "Namespace"
-  metadata {
-    name = var.namespace
-  }
-  annotations = {
-    "linkerd.io/inject" = "enabled"
-  }
-}
+# Note, the indico namespace, or namespace that contains cert-manager should not be annotated because this could cause a circular dependency with linkerd.
 
 resource "kubernetes_annotations" "monitoring-ns-annotation" {
   depends_on = [helm_release.linkerd-control-plane]

@@ -74,6 +74,9 @@ app-edge:
       http_api_port: 31270
   nginx:
     httpPort: 8080
+  ingress:
+    annotations:
+      nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "true" : "false"}
   aws-load-balancer-controller:
     enabled: true
     aws-load-balancer-controller:
@@ -117,6 +120,9 @@ app-edge:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
     ingress:
       useStaticCertificate: ${var.use_static_ssl_certificates}
+  ingress:
+    annotations:
+      nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "true" : "false"}
 EOT
   )
   dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT
@@ -679,6 +685,8 @@ ${local.dns_configuration_values}
 ingress-nginx:
   enabled: true
   controller:
+    podAnnotations:
+      linkerd.io/inject: ${var.enable_service_mesh ? "enabled" : "false"}
     service:
       enableHttp: ${local.enableHttp}
       targetPorts:
