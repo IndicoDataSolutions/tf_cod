@@ -1500,3 +1500,13 @@ variable "create_nginx_ingress_security_group" {
   default     = false
   description = "If enabled this will create a security group for the nginx ingress controller"
 }
+
+variable "http_tokens" {
+  type        = string
+  default     = "required"
+  description = "Set IMDSv2 tokens to required or optional"
+  validation {
+    condition     = var.http_tokens == "required" || var.http_tokens == "optional"
+    error_message = "${var.http_tokens} not valid. Type must be either required or optional"
+  }
+}
