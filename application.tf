@@ -140,7 +140,7 @@ external-dns:
     repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
   logLevel: debug
   policy: sync
-  txtOwnerId: "${local.dns_name}"
+  txtOwnerId: "${var.load_environment == "" ? local.dns_name : local.monitoring_domain_name}"
   domainFilters:
     - ${local.dns_zone_name}
 
@@ -170,7 +170,7 @@ external-dns:
     repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
   logLevel: debug
   policy: sync
-  txtOwnerId: "${local.dns_name}"
+  txtOwnerId: "${var.load_environment == "" ? local.dns_name : local.monitoring_domain_name}"
   domainFilters:
     - ${local.dns_zone_name}
 
@@ -189,7 +189,7 @@ alternate-external-dns:
     repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
   logLevel: debug
   policy: sync
-  txtOwnerId: "${local.dns_name}-${var.label}-${var.region}"
+  txtOwnerId: "${var.load_environment == "" ? local.dns_name : local.monitoring_domain_name}-${var.label}-${var.region}"
   domainFilters:
     - ${local.alternate_domain_root}
   extraArgs:
