@@ -728,7 +728,7 @@ externalSecretStore:
 
   monitoring_values = var.monitoring_enabled ? [<<EOF
 global:
-  host: "${local.dns_name}"
+  host: "${local.monitoring_domain_name}"
 authentication:
   ingressUsername: monitoring
   ingressPassword: ${random_password.monitoring-password.result}
