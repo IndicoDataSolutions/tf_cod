@@ -994,7 +994,7 @@ apiModels:
     registry: ${var.image_registry}
 secrets:
   rabbitmq:
-    create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+    create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   general:
     create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   fernet:
@@ -1083,7 +1083,7 @@ crunchy-postgres:
             cpu: 1000m
             memory: 3000Mi
 rabbitmq:
-  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   rabbitmq:
     image:
       registry: ${var.image_registry}
@@ -1092,7 +1092,7 @@ rabbitmq:
 externalSecretStore:
   enabled: ${var.secrets_operator_enabled}
   loadEnvironment:
-    enabled: ${var.load_environment == "" ? "false" : "true" }
+    enabled: ${var.load_environment == "" ? "false" : "true"}
     environment: ${var.load_environment == "" ? local.environment : lower(var.load_environment)}
   EOF
   ])
@@ -1129,7 +1129,7 @@ reloader:
         image:
           name: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/stakater/reloader
 kafka-strimzi:
-  enabled: ${var.load_environment == "" ? "true" : "false" }
+  enabled: ${var.load_environment == "" ? "true" : "false"}
   strimzi-kafka-operator: 
     defaultImageRegistry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/strimzi-proxy
   kafkacat:
@@ -1225,20 +1225,21 @@ faust-worker:
         DOCTOR_HOST: 'http://doctor-application-cluster:5000'
         NOCT_HOST: 'http://noct-application-cluster:5000'
 EOF
-) : (<<EOF
+    ) : (<<EOF
 faust-worker:
   enabled: false
 EOF
-) : (<<EOF
+    ) : (<<EOF
 faust-worker:
   enabled: true
 EOF
-)
+  )
 }
 
 module "intake" {
   depends_on = [
-    module.indico-common
+    module.indico-common,
+    module.service-mesh
   ]
   source                            = "./modules/common/intake"
   count                             = var.ipa_enabled ? 1 : 0
@@ -1940,7 +1941,7 @@ linkerd-multicluster:
   controllers:
     - link:
         ref:
-          name: ${var.load_environment == "" ? "application-cluster" : "data-cluster" }
+          name: ${var.load_environment == "" ? "application-cluster" : "data-cluster"}
       logLevel: debug
       gateway:
         enabled: false
@@ -1952,9 +1953,7 @@ EOF
 
 module "service-mesh" {
   depends_on = [
-    module.indico-common,
-    module.intake,
-    module.insights
+    module.indico-common.time_sleep.wait_1_minutes_after_crds
   ]
   source                        = "./modules/common/service-mesh"
   count                         = var.enable_service_mesh ? 1 : 0

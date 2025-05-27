@@ -533,11 +533,11 @@ module "argo-registration" {
 }
 
 locals {
-  security_group_id = var.include_fsx == true ? tolist(local.environment_fsx_rwx_security_group_ids)[0] : ""
-  cluster_name      = var.label
-  dns_zone_name     = var.dns_zone_name == "" ? lower("${var.aws_account}.${var.domain_suffix}") : var.dns_zone_name
+  security_group_id      = var.include_fsx == true ? tolist(local.environment_fsx_rwx_security_group_ids)[0] : ""
+  cluster_name           = var.label
+  dns_zone_name          = var.dns_zone_name == "" ? lower("${var.aws_account}.${var.domain_suffix}") : var.dns_zone_name
   calculated_domain_name = lower("${var.label}.${var.region}.${local.dns_zone_name}")
-  dns_name          = var.domain_host == "" ? local.calculated_domain_name : var.domain_host
+  dns_name               = var.domain_host == "" ? local.calculated_domain_name : var.domain_host
   monitoring_domain_name = var.load_environment == "" ? local.dns_name : local.calculated_domain_name
 }
 
