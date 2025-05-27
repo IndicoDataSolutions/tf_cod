@@ -122,7 +122,7 @@ app-edge:
     ingress:
       useStaticCertificate: ${var.use_static_ssl_certificates}
   ingress:
-     enabled: ${var.load_environment == "" ? true : false}
+    enabled: ${var.load_environment == "" ? true : false}
     annotations:
       nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "true" : "false"}
 EOT
