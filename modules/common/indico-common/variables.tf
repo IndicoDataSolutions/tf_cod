@@ -146,6 +146,11 @@ variable "label" {
   description = "name of the cluster"
 }
 
+variable "region" {
+  type        = string
+  description = "Region of the cluster"
+}
+
 variable "image_registry" {
   type        = string
   description = "Image registry"

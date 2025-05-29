@@ -26,7 +26,7 @@ resource "kubectl_manifest" "linkerd-issuer-secret" {
 }
 resource "kubectl_manifest" "linkerd-identity-trust-roots-bundle" {
   count = var.enable_service_mesh ? 1 : 0
-  depends_on = [kubectl_manifest.linkerd-issuer-secret, helm_release.linkerd-crds]
+  depends_on = [kubectl_manifest.linkerd-issuer-secret, helm_release.linkerd-crds, time_sleep.wait_1_minutes_after_crds]
   yaml_body  = <<YAML
     apiVersion: trust.cert-manager.io/v1alpha1
     kind: Bundle

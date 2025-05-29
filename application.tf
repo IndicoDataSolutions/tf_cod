@@ -547,6 +547,14 @@ external-secrets:
   certController:
     image:
       repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+trust-manager:
+  app:
+    trust:
+      namespace: indico
+  image:
+    repository: ${var.image_registry}/quay.io/jetstack/trust-manager
+  defaultPackageImage:
+    repository: ${var.image_registry}/quay.io/jetstack/trust-pkg-debian-bookworm
   EOF
   ]
 
@@ -587,14 +595,6 @@ global:
   host: ${local.dns_name}
   image:
     registry: ${var.image_registry}
-trust-manager:
-  app:
-    trust:
-      namespace: indico
-  image:
-    repository: ${var.image_registry}/quay.io/jetstack/trust-manager
-  defaultPackageImage:
-    repository: ${var.image_registry}/quay.io/jetstack/trust-pkg-debian-bookworm
 storage:
   ebsStorageClass:
     enabled: true
@@ -875,6 +875,7 @@ module "indico-common" {
   environment                      = local.environment
   account_name                     = var.aws_account
   label                            = var.label
+  region                           = var.region
   image_registry                   = var.image_registry
   insights_enabled                 = var.insights_enabled
   enable_service_mesh              = var.enable_service_mesh
