@@ -122,7 +122,7 @@ resource "kubernetes_annotations" "default-ns-annotation" {
 
 resource "kubernetes_annotations" "monitoring-ns-annotation" {
   count = var.enable_service_mesh && data.kubernetes_namespace.existing_namespace_monitoring[0].metadata[0].name != null ? 1 : 0
-  depends_on = [helm_release.linkerd-control-plane]
+  depends_on = [helm_release.linkerd-control-plane, kubernetes_annotations.default-ns-annotation]
   api_version = "v1"
   kind = "Namespace"
   metadata {
@@ -155,6 +155,7 @@ data "kubernetes_namespace" "existing_namespace_monitoring" {
 
 resource "kubernetes_namespace" "monitoring" {
   count = var.enable_service_mesh && data.kubernetes_namespace.existing_namespace_monitoring[0].metadata[0].name == null ? 1 : 0
+  depends_on = [helm_release.linkerd-control-plane, kubernetes_namespace.existing_namespace_monitoring]
 
   metadata {
     name = "monitoring"
