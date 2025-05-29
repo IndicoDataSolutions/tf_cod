@@ -1,18 +1,8 @@
-# This module is used to deploy the service mesh to the cluster.
 
-terraform {
-  required_providers {
-    kubectl = {
-      source  = "gavinbunney/kubectl"
-    }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-    }
-  }
-}
 # Create secrets for the service mesh.
 resource "kubectl_manifest" "linkerd-issuer-secret" {
-  depends_on = [helm_release.linkerd-crds]
+  count = var.enable_service_mesh ? 1 : 0
+  depends_on = [helm_release.linkerd-crds, time_sleep.wait_1_minutes_after_crds]
   yaml_body = <<YAML
     apiVersion: "secrets.hashicorp.com/v1beta1"
     kind: "VaultStaticSecret"
@@ -36,6 +26,7 @@ resource "kubectl_manifest" "linkerd-issuer-secret" {
   YAML
 }
 resource "kubectl_manifest" "linkerd-identity-trust-roots-bundle" {
+  count = var.enable_service_mesh ? 1 : 0
   depends_on = [kubectl_manifest.linkerd-issuer-secret, helm_release.linkerd-crds]
   yaml_body  = <<YAML
     apiVersion: trust.cert-manager.io/v1alpha1
@@ -59,7 +50,7 @@ resource "kubectl_manifest" "linkerd-identity-trust-roots-bundle" {
 
 resource "helm_release" "linkerd-crds" {
   count            = var.enable_service_mesh ? 1 : 0
-  depends_on       = []
+  depends_on       = [time_sleep.wait_1_minutes_after_crds]
   name             = "linkerd-crds"
   chart            = "linkerd-crds"
   namespace        = var.service_mesh_namespace
@@ -70,6 +61,7 @@ resource "helm_release" "linkerd-crds" {
 }
 
 resource "helm_release" "linkerd-control-plane" {
+  count = var.enable_service_mesh ? 1 : 0
   depends_on = [helm_release.linkerd-crds, kubectl_manifest.linkerd-identity-trust-roots-bundle, kubectl_manifest.linkerd-issuer-secret]
   name       = "linkerd-control-plane"
   chart      = "linkerd-control-plane"
@@ -80,6 +72,7 @@ resource "helm_release" "linkerd-control-plane" {
 }
 
 resource "helm_release" "linkerd-viz" {
+  count = var.enable_service_mesh ? 1 : 0
   depends_on = [helm_release.linkerd-control-plane]
   name       = "linkerd-viz"
   chart      = "linkerd-viz"
@@ -90,6 +83,7 @@ resource "helm_release" "linkerd-viz" {
 }
 
 resource "helm_release" "linkerd-multicluster" {
+  count = var.enable_service_mesh ? 1 : 0
   depends_on = [helm_release.linkerd-control-plane]
   name       = "linkerd-multicluster"
   chart      = "linkerd-multicluster"
@@ -101,6 +95,7 @@ resource "helm_release" "linkerd-multicluster" {
 }
 
 resource "kubernetes_annotations" "default-ns-annotation" {
+  count = var.enable_service_mesh ? 1 : 0
   depends_on = [helm_release.linkerd-control-plane]
   api_version = "v1"
   kind = "Namespace"
@@ -115,6 +110,7 @@ resource "kubernetes_annotations" "default-ns-annotation" {
 # Note, the indico namespace, or namespace that contains cert-manager should not be annotated because this could cause a circular dependency with linkerd.
 
 resource "kubernetes_annotations" "monitoring-ns-annotation" {
+  count = var.enable_service_mesh ? 1 : 0
   depends_on = [helm_release.linkerd-control-plane, kubernetes_namespace.monitoring]
   api_version = "v1"
   kind = "Namespace"
@@ -127,8 +123,8 @@ resource "kubernetes_annotations" "monitoring-ns-annotation" {
 }
 
 resource "kubernetes_annotations" "insights-ns-annotation" {
+  count = var.enable_service_mesh ? 1 : 0
   depends_on = [helm_release.linkerd-control-plane]
-  count      = var.insights_enabled ? 1 : 0
   api_version = "v1"
   kind = "Namespace"
   metadata {
@@ -140,16 +136,21 @@ resource "kubernetes_annotations" "insights-ns-annotation" {
 }
 
 data "kubernetes_namespace" "existing_namespace_monitoring" {
-  count = 1
+  count = var.enable_service_mesh ? 1 : 0
   metadata {
     name = "monitoring"
   }
 }
 
 resource "kubernetes_namespace" "monitoring" {
-  count = data.kubernetes_namespace.existing_namespace_monitoring[0].metadata.name == null ? 1 : 0
+  count = var.enable_service_mesh && data.kubernetes_namespace.existing_namespace_monitoring[0].metadata.name == null ? 1 : 0
 
   metadata {
     name = "monitoring"
   }
+}
+
+resource "time_sleep" "wait_1_minutes_after_service_mesh" {
+  depends_on = [helm_release.linkerd-crds, helm_release.linkerd-control-plane, helm_release.linkerd-viz, helm_release.linkerd-multicluster]
+  create_duration = "1m"
 }
