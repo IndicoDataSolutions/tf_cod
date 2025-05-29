@@ -134,7 +134,7 @@ resource "kubernetes_annotations" "monitoring-ns-annotation" {
 }
 
 resource "kubernetes_annotations" "insights-ns-annotation" {
-  count = var.enable_service_mesh ? 1 : 0
+  count = var.enable_service_mesh  && var.insights_enabled ? 1 : 0
   depends_on = [helm_release.linkerd-control-plane]
   api_version = "v1"
   kind = "Namespace"
