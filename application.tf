@@ -1100,6 +1100,9 @@ rabbitmq:
       registry: ${var.image_registry}
     persistence:
       storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
+    service:
+      annotations:
+        mirror.linkerd.io/exported: ${var.enable_service_mesh ? "remote-discovery" : "disabled"}
 externalSecretStore:
   enabled: ${var.secrets_operator_enabled}
   loadEnvironment:
