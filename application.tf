@@ -1254,8 +1254,7 @@ EOF
 
 module "intake" {
   depends_on = [
-    module.indico-common,
-    module.service-mesh
+    module.indico-common
   ]
   source                            = "./modules/common/intake"
   count                             = var.ipa_enabled ? 1 : 0
