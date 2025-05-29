@@ -121,8 +121,8 @@ resource "kubernetes_annotations" "default-ns-annotation" {
 # Note, the indico namespace, or namespace that contains cert-manager should not be annotated because this could cause a circular dependency with linkerd.
 
 resource "kubernetes_annotations" "monitoring-ns-annotation" {
-  count = var.enable_service_mesh && data.kubernetes_namespace.existing_namespace_monitoring[0].metadata[0].name != null ? 1 : 0
-  depends_on = [helm_release.linkerd-control-plane, kubernetes_annotations.default-ns-annotation]
+  count = var.enable_service_mesh ? 1 : 0
+  depends_on = [helm_release.linkerd-control-plane, kubernetes_namespace.monitoring]
   api_version = "v1"
   kind = "Namespace"
   metadata {
@@ -155,7 +155,7 @@ data "kubernetes_namespace" "existing_namespace_monitoring" {
 
 resource "kubernetes_namespace" "monitoring" {
   count = var.enable_service_mesh && data.kubernetes_namespace.existing_namespace_monitoring[0].metadata[0].name == null ? 1 : 0
-  depends_on = [helm_release.linkerd-control-plane, kubernetes_namespace.existing_namespace_monitoring]
+  depends_on = [helm_release.linkerd-control-plane, data.kubernetes_namespace.existing_namespace_monitoring]
 
   metadata {
     name = "monitoring"
