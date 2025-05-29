@@ -1,7 +1,7 @@
 # Create secrets for the service mesh.
 resource "kubectl_manifest" "linkerd-issuer-secret" {
   count = var.enable_service_mesh ? 1 : 0
-  depends_on = [helm_release.linkerd-crds, time_sleep.wait_1_minutes_after_crds]
+  depends_on = [helm_release.trust-manager]
   yaml_body = <<YAML
     apiVersion: "secrets.hashicorp.com/v1beta1"
     kind: "VaultStaticSecret"
@@ -26,7 +26,7 @@ resource "kubectl_manifest" "linkerd-issuer-secret" {
 }
 resource "kubectl_manifest" "linkerd-identity-trust-roots-bundle" {
   count = var.enable_service_mesh ? 1 : 0
-  depends_on = [kubectl_manifest.linkerd-issuer-secret, helm_release.linkerd-crds, time_sleep.wait_1_minutes_after_crds]
+  depends_on = [helm_release.trust-manager, kubectl_manifest.linkerd-issuer-secret]
   yaml_body  = <<YAML
     apiVersion: trust.cert-manager.io/v1alpha1
     kind: Bundle
@@ -47,9 +47,21 @@ resource "kubectl_manifest" "linkerd-identity-trust-roots-bundle" {
   YAML
 }
 
+resource "helm_release" "trust-manager" {
+  count = var.enable_service_mesh ? 1 : 0
+  depends_on = [time_sleep.wait_1_minutes_after_crds]
+  name = "trust-manager"
+  chart = "trust-manager"
+  namespace = var.namespace
+  repository = var.helm_registry
+  version = var.trust_manager_version
+  values = var.trust_manager_values
+}
+
+
 resource "helm_release" "linkerd-crds" {
   count            = var.enable_service_mesh ? 1 : 0
-  depends_on       = [time_sleep.wait_1_minutes_after_crds]
+  depends_on       = [time_sleep.wait_1_minutes_after_crds, helm_release.trust-manager]
   name             = "linkerd-crds"
   chart            = "linkerd-crds"
   namespace        = var.service_mesh_namespace
@@ -61,7 +73,7 @@ resource "helm_release" "linkerd-crds" {
 
 resource "helm_release" "linkerd-control-plane" {
   count = var.enable_service_mesh ? 1 : 0
-  depends_on = [helm_release.linkerd-crds, kubectl_manifest.linkerd-identity-trust-roots-bundle, kubectl_manifest.linkerd-issuer-secret]
+  depends_on = [helm_release.linkerd-crds, kubectl_manifest.linkerd-identity-trust-roots-bundle, kubectl_manifest.linkerd-issuer-secret, helm_release.trust-manager]
   name       = "linkerd-control-plane"
   chart      = "linkerd-control-plane"
   namespace  = var.service_mesh_namespace

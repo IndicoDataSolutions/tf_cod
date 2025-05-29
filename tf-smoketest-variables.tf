@@ -251,6 +251,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     linkerd_crds_version = "${jsonencode(var.linkerd_crds_version)}"
     linkerd_viz_version = "${jsonencode(var.linkerd_viz_version)}"
     linkerd_multicluster_version = "${jsonencode(var.linkerd_multicluster_version)}"
+    trust_manager_version = "${jsonencode(var.trust_manager_version)}"
     enable_data_application_cluster_separation = "${jsonencode(var.enable_data_application_cluster_separation)}"
 
     }

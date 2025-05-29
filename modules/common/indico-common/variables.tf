@@ -179,6 +179,17 @@ variable "linkerd_multicluster_values" {
   default     = []
 }
 
+variable "trust_manager_version" {
+  type        = string
+  description = "Version for the trust manager"
+}
+
+variable "trust_manager_values" {
+  type        = list(string)
+  default     = []
+  description = "Values for the trust manager"
+}
+
 variable "insights_enabled" {
   type        = bool
   description = "Toggle for enabling insights"

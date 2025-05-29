@@ -547,14 +547,6 @@ external-secrets:
   certController:
     image:
       repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
-trust-manager:
-  app:
-    trust:
-      namespace: indico
-  image:
-    repository: ${var.image_registry}/quay.io/jetstack/trust-manager
-  defaultPackageImage:
-    repository: ${var.image_registry}/quay.io/jetstack/trust-pkg-debian-bookworm
   EOF
   ]
 
@@ -871,6 +863,8 @@ module "indico-common" {
   linkerd_control_plane_values     = local.linkerd_control_plane_values
   linkerd_viz_values               = local.linkerd_viz_values
   linkerd_multicluster_values      = local.linkerd_multicluster_values
+  trust_manager_version            = var.trust_manager_version
+  trust_manager_values             = local.trust_manager_values
   load_environment                 = var.load_environment
   environment                      = local.environment
   account_name                     = var.aws_account
@@ -1965,5 +1959,17 @@ linkerd-multicluster:
 EOF
   ] : []
 
+  trust_manager_values = var.enable_service_mesh ? [<<EOF
+trust-manager:
+  app:
+    trust:
+      namespace: indico
+  image:
+    repository: ${var.image_registry}/quay.io/jetstack/trust-manager
+  defaultPackageImage:
+    repository: ${var.image_registry}/quay.io/jetstack/trust-pkg-debian-bookworm
+EOF
+  ] : []
 }
+
 

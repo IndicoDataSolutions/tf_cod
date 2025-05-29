@@ -1530,6 +1530,12 @@ variable "linkerd_multicluster_version" {
   description = "Version for the linkerd multicluster"
 }
 
+variable "trust_manager_version" {
+  type        = string
+  default     = "0.0.1"
+  description = "Version for the trust manager"
+}
+
 variable "enable_data_application_cluster_separation" {
   type        = bool
   default     = false
