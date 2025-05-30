@@ -119,18 +119,32 @@ resource "kubernetes_annotations" "default-ns-annotation" {
 }
 
 # Note, the indico namespace, or namespace that contains cert-manager should not be annotated because this could cause a circular dependency with linkerd.
-
-resource "kubernetes_annotations" "monitoring-ns-annotation" {
+resource "null_resource" "annotate_monitoring_namespace" {
   count = var.enable_service_mesh ? 1 : 0
-  depends_on = [helm_release.linkerd-control-plane, kubernetes_namespace.monitoring]
-  api_version = "v1"
-  kind = "Namespace"
-  metadata {
-    name = "monitoring"
+  depends_on = [
+    helm_release.linkerd-control-plane,
+  ]
+
+  triggers = {
+    always_run = "${timestamp()}"
   }
-  annotations = {
-    "linkerd.io/inject" = "enabled"
+  provisioner "local-exec" {
+    command = "curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl"
   }
+
+  provisioner "local-exec" {
+    command = "aws eks update-kubeconfig --name ${var.label} --region ${var.region}"
+  }
+
+
+  provisioner "local-exec" {
+    command = "./kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -"
+  }
+
+  provisioner "local-exec" {
+    command = "./kubectl annotate namespace monitoring linkerd.io/inject=enabled"
+  }
+
 }
 
 resource "kubernetes_annotations" "insights-ns-annotation" {
@@ -146,21 +160,6 @@ resource "kubernetes_annotations" "insights-ns-annotation" {
   }
 }
 
-data "kubernetes_namespace" "existing_namespace_monitoring" {
-  count = var.enable_service_mesh ? 1 : 0
-  metadata {
-    name = "monitoring"
-  }
-}
-
-resource "kubernetes_namespace" "monitoring" {
-  count = var.enable_service_mesh && data.kubernetes_namespace.existing_namespace_monitoring[0].metadata[0].name == null ? 1 : 0
-  depends_on = [helm_release.linkerd-control-plane, data.kubernetes_namespace.existing_namespace_monitoring]
-
-  metadata {
-    name = "monitoring"
-  }
-}
 
 resource "time_sleep" "wait_1_minutes_after_service_mesh" {
   depends_on = [helm_release.linkerd-crds, helm_release.linkerd-control-plane, helm_release.linkerd-viz, helm_release.linkerd-multicluster]
