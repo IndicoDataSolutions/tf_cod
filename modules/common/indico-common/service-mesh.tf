@@ -138,7 +138,7 @@ resource "null_resource" "annotate_monitoring_namespace" {
 
 
   provisioner "local-exec" {
-    command = "./kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -"
+    command = "./kubectl create namespace monitoring --dry-run=client -o yaml | ./kubectl apply -f -"
   }
 
   provisioner "local-exec" {
