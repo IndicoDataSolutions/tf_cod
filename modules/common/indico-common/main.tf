@@ -118,7 +118,7 @@ EOT
 }
 
 resource "helm_release" "monitoring" {
-  depends_on = [helm_release.indico_pre_requisites, kubernetes_annotations.monitoring-ns-annotation]
+  depends_on = [helm_release.indico_pre_requisites, null_resource.annotate_monitoring_namespace]
 
   count = var.monitoring_enabled == true ? 1 : 0
 
