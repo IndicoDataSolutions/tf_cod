@@ -391,48 +391,48 @@ crunchy-pgo:
     enabled: true
   pgo: 
     controllerImages:
-      cluster: ${var.image_registry}/registry.crunchydata.com/crunchydata/postgres-operator:ubi8-5.7.1-0
+      cluster: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/postgres-operator:ubi9-5.8.2-0
     relatedImages:
       postgres_17:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-17.2-0
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi9-17.5-2520
+      postgres_17_gis_3.5:
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-17.5-3.5-2520
       postgres_17_gis_3.4:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-17.2-3.4-0
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-17.5-3.4-2520
       postgres_16:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-16.6-0
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi9-16.9-2520
       postgres_16_gis_3.4:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.6-0
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-16.9-3.4-2520
       postgres_16_gis_3.3:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.6-3.3-0
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-16.9-3.3-2520
       postgres_15:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-15.10-0
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi9-15.13-2520
       postgres_15_gis_3.3:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-15.10-3.3-0
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-15.13-3.3-2520
       postgres_14:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.15-0
-      postgres_14_gis_3.1:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.15-3.1-0
-      postgres_14_gis_3.2:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.15-3.2-0
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi9-14.18-2520
       postgres_14_gis_3.3:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.15-3.3-0
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-14.18-3.3-2520
+      postgres_14_gis_3.2:
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-14.18-3.2-2520
+      postgres_14_gis_3.1:
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-14.18-3.1-2520
       postgres_13:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-13.18-0
-      postgres_13_gis_3.0:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.18-3.0-0
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi9-13.21-2520
       postgres_13_gis_3.1:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.18-3.1-0
-      pgadmin:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-4.30-32
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-13.21-3.1-2520
       pgbackrest:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.53.1-1
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi9-2.54.2-2520
       pgbouncer:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbouncer:ubi8-1.23-1
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-pgbouncer:ubi9-1.24-2520
       pgexporter:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi8-0.15.0-13
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi9-0.17.1-2520
       pgupgrade:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-upgrade:ubi8-5.7.1-0
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-upgrade:ubi9-17.5-2520
       standalone_pgadmin:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-8.12-1
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi9-9.2-2520
+      collector:
+        image: harbor.devops.indico.io/registry.crunchydata.com/crunchydata/postgres-operator:ubi9-5.8.2-0
 migrations-operator:
   enabled: ${var.ipa_enabled || var.insights_enabled}
   image:
