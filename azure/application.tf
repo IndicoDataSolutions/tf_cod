@@ -646,73 +646,72 @@ apiModels:
 
 crunchy-postgres:
   enabled: ${!var.is_openshift}
-  postgres-data:
+  metadata:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
+  instances:
+  - affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node_group
+              operator: In
+              values:
+              - pgo-workers
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: postgres-operator.crunchydata.com/cluster
+              operator: In
+              values:
+              - postgres-data
+            - key: postgres-operator.crunchydata.com/instance-set
+              operator: In
+              values:
+              - pgha1
+          topologyKey: kubernetes.io/hostname
     metadata:
       annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
         reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
-    instances:
-    - affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node_group
-                operator: In
-                values:
-                - pgo-workers
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: postgres-operator.crunchydata.com/cluster
-                operator: In
-                values:
-                - postgres-data
-              - key: postgres-operator.crunchydata.com/instance-set
-                operator: In
-                values:
-                - pgha1
-            topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
-      dataVolumeClaimSpec:
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 200Gi
-      name: pgha1
-      replicas: 1
+    dataVolumeClaimSpec:
+      accessModes:
+      - ReadWriteOnce
       resources:
         requests:
-          cpu: 500m
+          storage: 200Gi
+    name: pgha1
+    replicas: 1
+    resources:
+      requests:
+        cpu: 500m
+        memory: 3000Mi
+    tolerations:
+      - effect: NoSchedule
+        key: indico.io/crunchy
+        operator: Exists
+  pgBackRestConfig:
+    global:
+      archive-timeout: '10000'
+      repo1-path: /pgbackrest/postgres-data/repo1
+      repo1-retention-full: '5'
+      repo1-azure-account: ${module.storage.storage_account_name}
+      repo1-azure-key: ${module.storage.storage_account_primary_access_key}
+    repos:
+    - name: repo1
+      azure:
+        container: " ${module.storage.crunchy_backup_name}"
+      schedules:
+        full: 30 4 * * *
+        incremental: 0 0 * * *
+    jobs:
+      resources:
+        requests:
+          cpu: 1000m
           memory: 3000Mi
-      tolerations:
-        - effect: NoSchedule
-          key: indico.io/crunchy
-          operator: Exists
-    pgBackRestConfig:
-      global:
-        archive-timeout: '10000'
-        repo1-path: /pgbackrest/postgres-data/repo1
-        repo1-retention-full: '5'
-        repo1-azure-account: ${module.storage.storage_account_name}
-        repo1-azure-key: ${module.storage.storage_account_primary_access_key}
-      repos:
-      - name: repo1
-        azure:
-          container: " ${module.storage.crunchy_backup_name}"
-        schedules:
-          full: 30 4 * * *
-          incremental: 0 0 * * *
-      jobs:
-        resources:
-          requests:
-            cpu: 1000m
-            memory: 3000Mi
   EOF
   ]
 
@@ -835,85 +834,83 @@ locals {
   insights_pre_reqs_values = [<<EOF
 crunchy-postgres:
   enabled: ${!var.is_openshift}
-  postgres-data:
-    enabled: true
-    name: postgres-insights
-    postgresVersion: 13
+  name: postgres-insights
+  postgresVersion: 13
+  metadata:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
+  instances:
+  - affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node_group
+              operator: In
+              values:
+              - pgo-workers
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: postgres-operator.crunchydata.com/cluster
+              operator: In
+              values:
+              - postgres-insights
+            - key: postgres-operator.crunchydata.com/instance-set
+              operator: In
+              values:
+              - pgha2
+          topologyKey: kubernetes.io/hostname
     metadata:
       annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
         reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
-    instances:
-    - affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node_group
-                operator: In
-                values:
-                - pgo-workers
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: postgres-operator.crunchydata.com/cluster
-                operator: In
-                values:
-                - postgres-insights
-              - key: postgres-operator.crunchydata.com/instance-set
-                operator: In
-                values:
-                - pgha2
-            topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
-      dataVolumeClaimSpec:
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 200Gi
-      name: pgha2
-      replicas: 1
+    dataVolumeClaimSpec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 200Gi
+    name: pgha2
+    replicas: 1
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 3000Mi
+    tolerations:
+      - effect: NoSchedule
+        key: indico.io/crunchy
+        operator: Exists
+  pgBackRestConfig:
+    global:
+      archive-timeout: '10000'
+      repo2-path: /pgbackrest/postgres-data/repo2
+      repo2-retention-full: '5'
+      repo2-azure-account: ${module.storage.storage_account_name}
+      repo2-azure-key: ${module.storage.storage_account_primary_access_key}
+    repos:
+    - name: repo2
+      azure:
+        container: " ${module.storage.crunchy_backup_name}"
+      schedules:
+        full: 30 4 * * *
+        incremental: 0 */1 * * *
+    jobs:
       resources:
         requests:
           cpu: 1000m
           memory: 3000Mi
-      tolerations:
-        - effect: NoSchedule
-          key: indico.io/crunchy
-          operator: Exists
-    pgBackRestConfig:
-      global:
-        archive-timeout: '10000'
-        repo2-path: /pgbackrest/postgres-data/repo2
-        repo2-retention-full: '5'
-        repo2-azure-account: ${module.storage.storage_account_name}
-        repo2-azure-key: ${module.storage.storage_account_primary_access_key}
-      repos:
-      - name: repo2
-        azure:
-          container: " ${module.storage.crunchy_backup_name}"
-        schedules:
-          full: 30 4 * * *
-          incremental: 0 */1 * * *
-      jobs:
-        resources:
-          requests:
-            cpu: 1000m
-            memory: 3000Mi
-    monitoring: true
-    users:
-      - name: indico
-        options: "SUPERUSER"
-        databases:
-          - aqueduct
-          - ask_my_collection
-          - lagoon
-          - noct
+  monitoring: true
+  users:
+    - name: indico
+      options: "SUPERUSER"
+      databases:
+        - aqueduct
+        - ask_my_collection
+        - lagoon
+        - noct
 ingress:
   useStaticCertificate: false
   secretName: indico-ssl-static-cert
