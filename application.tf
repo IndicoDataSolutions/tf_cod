@@ -1150,7 +1150,6 @@ locals {
 crunchy-postgres:
   enabled: true
   name: postgres-insights
-  postgresVersion: 13
   metadata:
     annotations:
       reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
