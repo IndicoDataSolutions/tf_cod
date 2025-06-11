@@ -769,7 +769,7 @@ module "intake" {
   argo_application_name             = lower("${var.account}.${var.region}.${var.label}-ipa")
   vault_path                        = "tools/argo/data/ipa-deploy"
   argo_server                       = module.cluster.kubernetes_host
-  argo_project_name                 = module.argo-registration[0].argo_project_name
+  argo_project_name                 = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
   intake_version                    = var.ipa_version
   k8s_version                       = var.k8s_version
   intake_values_terraform_overrides = local.intake_values
@@ -982,7 +982,7 @@ module "insights" {
   argo_application_name               = lower("${var.account}.${var.region}.${var.label}-insights")
   vault_path                          = "tools/argo/data/ipa-deploy"
   argo_server                         = module.cluster.kubernetes_host
-  argo_project_name                   = module.argo-registration[0].argo_project_name
+  argo_project_name                   = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
   insights_version                    = var.insights_version
   k8s_version                         = var.k8s_version
   insights_values_terraform_overrides = local.insights_values
