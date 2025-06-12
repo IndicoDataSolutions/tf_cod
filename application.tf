@@ -1243,28 +1243,6 @@ minio:
       repository: harbor.devops.indico.io/docker.io/amazon/aws-cli
       tag: 2.22.4
     awsBucket: ${local.environment_miniobkp_s3_bucket_name}
-weaviate:
-  cronjob:
-    services:
-      weaviate-backup:
-        enabled: true
-  backupStorageConfig:
-    accessKey: insights
-    secretKey: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
-    url: http://minio-tenant-hl.insights.svc.cluster.local:9000
-  weaviate:
-    env:
-      # 1 less than the hard limit of the weaviate node group type
-      GOMEMLIMIT: "31GiB"
-    # TODO: switch this to a dedicated weaviate backup bucket
-    backups:
-      s3:
-        enabled: true
-        envconfig:
-          BACKUP_S3_ENDPOINT: minio-tenant-hl.insights.svc.cluster.local:9000
-        secrets:
-          AWS_ACCESS_KEY_ID: insights
-          AWS_SECRET_ACCESS_KEY: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
 rabbitmq:
   rabbitmq:
     image:
@@ -1277,15 +1255,6 @@ rabbitmq:
   insights_values = <<EOF
 global:
   host: ${lower("${var.label}.${var.region}.${var.aws_account}.indico.io")}
-  features:
-    askMyDocument: true
-ask-my-docs:
-  llmConfig:
-    llm: indico-azure-instance
-    azure:
-      apiBase: https://indico-openai.openai.azure.com/
-      deployment: indico-gpt-4
-      apiKey: <path:tools/argo/data/RandD/azureOpenAiKey#apiKey>
   EOF
 }
 
