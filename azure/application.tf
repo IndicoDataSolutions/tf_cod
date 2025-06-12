@@ -1038,7 +1038,7 @@ resource "argocd_application" "ipa" {
     helm_release.cod-snapshot-restore
   ]
 
-  count = var.ipa_enabled == true && var.argo_enabled == true ? 1 : 0
+  count = var.argo_enabled == true ? 1 : 0
 
   wait = true
 
