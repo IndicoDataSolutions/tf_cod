@@ -142,26 +142,6 @@ locals {
       desired_capacity       = "1"
       taints                 = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
       additional_node_labels = ""
-    },
-    weaviate = {
-      type                   = "cpu"
-      spot                   = false
-      instance_types         = ["r5a.xlarge"]
-      min_size               = 1
-      max_size               = 3
-      desired_capacity       = "3"
-      taints                 = "--register-with-taints=indico.io/weaviate=true:NoSchedule"
-      additional_node_labels = ""
-    },
-    weaviate-workers = {
-      type                   = "cpu"
-      spot                   = false
-      instance_types         = ["c6a.2xlarge"]
-      min_size               = 1
-      max_size               = 4
-      desired_capacity       = "2"
-      taints                 = "--register-with-taints=indico.io/weaviate-workers=true:NoSchedule"
-      additional_node_labels = ""
     }
   }
 
