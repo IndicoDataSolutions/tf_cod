@@ -4,6 +4,11 @@ variable "do_create_cluster" {
   default = true
 }
 
+variable "default_tags" {
+  default     = {}
+  description = "Default Tags for Resource Groups and Node Pools"
+  type        = map(string)
+}
 
 variable "is_azure" {
   type    = bool
