@@ -134,7 +134,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     terraform_smoketests_enabled = "${jsonencode(var.terraform_smoketests_enabled)}"
     on_prem_test = "${jsonencode(var.on_prem_test)}"
     harness_delegate = "${jsonencode(var.harness_delegate)}"
-    harness_delegate_replicas = "${jsonencode(var.harness_delegate_replicas)}"
     harness_mount_path = "${jsonencode(var.harness_mount_path)}"
     lambda_sns_forwarder_enabled = "${jsonencode(var.lambda_sns_forwarder_enabled)}"
     lambda_sns_forwarder_destination_endpoint = "${jsonencode(var.lambda_sns_forwarder_destination_endpoint)}"

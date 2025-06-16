@@ -6,7 +6,7 @@ locals {
   the_domain            = local.the_splits[local.the_length - 2]
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
   enable_external_dns   = var.use_static_ssl_certificates == false ? true : false
-  storage_class         = var.on_prem_test == false ? "encrypted-gp2" : "nfs-client"
+  storage_class         = var.on_prem_test == false ? "encrypted-gp3" : "nfs-client"
   acm_arn               = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
   efs_values = var.include_efs == true ? [<<EOF
   storage:
@@ -321,31 +321,6 @@ module "secrets-operator-setup" {
   environment     = var.load_environment == "" ? local.environment : lower(var.load_environment)
 }
 
-resource "kubectl_manifest" "gp2-storageclass" {
-  depends_on = [
-    module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
-  ]
-  yaml_body = <<YAML
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: gp2
-  annotations:
-    storageclass.kubernetes.io/is-default-class: "true"
-parameters:
-  fsType: ext4
-  type: gp2
-provisioner: kubernetes.io/aws-ebs
-volumeBindingMode: WaitForFirstConsumer
-YAML
-  lifecycle {
-    ignore_changes = [
-      yaml_body
-    ]
-  }
-}
-
 module "karpenter" {
   count = var.karpenter_enabled == true ? 1 : 0
   depends_on = [
@@ -441,48 +416,48 @@ crunchy-pgo:
     enabled: true
   pgo: 
     controllerImages:
-      cluster: ${var.image_registry}/registry.crunchydata.com/crunchydata/postgres-operator:ubi8-5.7.1-0
+      cluster: ${var.image_registry}/registry.crunchydata.com/crunchydata/postgres-operator:ubi9-5.8.2-0
     relatedImages:
       postgres_17:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-17.2-0
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi9-17.5-2520
+      postgres_17_gis_3.5:
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-17.5-3.5-2520
       postgres_17_gis_3.4:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-17.2-3.4-0
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-17.5-3.4-2520
       postgres_16:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-16.6-0
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi9-16.9-2520
       postgres_16_gis_3.4:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.6-0
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-16.9-3.4-2520
       postgres_16_gis_3.3:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-16.6-3.3-0
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-16.9-3.3-2520
       postgres_15:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-15.10-0
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi9-15.13-2520
       postgres_15_gis_3.3:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-15.10-3.3-0
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-15.13-3.3-2520
       postgres_14:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.15-0
-      postgres_14_gis_3.1:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.15-3.1-0
-      postgres_14_gis_3.2:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.15-3.2-0
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi9-14.18-2520
       postgres_14_gis_3.3:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-14.15-3.3-0
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-14.18-3.3-2520
+      postgres_14_gis_3.2:
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-14.18-3.2-2520
+      postgres_14_gis_3.1:
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-14.18-3.1-2520
       postgres_13:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi8-13.18-0
-      postgres_13_gis_3.0:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.18-3.0-0
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres:ubi9-13.21-2520
       postgres_13_gis_3.1:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi8-13.18-3.1-0
-      pgadmin:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-4.30-32
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-gis:ubi9-13.21-3.1-2520
       pgbackrest:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.53.1-1
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi9-2.54.2-2520
       pgbouncer:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbouncer:ubi8-1.23-1
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgbouncer:ubi9-1.24-2520
       pgexporter:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi8-0.15.0-13
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-postgres-exporter:ubi9-0.17.1-2520
       pgupgrade:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-upgrade:ubi8-5.7.1-0
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-upgrade:ubi9-17.5-2520
       standalone_pgadmin:
-        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi8-8.12-1
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/crunchy-pgadmin4:ubi9-9.2-2520
+      collector:
+        image: ${var.image_registry}/registry.crunchydata.com/crunchydata/postgres-operator:ubi9-5.8.2-0
 migrations-operator:
   enabled: ${var.ipa_enabled || var.insights_enabled}
   image:
@@ -573,6 +548,16 @@ storage:
       gidRangeStart: "1000"
       gidRangeEnd: "2000"
       basePath: "/dynamic_provisioning"
+EOF
+    ] : var.on_prem_test == true ? [<<EOF
+storage:
+  existingPVC:
+    name: read-write
+    namespace: default
+  onprem:
+    enabled: true
+    storageClass: nfs-client
+    size: 100Gi
 EOF
     ] : [<<EOF
 storage:
@@ -834,7 +819,6 @@ module "indico-common" {
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
     module.secrets-operator-setup,
-    kubectl_manifest.gp2-storageclass,
     module.karpenter
   ]
   source                           = "./modules/common/indico-common"
@@ -1021,6 +1005,8 @@ crunchy-postgres:
     enabled: true
     metadata:
       annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
         reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
     service:
       metadata:
@@ -1063,36 +1049,36 @@ crunchy-postgres:
             storage: 200Gi
       name: pgha1
       replicas: ${var.az_count}
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 3000Mi
+    tolerations:
+      - effect: NoSchedule
+        key: indico.io/crunchy
+        operator: Exists
+  pgBackRestConfig:
+    global:
+      archive-timeout: '10000'
+      repo1-path: /pgbackrest/postgres-data/repo1
+      repo1-retention-full: '5'
+      repo1-s3-key-type: auto
+      repo1-s3-kms-key-id: "${local.environment_kms_key_arn}"
+      repo1-s3-role: ${local.environment_node_role_name}
+    repos:
+    - name: repo1
+      s3:
+        bucket: ${local.environment_pgbackup_s3_bucket_name}
+        endpoint: s3.${var.region}.amazonaws.com
+        region: ${var.region}
+      schedules:
+        full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
+        differential: 0 0 * * * # Diff backup daily at midnight
+    jobs:
       resources:
         requests:
           cpu: 1000m
           memory: 3000Mi
-      tolerations:
-        - effect: NoSchedule
-          key: indico.io/crunchy
-          operator: Exists
-    pgBackRestConfig:
-      global:
-        archive-timeout: '10000'
-        repo1-path: /pgbackrest/postgres-data/repo1
-        repo1-retention-full: '5'
-        repo1-s3-key-type: auto
-        repo1-s3-kms-key-id: "${local.environment_kms_key_arn}"
-        repo1-s3-role: ${local.environment_node_role_name}
-      repos:
-      - name: repo1
-        s3:
-          bucket: ${local.environment_pgbackup_s3_bucket_name}
-          endpoint: s3.${var.region}.amazonaws.com
-          region: ${var.region}
-        schedules:
-          full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
-          differential: 0 0 * * * # Diff backup daily at midnight
-      jobs:
-        resources:
-          requests:
-            cpu: 1000m
-            memory: 3000Mi
 rabbitmq:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   rabbitmq:
@@ -1330,88 +1316,85 @@ locals {
   insights_pre_reqs_values = [<<EOF
 crunchy-postgres:
   enabled: true
-  postgres-data:
-    enabled: true
-    name: postgres-insights
-    postgresVersion: 13
+  name: postgres-insights
+  metadata:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
+  instances:
+  - affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node_group
+              operator: In
+              values:
+              - pgo-workers
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: postgres-operator.crunchydata.com/cluster
+              operator: In
+              values:
+              - postgres-insights
+            - key: postgres-operator.crunchydata.com/instance-set
+              operator: In
+              values:
+              - pgha2
+          topologyKey: kubernetes.io/hostname
     metadata:
       annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
         reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
-    instances:
-    - affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node_group
-                operator: In
-                values:
-                - pgo-workers
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: postgres-operator.crunchydata.com/cluster
-                operator: In
-                values:
-                - postgres-insights
-              - key: postgres-operator.crunchydata.com/instance-set
-                operator: In
-                values:
-                - pgha2
-            topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
-      dataVolumeClaimSpec:
-        storageClassName: ${local.storage_class}
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 200Gi
-      name: pgha2
-      replicas: ${var.az_count}
+    dataVolumeClaimSpec:
+      storageClassName: ${local.storage_class}
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 200Gi
+    name: pgha2
+    replicas: ${var.az_count}
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 3000Mi
+    tolerations:
+      - effect: NoSchedule
+        key: indico.io/crunchy
+        operator: Exists
+  pgBackRestConfig:
+    global:
+      archive-timeout: '10000'
+      repo2-path: /pgbackrest/postgres-insights/repo2
+      repo2-retention-full: '5'
+      repo2-s3-key-type: auto
+      repo2-s3-kms-key-id: "${local.environment_kms_key_arn}"
+      repo2-s3-role: ${local.environment_node_role_name}
+    repos:
+    - name: repo2
+      s3:
+        bucket: ${local.environment_pgbackup_s3_bucket_name}
+        endpoint: s3.${var.region}.amazonaws.com
+        region: ${var.region}
+      schedules:
+        full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
+        differential: 0 0 * * * # Diff backup daily at midnight
+    jobs:
       resources:
         requests:
           cpu: 1000m
           memory: 3000Mi
-      tolerations:
-        - effect: NoSchedule
-          key: indico.io/crunchy
-          operator: Exists
-    pgBackRestConfig:
-      global:
-        archive-timeout: '10000'
-        repo2-path: /pgbackrest/postgres-insights/repo2
-        repo2-retention-full: '5'
-        repo2-s3-key-type: auto
-        repo2-s3-kms-key-id: "${local.environment_kms_key_arn}"
-        repo2-s3-role: ${local.environment_node_role_name}
-      repos:
-      - name: repo2
-        s3:
-          bucket: ${local.environment_pgbackup_s3_bucket_name}
-          endpoint: s3.${var.region}.amazonaws.com
-          region: ${var.region}
-        schedules:
-          full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
-          differential: 0 0 * * * # Diff backup daily at midnight
-      jobs:
-        resources:
-          requests:
-            cpu: 1000m
-            memory: 3000Mi
-    users:
-      - name: indico
-        options: "SUPERUSER"
-        databases:
-          - aqueduct
-          - ask_my_collection
-          - lagoon
-          - noct
+  users:
+    - name: indico
+      options: "SUPERUSER"
+      databases:
+        - aqueduct
+        - ask_my_collection
+        - lagoon
+        - noct
 ingress:
   useStaticCertificate: false
   secretName: indico-ssl-static-cert

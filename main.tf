@@ -203,7 +203,7 @@ module "lambda-sns-forwarder" {
 module "kms_key" {
   count            = var.load_environment == "" ? 1 : 0
   source           = "app.terraform.io/indico/indico-aws-kms/mod"
-  version          = "2.1.2"
+  version          = "2.1.3"
   label            = var.label
   additional_tags  = var.additional_tags
   existing_kms_key = var.existing_kms_key
@@ -356,13 +356,13 @@ module "iam" {
 
 module "cluster" {
   source               = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version              = "9.0.35"
+  version              = "9.0.36"
   label                = var.label
   region               = var.region
   cluster_version      = var.k8s_version
   default_tags         = merge(coalesce(var.default_tags, {}), coalesce(var.additional_tags, {}))
   cluster_iam_role_arn = local.environment_cluster_role_arn == "null" ? null : local.environment_cluster_role_arn
-  generate_kms_key     = var.create_eks_cluster_role ? false : true #Once the cluster is created, we cannot change the kms key.
+  generate_kms_key     = var.generate_eks_kms_key #Once the cluster is created, we cannot change the kms key.
   kms_key_arn          = local.environment_kms_key_arn
 
   vpc_id     = local.environment_indico_vpc_id
@@ -382,6 +382,7 @@ module "cluster" {
 
   cluster_security_group_id             = local.environment_all_subnets_sg_id
   cluster_additional_security_group_ids = var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : []
+  http_tokens                           = var.http_tokens
 }
 
 resource "time_sleep" "wait_1_minutes_after_cluster" {

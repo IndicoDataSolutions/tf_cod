@@ -42,8 +42,3 @@ moved {
   from = helm_release.monitoring[0]
   to   = module.indico-common.helm_release.monitoring[0]
 }
-
-moved {
-  from = kubectl_manifest.gp2-storageclass
-  to   = module.indico-common.kubectl_manifest.gp2-storageclass
-}

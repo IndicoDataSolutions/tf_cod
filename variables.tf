@@ -830,11 +830,6 @@ variable "harness_delegate" {
   default = false
 }
 
-variable "harness_delegate_replicas" {
-  type    = number
-  default = 1
-}
-
 variable "harness_mount_path" {
   type    = string
   default = "harness"
@@ -1063,7 +1058,7 @@ variable "instance_volume_size" {
 
 variable "instance_volume_type" {
   type        = string
-  default     = "gp2"
+  default     = "gp3"
   description = "The type of EBS volume to attach to the cluster nodes"
 }
 
@@ -1211,6 +1206,12 @@ variable "create_eks_cluster_role" {
   type        = bool
   default     = false
   description = "Flag to create or load eks cluster role."
+}
+
+variable "generate_eks_kms_key" {
+  type        = bool
+  default     = true
+  description = "Flag to create or load eks kms key."
 }
 
 variable "eks_cluster_iam_role_name_override" {
@@ -1542,8 +1543,12 @@ variable "enable_data_application_cluster_separation" {
   description = "Toggle for enabling data application cluster separation"
 }
 
-
-
-
-
-
+variable "http_tokens" {
+  type        = string
+  default     = "required"
+  description = "Set IMDSv2 tokens to required or optional"
+  validation {
+    condition     = var.http_tokens == "required" || var.http_tokens == "optional"
+    error_message = "${var.http_tokens} not valid. Type must be either required or optional"
+  }
+}
