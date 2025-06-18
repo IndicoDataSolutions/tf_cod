@@ -26,7 +26,7 @@ terraform {
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.15.0"
+      version = "~> 3.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -491,11 +491,11 @@ provider "kubectl" {
 
 provider "helm" {
   debug = true
-  kubernetes {
+  kubernetes = {
     host                   = module.cluster.kubernetes_host
     cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
     #token                  = module.cluster.kubernetes_token
-    exec {
+    exec = {
       api_version = "client.authentication.k8s.io/v1beta1"
       args        = ["eks", "get-token", "--cluster-name", var.label]
       command     = "aws"
