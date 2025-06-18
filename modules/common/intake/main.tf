@@ -51,10 +51,12 @@ resource "helm_release" "ipa-pre-requisites" {
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
 
-  values = concat(var.ipa_pre_reqs_values_overrides, [<<EOT
-${var.argo_enabled == true ? data.github_repository_file.data_pre_reqs_values[0].content : base64decode(var.pre_reqs_values_yaml_b64)}
-EOT
-  ])
+  values = concat(
+    var.ipa_pre_reqs_values_overrides,
+    [
+      var.argo_enabled == true ? data.github_repository_file.data_pre_reqs_values[0].content : base64decode(var.pre_reqs_values_yaml_b64)
+    ]
+  )
 }
 
 # Let pre-reqs settle

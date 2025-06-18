@@ -49,10 +49,12 @@ resource "helm_release" "indico_crds" {
   wait             = true
   timeout          = "1800" # 30 minutes
 
-  values = concat(var.indico_crds_values_overrides, [<<EOT
-${var.argo_enabled == true ? data.github_repository_file.data_crds_values[0].content : base64decode(var.indico_crds_values_yaml_b64)}
-EOT
-  ])
+  values = concat(
+    var.indico_crds_values_overrides,
+    [
+      var.argo_enabled == true ? data.github_repository_file.data_crds_values[0].content : base64decode(var.indico_crds_values_yaml_b64)
+    ]
+  )
 }
 
 # Wait for the crd chart to settle
@@ -107,10 +109,12 @@ resource "helm_release" "indico_pre_requisites" {
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
 
-  values = concat(var.indico_pre_reqs_values_overrides, [<<EOT
-${var.argo_enabled == true ? data.github_repository_file.data_pre_reqs_values[0].content : base64decode(var.indico_pre_reqs_values_yaml_b64)}
-EOT
-  ])
+  values = concat(
+    var.indico_pre_reqs_values_overrides,
+    [
+      var.argo_enabled == true ? data.github_repository_file.data_pre_reqs_values[0].content : base64decode(var.indico_pre_reqs_values_yaml_b64)
+    ]
+  )
 }
 
 resource "helm_release" "monitoring" {
