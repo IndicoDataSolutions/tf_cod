@@ -21,7 +21,7 @@ terraform {
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "2.15.0"
+      version = "~> 2.15.0"
     }
     argocd = {
       source  = "oboukili/argocd"
