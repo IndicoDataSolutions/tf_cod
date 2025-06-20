@@ -600,6 +600,25 @@ variable "harness_mount_path" {
   default = "harness"
 }
 
+variable "harness_delegate_token" {
+  type        = string
+  default     = ""
+  description = "Harness delegate token"
+}
+
+variable "harness_delegate_account_id" {
+  type        = string
+  default     = ""
+  description = "Harness delegate account id"
+}
+
+variable "harness_delegate_image" {
+  type        = string
+  default     = ""
+  description = "Harness delegate image"
+}
+
+
 variable "terraform_smoketests_enabled" {
   type    = bool
   default = true
@@ -942,4 +961,33 @@ variable "indico-crds-values-yaml-b64" {
 
 variable "indico-pre-reqs-values-yaml-b64" {
   default = "Cg=="
+}
+
+variable "harbor_api_token" {
+  type        = string
+  default     = ""
+  description = "Harbor API token"
+}
+
+variable "zerossl_hmac_base64" {
+  type        = string
+  default     = ""
+  description = "ZeroSSL HMAC base64"
+}
+
+variable "zerossl_key_id" {
+  type        = string
+  default     = ""
+  description = "ZeroSSL key id"
+}
+
+variable "harbor_customer_robot_username" {
+  type        = string
+  default     = ""
+  description = "Harbor robot username"
+}
+
+variable "harbor_customer_robot_password" {
+  type        = string
+  default     = ""
 }

@@ -555,8 +555,8 @@ secrets:
     zerossl:
       create: true
       eabEmail: devops-sa@indico.io
-      eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
-      eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
+      eabKid: "${var.zerossl_key_id}"
+      eabHmacKey: "${var.zerossl_hmac_base64}"
     letsencrypt:
       create: true
     selfSigned:
@@ -566,10 +566,10 @@ localPullSecret:
   secretName: local-pull-secret
   username: local-user
 proxyRegistryAccess:
-  proxyPassword: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_password"] : ""}
+  proxyPassword: ${var.local_registry_enabled == true ? var.harbor_customer_robot_password : ""}
   proxyPullSecretName: remote-access
   proxyUrl: https://${var.image_registry}
-  proxyUsername: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_username"] : ""}
+  proxyUsername: ${var.local_registry_enabled == true ? var.harbor_customer_robot_username : ""}
 registryUrl: local-registry.${local.dns_name}
 restartCronjob:
   cronSchedule: 0 0 */3 * *
@@ -1424,7 +1424,7 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
 
   provisioner "local-exec" {
     environment = {
-      HARBOR_API_TOKEN = jsondecode(data.vault_kv_secret_v2.harbor-api-token[0].data_json)["bearer_token"]
+      HARBOR_API_TOKEN = var.harbor_api_token
     }
     command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${replace(data.external.git_information.result.branch, "/", "-")}-${substr(data.external.git_information.result.sha, 0, 8)}"
   }
@@ -1432,25 +1432,13 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
 
 output "harbor-api-token" {
   sensitive = true
-  value     = var.argo_enabled == true ? jsondecode(data.vault_kv_secret_v2.harbor-api-token[0].data_json)["bearer_token"] : ""
+  value     = var.harbor_api_token
 }
 
 output "smoketest_chart_version" {
   value = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${replace(data.external.git_information.result.branch, "/", "-")}-${substr(data.external.git_information.result.sha, 0, 8)}"
 }
 
-data "vault_kv_secret_v2" "account-robot-credentials" {
-  count = var.local_registry_enabled == true ? 1 : 0
-  mount = "customer-${var.aws_account}"
-  name  = "harbor-registry"
-}
-
-
-data "vault_kv_secret_v2" "harbor-api-token" {
-  count = var.argo_enabled == true ? 1 : 0
-  mount = "tools/argo"
-  name  = "harbor-api"
-}
 
 resource "kubernetes_namespace" "local-registry" {
   count = var.local_registry_enabled == true ? 1 : 0
@@ -1656,10 +1644,10 @@ metrics-server:
     create: true
   enabled: false
 proxyRegistryAccess:
-  proxyPassword: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_password"] : ""}
+  proxyPassword: ${var.local_registry_enabled == true ? var.harbor_customer_robot_password : ""}
   proxyPullSecretName: remote-access
   proxyUrl: https://${var.image_registry}
-  proxyUsername: ${var.local_registry_enabled == true ? jsondecode(data.vault_kv_secret_v2.account-robot-credentials[0].data_json)["harbor_username"] : ""}
+  proxyUsername: ${var.local_registry_enabled == true ? var.harbor_customer_robot_username : ""}
   
 registryUrl: local-registry.${local.dns_name}
 restartCronjob:
@@ -1676,16 +1664,6 @@ output "local_registry_password" {
 
 output "local_registry_username" {
   value = "local-user"
-}
-
-data "vault_kv_secret_v2" "zerossl_data" {
-  mount = var.vault_mount_path
-  name  = "zerossl"
-}
-
-output "zerossl" {
-  sensitive = true
-  value     = data.vault_kv_secret_v2.zerossl_data.data_json
 }
 
 resource "kubernetes_secret" "issuer-secret" {

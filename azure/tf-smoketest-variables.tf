@@ -103,6 +103,9 @@ resource "kubernetes_config_map" "terraform-variables" {
     thanos_enabled = "${jsonencode(var.thanos_enabled)}"
     harness_delegate = "${jsonencode(var.harness_delegate)}"
     harness_mount_path = "${jsonencode(var.harness_mount_path)}"
+    harness_delegate_token = "${jsonencode(var.harness_delegate_token)}"
+    harness_delegate_account_id = "${jsonencode(var.harness_delegate_account_id)}"
+    harness_delegate_image = "${jsonencode(var.harness_delegate_image)}"
     terraform_smoketests_enabled = "${jsonencode(var.terraform_smoketests_enabled)}"
     resource_group_name = "${jsonencode(var.resource_group_name)}"
     create_resource_group = "${jsonencode(var.create_resource_group)}"
@@ -163,6 +166,11 @@ resource "kubernetes_config_map" "terraform-variables" {
     minio_enabled = "${jsonencode(var.minio_enabled)}"
     indico_crds_values_yaml_b64 = "${jsonencode(var.indico-crds-values-yaml-b64)}"
     indico_pre_reqs_values_yaml_b64 = "${jsonencode(var.indico-pre-reqs-values-yaml-b64)}"
+    harbor_api_token = "${jsonencode(var.harbor_api_token)}"
+    zerossl_hmac_base64 = "${jsonencode(var.zerossl_hmac_base64)}"
+    zerossl_key_id = "${jsonencode(var.zerossl_key_id)}"
+    harbor_customer_robot_username = "${jsonencode(var.harbor_customer_robot_username)}"
+    harbor_customer_robot_password = "${jsonencode(var.harbor_customer_robot_password)}"
 
     }
   }
