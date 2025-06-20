@@ -1,3 +1,20 @@
+terraform {
+  required_providers {
+    vault = {
+      source  = "hashicorp/vault"
+      version = "5.0.0"
+    }
+  }
+}
+
+provider "vault" {
+  address          = var.vault_address
+  skip_child_token = true
+  auth_login_userpass {
+    username = var.vault_username
+    password = var.vault_password
+  }
+}
 
 resource "kubernetes_service_account_v1" "vault-auth-default" {
   metadata {

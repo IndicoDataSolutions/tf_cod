@@ -294,6 +294,8 @@ module "secrets-operator-setup" {
   region          = var.region
   name            = var.label
   kubernetes_host = module.cluster.kubernetes_host
+  vault_username  = var.vault_username
+  vault_password  = var.vault_password
 }
 
 module "karpenter" {
