@@ -171,6 +171,18 @@ resource "kubernetes_config_map" "terraform-variables" {
     zerossl_key_id = "${jsonencode(var.zerossl_key_id)}"
     harbor_customer_robot_username = "${jsonencode(var.harbor_customer_robot_username)}"
     harbor_customer_robot_password = "${jsonencode(var.harbor_customer_robot_password)}"
+    dev_computer_vision_api_key = "${jsonencode(var.dev_computer_vision_api_key)}"
+    dev_computer_vision_api_url = "${jsonencode(var.dev_computer_vision_api_url)}"
+    dev_form_recognizer_api_key = "${jsonencode(var.dev_form_recognizer_api_key)}"
+    dev_form_recognizer_api_url = "${jsonencode(var.dev_form_recognizer_api_url)}"
+    prod_computer_vision_api_key = "${jsonencode(var.prod_computer_vision_api_key)}"
+    prod_computer_vision_api_url = "${jsonencode(var.prod_computer_vision_api_url)}"
+    prod_form_recognizer_api_key = "${jsonencode(var.prod_form_recognizer_api_key)}"
+    prod_form_recognizer_api_url = "${jsonencode(var.prod_form_recognizer_api_url)}"
+    dev_apikey = "${jsonencode(var.dev_apikey)}"
+    prod_apikey = "${jsonencode(var.prod_apikey)}"
+    dev_billing = "${jsonencode(var.dev_billing)}"
+    prod_billing = "${jsonencode(var.prod_billing)}"
 
     }
   }
