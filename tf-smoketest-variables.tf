@@ -245,6 +245,13 @@ resource "kubernetes_config_map" "terraform-variables" {
     karpenter_version = "${jsonencode(var.karpenter_version)}"
     nginx_ingress_allowed_cidrs = "${jsonencode(var.nginx_ingress_allowed_cidrs)}"
     create_nginx_ingress_security_group = "${jsonencode(var.create_nginx_ingress_security_group)}"
+    enable_service_mesh = "${jsonencode(var.enable_service_mesh)}"
+    linkerd_control_plane_version = "${jsonencode(var.linkerd_control_plane_version)}"
+    linkerd_crds_version = "${jsonencode(var.linkerd_crds_version)}"
+    linkerd_viz_version = "${jsonencode(var.linkerd_viz_version)}"
+    linkerd_multicluster_version = "${jsonencode(var.linkerd_multicluster_version)}"
+    trust_manager_version = "${jsonencode(var.trust_manager_version)}"
+    enable_data_application_cluster_separation = "${jsonencode(var.enable_data_application_cluster_separation)}"
 
     }
   }

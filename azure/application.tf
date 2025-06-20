@@ -73,6 +73,7 @@ data "vault_kv_secret_v2" "harbor-api-token" {
   name  = "harbor-api"
 }
 
+# Note: this module is used to pull secrets from hashicorp vault. It is also used by the external-secrets operator to push secrets to hashicorp vault.
 module "secrets-operator-setup" {
   depends_on = [
     module.cluster

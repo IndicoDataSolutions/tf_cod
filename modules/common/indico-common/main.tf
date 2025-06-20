@@ -9,6 +9,9 @@ terraform {
       source  = "gavinbunney/kubectl"
       version = "1.14.0"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+    }
   }
 }
 
@@ -94,6 +97,7 @@ resource "helm_release" "indico_pre_requisites" {
   depends_on = [
     data.github_repository_file.data_pre_reqs_values,
     time_sleep.wait_1_minutes_after_crds,
+    time_sleep.wait_1_minutes_after_service_mesh
   ]
 
   verify           = false
@@ -114,7 +118,7 @@ EOT
 }
 
 resource "helm_release" "monitoring" {
-  depends_on = [helm_release.indico_pre_requisites]
+  depends_on = [helm_release.indico_pre_requisites, null_resource.annotate_monitoring_namespace]
 
   count = var.monitoring_enabled == true ? 1 : 0
 
