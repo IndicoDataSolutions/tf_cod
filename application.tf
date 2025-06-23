@@ -335,7 +335,7 @@ aws-ebs-csi-driver:
   sidecars:
     provisioner:
       image:
-        repository: ${var.image_registry}/public.ecr.aws/ebs-csi-driver/aws-ebs-csi-driver
+        repository: ${var.image_registry}/public.ecr.aws/csi-components/csi-provisioner
     attacher:
       image:
         repository: ${var.image_registry}/public.ecr.aws/csi-components/csi-attacher
