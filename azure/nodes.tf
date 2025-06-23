@@ -203,34 +203,6 @@ locals {
       cluster_auto_scaling           = true
       cluster_auto_scaling_min_count = 1
       cluster_auto_scaling_max_count = 4
-    },
-    weaviate = {
-      node_count = 0
-      pool_name  = "weaviate"
-      vm_size    = "Standard_D16_v3"
-      node_os    = "Linux"
-      zones      = ["1", "2"]
-      taints     = ["indico.io/weaviate=true:NoSchedule"]
-      labels = {
-        "node_group" : "weaviate"
-      }
-      cluster_auto_scaling           = true
-      cluster_auto_scaling_min_count = 0
-      cluster_auto_scaling_max_count = 3
-    },
-    weaviate-workers = {
-      node_count = 0
-      pool_name  = "weavworkers"
-      vm_size    = "Standard_D16_v3"
-      node_os    = "Linux"
-      zones      = ["1", "2"]
-      taints     = ["indico.io/weaviate-workers=true:NoSchedule"]
-      labels = {
-        "node_group" : "weaviate-workers"
-      }
-      cluster_auto_scaling           = true
-      cluster_auto_scaling_min_count = 0
-      cluster_auto_scaling_max_count = 2
     }
   }
 

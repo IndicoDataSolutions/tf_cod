@@ -920,43 +920,12 @@ minio:
   storage:
     accessKey: insights
     secretKey: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
-weaviate:
-  cronjob:
-    services:
-      weaviate-backup:
-        enabled: true
-  backupStorageConfig:
-    accessKey: insights
-    secretKey: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
-    url: http://minio-tenant-hl.insights.svc.cluster.local:9000
-  weaviate:
-    env:
-      # 1 less than the hard limit of the weaviate node group type
-      GOMEMLIMIT: "31GiB"
-    # TODO: switch this to a dedicated weaviate backup bucket
-    backups:
-      s3:
-        enabled: true
-        envconfig:
-          BACKUP_S3_ENDPOINT: minio-tenant-hl.insights.svc.cluster.local:9000
-        secrets:
-          AWS_ACCESS_KEY_ID: insights
-          AWS_SECRET_ACCESS_KEY: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
   EOF
   ]
 
   insights_values = <<EOF
 global:
   host: ${var.label}.${var.region}.indico-dev.indico.io
-  features:
-    askMyDocument: true
-ask-my-docs:
-  llmConfig:
-    llm: indico-azure-instance
-    azure:
-      apiBase: https://indico-openai.openai.azure.com/
-      deployment: indico-gpt-4
-      apiKey: <path:tools/argo/data/RandD/azureOpenAiKey#apiKey>
   EOF
 }
 
