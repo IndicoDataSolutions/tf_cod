@@ -335,22 +335,25 @@ aws-ebs-csi-driver:
   sidecars:
     provisioner:
       image:
-        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
+        repository: ${var.image_registry}/public.ecr.aws/ebs-csi-driver/aws-ebs-csi-driver
     attacher:
       image:
-        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-attacher
+        repository: ${var.image_registry}/public.ecr.aws/csi-components/csi-attacher
     snapshotter:
       image:
-        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-snapshotter/csi-snapshotter
+        repository: ${var.image_registry}/public.ecr.aws/csi-components/csi-snapshotter
     livenessProbe:
       image:
-        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/livenessprobe
+        repository: ${var.image_registry}/public.ecr.aws/csi-components/livenessprobe
     resizer:
       image:
-        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-resizer
+        repository: ${var.image_registry}/public.ecr.aws/csi-components/csi-resizer
     nodeDriverRegistrar:
       image:
-        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
+        repository: ${var.image_registry}/public.ecr.aws/csi-components/csi-node-driver-registrar
+    volumemodifier:
+      image:
+        repository: ${var.image_registry}/public.ecr.aws/ebs-csi-driver/volume-modifier-for-k8s
   controller:
     extraVolumeTags:
       ${indent(6, yamlencode(var.default_tags))}
