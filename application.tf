@@ -445,7 +445,7 @@ migrations-operator:
 minio:
   enabled: ${var.insights_enabled || var.minio_enabled}
 vault-secrets-operator:
-  enabled: ${var.secrets_operator_enabled}
+  enabled: false # Temporarily disabled until we have a vault backend configured correctly${var.secrets_operator_enabled}
   controller: 
     imagePullSecrets:
       - name: harbor-pull-secret
