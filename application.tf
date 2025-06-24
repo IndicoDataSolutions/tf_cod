@@ -444,51 +444,51 @@ migrations-operator:
     kubectlImage: ${var.image_registry}/indico/migrations-controller-kubectl
 minio:
   enabled: ${var.insights_enabled || var.minio_enabled}
-vault-secrets-operator:
-  enabled: false # Temporarily disabled until we have a vault backend configured correctly${var.secrets_operator_enabled}
-  controller: 
-    imagePullSecrets:
-      - name: harbor-pull-secret
-    kubeRbacProxy:
-      image:
-        repository: ${var.image_registry}/quay.io/brancz/kube-rbac-proxy
-      resources:
-        limits:
-          cpu: 500m
-          memory: 1024Mi
-        requests:
-          cpu: 500m
-          memory: 512Mi
-    manager:
-      image:
-        repository: ${var.image_registry}/docker.io/hashicorp/vault-secrets-operator
-      resources:
-        limits:
-          cpu: 500m
-          memory: 1024Mi
-        requests:
-          cpu: 500m
-          memory: 512Mi
-  defaultAuthMethod:
-    enabled: true
-    namespace: default
-    method: kubernetes
-    mount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
-    kubernetes:
-      role: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
-      tokenAudiences: ["vault"]
-      serviceAccount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
-  defaultVaultConnection:
-    enabled: true
-    address: ${var.vault_address}
-    skipTLSVerify: false
-    spec:
-    template:
-      spec:
-        containers:
-        - name: manager
-          args:
-          - "--client-cache-persistence-model=direct-encrypted"
+# vault-secrets-operator:
+#   enabled: false # Temporarily disabled until we have a vault backend configured correctly${var.secrets_operator_enabled}
+#   controller: 
+#     imagePullSecrets:
+#       - name: harbor-pull-secret
+#     kubeRbacProxy:
+#       image:
+#         repository: ${var.image_registry}/quay.io/brancz/kube-rbac-proxy
+#       resources:
+#         limits:
+#           cpu: 500m
+#           memory: 1024Mi
+#         requests:
+#           cpu: 500m
+#           memory: 512Mi
+#     manager:
+#       image:
+#         repository: ${var.image_registry}/docker.io/hashicorp/vault-secrets-operator
+#       resources:
+#         limits:
+#           cpu: 500m
+#           memory: 1024Mi
+#         requests:
+#           cpu: 500m
+#           memory: 512Mi
+#   defaultAuthMethod:
+#     enabled: true
+#     namespace: default
+#     method: kubernetes
+#     mount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+#     kubernetes:
+#       role: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+#       tokenAudiences: ["vault"]
+#       serviceAccount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+#   defaultVaultConnection:
+#     enabled: true
+#     address: ${var.vault_address}
+#     skipTLSVerify: false
+#     spec:
+#     template:
+#       spec:
+#         containers:
+#         - name: manager
+#           args:
+#           - "--client-cache-persistence-model=direct-encrypted"
 external-secrets:
   enabled: true
   image:
