@@ -253,7 +253,6 @@ resource "azurerm_resource_group" "cod-cluster" {
   count    = var.create_resource_group == true ? 1 : 0
   name     = local.resource_group_name
   location = var.region
-  tags     = var.default_tags
 }
 
 
