@@ -315,7 +315,6 @@ module "cluster" {
   insights_retention_in_days   = var.monitor_retention_in_days
   version                      = "4.2.5"
   label                        = var.label
-  default_tags                 = var.default_tags
   public_key                   = tls_private_key.pk.public_key_openssh
   region                       = var.region
   svp_client_id                = var.svp_client_id
