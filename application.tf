@@ -55,6 +55,12 @@ locals {
 
   alb_ipa_values = var.enable_waf == true ? (<<EOT
 app-edge:
+  service:
+    labels:
+      mirror.linkerd.io/exported: remote-discovery
+  applicationCluster:
+    enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+  backendServiceName: ${var.enable_data_application_cluster_separation ? "app-edge-application-cluster" : "app-edge"}
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
   alternateDomain: ""
@@ -68,6 +74,10 @@ app-edge:
       http_api_port: 31270
   nginx:
     httpPort: 8080
+  ingress:
+    enabled: ${var.load_environment == "" ? true : false}
+    annotations:
+      nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "true" : "false"}
   aws-load-balancer-controller:
     enabled: true
     aws-load-balancer-controller:
@@ -87,7 +97,7 @@ app-edge:
         wafArn: ${aws_wafv2_web_acl.wafv2-acl[0].arn}
         acmArn: ${local.acm_arn}
       service:
-        name: app-edge
+        name: ${var.enable_data_application_cluster_separation ? "app-edge-application-cluster" : "app-edge"}
         port: 8080
       hosts:
         - host: ${local.dns_name}
@@ -97,6 +107,12 @@ app-edge:
   EOT
     ) : (<<EOT
 app-edge:
+  service:
+    labels:
+      mirror.linkerd.io/exported: remote-discovery
+  applicationCluster:
+    enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+  backendServiceName: ${var.enable_data_application_cluster_separation ? "app-edge-application-cluster" : "app-edge"}
   cspApprovedSources:
     - ${local.environment_data_s3_bucket_name}.s3.${var.region}.amazonaws.com
     - ${local.environment_data_s3_bucket_name}.s3.amazonaws.com
@@ -105,6 +121,10 @@ app-edge:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
     ingress:
       useStaticCertificate: ${var.use_static_ssl_certificates}
+  ingress:
+    enabled: ${var.load_environment == "" ? true : false}
+    annotations:
+      nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "true" : "false"}
 EOT
   )
   dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT
@@ -122,7 +142,7 @@ external-dns:
     repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
   logLevel: debug
   policy: sync
-  txtOwnerId: "${local.dns_name}"
+  txtOwnerId: "${var.load_environment == "" ? local.dns_name : local.monitoring_domain_name}"
   domainFilters:
     - ${local.dns_zone_name}
 
@@ -152,7 +172,7 @@ external-dns:
     repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
   logLevel: debug
   policy: sync
-  txtOwnerId: "${local.dns_name}"
+  txtOwnerId: "${var.load_environment == "" ? local.dns_name : local.monitoring_domain_name}"
   domainFilters:
     - ${local.dns_zone_name}
 
@@ -171,7 +191,7 @@ alternate-external-dns:
     repository: ${var.image_registry}/registry.k8s.io/external-dns/external-dns
   logLevel: debug
   policy: sync
-  txtOwnerId: "${local.dns_name}-${var.label}-${var.region}"
+  txtOwnerId: "${var.load_environment == "" ? local.dns_name : local.monitoring_domain_name}-${var.label}-${var.region}"
   domainFilters:
     - ${local.alternate_domain_root}
   extraArgs:
@@ -236,6 +256,8 @@ EOT
   )
   dns01RecursiveNameserversOnly = var.network_allow_public == true ? false : true
   dns01RecursiveNameservers     = var.network_allow_public == true ? "" : "kube-dns.kube-system.svc.cluster.local:53"
+
+
 }
 
 data "github_repository" "argo-github-repo" {
@@ -281,6 +303,7 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 # (what level of permission does this require? Are we giving customers admin credentials?) 
 # The auth backend they create is named <account>-<region>-<cluster-name>, so we can make 
 # sure their credentials only have access to create <account>-* k8s auth methods
+# Note: this module is used to pull secrets from hashicorp vault. It is also used by the external-secrets operator to push secrets to hashicorp vault.
 module "secrets-operator-setup" {
   depends_on = [
     module.cluster,
@@ -294,6 +317,8 @@ module "secrets-operator-setup" {
   region          = var.region
   name            = var.label
   kubernetes_host = module.cluster.kubernetes_host
+  audience        = ""
+  environment     = var.load_environment == "" ? local.environment : lower(var.load_environment)
 }
 
 module "karpenter" {
@@ -642,6 +667,8 @@ ${local.dns_configuration_values}
 ingress-nginx:
   enabled: true
   controller:
+    podAnnotations:
+      linkerd.io/inject: ${var.enable_service_mesh ? "enabled" : "false"}
     service:
       enableHttp: ${local.enableHttp}
       targetPorts:
@@ -670,12 +697,20 @@ ${local.lb_config}
 reflector:
   image:
     repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
+externalSecretStore:
+  enabled: ${var.secrets_operator_enabled}
+  vaultAddress: ${var.vault_address}
+  vaultMountPath: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+  vaultPath: customer-${var.aws_account}
+  vaultRole: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+  vaultServiceAccount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+  vaultSecretName: "vault-auth"
   EOF
   ])
 
   monitoring_values = var.monitoring_enabled ? [<<EOF
 global:
-  host: "${local.dns_name}"
+  host: "${local.monitoring_domain_name}"
 authentication:
   ingressUsername: monitoring
   ingressPassword: ${random_password.monitoring-password.result}
@@ -779,6 +814,7 @@ opentelemetry-collector:
         logs: null
   EOF
   ] : []
+
 }
 
 module "indico-common" {
@@ -805,6 +841,25 @@ module "indico-common" {
   monitoring_enabled               = var.monitoring_enabled
   monitoring_values                = local.monitoring_values
   monitoring_version               = var.monitoring_version
+  service_mesh_namespace           = "linkerd"
+  linkerd_crds_version             = var.linkerd_crds_version
+  linkerd_control_plane_version    = var.linkerd_control_plane_version
+  linkerd_viz_version              = var.linkerd_viz_version
+  linkerd_multicluster_version     = var.linkerd_multicluster_version
+  linkerd_crds_values              = local.linkerd_crds_values
+  linkerd_control_plane_values     = local.linkerd_control_plane_values
+  linkerd_viz_values               = local.linkerd_viz_values
+  linkerd_multicluster_values      = local.linkerd_multicluster_values
+  trust_manager_version            = var.trust_manager_version
+  trust_manager_values             = local.trust_manager_values
+  load_environment                 = var.load_environment
+  environment                      = local.environment
+  account_name                     = var.aws_account
+  label                            = var.label
+  region                           = var.region
+  image_registry                   = var.image_registry
+  insights_enabled                 = var.insights_enabled
+  enable_service_mesh              = var.enable_service_mesh
 }
 
 
@@ -937,56 +992,66 @@ apiModels:
     registry: ${var.image_registry}
 secrets:
   rabbitmq:
-    create: true
+    create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   general:
-    create: true
-
+    create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
+  fernet:
+    create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
 celery-backend:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
   redis:
     global:
       imageRegistry: ${var.image_registry}
 crunchy-postgres:
-  enabled: true
-  metadata:
-    annotations:
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
-  instances:
-  - affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-          - matchExpressions:
-            - key: node_group
-              operator: In
-              values:
-              - pgo-workers
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-            - key: postgres-operator.crunchydata.com/cluster
-              operator: In
-              values:
-              - postgres-data
-            - key: postgres-operator.crunchydata.com/instance-set
-              operator: In
-              values:
-              - pgha1
-          topologyKey: kubernetes.io/hostname
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
+  postgres-data:
+    enabled: true
     metadata:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
         reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
         reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
-    dataVolumeClaimSpec:
-      storageClassName: ${local.storage_class}
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: 200Gi
-    name: pgha1
-    replicas: ${var.az_count}
+    service:
+      metadata:
+        labels:
+          mirror.linkerd.io/exported: "remote-discovery"
+    instances:
+    - affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node_group
+                operator: In
+                values:
+                - pgo-workers
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: postgres-operator.crunchydata.com/cluster
+                operator: In
+                values:
+                - postgres-data
+              - key: postgres-operator.crunchydata.com/instance-set
+                operator: In
+                values:
+                - pgha1
+            topologyKey: kubernetes.io/hostname
+      metadata:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
+      dataVolumeClaimSpec:
+        storageClassName: ${local.storage_class}
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 200Gi
+      name: pgha1
+      replicas: ${var.az_count}
     resources:
       requests:
         cpu: 1000m
@@ -1018,11 +1083,20 @@ crunchy-postgres:
           cpu: 1000m
           memory: 3000Mi
 rabbitmq:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   rabbitmq:
     image:
       registry: ${var.image_registry}
     persistence:
       storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
+    service:
+      labels:
+        mirror.linkerd.io/exported: ${var.enable_service_mesh ? "remote-discovery" : "disabled"}
+externalSecretStore:
+  enabled: ${var.secrets_operator_enabled}
+  loadEnvironment:
+    enabled: ${var.load_environment == "" ? "false" : "true"}
+    environment: ${var.load_environment == "" ? local.environment : lower(var.load_environment)}
   EOF
   ])
 
@@ -1047,6 +1121,7 @@ aws-node-termination:
     image:
       repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/public.ecr.aws/aws-ec2/aws-node-termination-handler
 nvidia-device-plugin:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
   nvidia-device-plugin:
     image:
       repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/public-nvcr-proxy/nvidia/k8s-device-plugin
@@ -1057,6 +1132,7 @@ reloader:
         image:
           name: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/stakater/reloader
 kafka-strimzi:
+  enabled: ${var.load_environment == "" ? "true" : "false"}
   strimzi-kafka-operator: 
     defaultImageRegistry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/strimzi-proxy
   kafkacat:
@@ -1068,8 +1144,99 @@ kafka-strimzi:
   kafkaConnect:
     image:
       registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
+worker:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+server:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+  service:
+    labels:
+      mirror.linkerd.io/exported: remote-discovery
+rainbow-nginx:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+readapi:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+migrations:
+  enable: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+${local.faust_worker_settings}
 ${local.alb_ipa_values}
+cronjob:
+  enabled: true
+  services:
+    kafka-connect-supervisor:
+      enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
+    meteor-refresh:
+      enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
+    rainbow-cleaner-submissions:
+      enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+    rainbow-cleaner-uploads:
+      enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+    service-account-generator:
+      enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+externalSecretStore:
+  enabled: ${var.secrets_operator_enabled}
+  loadEnvironment:
+    enabled: ${var.load_environment == "" ? "false" : "true"}
+    environment: ${var.load_environment == "" ? local.environment : lower(var.load_environment)}
   EOF
+
+  faust_worker_settings = var.enable_data_application_cluster_separation ? var.load_environment == "" ? (<<EOF
+faust-worker:
+  enabled: true
+  volumeMounts:
+    - mountPath: /mnt/submission
+      name: meteor-data
+      subPath: rainbow/submission
+
+    - mountPath: /mnt/data/
+      name: meteor-data
+      subPath: meteor
+
+  volumes:
+    - name: meteor-data
+      persistentVolumeClaim:
+        claimName: read-write
+
+  services:
+    meteor-worker:
+      app: meteor
+      command: [scripts/worker_entrypoint.sh]
+      enabled: true
+      livenessProbe:
+        initialDelaySeconds: 15
+        periodSeconds: 10
+        command:
+          httpGet:
+            path: /live
+            port: 6066
+      readinessProbe:
+        initialDelaySeconds: 15
+        timeoutSeconds: 5
+        periodSeconds: 15
+        command:
+          httpGet:
+            path: /ready
+            port: 6066
+      image:
+        repository: meteor
+      env:
+        POSTGRES_APP_SCHEMA: public
+        POSTGRES_DB_SCHEMA: public
+        SCHEMA_REGISTRY_URL: http://schema-registry-svc:8081
+        BOOTSTRAP_SERVERS: kafka-kafka-bootstrap:9092
+        SAME_DIR: 'True'
+        SUNBOW_HOST: 'http://sunbow-application-cluster:5000'
+        DOCTOR_HOST: 'http://doctor-application-cluster:5000'
+        NOCT_HOST: 'http://noct-application-cluster:5000'
+EOF
+    ) : (<<EOF
+faust-worker:
+  enabled: false
+EOF
+    ) : (<<EOF
+faust-worker:
+  enabled: true
+EOF
+  )
 }
 
 module "intake" {
@@ -1382,8 +1549,8 @@ resource "argocd_application" "ipa" {
 }
 
 resource "null_resource" "wait-for-tf-cod-chart-build" {
-  count = 0 #This is being disabled because terraform smoketests are not currently being used.
-  #count = var.argo_enabled == true ? 1 : 0
+  count = 0 # This is being disabled because the terraform smoketest is not currently being used.
+  #  count = var.argo_enabled == true ? 1 : 0
 
   depends_on = [
     module.intake,
@@ -1682,3 +1849,85 @@ resource "kubernetes_secret" "issuer-secret" {
     "secret-access-key" = var.aws_secret_key
   }
 }
+
+# Service mesh
+locals {
+
+  linkerd_crds_values = var.enable_service_mesh ? [<<EOF
+linkerd-crds:
+  enabled: true
+EOF
+  ] : []
+
+  linkerd_control_plane_values = var.enable_service_mesh ? [<<EOF
+linkerd-control-plane:
+  enabled: true
+  imagePullSecrets:
+    - name: harbor-pull-secret
+  controllerImage: ${var.image_registry}/cr.l5d.io/linkerd/controller
+  policyController:
+    name: ${var.image_registry}/cr.l5d.io/linkerd/policy-controller
+  proxy:
+    nativeSidecar: true
+    name: ${var.image_registry}/cr.l5d.io/linkerd/proxy
+  proxyInit:
+    name: ${var.image_registry}/cr.l5d.io/linkerd/proxy-init
+  debugContainer:
+    name: ${var.image_registry}/cr.l5d.io/linkerd/debug
+  identity:
+    externalCA: true
+    issuer:
+      scheme: kubernetes.io/tls
+EOF
+  ] : []
+
+  linkerd_viz_values = var.enable_service_mesh ? [<<EOF
+linkerd-viz:
+  enabled: true
+  defaultRegistry: ${var.image_registry}/cr.l5d.io/linkerd
+  imagePullSecrets:
+    - name: harbor-pull-secret
+EOF
+  ] : []
+
+  linkerd_multicluster_values = var.enable_service_mesh ? [<<EOF
+linkerd-multicluster:
+  enabled: true
+  imagePullSecrets:
+    - name: harbor-pull-secret
+  gateway:
+    enabled: false
+    pauseImage: ${var.image_registry}/gcr.io/google_containers/pause:3.2
+  namespaceMetadata:
+    registry: ${var.image_registry}/cr.l5d.io/linkerd
+  localServiceMirror:
+    image:
+      name: ${var.image_registry}/cr.l5d.io/linkerd/controller
+  controllerDefaults:
+    image:
+      name: ${var.image_registry}/cr.l5d.io/linkerd/controller
+  controllers:
+    - link:
+        ref:
+          name: ${var.load_environment == "" ? "application-cluster" : "data-cluster"}
+      logLevel: debug
+      gateway:
+        enabled: false
+      replicas: 2
+EOF
+  ] : []
+
+  trust_manager_values = var.enable_service_mesh ? [<<EOF
+trust-manager:
+  app:
+    trust:
+      namespace: indico
+  image:
+    repository: ${var.image_registry}/quay.io/jetstack/trust-manager
+  defaultPackageImage:
+    repository: ${var.image_registry}/quay.io/jetstack/trust-pkg-debian-bookworm
+EOF
+  ] : []
+}
+
+

@@ -1501,6 +1501,48 @@ variable "create_nginx_ingress_security_group" {
   description = "If enabled this will create a security group for the nginx ingress controller"
 }
 
+variable "enable_service_mesh" {
+  type        = bool
+  default     = true
+  description = "Toggle for enabling service mesh deployment"
+}
+
+variable "linkerd_control_plane_version" {
+  type        = string
+  default     = "0.0.1"
+  description = "Version of the linkerd control plane"
+}
+
+variable "linkerd_crds_version" {
+  type        = string
+  default     = "0.0.1"
+  description = "Version for the linkerd crds"
+}
+
+variable "linkerd_viz_version" {
+  type        = string
+  default     = "0.0.1"
+  description = "Version for the linkerd viz"
+}
+
+variable "linkerd_multicluster_version" {
+  type        = string
+  default     = "0.0.1"
+  description = "Version for the linkerd multicluster"
+}
+
+variable "trust_manager_version" {
+  type        = string
+  default     = "0.0.1"
+  description = "Version for the trust manager"
+}
+
+variable "enable_data_application_cluster_separation" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling data application cluster separation"
+}
+
 variable "http_tokens" {
   type        = string
   default     = "required"

@@ -109,6 +109,7 @@ locals {
   chart_version_parts = split("-", var.ipa_version)
   chart_suffix        = trimprefix(var.ipa_version, local.chart_version_parts[0])
 
+  environment = var.load_environment == "" ? lower("${var.aws_account}-${var.region}-${var.label}") : lower(var.load_environment)
 }
 
 resource "tls_private_key" "pk" {
@@ -533,10 +534,12 @@ module "argo-registration" {
 }
 
 locals {
-  security_group_id = var.include_fsx == true ? tolist(local.environment_fsx_rwx_security_group_ids)[0] : ""
-  cluster_name      = var.label
-  dns_zone_name     = var.dns_zone_name == "" ? lower("${var.aws_account}.${var.domain_suffix}") : var.dns_zone_name
-  dns_name          = var.domain_host == "" ? lower("${var.label}.${var.region}.${local.dns_zone_name}") : var.domain_host
+  security_group_id      = var.include_fsx == true ? tolist(local.environment_fsx_rwx_security_group_ids)[0] : ""
+  cluster_name           = var.label
+  dns_zone_name          = var.dns_zone_name == "" ? lower("${var.aws_account}.${var.domain_suffix}") : var.dns_zone_name
+  calculated_domain_name = lower("${var.label}.${var.region}.${local.dns_zone_name}")
+  dns_name               = var.domain_host == "" ? local.calculated_domain_name : var.domain_host
+  monitoring_domain_name = var.load_environment == "" ? local.dns_name : local.calculated_domain_name
 }
 
 
@@ -548,7 +551,7 @@ data "aws_route53_zone" "primary" {
 
 
 resource "aws_route53_record" "ipa-app-caa" {
-  count   = var.is_alternate_account_domain == "true" || var.use_static_ssl_certificates ? 0 : 1
+  count   = var.is_alternate_account_domain == "true" || var.use_static_ssl_certificates || var.load_environment != "" ? 0 : 1
   zone_id = data.aws_route53_zone.primary[0].zone_id
   name    = local.dns_name
   type    = "CAA"
