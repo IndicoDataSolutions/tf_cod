@@ -189,6 +189,8 @@ global:
 storage:
   ebsStorageClass:
     enabled: false
+  indicoStorageClass:
+    name: "${local.indico_storage_class_name}"
 secrets:
   rabbitmq:
     create: true
