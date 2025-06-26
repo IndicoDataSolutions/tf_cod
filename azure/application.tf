@@ -1102,3 +1102,83 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
     command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
   }
 }
+
+# Service mesh
+locals {
+
+  linkerd_crds_values = var.enable_service_mesh ? [<<EOF
+linkerd-crds:
+  enabled: true
+EOF
+  ] : []
+
+  linkerd_control_plane_values = var.enable_service_mesh ? [<<EOF
+linkerd-control-plane:
+  enabled: true
+  imagePullSecrets:
+    - name: harbor-pull-secret
+  controllerImage: ${var.image_registry}/cr.l5d.io/linkerd/controller
+  policyController:
+    name: ${var.image_registry}/cr.l5d.io/linkerd/policy-controller
+  proxy:
+    nativeSidecar: true
+    name: ${var.image_registry}/cr.l5d.io/linkerd/proxy
+  proxyInit:
+    name: ${var.image_registry}/cr.l5d.io/linkerd/proxy-init
+  debugContainer:
+    name: ${var.image_registry}/cr.l5d.io/linkerd/debug
+  identity:
+    externalCA: true
+    issuer:
+      scheme: kubernetes.io/tls
+EOF
+  ] : []
+
+  linkerd_viz_values = var.enable_service_mesh ? [<<EOF
+linkerd-viz:
+  enabled: true
+  defaultRegistry: ${var.image_registry}/cr.l5d.io/linkerd
+  imagePullSecrets:
+    - name: harbor-pull-secret
+EOF
+  ] : []
+
+  linkerd_multicluster_values = var.enable_service_mesh ? [<<EOF
+linkerd-multicluster:
+  enabled: true
+  imagePullSecrets:
+    - name: harbor-pull-secret
+  gateway:
+    enabled: false
+    pauseImage: ${var.image_registry}/gcr.io/google_containers/pause:3.2
+  namespaceMetadata:
+    registry: ${var.image_registry}/cr.l5d.io/linkerd
+  localServiceMirror:
+    image:
+      name: ${var.image_registry}/cr.l5d.io/linkerd/controller
+  controllerDefaults:
+    image:
+      name: ${var.image_registry}/cr.l5d.io/linkerd/controller
+  controllers:
+    - link:
+        ref:
+          name: ${var.load_environment == "" ? "application-cluster" : "data-cluster"}
+      logLevel: debug
+      gateway:
+        enabled: false
+      replicas: 2
+EOF
+  ] : []
+
+  trust_manager_values = var.enable_service_mesh ? [<<EOF
+trust-manager:
+  app:
+    trust:
+      namespace: indico
+  image:
+    repository: ${var.image_registry}/quay.io/jetstack/trust-manager
+  defaultPackageImage:
+    repository: ${var.image_registry}/quay.io/jetstack/trust-pkg-debian-bookworm
+EOF
+  ] : []
+}
