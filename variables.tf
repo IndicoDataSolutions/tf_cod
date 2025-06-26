@@ -1503,7 +1503,7 @@ variable "create_nginx_ingress_security_group" {
 
 variable "enable_service_mesh" {
   type        = bool
-  default     = true
+  default     = false
   description = "Toggle for enabling service mesh deployment"
 }
 
