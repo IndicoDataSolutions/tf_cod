@@ -445,7 +445,7 @@ migrations-operator:
 minio:
   enabled: ${var.insights_enabled || var.minio_enabled}
 vault-secrets-operator:
-  enabled: false
+  enabled: ${var.secrets_operator_enabled}
   controller: 
     imagePullSecrets:
       - name: harbor-pull-secret
@@ -473,11 +473,11 @@ vault-secrets-operator:
     enabled: true
     namespace: default
     method: kubernetes
-    mount: "unused-mount"
+    mount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
     kubernetes:
-      role: "unused-role"
-      tokenAudiences: ["vault"]
-      serviceAccount: "vault-sa"
+      role: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+      tokenAudiences: [""]
+      serviceAccount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
   defaultVaultConnection:
     enabled: true
     address: ${var.vault_address}
