@@ -131,7 +131,7 @@ resource "helm_release" "monitoring" {
   version          = var.monitoring_version
   wait             = false
   timeout          = "1800" # 30 minutes
-  force_update     = true
+  upgrade_install     = true
 
   values = var.monitoring_values
 }
