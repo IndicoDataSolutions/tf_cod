@@ -70,7 +70,7 @@ resource "null_resource" "vault_auth_backend" {
     quiet = true
   }
   provisioner "local-exec" {
-    command = "./vault auth enable kubernetes -path=${local.account_region_name}"
+    command = "./vault auth enable -path=${local.account_region_name} kubernetes"
   }
   provisioner "local-exec" {
     command = "./vault write auth/${local.account_region_name}/config kubernetes_host=${var.kubernetes_host} token_reviewer_jwt=${kubernetes_secret_v1.vault-auth-default.data["token"]} kubernetes_ca_cert=${kubernetes_secret_v1.vault-auth-default.data["ca.crt"]} disable_local_ca_jwt=true disable_iss_validation=true"
