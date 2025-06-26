@@ -6,6 +6,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     }
     data = {
       do_create_cluster = "${jsonencode(var.do_create_cluster)}"
+    default_tags = "${jsonencode(var.default_tags)}"
     is_azure = "${jsonencode(var.is_azure)}"
     is_aws = "${jsonencode(var.is_aws)}"
     environment = "${jsonencode(var.environment)}"
@@ -163,6 +164,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     minio_enabled = "${jsonencode(var.minio_enabled)}"
     indico_crds_values_yaml_b64 = "${jsonencode(var.indico-crds-values-yaml-b64)}"
     indico_pre_reqs_values_yaml_b64 = "${jsonencode(var.indico-pre-reqs-values-yaml-b64)}"
+    load_environment = "${jsonencode(var.load_environment)}"
 
     }
   }

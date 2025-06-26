@@ -198,6 +198,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     create_vpc_flow_logs_role = "${jsonencode(var.create_vpc_flow_logs_role)}"
     vpc_flow_logs_role_name_override = "${jsonencode(var.vpc_flow_logs_role_name_override)}"
     create_eks_cluster_role = "${jsonencode(var.create_eks_cluster_role)}"
+    generate_eks_kms_key = "${jsonencode(var.generate_eks_kms_key)}"
     eks_cluster_iam_role_name_override = "${jsonencode(var.eks_cluster_iam_role_name_override)}"
     api_models_s3_bucket_name_override = "${jsonencode(var.api_models_s3_bucket_name_override)}"
     pgbackup_s3_bucket_name_override = "${jsonencode(var.pgbackup_s3_bucket_name_override)}"
@@ -252,6 +253,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     linkerd_multicluster_version = "${jsonencode(var.linkerd_multicluster_version)}"
     trust_manager_version = "${jsonencode(var.trust_manager_version)}"
     enable_data_application_cluster_separation = "${jsonencode(var.enable_data_application_cluster_separation)}"
+    http_tokens = "${jsonencode(var.http_tokens)}"
 
     }
   }

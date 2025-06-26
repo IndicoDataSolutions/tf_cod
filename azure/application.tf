@@ -85,6 +85,8 @@ module "secrets-operator-setup" {
   region          = var.region
   name            = var.label
   kubernetes_host = module.cluster.kubernetes_host
+  audience        = ""
+  environment     = var.load_environment == "" ? local.environment : lower(var.load_environment)
 }
 
 resource "kubernetes_namespace" "indico" {
