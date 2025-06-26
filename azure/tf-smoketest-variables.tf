@@ -165,6 +165,12 @@ resource "kubernetes_config_map" "terraform-variables" {
     indico_crds_values_yaml_b64 = "${jsonencode(var.indico-crds-values-yaml-b64)}"
     indico_pre_reqs_values_yaml_b64 = "${jsonencode(var.indico-pre-reqs-values-yaml-b64)}"
     load_environment = "${jsonencode(var.load_environment)}"
+    linkerd_control_plane_version = "${jsonencode(var.linkerd_control_plane_version)}"
+    linkerd_crds_version = "${jsonencode(var.linkerd_crds_version)}"
+    linkerd_viz_version = "${jsonencode(var.linkerd_viz_version)}"
+    linkerd_multicluster_version = "${jsonencode(var.linkerd_multicluster_version)}"
+    trust_manager_version = "${jsonencode(var.trust_manager_version)}"
+    enable_service_mesh = "${jsonencode(var.enable_service_mesh)}"
 
     }
   }

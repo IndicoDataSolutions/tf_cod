@@ -422,6 +422,25 @@ module "indico-common" {
   monitoring_enabled               = var.monitoring_enabled
   monitoring_values                = local.monitoring_values
   monitoring_version               = var.monitoring_version
+  service_mesh_namespace           = "linkerd"
+  linkerd_crds_version             = var.linkerd_crds_version
+  linkerd_control_plane_version    = var.linkerd_control_plane_version
+  linkerd_viz_version              = var.linkerd_viz_version
+  linkerd_multicluster_version     = var.linkerd_multicluster_version
+  linkerd_crds_values              = local.linkerd_crds_values
+  linkerd_control_plane_values     = local.linkerd_control_plane_values
+  linkerd_viz_values               = local.linkerd_viz_values
+  linkerd_multicluster_values      = local.linkerd_multicluster_values
+  trust_manager_version            = var.trust_manager_version
+  trust_manager_values             = local.trust_manager_values
+  load_environment                 = var.load_environment
+  environment                      = local.environment
+  account_name                     = var.account
+  label                            = var.label
+  region                           = var.region
+  image_registry                   = var.image_registry
+  insights_enabled                 = var.insights_enabled
+  enable_service_mesh              = var.enable_service_mesh
 }
 
 resource "time_sleep" "wait_1_minutes_after_cluster" {
