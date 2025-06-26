@@ -51,6 +51,10 @@ resource "null_resource" "download_vault" {
   provisioner "local-exec" {
     command = "unzip vault.zip"
   }
+
+  provisioner "local-exec" {
+    command = "chmod +x vault"
+  }
 }
 
 resource "null_resource" "vault_auth_backend" {
