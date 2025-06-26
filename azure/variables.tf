@@ -948,3 +948,9 @@ variable "indico-crds-values-yaml-b64" {
 variable "indico-pre-reqs-values-yaml-b64" {
   default = "Cg=="
 }
+
+variable "load_environment" {
+  type        = string
+  default     = ""
+  description = "Environment to load"
+}

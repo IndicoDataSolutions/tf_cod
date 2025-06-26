@@ -242,6 +242,8 @@ locals {
   argo_branch               = var.argo_branch
   argo_path                 = var.argo_path
   argo_repo                 = var.argo_repo
+
+  environment = var.load_environment == "" ? lower("${local.argo_cluster_name}") : lower(var.load_environment)
 }
 
 resource "tls_private_key" "pk" {
