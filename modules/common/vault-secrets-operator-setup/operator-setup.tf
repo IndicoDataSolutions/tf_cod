@@ -43,6 +43,9 @@ resource "kubernetes_secret_v1" "vault-auth-default" {
 }
 
 resource "null_resource" "download_vault" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
   #download vault binary
   provisioner "local-exec" {
     command = "curl -L -o vault.zip https://releases.hashicorp.com/vault/1.19.5/vault_1.19.5_linux_amd64.zip"
