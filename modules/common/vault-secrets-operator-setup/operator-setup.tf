@@ -63,7 +63,10 @@ resource "null_resource" "download_vault" {
 resource "null_resource" "vault_auth_backend" {
   depends_on = [kubernetes_secret_v1.vault-auth-default, null_resource.download_vault]
   provisioner "local-exec" {
-    command = "./vault login -method=userpass -address=${var.vault_address} username=${var.vault_username} password='${var.vault_password}'"
+    command = "./vault login -method=userpass -address=${var.vault_address} username=${var.vault_username} password=$VAULT_PASSWORD"
+    environment = {
+      VAULT_PASSWORD = "${var.vault_password}"
+    }
     quiet = true
   }
   provisioner "local-exec" {
