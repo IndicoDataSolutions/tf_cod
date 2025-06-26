@@ -71,15 +71,27 @@ resource "null_resource" "vault_auth_backend" {
   }
   provisioner "local-exec" {
     command = "./vault auth enable -path=${local.account_region_name} kubernetes"
+    environment = {
+      VAULT_ADDR = "${var.vault_address}"
+    }
   }
   provisioner "local-exec" {
     command = "./vault write auth/${local.account_region_name}/config kubernetes_host=${var.kubernetes_host} token_reviewer_jwt=${kubernetes_secret_v1.vault-auth-default.data["token"]} kubernetes_ca_cert=${kubernetes_secret_v1.vault-auth-default.data["ca.crt"]} disable_local_ca_jwt=true disable_iss_validation=true"
+    environment = {
+      VAULT_ADDR = "${var.vault_address}"
+    }
   }
   provisioner "local-exec" {
     command = "./vault policy write ${local.account_region_name} -<<EOT\n${local.vault_policies}\nEOT"
+    environment = {
+      VAULT_ADDR = "${var.vault_address}"
+    }
   }
   provisioner "local-exec" {
     command = "./vault write auth/${local.account_region_name}/role/vault-auth-role bound_service_account_names=${kubernetes_service_account_v1.vault-auth-default.metadata.0.name} bound_service_account_namespaces=indico token_policies=${local.account_region_name} token_ttl=3600"
+    environment = {
+      VAULT_ADDR = "${var.vault_address}"
+    }
   }
 }
 
