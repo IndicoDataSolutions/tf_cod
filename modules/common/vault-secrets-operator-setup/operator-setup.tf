@@ -53,6 +53,25 @@ resource "null_resource" "download_vault" {
   }
 }
 
+resource "null_resource" "vault_auth_backend" {
+  depends_on = [kubernetes_secret_v1.vault-auth-default, null_resource.download_vault]
+  provisioner "local-exec" {
+    command = "./vault login -method=userpass -address=${var.vault_address} username=${var.vault_username} password=${var.vault_password}"
+  }
+  provisioner "local-exec" {
+    command = "./vault auth enable kubernetes -path=${local.account_region_name}"
+  }
+  provisioner "local-exec" {
+    command = "./vault write auth/${local.account_region_name}/config kubernetes_host=${var.kubernetes_host} token_reviewer_jwt=${kubernetes_secret_v1.vault-auth-default.data["token"]} kubernetes_ca_cert=${kubernetes_secret_v1.vault-auth-default.data["ca.crt"]} disable_local_ca_jwt=true disable_iss_validation=true"
+  }
+  provisioner "local-exec" {
+    command = "./vault policy write ${local.account_region_name} -<<EOT\n${local.vault_policies}\nEOT"
+  }
+  provisioner "local-exec" {
+    command = "./vault write auth/${local.account_region_name}/role/vault-auth-role bound_service_account_names=${kubernetes_service_account_v1.vault-auth-default.metadata.0.name} bound_service_account_namespaces=indico token_policies=${local.account_region_name} token_ttl=3600"
+  }
+}
+
 # resource "vault_auth_backend" "kubernetes" {
 #   type = "kubernetes"
 #   path = local.account_region_name
@@ -84,6 +103,21 @@ resource "null_resource" "download_vault" {
 # }
 # EOT
 # }
+
+locals {
+  vault_policies = <<EOT
+path "indico-common/*" {
+  capabilities = ["read", "list"]
+}
+
+path "customer-Indico-Devops/data/thanos-storage" {
+  capabilities = ["read", "list"]
+}
+path "customer-${var.account}/*" {
+  capabilities = ["read", "list"]
+}
+EOT
+}
 
 # resource "vault_kubernetes_auth_backend_role" "vault-auth-role" {
 #   backend                          = vault_auth_backend.kubernetes.path
