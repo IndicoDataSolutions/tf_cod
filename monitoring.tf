@@ -25,7 +25,7 @@ locals {
       tls:
         - secretName: ${var.ssl_static_secret_name}
           hosts:
-            - alertmanager-${local.dns_name}
+            - alertmanager-${local.monitoring_domain_name}
   EOT
     ) : (<<EOT
       tls: []
@@ -35,7 +35,7 @@ locals {
       tls:
         - secretName: ${var.ssl_static_secret_name}
           hosts:
-            - grafana-${local.dns_name}
+            - grafana-${local.monitoring_domain_name}
   EOT
     ) : (<<EOT
       tls: []
@@ -45,7 +45,7 @@ locals {
       tls:
         - secretName: ${var.ssl_static_secret_name}
           hosts:
-            - prometheus-${local.dns_name}
+            - prometheus-${local.monitoring_domain_name}
   EOT
     ) : (<<EOT
       tls: []
@@ -63,7 +63,7 @@ locals {
       enabled: true
       ingressClassName: nginx
       hosts:
-        - alertmanager-${local.dns_name}
+        - alertmanager-${local.monitoring_domain_name}
       paths:
         - /
 ${local.alertmanager_tls}
@@ -113,7 +113,7 @@ ${local.thanos_config}
       enabled: true
       ingressClassName: nginx
       hosts:
-        - prometheus-${local.dns_name}
+        - prometheus-${local.monitoring_domain_name}
       paths:
         - /
 ${local.prometheus_tls}
@@ -132,7 +132,7 @@ ${local.prometheus_tls}
       enabled: true
       ingressClassName: nginx
       hosts:
-        - grafana-${local.dns_name}
+        - grafana-${local.monitoring_domain_name}
       path: /
 ${local.grafana_tls}
 sql-exporter:
@@ -235,7 +235,7 @@ EOT
 resource "aws_route53_record" "grafana-caa" {
   count   = var.monitoring_enabled == true && var.use_static_ssl_certificates == false ? 1 : 0
   zone_id = data.aws_route53_zone.primary[0].zone_id
-  name    = lower("grafana.${local.dns_name}")
+  name    = lower("grafana.${local.monitoring_domain_name}")
   type    = "CAA"
   ttl     = 300
   records = [
@@ -248,7 +248,7 @@ resource "aws_route53_record" "grafana-caa" {
 resource "aws_route53_record" "prometheus-caa" {
   count   = var.monitoring_enabled == true && var.use_static_ssl_certificates == false ? 1 : 0
   zone_id = data.aws_route53_zone.primary[0].zone_id
-  name    = lower("prometheus.${local.dns_name}")
+  name    = lower("prometheus.${local.monitoring_domain_name}")
   type    = "CAA"
   ttl     = 300
   records = [
@@ -260,7 +260,7 @@ resource "aws_route53_record" "prometheus-caa" {
 resource "aws_route53_record" "alertmanager-caa" {
   count   = var.monitoring_enabled == true && var.use_static_ssl_certificates == false ? 1 : 0
   zone_id = data.aws_route53_zone.primary[0].zone_id
-  name    = lower("alertmanager.${local.dns_name}")
+  name    = lower("alertmanager.${local.monitoring_domain_name}")
   type    = "CAA"
   ttl     = 300
   records = [

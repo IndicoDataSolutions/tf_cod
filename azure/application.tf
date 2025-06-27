@@ -68,6 +68,7 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 }
 
 
+# Note: this module is used to pull secrets from hashicorp vault. It is also used by the external-secrets operator to push secrets to hashicorp vault.
 module "secrets-operator-setup" {
   depends_on = [
     module.cluster
@@ -81,6 +82,8 @@ module "secrets-operator-setup" {
   kubernetes_host = module.cluster.kubernetes_host
   vault_username  = var.vault_username
   vault_password  = var.vault_password
+  audience        = ""
+  environment     = var.load_environment == "" ? local.environment : lower(var.load_environment)
 }
 
 resource "kubernetes_namespace" "indico" {
@@ -186,6 +189,9 @@ global:
 storage:
   ebsStorageClass:
     enabled: false
+  indicoStorageClass:
+    enabled: false
+    name: "${local.indico_storage_class_name}"
 secrets:
   rabbitmq:
     create: true
@@ -413,6 +419,25 @@ module "indico-common" {
   monitoring_enabled               = var.monitoring_enabled
   monitoring_values                = local.monitoring_values
   monitoring_version               = var.monitoring_version
+  service_mesh_namespace           = "linkerd"
+  linkerd_crds_version             = var.linkerd_crds_version
+  linkerd_control_plane_version    = var.linkerd_control_plane_version
+  linkerd_viz_version              = var.linkerd_viz_version
+  linkerd_multicluster_version     = var.linkerd_multicluster_version
+  linkerd_crds_values              = local.linkerd_crds_values
+  linkerd_control_plane_values     = local.linkerd_control_plane_values
+  linkerd_viz_values               = local.linkerd_viz_values
+  linkerd_multicluster_values      = local.linkerd_multicluster_values
+  trust_manager_version            = var.trust_manager_version
+  trust_manager_values             = local.trust_manager_values
+  load_environment                 = var.load_environment
+  environment                      = local.environment
+  account_name                     = var.account
+  label                            = var.label
+  region                           = var.region
+  image_registry                   = var.image_registry
+  insights_enabled                 = var.insights_enabled
+  enable_service_mesh              = var.enable_service_mesh
 }
 
 resource "time_sleep" "wait_1_minutes_after_cluster" {
@@ -765,7 +790,7 @@ module "intake" {
   argo_application_name             = lower("${var.account}.${var.region}.${var.label}-ipa")
   vault_path                        = "tools/argo/data/ipa-deploy"
   argo_server                       = module.cluster.kubernetes_host
-  argo_project_name                 = module.argo-registration[0].argo_project_name
+  argo_project_name                 = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
   intake_version                    = var.ipa_version
   k8s_version                       = var.k8s_version
   intake_values_terraform_overrides = local.intake_values
@@ -916,43 +941,12 @@ minio:
   storage:
     accessKey: insights
     secretKey: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
-weaviate:
-  cronjob:
-    services:
-      weaviate-backup:
-        enabled: true
-  backupStorageConfig:
-    accessKey: insights
-    secretKey: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
-    url: http://minio-tenant-hl.insights.svc.cluster.local:9000
-  weaviate:
-    env:
-      # 1 less than the hard limit of the weaviate node group type
-      GOMEMLIMIT: "31GiB"
-    # TODO: switch this to a dedicated weaviate backup bucket
-    backups:
-      s3:
-        enabled: true
-        envconfig:
-          BACKUP_S3_ENDPOINT: minio-tenant-hl.insights.svc.cluster.local:9000
-        secrets:
-          AWS_ACCESS_KEY_ID: insights
-          AWS_SECRET_ACCESS_KEY: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
   EOF
   ]
 
   insights_values = <<EOF
 global:
   host: ${var.label}.${var.region}.indico-dev.indico.io
-  features:
-    askMyDocument: true
-ask-my-docs:
-  llmConfig:
-    llm: indico-azure-instance
-    azure:
-      apiBase: https://indico-openai.openai.azure.com/
-      deployment: indico-gpt-4
-      apiKey: <path:tools/argo/data/RandD/azureOpenAiKey#apiKey>
   EOF
 }
 
@@ -978,7 +972,7 @@ module "insights" {
   argo_application_name               = lower("${var.account}.${var.region}.${var.label}-insights")
   vault_path                          = "tools/argo/data/ipa-deploy"
   argo_server                         = module.cluster.kubernetes_host
-  argo_project_name                   = module.argo-registration[0].argo_project_name
+  argo_project_name                   = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
   insights_version                    = var.insights_version
   k8s_version                         = var.k8s_version
   insights_values_terraform_overrides = local.insights_values
@@ -1024,7 +1018,7 @@ resource "argocd_application" "ipa" {
     helm_release.cod-snapshot-restore
   ]
 
-  count = var.ipa_enabled == true ? 1 : 0
+  count = var.argo_enabled == true ? 1 : 0
 
   wait = true
 
@@ -1093,4 +1087,84 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
     }
     command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
   }
+}
+
+# Service mesh
+locals {
+
+  linkerd_crds_values = var.enable_service_mesh ? [<<EOF
+linkerd-crds:
+  enabled: true
+EOF
+  ] : []
+
+  linkerd_control_plane_values = var.enable_service_mesh ? [<<EOF
+linkerd-control-plane:
+  enabled: true
+  imagePullSecrets:
+    - name: harbor-pull-secret
+  controllerImage: ${var.image_registry}/cr.l5d.io/linkerd/controller
+  policyController:
+    name: ${var.image_registry}/cr.l5d.io/linkerd/policy-controller
+  proxy:
+    nativeSidecar: true
+    name: ${var.image_registry}/cr.l5d.io/linkerd/proxy
+  proxyInit:
+    name: ${var.image_registry}/cr.l5d.io/linkerd/proxy-init
+  debugContainer:
+    name: ${var.image_registry}/cr.l5d.io/linkerd/debug
+  identity:
+    externalCA: true
+    issuer:
+      scheme: kubernetes.io/tls
+EOF
+  ] : []
+
+  linkerd_viz_values = var.enable_service_mesh ? [<<EOF
+linkerd-viz:
+  enabled: true
+  defaultRegistry: ${var.image_registry}/cr.l5d.io/linkerd
+  imagePullSecrets:
+    - name: harbor-pull-secret
+EOF
+  ] : []
+
+  linkerd_multicluster_values = var.enable_service_mesh ? [<<EOF
+linkerd-multicluster:
+  enabled: true
+  imagePullSecrets:
+    - name: harbor-pull-secret
+  gateway:
+    enabled: false
+    pauseImage: ${var.image_registry}/gcr.io/google_containers/pause:3.2
+  namespaceMetadata:
+    registry: ${var.image_registry}/cr.l5d.io/linkerd
+  localServiceMirror:
+    image:
+      name: ${var.image_registry}/cr.l5d.io/linkerd/controller
+  controllerDefaults:
+    image:
+      name: ${var.image_registry}/cr.l5d.io/linkerd/controller
+  controllers:
+    - link:
+        ref:
+          name: ${var.load_environment == "" ? "application-cluster" : "data-cluster"}
+      logLevel: debug
+      gateway:
+        enabled: false
+      replicas: 2
+EOF
+  ] : []
+
+  trust_manager_values = var.enable_service_mesh ? [<<EOF
+trust-manager:
+  app:
+    trust:
+      namespace: indico
+  image:
+    repository: ${var.image_registry}/quay.io/jetstack/trust-manager
+  defaultPackageImage:
+    repository: ${var.image_registry}/quay.io/jetstack/trust-pkg-debian-bookworm
+EOF
+  ] : []
 }

@@ -4,6 +4,11 @@ variable "do_create_cluster" {
   default = true
 }
 
+variable "default_tags" {
+  default     = {}
+  description = "Default Tags for Resource Groups and Node Pools"
+  type        = map(string)
+}
 
 variable "is_azure" {
   type    = bool
@@ -1062,4 +1067,45 @@ variable "prod_billing" {
   type        = string
   default     = ""
   description = "This is the billing url for readapi and has the same value as prod_computer_vision_api_url "
+}
+variable "load_environment" {
+  type        = string
+  default     = ""
+  description = "Environment to load"
+}
+
+variable "linkerd_control_plane_version" {
+  type        = string
+  default     = "0.0.1"
+  description = "Version of the linkerd control plane"
+}
+
+variable "linkerd_crds_version" {
+  type        = string
+  default     = "0.0.1"
+  description = "Version for the linkerd crds"
+}
+
+variable "linkerd_viz_version" {
+  type        = string
+  default     = "0.0.1"
+  description = "Version for the linkerd viz"
+}
+
+variable "linkerd_multicluster_version" {
+  type        = string
+  default     = "0.0.1"
+  description = "Version for the linkerd multicluster"
+}
+
+variable "trust_manager_version" {
+  type        = string
+  default     = "0.0.1"
+  description = "Version for the trust manager"
+}
+
+variable "enable_service_mesh" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling service mesh"
 }

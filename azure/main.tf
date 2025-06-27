@@ -14,7 +14,7 @@ terraform {
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.35.0"
+      version = "~> 2.37"
     }
     kubectl = {
       source  = "gavinbunney/kubectl"
@@ -22,7 +22,7 @@ terraform {
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.15.0"
+      version = "~> 2.15"
     }
     argocd = {
       source  = "oboukili/argocd"
@@ -230,6 +230,8 @@ locals {
   argo_branch               = var.argo_branch
   argo_path                 = var.argo_path
   argo_repo                 = var.argo_repo
+
+  environment = var.load_environment == "" ? lower("${local.argo_cluster_name}") : lower(var.load_environment)
 }
 
 resource "tls_private_key" "pk" {

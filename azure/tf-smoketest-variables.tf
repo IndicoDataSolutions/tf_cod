@@ -6,6 +6,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     }
     data = {
       do_create_cluster = "${jsonencode(var.do_create_cluster)}"
+    default_tags = "${jsonencode(var.default_tags)}"
     is_azure = "${jsonencode(var.is_azure)}"
     is_aws = "${jsonencode(var.is_aws)}"
     environment = "${jsonencode(var.environment)}"
@@ -183,6 +184,13 @@ resource "kubernetes_config_map" "terraform-variables" {
     prod_apikey = "${jsonencode(var.prod_apikey)}"
     dev_billing = "${jsonencode(var.dev_billing)}"
     prod_billing = "${jsonencode(var.prod_billing)}"
+    load_environment = "${jsonencode(var.load_environment)}"
+    linkerd_control_plane_version = "${jsonencode(var.linkerd_control_plane_version)}"
+    linkerd_crds_version = "${jsonencode(var.linkerd_crds_version)}"
+    linkerd_viz_version = "${jsonencode(var.linkerd_viz_version)}"
+    linkerd_multicluster_version = "${jsonencode(var.linkerd_multicluster_version)}"
+    trust_manager_version = "${jsonencode(var.trust_manager_version)}"
+    enable_service_mesh = "${jsonencode(var.enable_service_mesh)}"
 
     }
   }
