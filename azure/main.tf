@@ -6,15 +6,15 @@ terraform {
     }
     azuread = {
       source  = "hashicorp/azuread"
-      version = "~> 2.33.0"
+      version = "2.33.0"
     }
     azapi = {
       source  = "Azure/azapi"
-      version = ">=1.2.0"
+      version = "2.4.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "~> 2.37"
+      version = "2.37.1"
     }
     kubectl = {
       source  = "gavinbunney/kubectl"
@@ -22,7 +22,7 @@ terraform {
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "~> 2.15"
+      version = "2.17.0"
     }
     argocd = {
       source  = "oboukili/argocd"
@@ -30,7 +30,7 @@ terraform {
     }
     local = {
       source  = "hashicorp/local"
-      version = "=2.2.3"
+      version = "2.2.3"
     }
     github = {
       source  = "integrations/github"
@@ -42,7 +42,7 @@ terraform {
     }
     random = {
       source  = "hashicorp/random"
-      version = "~>3.5.1"
+      version = "3.7.2"
     }
   }
 }
@@ -155,38 +155,6 @@ provider "helm" {
     cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
   }
 }
-
-
-provider "aws" {
-  access_key                  = var.indico_devops_aws_access_key_id
-  secret_key                  = var.indico_devops_aws_secret_access_key
-  region                      = var.indico_devops_aws_region
-  alias                       = "aws-indico-devops"
-  skip_credentials_validation = var.thanos_enabled == true ? false : true
-  skip_requesting_account_id  = var.thanos_enabled == true ? false : true
-  skip_metadata_api_check     = var.thanos_enabled == true ? false : true
-}
-
-data "aws_eks_cluster" "thanos" {
-  count    = var.thanos_enabled == true ? 1 : 0
-  name     = var.thanos_cluster_name
-  provider = aws.aws-indico-devops
-}
-
-data "aws_eks_cluster_auth" "thanos" {
-  count    = var.thanos_enabled == true ? 1 : 0
-  name     = var.thanos_cluster_name
-  provider = aws.aws-indico-devops
-}
-
-provider "kubectl" {
-  alias                  = "thanos-kubectl"
-  host                   = var.thanos_enabled == true ? data.aws_eks_cluster.thanos[0].endpoint : ""
-  cluster_ca_certificate = var.thanos_enabled == true ? base64decode(data.aws_eks_cluster.thanos[0].certificate_authority[0].data) : ""
-  token                  = var.thanos_enabled == true ? data.aws_eks_cluster_auth.thanos[0].token : ""
-  load_config_file       = false
-}
-
 
 module "argo-registration" {
   depends_on = [
