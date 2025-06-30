@@ -76,7 +76,7 @@ resource "null_resource" "vault_auth_backend" {
     }
   }
   provisioner "local-exec" {
-    command = "./vault write auth/${local.account_region_name}/config kubernetes_host=${var.kubernetes_host} token_reviewer_jwt=${kubernetes_secret_v1.vault-auth-default.data["token"]} kubernetes_ca_cert=${kubernetes_secret_v1.vault-auth-default.data["ca.crt"]} disable_local_ca_jwt=true disable_iss_validation=true"
+    command = "./vault write auth/${local.account_region_name}/config kubernetes_host=${var.kubernetes_host} token_reviewer_jwt='${kubernetes_secret_v1.vault-auth-default.data["token"]}' kubernetes_ca_cert='${local.kube_ca_cert}' disable_local_ca_jwt=true disable_iss_validation=true"
     environment = {
       VAULT_ADDR = "${var.vault_address}"
     }
@@ -143,6 +143,10 @@ path "customer-${var.account}/*" {
 path "customer-${var.account}/environments/${var.environment}/*" {
   capabilities = ["read", "list", "create", "update", "patch", "delete"]
 }
+EOT
+
+kube_ca_cert = <<EOT
+${kubernetes_secret_v1.vault-auth-default.data["ca.crt"]}
 EOT
 }
 
