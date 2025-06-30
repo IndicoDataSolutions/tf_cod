@@ -95,37 +95,6 @@ resource "null_resource" "vault_auth_backend" {
   }
 }
 
-# resource "vault_auth_backend" "kubernetes" {
-#   type = "kubernetes"
-#   path = local.account_region_name
-# }
-
-# vault read auth/indico-dev-us-east-2-dop-999/config
-# resource "vault_kubernetes_auth_backend_config" "vault-auth" {
-#   disable_iss_validation = true
-#   disable_local_ca_jwt   = true
-#   backend                = vault_auth_backend.kubernetes.path
-#   kubernetes_host        = var.kubernetes_host
-#   token_reviewer_jwt     = kubernetes_secret_v1.vault-auth-default.data["token"]
-#   kubernetes_ca_cert     = kubernetes_secret_v1.vault-auth-default.data["ca.crt"]
-# }
-
-# resource "vault_policy" "vault-auth-policy" {
-#   name = local.account_region_name
-
-#   policy = <<EOT
-# path "indico-common/*" {
-#   capabilities = ["read", "list"]
-# }
-
-# path "customer-Indico-Devops/data/thanos-storage" {
-#   capabilities = ["read", "list"]
-# }
-# path "customer-${var.account}/*" {
-#   capabilities = ["read", "list"]
-# }
-# EOT
-# }
 
 locals {
   vault_policies = <<EOT
@@ -150,12 +119,3 @@ ${kubernetes_secret_v1.vault-auth-default.data["ca.crt"]}
 EOT
 }
 
-# resource "vault_kubernetes_auth_backend_role" "vault-auth-role" {
-#   backend                          = vault_auth_backend.kubernetes.path
-#   role_name                        = "vault-auth-role"
-#   bound_service_account_names      = [kubernetes_service_account_v1.vault-auth-default.metadata.0.name]
-#   bound_service_account_namespaces = ["indico"]
-#   token_ttl                        = 3600
-#   token_policies                   = [vault_policy.vault-auth-policy.name]
-#   audience                         = var.audience
-# }
