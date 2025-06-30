@@ -6,15 +6,15 @@ terraform {
     }
     azuread = {
       source  = "hashicorp/azuread"
-      version = "~> 2.33.0"
+      version = "2.33.0"
     }
     azapi = {
       source  = "Azure/azapi"
-      version = ">=1.2.0"
+      version = "2.4.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "~> 2.37"
+      version = "2.37.1"
     }
     kubectl = {
       source  = "gavinbunney/kubectl"
@@ -22,7 +22,7 @@ terraform {
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "~> 2.15"
+      version = "2.17.0"
     }
     argocd = {
       source  = "oboukili/argocd"
@@ -30,7 +30,7 @@ terraform {
     }
     local = {
       source  = "hashicorp/local"
-      version = "=2.2.3"
+      version = "2.2.3"
     }
     github = {
       source  = "integrations/github"
@@ -42,7 +42,7 @@ terraform {
     }
     random = {
       source  = "hashicorp/random"
-      version = "~>3.5.1"
+      version = "3.7.2"
     }
   }
 }
