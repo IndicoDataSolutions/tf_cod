@@ -319,7 +319,7 @@ module "secrets-operator-setup" {
   kubernetes_host = module.cluster.kubernetes_host
   vault_username  = var.vault_username
   vault_password  = var.vault_password
-  audience        = ""
+  audience        = "vault"
   environment     = var.load_environment == "" ? local.environment : lower(var.load_environment)
 }
 

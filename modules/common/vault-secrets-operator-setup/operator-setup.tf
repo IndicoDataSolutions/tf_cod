@@ -88,7 +88,7 @@ resource "null_resource" "vault_auth_backend" {
     }
   }
   provisioner "local-exec" {
-    command = "./vault write auth/${local.account_region_name}/role/vault-auth-role bound_service_account_names=${kubernetes_service_account_v1.vault-auth-default.metadata.0.name} bound_service_account_namespaces=indico token_policies=${local.account_region_name} token_ttl=3600"
+    command = "./vault write auth/${local.account_region_name}/role/vault-auth-role bound_service_account_names=${kubernetes_service_account_v1.vault-auth-default.metadata.0.name} bound_service_account_namespaces=indico token_policies=${local.account_region_name} token_ttl=3600 audience=${var.audience}"
     environment = {
       VAULT_ADDR = "${var.vault_address}"
     }
