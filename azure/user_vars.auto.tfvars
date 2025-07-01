@@ -7,7 +7,7 @@ region                  = "eastus"
 vnet_cidr               = "192.168.0.0/20"
 subnet_cidrs            = ["192.168.0.0/22"]
 private_cluster_enabled = false
-k8s_version             = "1.32"
+k8s_version             = "1.33"
 
 default_node_pool = null
 
