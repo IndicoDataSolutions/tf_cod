@@ -70,7 +70,7 @@ resource "null_resource" "vault_auth_backend" {
     quiet = true
   }
   provisioner "local-exec" {
-    command = "./vault auth enable -path=${local.account_region_name} kubernetes"
+    command = "./vault auth enable -path=${local.account_region_name} kubernetes || true"
     environment = {
       VAULT_ADDR = "${var.vault_address}"
     }
