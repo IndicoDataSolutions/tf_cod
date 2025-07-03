@@ -1,4 +1,5 @@
 
+
 resource "kubernetes_service_account_v1" "vault-auth-default" {
   metadata {
     name      = "vault-auth"
@@ -41,26 +42,62 @@ resource "kubernetes_secret_v1" "vault-auth-default" {
   type = "kubernetes.io/service-account-token"
 }
 
+resource "null_resource" "download_vault" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+  #download vault binary
+  provisioner "local-exec" {
+    command = "curl -L -o vault.zip https://releases.hashicorp.com/vault/1.19.5/vault_1.19.5_linux_amd64.zip"
+  }
+  #unzip vault binary
+  provisioner "local-exec" {
+    command = "unzip vault.zip"
+  }
 
-resource "vault_auth_backend" "kubernetes" {
-  type = "kubernetes"
-  path = local.account_region_name
+  provisioner "local-exec" {
+    command = "chmod +x vault"
+  }
 }
 
-# vault read auth/indico-dev-us-east-2-dop-999/config
-resource "vault_kubernetes_auth_backend_config" "vault-auth" {
-  disable_iss_validation = true
-  disable_local_ca_jwt   = true
-  backend                = vault_auth_backend.kubernetes.path
-  kubernetes_host        = var.kubernetes_host
-  token_reviewer_jwt     = kubernetes_secret_v1.vault-auth-default.data["token"]
-  kubernetes_ca_cert     = kubernetes_secret_v1.vault-auth-default.data["ca.crt"]
+resource "null_resource" "vault_auth_backend" {
+  depends_on = [kubernetes_secret_v1.vault-auth-default, null_resource.download_vault]
+  provisioner "local-exec" {
+    command = "./vault login -method=userpass -address=${var.vault_address} username=${var.vault_username} password=$VAULT_PASSWORD"
+    environment = {
+      VAULT_PASSWORD = "${var.vault_password}"
+    }
+    quiet = true
+  }
+  provisioner "local-exec" {
+    command = "./vault auth enable -path=${local.account_region_name} kubernetes || true"
+    environment = {
+      VAULT_ADDR = "${var.vault_address}"
+    }
+  }
+  provisioner "local-exec" {
+    command = "./vault write auth/${local.account_region_name}/config kubernetes_host=${var.kubernetes_host} token_reviewer_jwt='${kubernetes_secret_v1.vault-auth-default.data["token"]}' kubernetes_ca_cert='${local.kube_ca_cert}' disable_local_ca_jwt=true disable_iss_validation=true"
+    environment = {
+      VAULT_ADDR = "${var.vault_address}"
+    }
+  }
+  provisioner "local-exec" {
+    command = "./vault policy write ${local.account_region_name} -<<EOT\n${local.vault_policies}\nEOT"
+    environment = {
+      VAULT_ADDR = "${var.vault_address}"
+    }
+  }
+  provisioner "local-exec" {
+    command = "./vault write auth/${local.account_region_name}/role/vault-auth-role bound_service_account_names=${kubernetes_service_account_v1.vault-auth-default.metadata.0.name} bound_service_account_namespaces=indico token_policies=${local.account_region_name} token_ttl=3600 audience=${var.audience}"
+    environment = {
+      VAULT_ADDR = "${var.vault_address}"
+    }
+  }
 }
 
-resource "vault_policy" "vault-auth-policy" {
-  name = local.account_region_name
 
-  policy = <<EOT
+locals {
+  vault_policies = <<EOT
 path "indico-common/*" {
   capabilities = ["read", "list"]
 }
@@ -75,16 +112,10 @@ path "customer-${var.account}/*" {
 path "customer-${var.account}/environments/${var.environment}/*" {
   capabilities = ["read", "list", "create", "update", "patch", "delete"]
 }
+EOT
 
+kube_ca_cert = <<EOT
+${kubernetes_secret_v1.vault-auth-default.data["ca.crt"]}
 EOT
 }
 
-resource "vault_kubernetes_auth_backend_role" "vault-auth-role" {
-  backend                          = vault_auth_backend.kubernetes.path
-  role_name                        = "vault-auth-role"
-  bound_service_account_names      = [kubernetes_service_account_v1.vault-auth-default.metadata.0.name]
-  bound_service_account_namespaces = ["indico"]
-  token_ttl                        = 3600
-  token_policies                   = [vault_policy.vault-auth-policy.name]
-  audience                         = var.audience
-}

@@ -36,10 +36,6 @@ terraform {
       source  = "integrations/github"
       version = "5.34.0"
     }
-    vault = {
-      source  = "hashicorp/vault"
-      version = "3.22.0"
-    }
     htpasswd = {
       source  = "loafoe/htpasswd"
       version = "1.0.4"
@@ -52,16 +48,6 @@ provider "time" {}
 provider "keycloak" {
   initial_login = false
 }
-
-provider "vault" {
-  address          = var.vault_address
-  skip_child_token = true
-  auth_login_userpass {
-    username = var.vault_username
-    password = var.vault_password
-  }
-}
-
 
 provider "github" {
   token = var.git_pat
@@ -139,7 +125,7 @@ module "public_networking" {
 
 
 module "networking" {
-  count                               = var.direct_connect == false && var.network_module == "networking" && var.load_environment == "" ? 1 : 0
+  count                               = var.direct_connect == false && var.network_module == "networking" &&var.load_environment == "" ? 1 : 0
   source                              = "app.terraform.io/indico/indico-aws-network/mod"
   version                             = "2.4.0"
   label                               = var.label
@@ -203,7 +189,7 @@ module "lambda-sns-forwarder" {
 module "kms_key" {
   count            = var.load_environment == "" ? 1 : 0
   source           = "app.terraform.io/indico/indico-aws-kms/mod"
-  version          = "2.1.3"
+  version          = "2.1.2"
   label            = var.label
   additional_tags  = var.additional_tags
   existing_kms_key = var.existing_kms_key
@@ -362,7 +348,7 @@ module "cluster" {
   cluster_version      = var.k8s_version
   default_tags         = merge(coalesce(var.default_tags, {}), coalesce(var.additional_tags, {}))
   cluster_iam_role_arn = local.environment_cluster_role_arn == "null" ? null : local.environment_cluster_role_arn
-  generate_kms_key     = var.generate_eks_kms_key #Once the cluster is created, we cannot change the kms key.
+  generate_kms_key     = var.create_eks_cluster_role ? false : true #Once the cluster is created, we cannot change the kms key.
   kms_key_arn          = local.environment_kms_key_arn
 
   vpc_id     = local.environment_indico_vpc_id
@@ -382,7 +368,6 @@ module "cluster" {
 
   cluster_security_group_id             = local.environment_all_subnets_sg_id
   cluster_additional_security_group_ids = var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : []
-  http_tokens                           = var.http_tokens
 }
 
 resource "time_sleep" "wait_1_minutes_after_cluster" {
@@ -392,13 +377,14 @@ resource "time_sleep" "wait_1_minutes_after_cluster" {
 }
 
 locals {
-  readapi_secret_path = var.environment == "production" ? "prod-readapi" : "dev-readapi"
+  readapi_billing_variable = var.environment == "production" ? var.prod_billing : var.dev_billing
+  readapi_api_key_variable = var.environment == "production" ? var.prod_apikey : var.dev_apikey
+  readapi_computer_vision_variable = var.environment == "production" ? var.prod_computer_vision_api_url : var.dev_computer_vision_api_url
+  readapi_computer_vision_key_variable = var.environment == "production" ? var.prod_computer_vision_api_key : var.dev_computer_vision_api_key
+  readapi_form_recognizer_variable = var.environment == "production" ? var.prod_form_recognizer_api_url : var.dev_form_recognizer_api_url
+  readapi_form_recognizer_key_variable = var.environment == "production" ? var.prod_form_recognizer_api_key : var.dev_form_recognizer_api_key
 }
 
-data "vault_kv_secret_v2" "readapi_secret" {
-  mount = var.readapi_customer != null ? "customer-${var.readapi_customer}" : "customer-${var.aws_account}"
-  name  = local.readapi_secret_path
-}
 
 resource "kubernetes_secret" "readapi" {
   count = var.enable_readapi ? 1 : 0
@@ -411,12 +397,12 @@ resource "kubernetes_secret" "readapi" {
   }
 
   data = {
-    billing                       = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_url"]
-    apikey                        = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
-    READAPI_COMPUTER_VISION_HOST  = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_url"]
-    READAPI_COMPUTER_VISION_KEY   = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
-    READAPI_FORM_RECOGNITION_HOST = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_url"]
-    READAPI_FORM_RECOGNITION_KEY  = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_key"]
+    billing                       = local.readapi_billing_variable
+    apikey                        = local.readapi_api_key_variable
+    READAPI_COMPUTER_VISION_HOST  = local.readapi_computer_vision_variable
+    READAPI_COMPUTER_VISION_KEY   = local.readapi_computer_vision_key_variable
+    READAPI_FORM_RECOGNITION_HOST = local.readapi_form_recognizer_variable
+    READAPI_FORM_RECOGNITION_KEY  = local.readapi_form_recognizer_key_variable
   }
 }
 

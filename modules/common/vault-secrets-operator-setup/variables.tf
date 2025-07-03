@@ -6,6 +6,8 @@ variable "name" {}
 variable "kubernetes_host" {}
 variable "audience" {}
 variable "environment" {}
+variable "vault_username" {}
+variable "vault_password" {}
 locals {
   account_region_name = lower("${var.account}-${var.region}-${var.name}")
 }

@@ -36,10 +36,6 @@ terraform {
       source  = "integrations/github"
       version = "5.34.0"
     }
-    vault = {
-      source  = "hashicorp/vault"
-      version = "3.22.0"
-    }
     random = {
       source  = "hashicorp/random"
       version = "3.7.2"
@@ -94,14 +90,6 @@ provider "http" {}
 
 provider "time" {}
 
-provider "vault" {
-  address          = var.vault_address
-  skip_child_token = true
-  auth_login_userpass {
-    username = var.vault_username
-    password = var.vault_password
-  }
-}
 
 provider "github" {
   token = var.git_pat
@@ -339,34 +327,35 @@ module "readapi_queue" {
 }
 
 locals {
-  readapi_secret_path       = var.environment == "production" ? "prod-readapi" : "dev-readapi"
   customer_vault_mount_path = "customer-${coalesce(var.vault_mount_path, var.account)}"
 }
-
-data "vault_kv_secret_v2" "readapi_secret" {
-  mount = local.customer_vault_mount_path
-  name  = local.readapi_secret_path
+locals {
+  readapi_billing_variable = var.environment == "production" ? var.prod_billing : var.dev_billing
+  readapi_api_key_variable = var.environment == "production" ? var.prod_apikey : var.dev_apikey
+  readapi_computer_vision_variable = var.environment == "production" ? var.prod_computer_vision_api_url : var.dev_computer_vision_api_url
+  readapi_computer_vision_key_variable = var.environment == "production" ? var.prod_computer_vision_api_key : var.dev_computer_vision_api_key
+  readapi_form_recognizer_variable = var.environment == "production" ? var.prod_form_recognizer_api_url : var.dev_form_recognizer_api_url
+  readapi_form_recognizer_key_variable = var.environment == "production" ? var.prod_form_recognizer_api_key : var.dev_form_recognizer_api_key
 }
 
+
 resource "kubernetes_secret" "readapi" {
-  count      = var.enable_readapi ? 1 : 0
-  depends_on = [module.cluster]
+  count = var.enable_readapi ? 1 : 0
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
   metadata {
     name = "readapi-secret"
   }
 
   data = {
-    billing                       = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_url"]
-    apikey                        = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
-    READAPI_COMPUTER_VISION_HOST  = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_url"]
-    READAPI_COMPUTER_VISION_KEY   = data.vault_kv_secret_v2.readapi_secret.data["computer_vision_api_key"]
-    READAPI_FORM_RECOGNITION_HOST = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_url"]
-    READAPI_FORM_RECOGNITION_KEY  = data.vault_kv_secret_v2.readapi_secret.data["form_recognizer_api_key"]
-    storage_account_name          = module.readapi_queue[0].storage_account_name
-    storage_account_id            = module.readapi_queue[0].storage_account_id
-    storage_account_access_key    = module.readapi_queue[0].storage_account_access_key
-    storage_queue_name            = module.readapi_queue[0].storage_queue_name
-    QUEUE_CONNECTION_STRING       = module.readapi_queue[0].storage_connection_string
+    billing                       = local.readapi_billing_variable
+    apikey                        = local.readapi_api_key_variable
+    READAPI_COMPUTER_VISION_HOST  = local.readapi_computer_vision_variable
+    READAPI_COMPUTER_VISION_KEY   = local.readapi_computer_vision_key_variable
+    READAPI_FORM_RECOGNITION_HOST = local.readapi_form_recognizer_variable
+    READAPI_FORM_RECOGNITION_KEY  = local.readapi_form_recognizer_key_variable
   }
 }
 
