@@ -224,8 +224,6 @@ clusterIssuer:
 
 aws-efs-csi-driver:
   enabled: false
-aws-for-fluent-bit:
-  enabled: false
 aws-fsx-csi-driver:
   enabled: false
 aws-load-balancer-controller:
