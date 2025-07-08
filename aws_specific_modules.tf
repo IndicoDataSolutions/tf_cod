@@ -99,7 +99,7 @@ resource "aws_eks_addon" "guardduty" {
 
   cluster_name      = var.label
   addon_name        = "aws-guardduty-agent"
-  addon_version     = "v1.9.0-eksbuild.2"
+  addon_version     = "v1.10.0-eksbuild.2"
   resolve_conflicts = "OVERWRITE"
 
   preserve = true
