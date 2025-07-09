@@ -590,14 +590,6 @@ aws-efs-csi-driver:
     csiProvisioner:
       image:
         repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
-aws-for-fluent-bit:
-  enabled: true
-  image:
-    repository: ${var.image_registry}/public.ecr.aws/aws-observability/aws-for-fluent-bit
-  cloudWatchLogs:
-    region: ${var.region}
-    logGroupName: "/aws/eks/fluentbit-cloudwatch/${var.label}/logs"
-    logGroupTemplate: "/aws/eks/fluentbit-cloudwatch/${var.label}/workload/$kubernetes['namespace_name']"
 aws-fsx-csi-driver:
   enabled: ${var.include_fsx}
   image:  
