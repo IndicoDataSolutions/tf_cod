@@ -1041,7 +1041,7 @@ variable "enable_s3_access_logging" {
 
 variable "enable_vpc_flow_logs" {
   type        = bool
-  default     = true
+  default     = false
   description = "If enabled this will create flow logs for the VPC"
 }
 
