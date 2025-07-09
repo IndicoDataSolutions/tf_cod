@@ -13,7 +13,7 @@ locals {
     celery-workers = {
       min_size               = 0
       max_size               = 20
-      instance_types         = ["m5.xlarge"]
+      instance_types         = ["m6a.xlarge"]
       type                   = "cpu"
       spot                   = false
       desired_capacity       = "0"
@@ -23,7 +23,7 @@ locals {
     static-workers = {
       min_size               = 1
       max_size               = 20
-      instance_types         = ["m5.xlarge"]
+      instance_types         = ["m6a.xlarge"]
       type                   = "cpu"
       spot                   = false
       desired_capacity       = "0"
@@ -33,7 +33,7 @@ locals {
     pdf-workers = {
       min_size               = 0
       max_size               = 3
-      instance_types         = ["m5.xlarge"]
+      instance_types         = ["m6a.xlarge"]
       type                   = "cpu"
       spot                   = false
       desired_capacity       = "1"
@@ -43,7 +43,7 @@ locals {
     highmem-workers = {
       min_size               = 0
       max_size               = 3
-      instance_types         = ["m5.2xlarge"]
+      instance_types         = ["m6a.2xlarge"]
       type                   = "cpu"
       spot                   = false
       desired_capacity       = "0"
@@ -53,7 +53,7 @@ locals {
     monitoring-workers = {
       min_size               = 1
       max_size               = 4
-      instance_types         = ["m5.large"]
+      instance_types         = ["m6a.large"]
       type                   = "cpu"
       spot                   = false
       desired_capacity       = "1"
@@ -63,7 +63,7 @@ locals {
     pgo-workers = {
       min_size               = 1
       max_size               = 4
-      instance_types         = ["m5.large"]
+      instance_types         = ["m6a.large"]
       type                   = "cpu"
       spot                   = false
       desired_capacity       = "1"
@@ -73,7 +73,7 @@ locals {
     readapi-servers = {
       min_size               = 0
       max_size               = 3
-      instance_types         = ["m5.2xlarge"]
+      instance_types         = ["m6a.2xlarge"]
       type                   = "cpu"
       spot                   = false
       desired_capacity       = "0"
@@ -83,7 +83,7 @@ locals {
     readapi-azurite = {
       min_size               = 0
       max_size               = 1
-      instance_types         = ["m5.xlarge"]
+      instance_types         = ["m6a.xlarge"]
       type                   = "cpu"
       spot                   = false
       desired_capacity       = "1"
@@ -96,7 +96,7 @@ locals {
     static-workers = {
       type                   = "cpu"
       spot                   = false
-      instance_types         = ["m5a.xlarge"]
+      instance_types         = ["m6a.xlarge"]
       min_size               = 1
       max_size               = 10
       desired_capacity       = "3"
@@ -106,7 +106,7 @@ locals {
     pgo-workers = {
       type                   = "cpu"
       spot                   = false
-      instance_types         = ["m5a.large"]
+      instance_types         = ["m6a.large"]
       min_size               = 1
       max_size               = 2
       desired_capacity       = "2"
@@ -116,7 +116,7 @@ locals {
     celery-workers = {
       type                   = "cpu"
       spot                   = false
-      instance_types         = ["m5a.xlarge"]
+      instance_types         = ["m6a.xlarge"]
       min_size               = 1
       max_size               = 3
       desired_capacity       = "1"
@@ -126,7 +126,7 @@ locals {
     minio = {
       type                   = "cpu"
       spot                   = false
-      instance_types         = ["m5.xlarge"]
+      instance_types         = ["m6a.xlarge"]
       min_size               = 1
       max_size               = 4
       desired_capacity       = "4"
@@ -136,7 +136,7 @@ locals {
     monitoring-workers = {
       min_size               = 1
       max_size               = 4
-      instance_types         = ["m5.large"]
+      instance_types         = ["m6a.large"]
       type                   = "cpu"
       spot                   = false
       desired_capacity       = "1"
@@ -169,7 +169,7 @@ locals {
     default-workers = {
       min_size               = 1
       max_size               = 3
-      instance_types         = ["m5.xlarge"]
+      instance_types         = ["m6.xlarge"]
       type                   = "cpu"
       spot                   = false
       desired_capacity       = "0"
