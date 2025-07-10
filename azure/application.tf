@@ -67,11 +67,6 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
-data "vault_kv_secret_v2" "harbor-api-token" {
-  count = var.argo_enabled == true ? 1 : 0
-  mount = "tools/argo"
-  name  = "harbor-api"
-}
 
 # Note: this module is used to pull secrets from hashicorp vault. It is also used by the external-secrets operator to push secrets to hashicorp vault.
 module "secrets-operator-setup" {
@@ -85,6 +80,8 @@ module "secrets-operator-setup" {
   region          = var.region
   name            = var.label
   kubernetes_host = module.cluster.kubernetes_host
+  vault_username  = var.vault_username
+  vault_password  = var.vault_password
   audience        = ""
   environment     = var.load_environment == "" ? local.environment : lower(var.load_environment)
 }
@@ -204,8 +201,8 @@ secrets:
     zerossl:
       create: ${var.enable_custom_cluster_issuer == false ? true : false}
       eabEmail: devops-sa@indico.io
-      eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
-      eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
+      eabKid: "${var.zerossl_key_id}"
+      eabHmacKey: "${var.zerossl_hmac_base64}"
     letsencrypt:
       create: true
 clusterIssuer:
@@ -600,7 +597,6 @@ resource "kubectl_manifest" "custom-cluster-issuer" {
     module.storage,
     module.indico-common,
     time_sleep.wait_1_minutes_after_cluster,
-    data.vault_kv_secret_v2.zerossl_data,
     kubernetes_secret.azure_storage_key,
     kubernetes_config_map.azure_dns_credentials,
     kubernetes_service_account.workload_identity,
@@ -1012,16 +1008,6 @@ module "additional_application" {
   helm_values            = trimspace(base64decode(each.value.values))
 }
 
-data "vault_kv_secret_v2" "zerossl_data" {
-  mount = local.customer_vault_mount_path
-  name  = "zerossl"
-}
-
-output "zerossl" {
-  sensitive = true
-  value     = data.vault_kv_secret_v2.zerossl_data.data_json
-}
-
 resource "argocd_application" "ipa" {
   depends_on = [
     module.intake,
@@ -1095,7 +1081,7 @@ resource "null_resource" "wait-for-tf-cod-chart-build" {
 
   provisioner "local-exec" {
     environment = {
-      HARBOR_API_TOKEN = jsondecode(data.vault_kv_secret_v2.harbor-api-token[0].data_json)["bearer_token"]
+      HARBOR_API_TOKEN = var.harbor_api_token
     }
     command = "${path.module}/validate_chart.sh terraform-smoketests 0.1.1-${data.external.git_information.result.branch}-${substr(data.external.git_information.result.sha, 0, 8)}"
   }

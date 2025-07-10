@@ -605,6 +605,25 @@ variable "harness_mount_path" {
   default = "harness"
 }
 
+variable "harness_delegate_token" {
+  type        = string
+  default     = ""
+  description = "Harness delegate token"
+}
+
+variable "harness_delegate_account_id" {
+  type        = string
+  default     = ""
+  description = "Harness delegate account id"
+}
+
+variable "harness_delegate_image" {
+  type        = string
+  default     = ""
+  description = "Harness delegate image"
+}
+
+
 variable "terraform_smoketests_enabled" {
   type    = bool
   default = true
@@ -949,6 +968,106 @@ variable "indico-pre-reqs-values-yaml-b64" {
   default = "Cg=="
 }
 
+variable "harbor_api_token" {
+  type        = string
+  default     = ""
+  description = "Harbor API token"
+}
+
+variable "zerossl_hmac_base64" {
+  type        = string
+  default     = ""
+  description = "ZeroSSL HMAC base64"
+}
+
+variable "zerossl_key_id" {
+  type        = string
+  default     = ""
+  description = "ZeroSSL key id"
+}
+
+variable "harbor_customer_robot_username" {
+  type        = string
+  default     = ""
+  description = "Harbor robot username"
+}
+
+variable "harbor_customer_robot_password" {
+  type        = string
+  default     = ""
+}
+
+variable "dev_computer_vision_api_key" {
+  type        = string
+  default     = ""
+  description = "readapi Computer vision api key"
+}
+
+variable "dev_computer_vision_api_url" {
+  type        = string
+  default     = ""
+  description = "readapi computer vision api url"
+}
+
+variable "dev_form_recognizer_api_key" {
+  type        = string
+  default     = ""
+  description = "readapi form recognizer api key"
+}
+
+variable "dev_form_recognizer_api_url" {
+  type        = string
+  default     = ""
+  description = "readapi form recognizer api url"
+}
+
+variable "prod_computer_vision_api_key" {
+  type        = string
+  default     = ""
+  description = "readapi Computer vision api key"
+}
+
+variable "prod_computer_vision_api_url" {
+  type        = string
+  default     = ""
+  description = "readapi computer vision api url"
+} 
+
+variable "prod_form_recognizer_api_key" {
+  type        = string
+  default     = ""
+  description = "readapi form recognizer api key"
+}
+
+variable "prod_form_recognizer_api_url" {
+  type        = string
+  default     = ""
+  description = "readapi form recognizer api url"
+} 
+
+variable "dev_apikey" {
+  type        = string
+  default     = ""
+  description = "this has the same value as dev_computer_vision_api_key"
+}
+
+variable "prod_apikey" {
+  type        = string
+  default     = ""
+  description = "this has the same value as prod_computer_vision_api_key"
+}
+
+variable "dev_billing" {
+  type        = string
+  default     = ""
+  description = "This is the billing url for readapi and has the same value as dev_computer_vision_api_url"
+}
+
+variable "prod_billing" {
+  type        = string
+  default     = ""
+  description = "This is the billing url for readapi and has the same value as prod_computer_vision_api_url "
+}
 variable "load_environment" {
   type        = string
   default     = ""
