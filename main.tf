@@ -125,7 +125,7 @@ module "public_networking" {
 
 
 module "networking" {
-  count                               = var.direct_connect == false && var.network_module == "networking" &&var.load_environment == "" ? 1 : 0
+  count                               = var.direct_connect == false && var.network_module == "networking" && var.load_environment == "" ? 1 : 0
   source                              = "app.terraform.io/indico/indico-aws-network/mod"
   version                             = "2.4.0"
   label                               = var.label
@@ -368,6 +368,7 @@ module "cluster" {
 
   cluster_security_group_id             = local.environment_all_subnets_sg_id
   cluster_additional_security_group_ids = var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : []
+  http_tokens                           = var.http_tokens
 }
 
 resource "time_sleep" "wait_1_minutes_after_cluster" {
@@ -377,11 +378,11 @@ resource "time_sleep" "wait_1_minutes_after_cluster" {
 }
 
 locals {
-  readapi_billing_variable = var.environment == "production" ? var.prod_billing : var.dev_billing
-  readapi_api_key_variable = var.environment == "production" ? var.prod_apikey : var.dev_apikey
-  readapi_computer_vision_variable = var.environment == "production" ? var.prod_computer_vision_api_url : var.dev_computer_vision_api_url
+  readapi_billing_variable             = var.environment == "production" ? var.prod_billing : var.dev_billing
+  readapi_api_key_variable             = var.environment == "production" ? var.prod_apikey : var.dev_apikey
+  readapi_computer_vision_variable     = var.environment == "production" ? var.prod_computer_vision_api_url : var.dev_computer_vision_api_url
   readapi_computer_vision_key_variable = var.environment == "production" ? var.prod_computer_vision_api_key : var.dev_computer_vision_api_key
-  readapi_form_recognizer_variable = var.environment == "production" ? var.prod_form_recognizer_api_url : var.dev_form_recognizer_api_url
+  readapi_form_recognizer_variable     = var.environment == "production" ? var.prod_form_recognizer_api_url : var.dev_form_recognizer_api_url
   readapi_form_recognizer_key_variable = var.environment == "production" ? var.prod_form_recognizer_api_key : var.dev_form_recognizer_api_key
 }
 
