@@ -54,7 +54,7 @@ fluent-bit:
           name              loki
           match             *
           host              ${var.loki_endpoint}
-          port              3100
+          port              80
           labels            cluster=${var.label}
           line_format       json
           tenant_id         ${var.label}
