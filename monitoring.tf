@@ -47,8 +47,6 @@ fluent-bit:
           keep_log            off
           k8s-logging.parser  on
           k8s-logging.exclude off
-          k8s-logging.max_records 50000
-          k8s-logging.cache_ttl 600
           buffer_size 256KB
 
     outputs: |
