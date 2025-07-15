@@ -20,6 +20,53 @@ locals {
   EOT
   )
 
+  fluent_bit_config = var.enable_loki_logging == true ? (<<EOT
+fluent-bit:
+  enabled: true
+  image:
+    repository: harbor.devops.indico.io/docker.io/fluent/fluent-bit
+  imagePullSecrets:
+    - name: harbor-pull-secret
+  config:
+    inputs: |
+      [INPUT]
+        name              tail
+        path              /var/log/containers/*.log
+        parser            docker
+        tag               kube.*
+
+    filters: |
+      [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Kube_Tag_Prefix     kube.var.log.containers.
+        Merge_Log           On
+        Keep_Log            Off
+        K8S-Logging.Parser  On
+        K8S-Logging.Exclude Off
+
+      [FILTER]
+        Name                grep
+        Match               kube.*
+        Regex               kubernetes.namespace_name    default
+
+    outputs: |
+      [OUTPUT]
+        name              loki
+        match             *
+        host              ${var.loki_endpoint}
+        port              3100
+        labels            job=fluent-bit, cluster=${var.label}
+        line_format       json
+        tenant_id         devops
+        http_user         ${var.loki_username}
+        http_passwd       ${var.loki_password}
+EOT
+    ) : (<<EOT
+fluent-bit:
+  enabled: false
+EOT
+  )
 
   alertmanager_tls = var.acm_arn == "" ? (<<EOT
       tls:

@@ -745,6 +745,7 @@ keda:
         enabled: true
 kube-prometheus-stack:
 ${local.kube_prometheus_stack_values}
+${local.fluent_bit_config}
 metrics-server:
   global:
     imageRegistry: ${var.image_registry}/docker.io
