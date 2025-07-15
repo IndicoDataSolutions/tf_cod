@@ -63,7 +63,7 @@ resource "helm_release" "linkerd-crds" {
   count            = var.enable_service_mesh ? 1 : 0
   depends_on       = [time_sleep.wait_1_minutes_after_crds, helm_release.trust-manager]
   name             = "linkerd-crds"
-  chart            = var.use_local_helm_charts ? "../../../charts/linkerd-crds.tgz" : "linkerd-crds"
+  chart            = var.use_local_helm_charts ? "./charts/linkerd-crds.tgz" : "linkerd-crds"
   namespace        = var.service_mesh_namespace
   create_namespace = true
   repository       = var.use_local_helm_charts ? null : var.helm_registry
@@ -75,7 +75,7 @@ resource "helm_release" "linkerd-control-plane" {
   count = var.enable_service_mesh ? 1 : 0
   depends_on = [helm_release.linkerd-crds, kubectl_manifest.linkerd-identity-trust-roots-bundle, kubectl_manifest.linkerd-issuer-secret, helm_release.trust-manager]
   name       = "linkerd-control-plane"
-  chart      = var.use_local_helm_charts ? "../../../charts/linkerd-control-plane.tgz" : "linkerd-control-plane"
+  chart      = var.use_local_helm_charts ? "./charts/linkerd-control-plane.tgz" : "linkerd-control-plane"
   namespace  = var.service_mesh_namespace
   repository = var.use_local_helm_charts ? null : var.helm_registry
   version    = var.use_local_helm_charts ? null : var.linkerd_control_plane_version
@@ -86,7 +86,7 @@ resource "helm_release" "linkerd-viz" {
   count = var.enable_service_mesh ? 1 : 0
   depends_on = [helm_release.linkerd-control-plane]
   name       = "linkerd-viz"
-  chart      = var.use_local_helm_charts ? "../../../charts/linkerd-viz.tgz" : "linkerd-viz"
+  chart      = var.use_local_helm_charts ? "./charts/linkerd-viz.tgz" : "linkerd-viz"
   namespace  = var.service_mesh_namespace
   repository = var.use_local_helm_charts ? null : var.helm_registry
   version    = var.use_local_helm_charts ? null : var.linkerd_viz_version
@@ -97,7 +97,7 @@ resource "helm_release" "linkerd-multicluster" {
   count = var.enable_service_mesh ? 1 : 0
   depends_on = [helm_release.linkerd-control-plane]
   name       = "linkerd-multicluster"
-  chart      = var.use_local_helm_charts ? "../../../charts/linkerd-multicluster.tgz" : "linkerd-multicluster"
+  chart      = var.use_local_helm_charts ? "./charts/linkerd-multicluster.tgz" : "linkerd-multicluster"
   namespace  = "linkerd-multicluster"
   create_namespace = true
   repository = var.use_local_helm_charts ? null : var.helm_registry

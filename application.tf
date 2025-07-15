@@ -1697,7 +1697,7 @@ resource "helm_release" "local-registry" {
   create_namespace = false
   namespace        = "local-registry"
   repository       = var.use_local_helm_charts ? null : var.ipa_repo
-  chart            = var.use_local_helm_charts ? "../../../charts/local-registry.tgz" : "local-registry"
+  chart            = var.use_local_helm_charts ? "./charts/local-registry.tgz" : "local-registry"
   version          = var.use_local_helm_charts ? null : var.local_registry_version
   wait             = false
   timeout          = "1800" # 30 minutes
