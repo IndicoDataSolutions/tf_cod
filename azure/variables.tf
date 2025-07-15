@@ -1109,3 +1109,9 @@ variable "enable_service_mesh" {
   default     = false
   description = "Toggle for enabling service mesh"
 }
+
+variable "use_local_helm_charts" {
+  type        = bool
+  default     = false
+  description = "Toggle for using local helm charts"
+}

@@ -1671,3 +1671,9 @@ variable "prod_billing" {
   default     = ""
   description = "This is the billing url for readapi and has the same value as prod_computer_vision_api_url "
 }
+
+variable "use_local_helm_charts" {
+  type        = bool
+  default     = false
+  description = "Toggle for using local helm charts"
+}

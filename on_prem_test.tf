@@ -136,9 +136,9 @@ resource "null_resource" "get_nfs_server_ip" {
 resource "helm_release" "nfs-provider" {
   count      = var.on_prem_test == true ? 1 : 0
   name       = "csi-driver-nfs"
-  repository = var.ipa_repo
-  chart      = "csi-driver-nfs"
-  version    = var.csi_driver_nfs_version
+  repository = var.use_local_helm_charts ? null : var.ipa_repo
+  chart      = var.use_local_helm_charts ? "../../../charts/csi-driver-nfs.tgz" : "csi-driver-nfs"
+  version    = var.use_local_helm_charts ? null : var.csi_driver_nfs_version
   namespace  = "default"
   depends_on = [
     module.cluster,

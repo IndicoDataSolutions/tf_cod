@@ -126,3 +126,9 @@ variable "intake_values_overrides" {
   default     = ""
   description = "Overrides to the helm values of the intake chart from the cod user"
 }
+
+variable "use_local_helm_charts" {
+  type        = bool
+  default     = false
+  description = "Toggle for using local helm charts"
+}

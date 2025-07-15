@@ -191,6 +191,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     linkerd_multicluster_version = "${jsonencode(var.linkerd_multicluster_version)}"
     trust_manager_version = "${jsonencode(var.trust_manager_version)}"
     enable_service_mesh = "${jsonencode(var.enable_service_mesh)}"
+    use_local_helm_charts = "${jsonencode(var.use_local_helm_charts)}"
 
     }
   }

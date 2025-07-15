@@ -62,3 +62,9 @@ variable "kms_key_id" {
 variable "node_pools" {
   default = null
 }
+
+variable "use_local_helm_charts" {
+  type        = bool
+  default     = false
+  description = "Toggle for using local helm charts"
+}
