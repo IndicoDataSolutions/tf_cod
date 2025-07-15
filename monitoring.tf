@@ -30,37 +30,37 @@ fluent-bit:
   config:
     inputs: |
       [INPUT]
-        name              tail
-        path              /var/log/containers/*.log
-        parser            docker
-        tag               kube.*
+          name              tail
+          path              /var/log/containers/*.log
+          parser            docker
+          tag               kube.*
 
     filters: |
       [FILTER]
-        Name                kubernetes
-        Match               kube.*
-        Kube_Tag_Prefix     kube.var.log.containers.
-        Merge_Log           On
-        Keep_Log            Off
-        K8S-Logging.Parser  On
-        K8S-Logging.Exclude Off
+          Name                kubernetes
+          Match               kube.*
+          Kube_Tag_Prefix     kube.var.log.containers.
+          Merge_Log           On
+          Keep_Log            Off
+          K8S-Logging.Parser  On
+          K8S-Logging.Exclude Off
 
       [FILTER]
-        Name                grep
-        Match               kube.*
-        Regex               kubernetes.namespace_name    default
+          Name                grep
+          Match               kube.*
+          Regex               kubernetes.namespace_name    default
 
     outputs: |
       [OUTPUT]
-        name              loki
-        match             *
-        host              ${var.loki_endpoint}
-        port              3100
-        labels            job=fluent-bit, cluster=${var.label}
-        line_format       json
-        tenant_id         devops
-        http_user         ${var.loki_username}
-        http_passwd       ${var.loki_password}
+          name              loki
+          match             *
+          host              ${var.loki_endpoint}
+          port              3100
+          labels            job=fluent-bit, cluster=${var.label}
+          line_format       json
+          tenant_id         devops
+          http_user         ${var.loki_username}
+          http_passwd       ${var.loki_password}
 EOT
     ) : (<<EOT
 fluent-bit:
