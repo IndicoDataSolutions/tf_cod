@@ -32,23 +32,24 @@ fluent-bit:
       [INPUT]
           name              tail
           path              /var/log/containers/*.log
+          exclude_path      /var/log/containers/*_kube-system_*.log,/var/log/containers/*_indico_*.log,/var/log/containers/*_monitoring_*.log,/var/log/containers/*_amazon-guardduty_*.log
           parser            docker
           tag               kube.*
+          buffer_chunk_size 64KB
+          buffer_max_size 128KB
 
     filters: |
       [FILTER]
-          Name                kubernetes
-          Match               kube.*
-          Kube_Tag_Prefix     kube.var.log.containers.
-          Merge_Log           On
-          Keep_Log            Off
-          K8S-Logging.Parser  On
-          K8S-Logging.Exclude Off
-
-      [FILTER]
-          Name                grep
-          Match               kube.*
-          Regex               kubernetes.namespace_name    default
+          name                kubernetes
+          match               kube.*
+          kube_tag_prefix     kube.var.log.containers.
+          merge_log           on
+          keep_log            off
+          k8s-logging.parser  on
+          k8s-logging.exclude off
+          k8s-logging.max_records 50000
+          k8s-logging.cache_ttl 600
+          buffer_size 256KB
 
     outputs: |
       [OUTPUT]
@@ -56,9 +57,9 @@ fluent-bit:
           match             *
           host              ${var.loki_endpoint}
           port              3100
-          labels            job=fluent-bit, cluster=${var.label}
+          labels            cluster=${var.label}
           line_format       json
-          tenant_id         devops
+          tenant_id         ${var.label}
           http_user         ${var.loki_username}
           http_passwd       ${var.loki_password}
 EOT
@@ -182,6 +183,24 @@ ${local.prometheus_tls}
         - grafana-${local.monitoring_domain_name}
       path: /
 ${local.grafana_tls}
+${var.enable_loki_logging == true ? (<<EOT
+    additionalDataSources:
+      - name: loki
+        type: loki
+        access: proxy
+        basicAuth: true
+        url: http://${var.loki_endpoint}
+        basicAuthUser: ${var.loki_username}
+        secureJsonData:
+          basicAuthPassword: ${var.loki_password}
+          httpHeaderValue1: ${var.label}
+        jsonData:
+          httpHeaderName1: "X-Scope-OrgID"
+EOT
+    ) : (<<EOT
+    additionalDataSources: []
+EOT
+)}
 sql-exporter:
   enabled: ${var.ipa_enabled}
   image:
@@ -190,7 +209,7 @@ tempo:
   tempo:
     repository: ${var.image_registry}/docker.io/grafana/tempo
   EOT
-    ) : (<<EOT
+) : (<<EOT
   prometheus-node-exporter:
     image:
       registry: ${var.image_registry}/quay.io
@@ -266,6 +285,25 @@ ${local.thanos_config}
         cert-manager.io/cluster-issuer: zerossl
       labels:
         acme.cert-manager.io/dns01-solver: "true"
+${var.enable_loki_logging == true ? (<<EOT
+    additionalDataSources:
+      - name: loki
+        type: loki
+        access: proxy
+        basicAuth: true
+        url: http://${var.loki_endpoint}
+        basicAuthUser: ${var.loki_username}
+        secureJsonData:
+          basicAuthPassword: ${var.loki_password}
+          httpHeaderValue1: ${var.label}
+        jsonData:
+          httpHeaderName1: "X-Scope-OrgID"
+EOT
+) : (<<EOT
+    additionalDataSources: []
+EOT
+)}
+        
 sql-exporter:
   enabled: ${var.ipa_enabled}
   image:
@@ -274,7 +312,7 @@ tempo:
   tempo:
     repository: ${var.image_registry}/docker.io/grafana/tempo
 EOT
-  )
+)
 }
 
 
