@@ -27,6 +27,10 @@ fluent-bit:
     repository: harbor.devops.indico.io/docker.io/fluent/fluent-bit
   imagePullSecrets:
     - name: harbor-pull-secret
+  rbac:
+    create: true
+    nodeAccess: true
+    eventsAccess: true
   config:
     inputs: |
       [INPUT]
@@ -37,6 +41,10 @@ fluent-bit:
           tag               kube.*
           buffer_chunk_size 64KB
           buffer_max_size 128KB
+      [INPUT]
+          name            kubernetes_events
+          tag             k8s_events
+          kube_url        https://kubernetes.default.svc
 
     filters: |
       [FILTER]
