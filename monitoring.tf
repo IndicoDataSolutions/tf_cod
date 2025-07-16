@@ -45,6 +45,7 @@ fluent-bit:
           name            kubernetes_events
           tag             k8s_events
           kube_url        https://kubernetes.default.svc
+          kube_namespace  ${var.insights_enabled ? "insights" : "default"}
 
     filters: |
       [FILTER]
