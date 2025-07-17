@@ -105,7 +105,7 @@ resource "helm_release" "indico_pre_requisites" {
   create_namespace = true
   namespace        = var.namespace
   repository       = var.use_local_helm_charts ? null : var.helm_registry
-  chart            = var.use_local_helm_charts ? "./charts/indico-pre-requisites/" : "indico-pre-reqs"
+  chart            = var.use_local_helm_charts ? "./charts/indico-pre-reqs/" : "indico-pre-reqs"
   version          = var.use_local_helm_charts ? null : var.indico_pre_reqs_version
   wait             = false
   timeout          = "1800" # 30 minutes
