@@ -165,7 +165,7 @@ ${var.enable_loki_logging == true ? (<<EOT
         type: loki
         access: proxy
         basicAuth: true
-        url: http://loki-gateway.monitoring.svc.cluster.local
+        url: http://monitoring-loki-gateway.monitoring.svc.cluster.local
         secureJsonData:
           httpHeaderValue1: logs
         jsonData:
@@ -265,7 +265,7 @@ ${var.enable_loki_logging == true ? (<<EOT
         type: loki
         access: proxy
         basicAuth: true
-        url: http://loki-gateway.monitoring.svc.cluster.local
+        url: http://monitoring-loki-gateway.monitoring.svc.cluster.local
         secureJsonData:
           httpHeaderValue1: logs
         jsonData:
