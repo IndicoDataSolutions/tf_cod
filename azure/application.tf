@@ -457,7 +457,7 @@ resource "helm_release" "crunchy-postgres" {
   create_namespace = true
   namespace        = "crunchy"
   repository       = var.use_local_helm_charts ? null : var.ipa_repo
-  chart            = var.use_local_helm_charts ? "./charts/crunchy-postgres/crunchy-postgres.tgz" : "crunchy-postgres"
+  chart            = var.use_local_helm_charts ? "./charts/crunchy-postgres/" : "crunchy-postgres"
   version          = var.use_local_helm_charts ? null : "0.3.0"
   timeout          = "600" # 10 minutes
   wait             = true

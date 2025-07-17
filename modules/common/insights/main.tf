@@ -44,9 +44,9 @@ resource "helm_release" "ins_pre_requisites" {
   name             = "insights-pre-reqs"
   create_namespace = true
   namespace        = var.namespace
-  repository       = var.helm_registry
-  chart            = "insights-pre-reqs"
-  version          = var.ins_pre_reqs_version
+  repository       = var.use_local_helm_charts ? null : var.helm_registry
+  chart            = var.use_local_helm_charts ? "charts/insights-pre-reqs/" : "insights-pre-reqs"
+  version          = var.use_local_helm_charts ? null : var.ins_pre_reqs_version
   wait             = false
   timeout          = "1800" # 30 minutes
   disable_webhooks = false

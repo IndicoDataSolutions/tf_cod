@@ -47,7 +47,7 @@ resource "helm_release" "indico_crds" {
   create_namespace = true
   namespace        = var.namespace
   repository       = var.use_local_helm_charts ? null : var.helm_registry
-  chart            = var.use_local_helm_charts ? "charts/indico-crds/indico-crds.tgz" : "indico-crds"
+  chart            = var.use_local_helm_charts ? "charts/indico-crds/" : "indico-crds"
   version          = var.use_local_helm_charts ? null : var.indico_crds_version
   wait             = true
   timeout          = "1800" # 30 minutes
@@ -105,7 +105,7 @@ resource "helm_release" "indico_pre_requisites" {
   create_namespace = true
   namespace        = var.namespace
   repository       = var.use_local_helm_charts ? null : var.helm_registry
-  chart            = var.use_local_helm_charts ? "./charts/indico-pre-requisites/indico-pre-requisites.tgz" : "indico-pre-reqs"
+  chart            = var.use_local_helm_charts ? "./charts/indico-pre-requisites/" : "indico-pre-reqs"
   version          = var.use_local_helm_charts ? null : var.indico_pre_reqs_version
   wait             = false
   timeout          = "1800" # 30 minutes
@@ -127,7 +127,7 @@ resource "helm_release" "monitoring" {
   create_namespace = true
   namespace        = "monitoring"
   repository       = var.use_local_helm_charts ? null : var.helm_registry
-  chart            = var.use_local_helm_charts ? "./charts/monitoring/monitoring.tgz" : "monitoring"
+  chart            = var.use_local_helm_charts ? "./charts/monitoring/" : "monitoring"
   version          = var.use_local_helm_charts ? null : var.monitoring_version
   wait             = false
   timeout          = "1800" # 30 minutes

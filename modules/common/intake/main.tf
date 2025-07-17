@@ -44,9 +44,9 @@ resource "helm_release" "ipa-pre-requisites" {
   name             = "ipa-pre-reqs"
   create_namespace = true
   namespace        = var.namespace
-  repository       = var.helm_registry
-  chart            = "ipa-pre-requisites"
-  version          = var.ipa_pre_reqs_version
+  repository       = var.use_local_helm_charts ? null : var.helm_registry
+  chart            = var.use_local_helm_charts ? "charts/ipa-pre-requisites/" : "ipa-pre-requisites"
+  version          = var.use_local_helm_charts ? null : var.ipa_pre_reqs_version
   wait             = false
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
