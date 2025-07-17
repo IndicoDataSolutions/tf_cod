@@ -47,7 +47,7 @@ resource "helm_release" "indico_crds" {
   create_namespace = true
   namespace        = var.namespace
   repository       = var.use_local_helm_charts ? null : var.helm_registry
-  chart            = var.use_local_helm_charts ? "./charts/indico-crds/indico-crds.tgz" : "indico-crds"
+  chart            = var.use_local_helm_charts ? "charts/indico-crds/indico-crds.tgz" : "indico-crds"
   version          = var.use_local_helm_charts ? null : var.indico_crds_version
   wait             = true
   timeout          = "1800" # 30 minutes
