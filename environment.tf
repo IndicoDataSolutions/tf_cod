@@ -24,6 +24,7 @@ locals {
   environment_data_s3_bucket_name             = var.load_environment == "" ? coalesce(module.s3-storage[0].data_s3_bucket_name, "null") : data.terraform_remote_state.environment[0].outputs.data_s3_bucket_name
   environment_pgbackup_s3_bucket_name         = var.load_environment == "" ? coalesce(module.s3-storage[0].pgbackup_s3_bucket_name, "null") : data.terraform_remote_state.environment[0].outputs.pgbackup_s3_bucket_name
   environment_miniobkp_s3_bucket_name         = var.load_environment == "" ? coalesce(module.s3-storage[0].miniobkp_s3_bucket_name, "null") : data.terraform_remote_state.environment[0].outputs.miniobkp_s3_bucket_name
+  environment_loki_s3_bucket_name             = var.load_environment == "" ? coalesce(module.s3-storage[0].loki_s3_bucket_name, "null") : data.terraform_remote_state.environment[0].outputs.loki_s3_bucket_name
   environment_efs_filesystem_id               = var.load_environment == "" ? var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : "null" : data.terraform_remote_state.environment[0].outputs.efs_filesystem_id
   environment_fsx_rwx_id                      = var.load_environment == "" ? var.include_fsx == true ? module.fsx-storage[0].fsx_rwx_id : "null" : data.terraform_remote_state.environment[0].outputs.fsx_rwx_id
   environment_fsx_rwx_arn                     = var.load_environment == "" ? var.include_fsx == true ? module.fsx-storage[0].fsx_rwx_arn : "null" : data.terraform_remote_state.environment[0].outputs.fsx_rwx_arn
