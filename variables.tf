@@ -1678,20 +1678,8 @@ variable "enable_loki_logging" {
   description = "Toggle for enabling loki logging"
 }
 
-variable "loki_endpoint" {
-  type        = string
-  default     = "loki.devops.indico.io"
-  description = "Loki endpoint"
-}
-
-variable "loki_username" {
-  type        = string
-  default     = "devops"
-  description = "Loki username"
-}
-
-variable "loki_password" {
+variable "loki_s3_bucket_name_override" {
   type        = string
   default     = ""
-  description = "Loki password"
+  description = "The name of the existing S3 bucket to be loaded and used as the loki bucket"
 }

@@ -20,55 +20,24 @@ locals {
   EOT
   )
 
-  fluent_bit_config = var.enable_loki_logging == true ? (<<EOT
+  loki_config = var.enable_loki_logging == true ? (<<EOT
 fluent-bit:
   enabled: true
-  image:
-    repository: harbor.devops.indico.io/docker.io/fluent/fluent-bit
-  imagePullSecrets:
-    - name: harbor-pull-secret
-  rbac:
-    create: true
-    nodeAccess: true
-    eventsAccess: true
-  config:
-    inputs: |
-      [INPUT]
-          name              tail
-          path              /var/log/containers/*.log
-          exclude_path      /var/log/containers/*_kube-system_*.log,/var/log/containers/*_indico_*.log,/var/log/containers/*_monitoring_*.log,/var/log/containers/*_amazon-guardduty_*.log
-          parser            docker
-          tag               kube.*
-          buffer_chunk_size 64KB
-          buffer_max_size 128KB
-      [INPUT]
-          name            kubernetes_events
-          tag             k8s_events
-          kube_url        https://kubernetes.default.svc
-          kube_namespace  ${var.insights_enabled ? "insights" : "default"}
-
-    filters: |
-      [FILTER]
-          name                kubernetes
-          match               kube.*
-          kube_tag_prefix     kube.var.log.containers.
-          merge_log           on
-          keep_log            off
-          k8s-logging.parser  on
-          k8s-logging.exclude off
-          buffer_size 256KB
-
-    outputs: |
-      [OUTPUT]
-          name              loki
-          match             *
-          host              ${var.loki_endpoint}
-          port              80
-          labels            job=${var.label},cluster=${var.label}
-          line_format       json
-          tenant_id         ${var.label}
-          http_user         ${var.loki_username}
-          http_passwd       ${var.loki_password}
+loki:
+  enabled: true
+  loki:
+    storage_config:
+      aws:
+        region: ${var.region}
+        bucketnames: ${module.s3-storage.loki_bucket_name}
+        s3forcepathstyle: false
+    storage:
+      type: s3
+      bucketNames:
+        chunks: ${module.s3-storage.loki_bucket_name}
+      s3:
+        region: ${var.region}
+  
 EOT
     ) : (<<EOT
 fluent-bit:
@@ -196,11 +165,9 @@ ${var.enable_loki_logging == true ? (<<EOT
         type: loki
         access: proxy
         basicAuth: true
-        url: http://${var.loki_endpoint}
-        basicAuthUser: ${var.loki_username}
+        url: http://loki-gateway.monitoring.svc.cluster.local
         secureJsonData:
-          basicAuthPassword: ${var.loki_password}
-          httpHeaderValue1: ${var.label}
+          httpHeaderValue1: logs
         jsonData:
           httpHeaderName1: "X-Scope-OrgID"
 EOT
@@ -298,11 +265,9 @@ ${var.enable_loki_logging == true ? (<<EOT
         type: loki
         access: proxy
         basicAuth: true
-        url: http://${var.loki_endpoint}
-        basicAuthUser: ${var.loki_username}
+        url: http://loki-gateway.monitoring.svc.cluster.local
         secureJsonData:
-          basicAuthPassword: ${var.loki_password}
-          httpHeaderValue1: ${var.label}
+          httpHeaderValue1: logs
         jsonData:
           httpHeaderName1: "X-Scope-OrgID"
 EOT
