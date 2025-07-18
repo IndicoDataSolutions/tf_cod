@@ -1,5 +1,5 @@
 apiVersion: v2
-name: placeholder
-description: placeholder
+name: monitoring
+description: monitoring chart
 type: application
 version: 0.0.1

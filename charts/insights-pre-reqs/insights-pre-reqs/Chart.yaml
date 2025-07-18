@@ -1,0 +1,20 @@
+apiVersion: v2
+dependencies:
+- condition: crunchy-postgres.enabled
+  name: crunchy-postgres
+  repository: file://../crunchy-postgres
+- condition: minio.enabled
+  name: minio
+  repository: file://../minio
+- name: common
+  repository: file://../common
+- condition: rabbitmq.enabled
+  name: rabbitmq
+  repository: file://../rabbitmq
+- condition: celery-backend.enabled
+  name: celery-backend
+  repository: file://../celery-backend
+description: A Helm chart for Kubernetes
+name: insights-pre-reqs
+type: application
+version: 2.1.2-dev-13724-842cf987

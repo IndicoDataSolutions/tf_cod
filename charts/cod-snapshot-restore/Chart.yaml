@@ -1,5 +1,5 @@
 apiVersion: v2
-name: placeholder
-description: placeholder
+name: cod-snapshot-restore
+description: cod-snapshot-restore chart
 type: application
 version: 0.0.1

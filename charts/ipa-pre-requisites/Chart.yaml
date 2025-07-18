@@ -1,5 +1,5 @@
 apiVersion: v2
-name: placeholder
-description: placeholder
+name: ipa-pre-requisites
+description: ipa-pre-requisites chart
 type: application
 version: 0.0.1
