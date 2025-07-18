@@ -102,5 +102,5 @@ resource "helm_release" "insights" {
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
 
-  values = trimspace(base64decode(var.insights_values_overrides))
+  values = [trimspace(base64decode(var.insights_values_overrides))]
 }
