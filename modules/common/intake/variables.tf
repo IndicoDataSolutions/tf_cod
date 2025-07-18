@@ -132,3 +132,14 @@ variable "use_local_helm_charts" {
   default     = false
   description = "Toggle for using local helm charts"
 }
+
+variable "install_local_intake_chart" {
+  type        = bool
+  default     = false
+  description = "Toggle for installing the local intake chart"
+}
+
+variable "ipa_version" {
+  type    = string
+  default = "0.12.1"
+}

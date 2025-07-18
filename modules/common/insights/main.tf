@@ -89,3 +89,18 @@ module "insights_application" {
   terraform_helm_values  = indent(12, trimspace(var.insights_values_terraform_overrides))
   helm_values            = trimspace(base64decode(var.insights_values_overrides))
 }
+
+resource "helm_release" "insights" {
+  depends_on = [module.insights_application]
+  count = var.install_local_insights_chart && var.use_local_helm_charts && var.argo_enabled == false? 1 : 0
+
+  name             = "insights"
+  create_namespace = true
+  namespace        = "default"
+  chart            = "./charts/insights"
+  wait             = false
+  timeout          = "1800" # 30 minutes
+  disable_webhooks = false
+
+  values = trimspace(base64decode(var.insights_values_overrides))
+}
