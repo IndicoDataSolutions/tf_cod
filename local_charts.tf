@@ -1,6 +1,10 @@
 resource "null_resource" "local_charts" {
   count = var.use_local_helm_charts ? 1 : 0
 
+  triggers = {
+    always_run = timestamp()
+  }
+
   provisioner "local-exec" {
     command = <<-EOT
       if [ -d "charts" ]; then
@@ -8,7 +12,7 @@ resource "null_resource" "local_charts" {
         for chart_file in charts/*.tgz; do
           if [ -f "$chart_file" ]; then
             echo "Untarring $chart_file..."
-            tar -xzf "$chart_file"
+            tar -xzf "$chart_file" -C charts/
           fi
         done
         echo "Finished untarring charts"
