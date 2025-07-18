@@ -795,6 +795,7 @@ module "intake" {
   intake_values_terraform_overrides = local.intake_values
   intake_values_overrides           = var.ipa_values
   use_local_helm_charts             = var.use_local_helm_charts
+  install_local_intake_chart        = var.install_local_intake_chart
 }
 
 data "github_repository" "argo-github-repo" {
@@ -978,6 +979,7 @@ module "insights" {
   insights_values_terraform_overrides = local.insights_values
   insights_values_overrides           = var.insights_values
   use_local_helm_charts               = var.use_local_helm_charts
+  install_local_insights_chart        = var.install_local_insights_chart
 }
 
 # And we can install any additional helm charts at this point as well

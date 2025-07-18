@@ -1265,7 +1265,6 @@ module "intake" {
   intake_values_overrides           = var.ipa_values
   use_local_helm_charts             = var.use_local_helm_charts
   install_local_intake_chart        = var.install_local_intake_chart
-  ipa_version                       = var.ipa_version
 }
 
 locals {
@@ -1457,7 +1456,6 @@ module "insights" {
   insights_values_overrides           = var.insights_values
   use_local_helm_charts               = var.use_local_helm_charts
   install_local_insights_chart        = var.install_local_insights_chart
-  insights_version                    = var.insights_version
 }
 
 # And we can install any additional helm charts at this point as well
