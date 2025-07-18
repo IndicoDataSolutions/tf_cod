@@ -1,0 +1,36 @@
+apiVersion: v2
+appVersion: 1.16.0
+dependencies:
+- condition: aws-efs-csi-driver.enabled
+  name: aws-efs-csi-driver
+  repository: https://kubernetes-sigs.github.io/aws-efs-csi-driver
+  version: 3.2.0
+- condition: aws-fsx-csi-driver.enabled
+  name: aws-fsx-csi-driver
+  repository: https://kubernetes-sigs.github.io/aws-fsx-csi-driver
+  version: 1.11.0
+- condition: aws-load-balancer-controller.enabled
+  name: aws-load-balancer-controller
+  repository: file://../aws-load-balancer-controller
+- condition: cluster-autoscaler.enabled
+  name: cluster-autoscaler
+  repository: file://../cluster-autoscaler
+- name: common
+  repository: file://../common
+- condition: external-dns.enabled
+  name: external-dns
+  repository: https://kubernetes-sigs.github.io/external-dns
+  version: 1.17.0
+- alias: alternate-external-dns
+  condition: alternate-external-dns.enabled
+  name: external-dns
+  repository: https://kubernetes-sigs.github.io/external-dns
+  version: 1.17.0
+- condition: ingress-nginx.enabled
+  name: ingress-nginx
+  repository: https://kubernetes.github.io/ingress-nginx
+  version: 4.13.0
+description: A Helm chart for Kubernetes
+name: indico-pre-reqs
+type: application
+version: 1.8.0-dev-13724-842cf987
