@@ -1,9 +1,4 @@
 apiVersion: v2
-dependencies:
-- condition: linkerd-viz.enabled
-  name: linkerd-viz
-  repository: https://helm.linkerd.io/edge
-  version: 2025.7.1
 description: A Helm chart to deploy Linkerd viz to Kubernetes
 maintainers:
 - email: devops@indico.io

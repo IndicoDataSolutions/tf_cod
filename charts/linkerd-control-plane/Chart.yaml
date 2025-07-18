@@ -1,9 +1,4 @@
 apiVersion: v2
-dependencies:
-- condition: linkerd-control-plane.enabled
-  name: linkerd-control-plane
-  repository: https://helm.linkerd.io/edge
-  version: 2025.7.1
 description: A Helm chart to deploy Linkerd control plane to Kubernetes
 maintainers:
 - email: devops@indico.io

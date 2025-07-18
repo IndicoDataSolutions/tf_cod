@@ -1,41 +1,5 @@
 apiVersion: v2
 appVersion: 1.16.0
-dependencies:
-- condition: aws-ebs-csi-driver.enabled
-  name: aws-ebs-csi-driver
-  repository: https://kubernetes-sigs.github.io/aws-ebs-csi-driver
-  version: 2.45.1
-- condition: cert-manager.enabled
-  name: cert-manager
-  repository: https://charts.jetstack.io
-  version: v1.18.2
-- condition: crunchy-pgo.enabled
-  name: crunchy-pgo
-  repository: file://../crunchy-pgo
-- condition: migration-operator.enabled
-  name: migrations-operator
-  repository: file://../migrations-operator
-- alias: minio
-  condition: minio.enabled
-  name: operator
-  repository: https://operator.min.io
-  version: 7.1.1
-- condition: prometheus-operator-crds.enabled
-  name: prometheus-operator-crds
-  repository: https://prometheus-community.github.io/helm-charts
-  version: 21.0.0
-- condition: vault-secrets-operator.enabled
-  name: vault-secrets-operator
-  repository: https://helm.releases.hashicorp.com
-  version: 0.10.0
-- condition: external-secrets.enabled
-  name: external-secrets
-  repository: https://charts.external-secrets.io/
-  version: 0.18.2
-- condition: reflector.enabled
-  name: reflector
-  repository: https://emberstack.github.io/helm-charts
-  version: 9.1.19
 description: A Helm chart for deploying CRDS and Operators into indico clusters
 name: indico-crds
 type: application

@@ -1,9 +1,4 @@
 apiVersion: v2
-dependencies:
-- condition: trustManager.enabled
-  name: trust-manager
-  repository: https://charts.jetstack.io
-  version: v0.18.0
 description: A Helm chart to deploy Trust Manager to Kubernetes
 maintainers:
 - email: devops@indico.io

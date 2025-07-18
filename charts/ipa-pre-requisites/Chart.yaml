@@ -1,20 +1,5 @@
 apiVersion: v2
 appVersion: 0.2.1
-dependencies:
-- condition: celery-backend.enabled
-  name: celery-backend
-  repository: file://../celery-backend
-- name: common
-  repository: file://../common
-- condition: crunchy-postgres.enabled
-  name: crunchy-postgres
-  repository: file://../crunchy-postgres
-- condition: grafana-dashboards.enabled
-  name: grafana-dashboards
-  repository: file://../grafana-dashboards
-- condition: rabbitmq.enabled
-  name: rabbitmq
-  repository: file://../rabbitmq
 description: A Helm chart for installing prerequisites for the ipa helm chart
 name: ipa-pre-requisites
 type: application
