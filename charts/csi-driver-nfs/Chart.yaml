@@ -1,5 +1,0 @@
-apiVersion: v2
-name: csi-driver-nfs
-description: csi-driver-nfs chart
-type: application
-version: 0.0.1

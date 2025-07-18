@@ -1,5 +1,0 @@
-apiVersion: v2
-name: local-registry
-description: local-registry chart
-type: application
-version: 0.0.1

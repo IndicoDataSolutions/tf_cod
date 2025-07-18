@@ -1,5 +1,0 @@
-apiVersion: v2
-name: linkerd-control-plane
-description: linkerd-control-plane chart
-type: application
-version: 0.0.1
