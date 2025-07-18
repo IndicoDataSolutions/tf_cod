@@ -102,5 +102,5 @@ resource "helm_release" "intake" {
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
 
-  values = [trimspace(base64decode(var.intake_values_overrides))]
+  values = [indent(0, trimspace(base64decode(var.intake_values_overrides)))]
 }
