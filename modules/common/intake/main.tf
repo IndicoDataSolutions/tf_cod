@@ -44,9 +44,9 @@ resource "helm_release" "ipa-pre-requisites" {
   name             = "ipa-pre-reqs"
   create_namespace = true
   namespace        = var.namespace
-  repository       = var.helm_registry
-  chart            = "ipa-pre-requisites"
-  version          = var.ipa_pre_reqs_version
+  repository       = var.use_local_helm_charts ? null : var.helm_registry
+  chart            = var.use_local_helm_charts ? "charts/ipa-pre-requisites/" : "ipa-pre-requisites"
+  version          = var.use_local_helm_charts ? null : var.ipa_pre_reqs_version
   wait             = false
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
@@ -88,4 +88,19 @@ module "intake_application" {
   release_name           = "ipa"
   terraform_helm_values  = indent(12, trimspace(var.intake_values_terraform_overrides))
   helm_values            = trimspace(base64decode(var.intake_values_overrides))
+}
+
+resource "helm_release" "intake" {
+  depends_on = [module.intake_application]
+  count = var.install_local_intake_chart && var.use_local_helm_charts && var.argo_enabled == false? 1 : 0
+
+  name             = "ipa"
+  create_namespace = true
+  namespace        = "default"
+  chart            = "./charts/ipa"
+  wait             = false
+  timeout          = "1800" # 30 minutes
+  disable_webhooks = false
+
+  values = [indent(0, trimspace(base64decode(var.intake_values_overrides)))]
 }

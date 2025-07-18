@@ -436,6 +436,7 @@ module "indico-common" {
   image_registry                   = var.image_registry
   insights_enabled                 = var.insights_enabled
   enable_service_mesh              = var.enable_service_mesh
+  use_local_helm_charts            = var.use_local_helm_charts
 }
 
 resource "time_sleep" "wait_1_minutes_after_cluster" {
@@ -455,9 +456,9 @@ resource "helm_release" "crunchy-postgres" {
   name             = "crunchy"
   create_namespace = true
   namespace        = "crunchy"
-  repository       = var.ipa_repo
-  chart            = "crunchy-postgres"
-  version          = "0.3.0"
+  repository       = var.use_local_helm_charts ? null : var.ipa_repo
+  chart            = var.use_local_helm_charts ? "./charts/crunchy-postgres/" : "crunchy-postgres"
+  version          = var.use_local_helm_charts ? null : "0.3.0"
   timeout          = "600" # 10 minutes
   wait             = true
 
@@ -793,6 +794,8 @@ module "intake" {
   k8s_version                       = var.k8s_version
   intake_values_terraform_overrides = local.intake_values
   intake_values_overrides           = var.ipa_values
+  use_local_helm_charts             = var.use_local_helm_charts
+  install_local_intake_chart        = var.install_local_intake_chart
 }
 
 data "github_repository" "argo-github-repo" {
@@ -975,6 +978,8 @@ module "insights" {
   k8s_version                         = var.k8s_version
   insights_values_terraform_overrides = local.insights_values
   insights_values_overrides           = var.insights_values
+  use_local_helm_charts               = var.use_local_helm_charts
+  install_local_insights_chart        = var.install_local_insights_chart
 }
 
 # And we can install any additional helm charts at this point as well

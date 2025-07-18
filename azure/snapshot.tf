@@ -28,9 +28,9 @@ resource "helm_release" "cod-snapshot-restore" {
   name             = "cod-snapshot-restore"
   create_namespace = true
   namespace        = "default"
-  repository       = var.ipa_repo
-  chart            = "cod-snapshot-restore"
-  version          = var.cod_snapshot_restore_version
+  repository       = var.use_local_helm_charts ? null : var.ipa_repo
+  chart            = var.use_local_helm_charts ? "charts/cod-snapshot-restore/" : "cod-snapshot-restore"
+  version          = var.use_local_helm_charts ? null : var.cod_snapshot_restore_version
   wait             = true
   timeout          = "3600" # 120 minutes
   disable_webhooks = false

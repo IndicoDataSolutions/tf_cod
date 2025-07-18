@@ -274,6 +274,9 @@ resource "kubernetes_config_map" "terraform-variables" {
     prod_apikey = "${jsonencode(var.prod_apikey)}"
     dev_billing = "${jsonencode(var.dev_billing)}"
     prod_billing = "${jsonencode(var.prod_billing)}"
+    use_local_helm_charts = "${jsonencode(var.use_local_helm_charts)}"
+    install_local_intake_chart = "${jsonencode(var.install_local_intake_chart)}"
+    install_local_insights_chart = "${jsonencode(var.install_local_insights_chart)}"
 
     }
   }

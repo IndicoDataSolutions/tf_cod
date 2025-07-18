@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: INS-0.1.0
+description: A Helm chart for Kubernetes
+name: insights
+type: application
+version: 1.2.41-dev-13724-842cf987
