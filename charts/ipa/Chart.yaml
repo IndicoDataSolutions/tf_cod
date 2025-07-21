@@ -4,4 +4,4 @@ maintainers:
 - email: devops@indico.io
   name: indico devops
 name: ipa
-version: 1.6.83-main-062eed1d
+version: 1.6.83-dev-13724-062eed1d
