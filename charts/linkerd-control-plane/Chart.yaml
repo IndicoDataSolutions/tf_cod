@@ -1,9 +1,0 @@
-apiVersion: v2
-description: A Helm chart to deploy Linkerd control plane to Kubernetes
-maintainers:
-- email: devops@indico.io
-  name: indico-devops
-  url: https://indicodata.ai
-name: linkerd-control-plane
-type: application
-version: 0.2.0-dev-13724-842cf987

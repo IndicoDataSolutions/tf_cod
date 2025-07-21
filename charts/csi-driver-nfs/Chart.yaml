@@ -2,4 +2,4 @@ apiVersion: v2
 appVersion: v4.9.0
 description: CSI NFS Driver for Kubernetes
 name: csi-driver-nfs
-version: 4.11.0-dev-13724-842cf987
+version: 4.11.0-IPA-7.3.4
