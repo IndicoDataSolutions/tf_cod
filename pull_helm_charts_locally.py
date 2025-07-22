@@ -25,9 +25,9 @@ def get_current_branch():
         sys.exit(1)
 
 
-def call_tcm_api(branch: str, tcm_url: str, github_token: str):
+def call_tcm_api(branch: str, tcm_url: str, github_token: str, charts_branch: str):
     """Call the TCM API to generate COD helm charts."""
-    url = f"{tcm_url}/generate-cod-helm-charts/{branch}"
+    url = f"{tcm_url}/generate-cod-helm-charts/{branch}/{charts_branch}"
     headers = {
         "Authorization": f"Bearer {github_token}",
         "Content-Type": "application/json",
@@ -93,6 +93,9 @@ def main():
         help="TCM URL (default: TCM_URL env var or https://tcm.devops.indico.io)",
     )
     parser.add_argument(
+        "--charts-branch", help="Branch to use for charts (default: current branch)"
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Only show what would be done, don't actually execute",
@@ -110,13 +113,17 @@ def main():
     current_branch = get_current_branch()
     print(f"Current branch: {current_branch}")
 
+    # Use charts branch if specified, otherwise use current branch
+    charts_branch = args.charts_branch if args.charts_branch else current_branch
+    print(f"Charts branch: {charts_branch}")
+
     if args.dry_run:
-        print(f"Dry run mode - would call TCM API for branch {current_branch}")
+        print(f"Dry run mode - would call TCM API for charts branch {charts_branch}")
         print(f"Would perform git pull on {current_branch}")
         return
 
     # Call TCM API
-    if call_tcm_api(current_branch, args.tcm_url, github_token):
+    if call_tcm_api(current_branch, args.tcm_url, github_token, charts_branch):
         # If TCM API call succeeds, do git pull
         git_pull(current_branch)
     else:
