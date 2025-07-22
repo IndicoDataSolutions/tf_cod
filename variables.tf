@@ -1671,3 +1671,21 @@ variable "prod_billing" {
   default     = ""
   description = "This is the billing url for readapi and has the same value as prod_computer_vision_api_url "
 }
+
+variable "use_local_helm_charts" {
+  type        = bool
+  default     = false
+  description = "Toggle for using local helm charts"
+}
+
+variable "install_local_intake_chart" {
+  type        = bool
+  default     = false
+  description = "Toggle for installing the local intake chart"
+}
+
+variable "install_local_insights_chart" {
+  type        = bool
+  default     = false
+  description = "Toggle for installing the local insights chart"
+}

@@ -44,9 +44,9 @@ resource "helm_release" "ins_pre_requisites" {
   name             = "insights-pre-reqs"
   create_namespace = true
   namespace        = var.namespace
-  repository       = var.helm_registry
-  chart            = "insights-pre-reqs"
-  version          = var.ins_pre_reqs_version
+  repository       = var.use_local_helm_charts ? null : var.helm_registry
+  chart            = var.use_local_helm_charts ? "charts/insights-pre-reqs/" : "insights-pre-reqs"
+  version          = var.use_local_helm_charts ? null : var.ins_pre_reqs_version
   wait             = false
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
@@ -88,4 +88,19 @@ module "insights_application" {
   release_name           = "insights"
   terraform_helm_values  = indent(12, trimspace(var.insights_values_terraform_overrides))
   helm_values            = trimspace(base64decode(var.insights_values_overrides))
+}
+
+resource "helm_release" "insights" {
+  depends_on = [module.insights_application]
+  count = var.install_local_insights_chart && var.use_local_helm_charts && var.argo_enabled == false? 1 : 0
+
+  name             = "insights"
+  create_namespace = true
+  namespace        = "default"
+  chart            = "./charts/insights"
+  wait             = false
+  timeout          = "1800" # 30 minutes
+  disable_webhooks = false
+
+  values = [indent(0, trimspace(base64decode(var.insights_values_overrides)))]
 }

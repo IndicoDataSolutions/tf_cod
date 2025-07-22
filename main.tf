@@ -449,6 +449,7 @@ provider "helm" {
   }
 }
 
+
 module "argo-registration" {
   count = var.argo_enabled == true ? 1 : 0
 
