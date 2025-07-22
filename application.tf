@@ -1165,8 +1165,10 @@ cronjob:
       enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
     rainbow-cleaner-submissions:
       enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+      serviceAccountName: ${var.use_workload_identity ? "workload-identity-storage-account" : "default"}
     rainbow-cleaner-uploads:
       enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+      serviceAccountName: ${var.use_workload_identity ? "workload-identity-storage-account" : "default"}  
     service-account-generator:
       enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
 externalSecretStore:
