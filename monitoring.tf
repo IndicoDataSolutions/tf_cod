@@ -20,6 +20,30 @@ locals {
   EOT
   )
 
+  loki_config = var.enable_loki_logging == true ? (<<EOT
+fluent-bit:
+  enabled: true
+loki:
+  enabled: true
+  loki:
+    storage_config:
+      aws:
+        region: ${var.region}
+        bucketnames: ${module.s3-storage[0].loki_s3_bucket_name}
+        s3forcepathstyle: false
+    storage:
+      type: s3
+      bucketNames:
+        chunks: ${module.s3-storage[0].loki_s3_bucket_name}
+      s3:
+        region: ${var.region}
+  
+EOT
+    ) : (<<EOT
+fluent-bit:
+  enabled: false
+EOT
+  )
 
   alertmanager_tls = var.acm_arn == "" ? (<<EOT
       tls:
@@ -135,6 +159,22 @@ ${local.prometheus_tls}
         - grafana-${local.monitoring_domain_name}
       path: /
 ${local.grafana_tls}
+${var.enable_loki_logging == true ? (<<EOT
+    additionalDataSources:
+      - name: loki
+        type: loki
+        access: proxy
+        basicAuth: true
+        url: http://monitoring-loki-gateway.monitoring.svc.cluster.local
+        secureJsonData:
+          httpHeaderValue1: logs
+        jsonData:
+          httpHeaderName1: "X-Scope-OrgID"
+EOT
+    ) : (<<EOT
+    additionalDataSources: []
+EOT
+)}
 sql-exporter:
   enabled: ${var.ipa_enabled}
   image:
@@ -143,7 +183,7 @@ tempo:
   tempo:
     repository: ${var.image_registry}/docker.io/grafana/tempo
   EOT
-    ) : (<<EOT
+) : (<<EOT
   prometheus-node-exporter:
     image:
       registry: ${var.image_registry}/quay.io
@@ -219,6 +259,23 @@ ${local.thanos_config}
         cert-manager.io/cluster-issuer: zerossl
       labels:
         acme.cert-manager.io/dns01-solver: "true"
+${var.enable_loki_logging == true ? (<<EOT
+    additionalDataSources:
+      - name: loki
+        type: loki
+        access: proxy
+        basicAuth: true
+        url: http://monitoring-loki-gateway.monitoring.svc.cluster.local
+        secureJsonData:
+          httpHeaderValue1: logs
+        jsonData:
+          httpHeaderName1: "X-Scope-OrgID"
+EOT
+) : (<<EOT
+    additionalDataSources: []
+EOT
+)}
+        
 sql-exporter:
   enabled: ${var.ipa_enabled}
   image:
@@ -227,7 +284,7 @@ tempo:
   tempo:
     repository: ${var.image_registry}/docker.io/grafana/tempo
 EOT
-  )
+)
 }
 
 

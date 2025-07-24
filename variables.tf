@@ -1596,8 +1596,8 @@ variable "harbor_customer_robot_username" {
 }
 
 variable "harbor_customer_robot_password" {
-  type        = string
-  default     = ""
+  type    = string
+  default = ""
 }
 
 variable "dev_computer_vision_api_key" {
@@ -1634,7 +1634,7 @@ variable "prod_computer_vision_api_url" {
   type        = string
   default     = ""
   description = "readapi computer vision api url"
-} 
+}
 
 variable "prod_form_recognizer_api_key" {
   type        = string
@@ -1646,7 +1646,7 @@ variable "prod_form_recognizer_api_url" {
   type        = string
   default     = ""
   description = "readapi form recognizer api url"
-} 
+}
 
 variable "dev_apikey" {
   type        = string
@@ -1670,6 +1670,18 @@ variable "prod_billing" {
   type        = string
   default     = ""
   description = "This is the billing url for readapi and has the same value as prod_computer_vision_api_url "
+}
+
+variable "enable_loki_logging" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling loki logging"
+}
+
+variable "loki_s3_bucket_name_override" {
+  type        = string
+  default     = null
+  description = "The name of the existing S3 bucket to be loaded and used as the loki bucket"
 }
 
 variable "use_local_helm_charts" {

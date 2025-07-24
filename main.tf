@@ -207,7 +207,7 @@ module "security-group" {
 module "s3-storage" {
   count                              = var.load_environment == "" ? 1 : 0
   source                             = "app.terraform.io/indico/indico-aws-buckets/mod"
-  version                            = "4.4.0"
+  version                            = "4.5.0"
   force_destroy                      = true # allows terraform to destroy non-empty buckets.
   label                              = var.label
   kms_key_arn                        = local.environment_kms_key_arn
@@ -224,6 +224,8 @@ module "s3-storage" {
   miniobkp_s3_bucket_name_override   = var.miniobkp_s3_bucket_name_override
   include_miniobkp                   = var.include_miniobkp && var.insights_enabled ? true : false
   allowed_origins                    = ["https://${local.dns_name}"]
+  loki_s3_bucket_name_override       = var.loki_s3_bucket_name_override
+  enable_loki_logging                = var.enable_loki_logging
 }
 
 
@@ -315,7 +317,7 @@ module "iam" {
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
   efs_filesystem_id          = [var.include_efs == true ? local.environment_efs_filesystem_id : ""]
   fsx_arns                   = [var.include_rox ? local.environment_fsx_rox_arn : "", var.include_fsx == true ? local.environment_fsx_rwx_arn : ""]
-  s3_buckets                 = compact([local.environment_data_s3_bucket_name, var.include_pgbackup ? local.environment_pgbackup_s3_bucket_name : "", var.include_rox ? local.environment_api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "", var.include_miniobkp && var.insights_enabled ? local.environment_miniobkp_s3_bucket_name : ""])
+  s3_buckets                 = compact([local.environment_data_s3_bucket_name, var.include_pgbackup ? local.environment_pgbackup_s3_bucket_name : "", var.include_rox ? local.environment_api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "", var.include_miniobkp && var.insights_enabled ? local.environment_miniobkp_s3_bucket_name : "", var.enable_loki_logging ? local.environment_loki_s3_bucket_name : ""])
   kms_key_arn                = local.environment_kms_key_arn
   # EKS cluster role
   create_cluster_iam_role = var.create_eks_cluster_role
