@@ -45,9 +45,9 @@ locals {
 
 resource "helm_release" "karpenter" {
   name             = "karpenter"
-  repository       = var.helm_registry
-  chart            = "karpenter"
-  version          = var.karpenter_version
+  repository       = var.use_local_helm_charts ? null : var.helm_registry
+  chart            = var.use_local_helm_charts ? "./charts/karpenter/" : "karpenter"
+  version          = var.use_local_helm_charts ? null : var.karpenter_version
   namespace        = "karpenter"
   create_namespace = true
   values = [<<EOF

@@ -1683,3 +1683,21 @@ variable "loki_s3_bucket_name_override" {
   default     = null
   description = "The name of the existing S3 bucket to be loaded and used as the loki bucket"
 }
+
+variable "use_local_helm_charts" {
+  type        = bool
+  default     = false
+  description = "Toggle for using local helm charts"
+}
+
+variable "install_local_intake_chart" {
+  type        = bool
+  default     = false
+  description = "Toggle for installing the local intake chart"
+}
+
+variable "install_local_insights_chart" {
+  type        = bool
+  default     = false
+  description = "Toggle for installing the local insights chart"
+}

@@ -344,6 +344,7 @@ module "karpenter" {
   instance_volume_type = var.instance_volume_type
   kms_key_id           = local.environment_kms_key_arn
   node_pools           = local.node_pools
+  use_local_helm_charts = var.use_local_helm_charts
 }
 
 # Once (if) the secrets operator is set up, we can deploy the common charts
@@ -817,7 +818,8 @@ module "indico-common" {
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
     module.secrets-operator-setup,
-    module.karpenter
+    module.karpenter,
+    null_resource.local_charts
   ]
   source                           = "./modules/common/indico-common"
   argo_enabled                     = var.argo_enabled
@@ -855,6 +857,7 @@ module "indico-common" {
   image_registry                   = var.image_registry
   insights_enabled                 = var.insights_enabled
   enable_service_mesh              = var.enable_service_mesh
+  use_local_helm_charts            = var.use_local_helm_charts
 }
 
 
@@ -1261,6 +1264,8 @@ module "intake" {
   k8s_version                       = var.k8s_version
   intake_values_terraform_overrides = local.intake_values
   intake_values_overrides           = var.ipa_values
+  use_local_helm_charts             = var.use_local_helm_charts
+  install_local_intake_chart        = var.install_local_intake_chart
 }
 
 locals {
@@ -1450,6 +1455,8 @@ module "insights" {
   k8s_version                         = var.k8s_version
   insights_values_terraform_overrides = local.insights_values
   insights_values_overrides           = var.insights_values
+  use_local_helm_charts               = var.use_local_helm_charts
+  install_local_insights_chart        = var.install_local_insights_chart
 }
 
 # And we can install any additional helm charts at this point as well
@@ -1693,9 +1700,9 @@ resource "helm_release" "local-registry" {
   name             = "local-registry"
   create_namespace = false
   namespace        = "local-registry"
-  repository       = var.ipa_repo
-  chart            = "local-registry"
-  version          = var.local_registry_version
+  repository       = var.use_local_helm_charts ? null : var.ipa_repo
+  chart            = var.use_local_helm_charts ? "./charts/local-registry/" : "local-registry"
+  version          = var.use_local_helm_charts ? null : var.local_registry_version
   wait             = false
   timeout          = "1800" # 30 minutes
   disable_webhooks = false

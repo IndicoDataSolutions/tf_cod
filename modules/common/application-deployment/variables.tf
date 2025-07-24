@@ -120,3 +120,8 @@ variable "helm_values" {
   description = ""
 }
 
+variable "use_local_helm_charts" {
+  type        = bool
+  default     = false
+  description = "Toggle for using local helm charts"
+}
