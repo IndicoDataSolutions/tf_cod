@@ -50,6 +50,7 @@ resource "helm_release" "ipa-pre-requisites" {
   wait             = false
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
+  max_history      = 10
 
   values = concat(var.ipa_pre_reqs_values_overrides, [<<EOT
 ${var.argo_enabled == true ? data.github_repository_file.data_pre_reqs_values[0].content : base64decode(var.pre_reqs_values_yaml_b64)}
@@ -92,7 +93,7 @@ module "intake_application" {
 
 resource "helm_release" "intake" {
   depends_on = [module.intake_application]
-  count = var.install_local_intake_chart && var.use_local_helm_charts && var.argo_enabled == false? 1 : 0
+  count      = var.install_local_intake_chart && var.use_local_helm_charts && var.argo_enabled == false ? 1 : 0
 
   name             = "ipa"
   create_namespace = true
@@ -101,6 +102,7 @@ resource "helm_release" "intake" {
   wait             = false
   timeout          = "1800" # 30 minutes
   disable_webhooks = false
+  max_history      = 10
 
   values = [indent(0, trimspace(base64decode(var.intake_values_overrides)))]
 }

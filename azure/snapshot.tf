@@ -33,6 +33,7 @@ resource "helm_release" "cod-snapshot-restore" {
   version          = var.use_local_helm_charts ? null : var.cod_snapshot_restore_version
   wait             = true
   timeout          = "3600" # 120 minutes
+  max_history      = 10
   disable_webhooks = false
 
   values = [<<EOF
