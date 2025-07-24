@@ -329,21 +329,21 @@ module "karpenter" {
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster
   ]
-  source               = "./modules/common/karpenter"
-  cluster_name         = var.label
-  node_role_arn        = local.environment_node_role_arn
-  node_role_name       = local.environment_node_role_name
-  k8s_version          = var.k8s_version
-  az_count             = var.az_count
-  subnet_ids           = flatten([local.environment_private_subnet_ids])
-  security_group_ids   = distinct(compact(concat([module.cluster.node_security_group_id], var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : [], [module.cluster.cluster_security_group_id])))
-  helm_registry        = var.ipa_repo
-  karpenter_version    = var.karpenter_version
-  default_tags         = var.default_tags
-  instance_volume_size = var.instance_volume_size
-  instance_volume_type = var.instance_volume_type
-  kms_key_id           = local.environment_kms_key_arn
-  node_pools           = local.node_pools
+  source                = "./modules/common/karpenter"
+  cluster_name          = var.label
+  node_role_arn         = local.environment_node_role_arn
+  node_role_name        = local.environment_node_role_name
+  k8s_version           = var.k8s_version
+  az_count              = var.az_count
+  subnet_ids            = flatten([local.environment_private_subnet_ids])
+  security_group_ids    = distinct(compact(concat([module.cluster.node_security_group_id], var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : [], [module.cluster.cluster_security_group_id])))
+  helm_registry         = var.ipa_repo
+  karpenter_version     = var.karpenter_version
+  default_tags          = var.default_tags
+  instance_volume_size  = var.instance_volume_size
+  instance_volume_type  = var.instance_volume_type
+  kms_key_id            = local.environment_kms_key_arn
+  node_pools            = local.node_pools
   use_local_helm_charts = var.use_local_helm_charts
 }
 
@@ -1705,6 +1705,7 @@ resource "helm_release" "local-registry" {
   version          = var.use_local_helm_charts ? null : var.local_registry_version
   wait             = false
   timeout          = "1800" # 30 minutes
+  max_history      = 10
   disable_webhooks = false
   values = [<<EOF
 cert-manager:

@@ -1,8 +1,8 @@
 # Create secrets for the service mesh.
 resource "kubectl_manifest" "linkerd-issuer-secret" {
-  count = var.enable_service_mesh ? 1 : 0
+  count      = var.enable_service_mesh ? 1 : 0
   depends_on = [helm_release.trust-manager]
-  yaml_body = <<YAML
+  yaml_body  = <<YAML
     apiVersion: "secrets.hashicorp.com/v1beta1"
     kind: "VaultStaticSecret"
     metadata:
@@ -25,7 +25,7 @@ resource "kubectl_manifest" "linkerd-issuer-secret" {
   YAML
 }
 resource "kubectl_manifest" "linkerd-identity-trust-roots-bundle" {
-  count = var.enable_service_mesh ? 1 : 0
+  count      = var.enable_service_mesh ? 1 : 0
   depends_on = [helm_release.trust-manager, kubectl_manifest.linkerd-issuer-secret]
   yaml_body  = <<YAML
     apiVersion: trust.cert-manager.io/v1alpha1
@@ -48,14 +48,15 @@ resource "kubectl_manifest" "linkerd-identity-trust-roots-bundle" {
 }
 
 resource "helm_release" "trust-manager" {
-  count = var.enable_service_mesh ? 1 : 0
-  depends_on = [time_sleep.wait_1_minutes_after_crds]
-  name = "trust-manager"
-  chart = var.use_local_helm_charts ? "charts/trust-manager/" : "trust-manager"
-  namespace = var.namespace
-  repository = var.use_local_helm_charts ? null : var.helm_registry
-  version = var.use_local_helm_charts ? null : var.trust_manager_version
-  values = var.trust_manager_values
+  count       = var.enable_service_mesh ? 1 : 0
+  depends_on  = [time_sleep.wait_1_minutes_after_crds]
+  name        = "trust-manager"
+  chart       = var.use_local_helm_charts ? "charts/trust-manager/" : "trust-manager"
+  namespace   = var.namespace
+  repository  = var.use_local_helm_charts ? null : var.helm_registry
+  version     = var.use_local_helm_charts ? null : var.trust_manager_version
+  max_history = 10
+  values      = var.trust_manager_values
 }
 
 
@@ -68,48 +69,52 @@ resource "helm_release" "linkerd-crds" {
   create_namespace = true
   repository       = var.use_local_helm_charts ? null : var.helm_registry
   version          = var.use_local_helm_charts ? null : var.linkerd_crds_version
+  max_history      = 10
   values           = var.linkerd_crds_values
 }
 
 resource "helm_release" "linkerd-control-plane" {
-  count = var.enable_service_mesh ? 1 : 0
-  depends_on = [helm_release.linkerd-crds, kubectl_manifest.linkerd-identity-trust-roots-bundle, kubectl_manifest.linkerd-issuer-secret, helm_release.trust-manager]
-  name       = "linkerd-control-plane"
-  chart      = var.use_local_helm_charts ? "./charts/linkerd-control-plane/" : "linkerd-control-plane"
-  namespace  = var.service_mesh_namespace
-  repository = var.use_local_helm_charts ? null : var.helm_registry
-  version    = var.use_local_helm_charts ? null : var.linkerd_control_plane_version
-  values     = var.linkerd_control_plane_values
+  count       = var.enable_service_mesh ? 1 : 0
+  depends_on  = [helm_release.linkerd-crds, kubectl_manifest.linkerd-identity-trust-roots-bundle, kubectl_manifest.linkerd-issuer-secret, helm_release.trust-manager]
+  name        = "linkerd-control-plane"
+  chart       = var.use_local_helm_charts ? "./charts/linkerd-control-plane/" : "linkerd-control-plane"
+  namespace   = var.service_mesh_namespace
+  repository  = var.use_local_helm_charts ? null : var.helm_registry
+  version     = var.use_local_helm_charts ? null : var.linkerd_control_plane_version
+  max_history = 10
+  values      = var.linkerd_control_plane_values
 }
 
 resource "helm_release" "linkerd-viz" {
-  count = var.enable_service_mesh ? 1 : 0
-  depends_on = [helm_release.linkerd-control-plane]
-  name       = "linkerd-viz"
-  chart      = var.use_local_helm_charts ? "./charts/linkerd-viz/" : "linkerd-viz"
-  namespace  = var.service_mesh_namespace
-  repository = var.use_local_helm_charts ? null : var.helm_registry
-  version    = var.use_local_helm_charts ? null : var.linkerd_viz_version
-  values     = var.linkerd_viz_values
+  count       = var.enable_service_mesh ? 1 : 0
+  depends_on  = [helm_release.linkerd-control-plane]
+  name        = "linkerd-viz"
+  chart       = var.use_local_helm_charts ? "./charts/linkerd-viz/" : "linkerd-viz"
+  namespace   = var.service_mesh_namespace
+  repository  = var.use_local_helm_charts ? null : var.helm_registry
+  version     = var.use_local_helm_charts ? null : var.linkerd_viz_version
+  max_history = 10
+  values      = var.linkerd_viz_values
 }
 
 resource "helm_release" "linkerd-multicluster" {
-  count = var.enable_service_mesh ? 1 : 0
-  depends_on = [helm_release.linkerd-control-plane]
-  name       = "linkerd-multicluster"
-  chart      = var.use_local_helm_charts ? "./charts/linkerd-multicluster/" : "linkerd-multicluster"
-  namespace  = "linkerd-multicluster"
+  count            = var.enable_service_mesh ? 1 : 0
+  depends_on       = [helm_release.linkerd-control-plane]
+  name             = "linkerd-multicluster"
+  chart            = var.use_local_helm_charts ? "./charts/linkerd-multicluster/" : "linkerd-multicluster"
+  namespace        = "linkerd-multicluster"
   create_namespace = true
-  repository = var.use_local_helm_charts ? null : var.helm_registry
-  version    = var.use_local_helm_charts ? null : var.linkerd_multicluster_version
-  values     = var.linkerd_multicluster_values
+  repository       = var.use_local_helm_charts ? null : var.helm_registry
+  version          = var.use_local_helm_charts ? null : var.linkerd_multicluster_version
+  max_history      = 10
+  values           = var.linkerd_multicluster_values
 }
 
 resource "kubernetes_annotations" "default-ns-annotation" {
-  count = var.enable_service_mesh ? 1 : 0
-  depends_on = [helm_release.linkerd-control-plane]
+  count       = var.enable_service_mesh ? 1 : 0
+  depends_on  = [helm_release.linkerd-control-plane]
   api_version = "v1"
-  kind = "Namespace"
+  kind        = "Namespace"
   metadata {
     name = "default"
   }
@@ -148,10 +153,10 @@ resource "null_resource" "annotate_monitoring_namespace" {
 }
 
 resource "kubernetes_annotations" "insights-ns-annotation" {
-  count = var.enable_service_mesh  && var.insights_enabled ? 1 : 0
-  depends_on = [helm_release.linkerd-control-plane]
+  count       = var.enable_service_mesh && var.insights_enabled ? 1 : 0
+  depends_on  = [helm_release.linkerd-control-plane]
   api_version = "v1"
-  kind = "Namespace"
+  kind        = "Namespace"
   metadata {
     name = "insights"
   }
@@ -162,6 +167,6 @@ resource "kubernetes_annotations" "insights-ns-annotation" {
 
 
 resource "time_sleep" "wait_1_minutes_after_service_mesh" {
-  depends_on = [helm_release.linkerd-crds, helm_release.linkerd-control-plane, helm_release.linkerd-viz, helm_release.linkerd-multicluster]
+  depends_on      = [helm_release.linkerd-crds, helm_release.linkerd-control-plane, helm_release.linkerd-viz, helm_release.linkerd-multicluster]
   create_duration = "1m"
 }

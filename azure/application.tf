@@ -460,6 +460,7 @@ resource "helm_release" "crunchy-postgres" {
   chart            = var.use_local_helm_charts ? "./charts/crunchy-postgres/" : "crunchy-postgres"
   version          = var.use_local_helm_charts ? null : "0.3.0"
   timeout          = "600" # 10 minutes
+  max_history      = 10
   wait             = true
 
   values = [<<EOF
