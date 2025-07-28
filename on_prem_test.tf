@@ -139,6 +139,7 @@ resource "helm_release" "nfs-provider" {
   repository = var.use_local_helm_charts ? null : var.ipa_repo
   chart      = var.use_local_helm_charts ? "./charts/csi-driver-nfs/" : "csi-driver-nfs"
   version    = var.use_local_helm_charts ? null : var.csi_driver_nfs_version
+  max_history      = 10
   namespace  = "default"
   depends_on = [
     module.cluster,

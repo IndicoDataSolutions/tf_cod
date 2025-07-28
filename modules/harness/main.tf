@@ -6,6 +6,7 @@ resource "helm_release" "delegate" {
   namespace        = var.namespace
   create_namespace = var.create_namespace
   wait             = false
+  max_history      = 10
 
   values = [data.utils_deep_merge_yaml.values.output]
 }

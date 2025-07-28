@@ -49,6 +49,7 @@ resource "helm_release" "karpenter" {
   chart            = var.use_local_helm_charts ? "./charts/karpenter/" : "karpenter"
   version          = var.use_local_helm_charts ? null : var.karpenter_version
   namespace        = "karpenter"
+  max_history      = 10
   create_namespace = true
   values = [<<EOF
 karpenter:
