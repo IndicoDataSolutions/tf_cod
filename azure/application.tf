@@ -764,6 +764,15 @@ runtime-scanner:
   authentication:
     ingressUser: monitoring
     ingressPassword: ${random_password.monitoring-password.result}
+cronjob:
+  enabled: true
+  services:
+    rainbow-cleaner-submissions:
+      enabled: true
+      serviceAccountName: ${var.use_workload_identity ? "workload-identity-storage-account" : "default"}
+    rainbow-cleaner-uploads:
+      enabled: true
+      serviceAccountName: ${var.use_workload_identity ? "workload-identity-storage-account" : "default"}  
   EOF
 }
 
