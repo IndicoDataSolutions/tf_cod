@@ -1425,6 +1425,12 @@ rabbitmq:
   insights_values = <<EOF
 global:
   host: ${lower("${var.label}.${var.region}.${var.aws_account}.indico.io")}
+insights-edge:
+  aws:
+    region: ${var.region}
+  s3:
+    bucketName: ${local.environment_data_s3_bucket_name}
+    endpoint: s3.${var.region}.amazonaws.com
   EOF
 }
 
