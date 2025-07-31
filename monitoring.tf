@@ -35,6 +35,7 @@ loki:
       type: s3
       bucketNames:
         chunks: ${module.s3-storage[0].loki_s3_bucket_name}
+        ruler: ${module.s3-storage[0].loki_s3_bucket_name}
       s3:
         region: ${var.region}
   
