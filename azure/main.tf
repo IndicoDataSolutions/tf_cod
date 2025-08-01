@@ -67,19 +67,6 @@ provider "azurerm" {
   tenant_id       = var.azure_readapi_tenant_id
 }
 
-provider "azurerm" {
-  features {
-    cognitive_account {
-      purge_soft_delete_on_destroy = true
-    }
-  }
-  alias           = "indicoio"
-  client_id       = var.azure_indico_io_client_id
-  client_secret   = var.azure_indico_io_client_secret
-  subscription_id = var.azure_indico_io_subscription_id
-  tenant_id       = var.azure_indico_io_tenant_id
-}
-
 provider "azuread" {
 }
 
@@ -330,11 +317,11 @@ locals {
   customer_vault_mount_path = "customer-${coalesce(var.vault_mount_path, var.account)}"
 }
 locals {
-  readapi_billing_variable = var.environment == "production" ? var.prod_billing : var.dev_billing
-  readapi_api_key_variable = var.environment == "production" ? var.prod_apikey : var.dev_apikey
-  readapi_computer_vision_variable = var.environment == "production" ? var.prod_computer_vision_api_url : var.dev_computer_vision_api_url
+  readapi_billing_variable             = var.environment == "production" ? var.prod_billing : var.dev_billing
+  readapi_api_key_variable             = var.environment == "production" ? var.prod_apikey : var.dev_apikey
+  readapi_computer_vision_variable     = var.environment == "production" ? var.prod_computer_vision_api_url : var.dev_computer_vision_api_url
   readapi_computer_vision_key_variable = var.environment == "production" ? var.prod_computer_vision_api_key : var.dev_computer_vision_api_key
-  readapi_form_recognizer_variable = var.environment == "production" ? var.prod_form_recognizer_api_url : var.dev_form_recognizer_api_url
+  readapi_form_recognizer_variable     = var.environment == "production" ? var.prod_form_recognizer_api_url : var.dev_form_recognizer_api_url
   readapi_form_recognizer_key_variable = var.environment == "production" ? var.prod_form_recognizer_api_key : var.dev_form_recognizer_api_key
 }
 
