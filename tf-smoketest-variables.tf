@@ -45,8 +45,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     eks_cluster_iam_role = "${jsonencode(var.eks_cluster_iam_role)}"
     eks_cluster_nodes_iam_role = "${jsonencode(var.eks_cluster_nodes_iam_role)}"
     storage_capacity = "${jsonencode(var.storage_capacity)}"
-    deletion_protection_enabled = "${jsonencode(var.deletion_protection_enabled)}"
-    skip_final_snapshot = "${jsonencode(var.skip_final_snapshot)}"
     per_unit_storage_throughput = "${jsonencode(var.per_unit_storage_throughput)}"
     az_count = "${jsonencode(var.az_count)}"
     snapshot_id = "${jsonencode(var.snapshot_id)}"

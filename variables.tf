@@ -116,6 +116,7 @@ variable "default_tags" {
 variable "vpc_cidr" {
   type        = string
   description = "The VPC for the entire indico stack"
+  default     = "10.0.0.0/16"
 }
 
 variable "public_ip" {
@@ -133,11 +134,13 @@ variable "vpc_name" {
 variable "private_subnet_cidrs" {
   type        = list(string)
   description = "CIDR ranges for the private subnets"
+  default     = ["10.0.0.0/19", "10.0.32.0/19", "10.0.64.0/19"]
 }
 
 variable "public_subnet_cidrs" {
   type        = list(string)
   description = "CIDR ranges for the public subnets"
+  default     = ["10.0.96.0/27", "10.0.97.0/27", "10.0.98.0/27"]
 }
 
 variable "subnet_az_zones" {
@@ -290,21 +293,9 @@ variable "storage_capacity" {
   description = "Storage capacity in GiB for RWX FSx"
 }
 
-variable "deletion_protection_enabled" {
-  type        = bool
-  default     = true
-  description = "Enable deletion protection if set to true"
-}
-
-variable "skip_final_snapshot" {
-  type        = bool
-  default     = false
-  description = "Skip taking a final snapshot before deletion; not recommended to enable"
-}
-
 variable "per_unit_storage_throughput" {
   type        = number
-  default     = 100
+  default     = 50
   description = "Throughput for each 1 TiB or storage (max 200) for RWX FSx"
 }
 
@@ -983,7 +974,7 @@ variable "sg_tag_value" {
 
 variable "s3_endpoint_enabled" {
   type        = bool
-  default     = false
+  default     = true
   description = "If set to true, an S3 VPC endpoint will be created. If this variable is set, the `region` variable must also be set"
 }
 
@@ -1596,8 +1587,8 @@ variable "harbor_customer_robot_username" {
 }
 
 variable "harbor_customer_robot_password" {
-  type        = string
-  default     = ""
+  type    = string
+  default = ""
 }
 
 variable "dev_computer_vision_api_key" {
@@ -1634,7 +1625,7 @@ variable "prod_computer_vision_api_url" {
   type        = string
   default     = ""
   description = "readapi computer vision api url"
-} 
+}
 
 variable "prod_form_recognizer_api_key" {
   type        = string
@@ -1646,7 +1637,7 @@ variable "prod_form_recognizer_api_url" {
   type        = string
   default     = ""
   description = "readapi form recognizer api url"
-} 
+}
 
 variable "dev_apikey" {
   type        = string
