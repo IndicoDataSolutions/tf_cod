@@ -66,11 +66,13 @@ variable "region" {
 variable "vnet_cidr" {
   type        = string
   description = "The VNet CIDR for the entire indico stack"
+  default     = "192.168.0.0/20"
 }
 
 variable "subnet_cidrs" {
   type        = list(string)
   description = "CIDR ranges for the subnet(s)"
+  default     = ["192.168.0.0/22"]
 }
 
 variable "worker_subnet_cidrs" {
