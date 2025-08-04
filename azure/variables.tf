@@ -379,21 +379,6 @@ variable "azure_readapi_tenant_id" {
   default = ""
 }
 
-# Old provider configuration to remove orphaned readapi resources
-variable "azure_indico_io_client_id" {
-  type = string
-}
-variable "azure_indico_io_client_secret" {
-  type      = string
-  sensitive = true
-}
-variable "azure_indico_io_subscription_id" {
-  type = string
-}
-variable "azure_indico_io_tenant_id" {
-  type = string
-}
-
 #openshift & azure common variables
 
 # enable for openshift
@@ -993,8 +978,8 @@ variable "harbor_customer_robot_username" {
 }
 
 variable "harbor_customer_robot_password" {
-  type        = string
-  default     = ""
+  type    = string
+  default = ""
 }
 
 variable "dev_computer_vision_api_key" {
@@ -1031,7 +1016,7 @@ variable "prod_computer_vision_api_url" {
   type        = string
   default     = ""
   description = "readapi computer vision api url"
-} 
+}
 
 variable "prod_form_recognizer_api_key" {
   type        = string
@@ -1043,7 +1028,7 @@ variable "prod_form_recognizer_api_url" {
   type        = string
   default     = ""
   description = "readapi form recognizer api url"
-} 
+}
 
 variable "dev_apikey" {
   type        = string
