@@ -748,7 +748,8 @@ kube-prometheus-stack:
 ${local.kube_prometheus_stack_values}
 ${local.loki_config}
 metrics-server:
-  imageRegistry: ${var.image_registry}/registry.k8s.io/metrics-server/metrics-server
+  image:
+    repository: ${var.image_registry}/registry.k8s.io/metrics-server/metrics-server
 opentelemetry-operator:
   enabled: ${var.monitoring_enabled}
   testFramework:
