@@ -1084,7 +1084,7 @@ rabbitmq:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   rabbitmq:
     image:
-      registry: ${var.image_registry}
+      registry: ${var.image_registry}/dockerhub-proxy
     persistence:
       storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
     service:
@@ -1416,7 +1416,7 @@ minio:
 rabbitmq:
   rabbitmq:
     image:
-      registry: ${var.image_registry}
+      registry: ${var.image_registry}/dockerhub-proxy	
     persistence:
       storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
   EOF
