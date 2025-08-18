@@ -48,6 +48,11 @@ variable "applications" {
 }
 
 # top level variable declarations
+variable "aws_account" {
+  type        = string
+  description = "The Name of the AWS Acccount this cluster lives in"
+}
+
 variable "region" {
   type        = string
   default     = "us-east-1"
@@ -231,44 +236,29 @@ variable "kms_encrypt_secrets" {
   description = "Encrypt EKS secrets with KMS"
 }
 
-# ReadAPI stuff
+# ReadAPI queue and setup
 variable "enable_readapi" {
   type    = bool
   default = true
 }
+
 variable "azure_readapi_client_id" {
   type    = string
   default = ""
 }
+
 variable "azure_readapi_client_secret" {
   type      = string
   sensitive = true
   default   = ""
 }
+
 variable "azure_readapi_subscription_id" {
   type    = string
   default = ""
 }
-variable "azure_readapi_tenant_id" {
-  type    = string
-  default = ""
-}
 
-# Old provider configuration to remove orphaned readapi resources
-variable "azure_indico_io_client_id" {
-  type    = string
-  default = ""
-}
-variable "azure_indico_io_client_secret" {
-  type      = string
-  sensitive = true
-  default   = ""
-}
-variable "azure_indico_io_subscription_id" {
-  type    = string
-  default = ""
-}
-variable "azure_indico_io_tenant_id" {
+variable "azure_readapi_tenant_id" {
   type    = string
   default = ""
 }
@@ -322,11 +312,7 @@ variable "include_rox" {
   description = "Create a read only FSx file system"
 }
 
-variable "aws_account" {
-  type        = string
-  description = "The Name of the AWS Acccount this cluster lives in"
-}
-
+# Argo enablement and configuration
 variable "argo_enabled" {
   type    = bool
   default = true
@@ -373,6 +359,7 @@ variable "argo_github_team_owner" {
   default     = "devops-core-admins" # any group other than devops-core
 }
 
+# IPA values
 variable "ipa_repo" {
   type    = string
   default = "oci://harbor.devops.indico.io/indico-charts"
@@ -403,11 +390,6 @@ variable "ipa_smoketest_enabled" {
   default = true
 }
 
-variable "monitoring_version" {
-  type    = string
-  default = "3.0.0"
-}
-
 variable "ipa_pre_reqs_version" {
   type    = string
   default = "0.4.0"
@@ -423,17 +405,17 @@ variable "ipa_enabled" {
   default = true
 }
 
+variable "ipa_namespace" {
+  type    = string
+  default = "default"
+}
+
 variable "ipa_values" {
   type    = string
   default = ""
 }
 
-variable "git_pat" {
-  type      = string
-  sensitive = true
-  default   = ""
-}
-
+# Vault connection variables
 variable "vault_address" {
   type    = string
   default = "https://vault.devops.indico.io"
@@ -444,12 +426,20 @@ variable "vault_password" {
   sensitive = true
 }
 
+# SNS/SQS
+variable "git_pat" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
 variable "sqs_sns" {
   type        = bool
   default     = true
   description = "Flag for enabling SQS/SNS"
 }
 
+# Restore snapshot values
 variable "restore_snapshot_enabled" {
   default     = false
   type        = bool
@@ -497,36 +487,15 @@ variable "oidc_username_claim" {
   default = "sub"
 }
 
+# Monitoring stack versions
 variable "monitoring_enabled" {
   type    = bool
   default = true
 }
 
-variable "hibernation_enabled" {
-  type    = bool
-  default = false
-}
-
-variable "keda_version" {
+variable "monitoring_version" {
   type    = string
-  default = "2.15.2"
-}
-
-variable "external_secrets_version" {
-  type        = string
-  default     = "0.10.5"
-  description = "Version of external-secrets helm chart"
-}
-
-variable "opentelemetry_collector_version" {
-  type    = string
-  default = "0.108.0"
-}
-
-variable "nfs_subdir_external_provisioner_version" {
-  type        = string
-  default     = "4.0.18"
-  description = "Version of nfs_subdir_external_provisioner_version helm chart"
+  default = "3.0.0"
 }
 
 variable "csi_driver_nfs_version" {
@@ -1137,11 +1106,6 @@ variable "harbor_admin_password" {
   default = ""
 }
 
-variable "azure_indico_io_client_secret_id" {
-  type    = string
-  default = ""
-}
-
 variable "az_readapi_subscription_id" {
   type    = string
   default = ""
@@ -1392,6 +1356,11 @@ variable "insights_enabled" {
   type        = bool
   default     = false
   description = "Toggle for enabling insights deployment"
+}
+
+variable "insights_namespace" {
+  type    = string
+  default = "insights"
 }
 
 variable "insights_values" {
