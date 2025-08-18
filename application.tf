@@ -528,6 +528,8 @@ external-secrets:
   certController:
     image:
       repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+rabbitmq-operator:
+  enabled: 
   EOF
   ]
 
