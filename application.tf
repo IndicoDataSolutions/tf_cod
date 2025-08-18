@@ -529,7 +529,7 @@ external-secrets:
     image:
       repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
 rabbitmq-operator:
-  enabled: 
+  enabled: ${var.ipa_enabled || var.insights_enabled}
   EOF
   ]
 
