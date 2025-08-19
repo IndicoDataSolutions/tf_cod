@@ -170,13 +170,15 @@ module "sqs_sns" {
 module "lambda-sns-forwarder" {
   count                = var.lambda_sns_forwarder_enabled == true && var.load_environment == "" ? 1 : 0
   source               = "app.terraform.io/indico/indico-lambda-sns-forwarder/mod"
-  version              = "2.0.1"
+  version              = "2.0.2"
   region               = var.region
   label                = var.label
   subnet_ids           = flatten([local.environment_private_subnet_ids])
   security_group_id    = var.network_module == "networking" ? local.environment_all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  lambda_timeout       = var.lambda_sns_forwarder_timeout
   kms_key              = local.environment_kms_key_arn
   sns_arn              = var.lambda_sns_forwarder_topic_arn == "" ? local.environment_indico_ipa_topic_arn : var.lambda_sns_forwarder_topic_arn
+  workflow_ids         = var.lambda_sns_forwarder_workflow_ids
   destination_endpoint = var.lambda_sns_forwarder_destination_endpoint
   github_organization  = var.lambda_sns_forwarder_github_organization
   github_repository    = var.lambda_sns_forwarder_github_repository

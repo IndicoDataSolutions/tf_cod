@@ -859,6 +859,18 @@ variable "lambda_sns_forwarder_enabled" {
   description = "If enabled a lamda will be provisioned to forward sns messages to an external endpoint."
 }
 
+variable "lambda_sns_forwarder_timeout" {
+  type        = number
+  default     = 180
+  description = "Timeout in seconds for the lambda sns forwarder"
+}
+
+variable "workflow_ids" {
+  type        = list(number)
+  default     = []
+  description = "List of workflow_ids "
+}
+
 variable "lambda_sns_forwarder_destination_endpoint" {
   type        = string
   default     = ""
