@@ -999,9 +999,9 @@ secrets:
     create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
 celery-backend:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
-  redis:
-    global:
-      imageRegistry: ${var.image_registry}
+  dragonfly:
+    image:
+      repository: ${var.image_registry}/docker.dragonflydb.io/dragonflydb/dragonfly
 crunchy-postgres:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   postgres-data:
