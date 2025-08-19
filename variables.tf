@@ -865,7 +865,7 @@ variable "lambda_sns_forwarder_timeout" {
   description = "Timeout in seconds for the lambda sns forwarder"
 }
 
-variable "workflow_ids" {
+variable "lambda_sns_forwarder_workflow_ids" {
   type        = list(number)
   default     = []
   description = "List of workflow_ids "

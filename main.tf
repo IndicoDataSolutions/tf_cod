@@ -87,7 +87,6 @@ data "aws_caller_identity" "current" {}
 locals {
   network = var.network_module == "public_networking" ? module.public_networking : module.networking
 
-
   argo_app_name           = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
   argo_smoketest_app_name = lower("${var.aws_account}.${var.region}.${var.label}-smoketest")
   argo_cluster_name       = "${var.aws_account}.${var.region}.${var.label}"
@@ -108,7 +107,6 @@ resource "aws_key_pair" "kp" {
   public_key = tls_private_key.pk.public_key_openssh
 }
 
-
 module "public_networking" {
   count                         = var.direct_connect == false && var.network_module == "public_networking" ? 1 : 0
   source                        = "app.terraform.io/indico/indico-aws-network/mod"
@@ -122,7 +120,6 @@ module "public_networking" {
   s3_endpoint_enabled           = var.s3_endpoint_enabled
   gateway_vpc_endpoints_enabled = var.gateway_vpc_endpoints_enabled
 }
-
 
 module "networking" {
   count                               = var.direct_connect == false && var.network_module == "networking" && var.load_environment == "" ? 1 : 0

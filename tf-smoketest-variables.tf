@@ -140,7 +140,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     harness_delegate_image = "${jsonencode(var.harness_delegate_image)}"
     lambda_sns_forwarder_enabled = "${jsonencode(var.lambda_sns_forwarder_enabled)}"
     lambda_sns_forwarder_timeout = "${jsonencode(var.lambda_sns_forwarder_timeout)}"
-    workflow_ids = "${jsonencode(var.workflow_ids)}"
+    lambda_sns_forwarder_workflow_ids = "${jsonencode(var.lambda_sns_forwarder_workflow_ids)}"
     lambda_sns_forwarder_destination_endpoint = "${jsonencode(var.lambda_sns_forwarder_destination_endpoint)}"
     lambda_sns_forwarder_topic_arn = "${jsonencode(var.lambda_sns_forwarder_topic_arn)}"
     lambda_sns_forwarder_github_organization = "${jsonencode(var.lambda_sns_forwarder_github_organization)}"
