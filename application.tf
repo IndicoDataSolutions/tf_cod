@@ -528,6 +528,8 @@ external-secrets:
   certController:
     image:
       repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
+rabbitmq-operator:
+  enabled: ${var.ipa_enabled || var.insights_enabled}
   EOF
   ]
 
@@ -748,8 +750,8 @@ kube-prometheus-stack:
 ${local.kube_prometheus_stack_values}
 ${local.loki_config}
 metrics-server:
-  global:
-    imageRegistry: ${var.image_registry}/docker.io
+  image:
+    repository: ${var.image_registry}/registry.k8s.io/metrics-server/metrics-server
 opentelemetry-operator:
   enabled: ${var.monitoring_enabled}
   testFramework:
@@ -997,9 +999,9 @@ secrets:
     create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
 celery-backend:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
-  redis:
-    global:
-      imageRegistry: ${var.image_registry}
+  dragonfly:
+    image:
+      repository: ${var.image_registry}/docker.dragonflydb.io/dragonflydb/dragonfly
 crunchy-postgres:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   postgres-data:
@@ -1084,7 +1086,7 @@ rabbitmq:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   rabbitmq:
     image:
-      registry: ${var.image_registry}
+      registry: ${var.image_registry}/dockerhub-proxy
     persistence:
       storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
     service:
@@ -1416,7 +1418,7 @@ minio:
 rabbitmq:
   rabbitmq:
     image:
-      registry: ${var.image_registry}
+      registry: ${var.image_registry}/dockerhub-proxy	
     persistence:
       storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
   EOF
