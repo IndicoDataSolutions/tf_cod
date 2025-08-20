@@ -87,7 +87,6 @@ data "aws_caller_identity" "current" {}
 locals {
   network = var.network_module == "public_networking" ? module.public_networking : module.networking
 
-
   argo_app_name           = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
   argo_smoketest_app_name = lower("${var.aws_account}.${var.region}.${var.label}-smoketest")
   argo_cluster_name       = "${var.aws_account}.${var.region}.${var.label}"
@@ -108,7 +107,6 @@ resource "aws_key_pair" "kp" {
   public_key = tls_private_key.pk.public_key_openssh
 }
 
-
 module "public_networking" {
   count                         = var.direct_connect == false && var.network_module == "public_networking" ? 1 : 0
   source                        = "app.terraform.io/indico/indico-aws-network/mod"
@@ -122,7 +120,6 @@ module "public_networking" {
   s3_endpoint_enabled           = var.s3_endpoint_enabled
   gateway_vpc_endpoints_enabled = var.gateway_vpc_endpoints_enabled
 }
-
 
 module "networking" {
   count                               = var.direct_connect == false && var.network_module == "networking" && var.load_environment == "" ? 1 : 0
@@ -170,13 +167,15 @@ module "sqs_sns" {
 module "lambda-sns-forwarder" {
   count                = var.lambda_sns_forwarder_enabled == true && var.load_environment == "" ? 1 : 0
   source               = "app.terraform.io/indico/indico-lambda-sns-forwarder/mod"
-  version              = "2.0.1"
+  version              = "2.0.2"
   region               = var.region
   label                = var.label
   subnet_ids           = flatten([local.environment_private_subnet_ids])
   security_group_id    = var.network_module == "networking" ? local.environment_all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  lambda_timeout       = var.lambda_sns_forwarder_timeout
   kms_key              = local.environment_kms_key_arn
   sns_arn              = var.lambda_sns_forwarder_topic_arn == "" ? local.environment_indico_ipa_topic_arn : var.lambda_sns_forwarder_topic_arn
+  workflow_ids         = var.lambda_sns_forwarder_workflow_ids
   destination_endpoint = var.lambda_sns_forwarder_destination_endpoint
   github_organization  = var.lambda_sns_forwarder_github_organization
   github_repository    = var.lambda_sns_forwarder_github_repository
