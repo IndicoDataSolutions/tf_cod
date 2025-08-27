@@ -1686,7 +1686,7 @@ variable "prod_billing" {
 
 variable "enable_loki_logging" {
   type        = bool
-  default     = false
+  default     = true
   description = "Toggle for enabling loki logging"
 }
 
