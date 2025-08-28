@@ -1052,14 +1052,14 @@ crunchy-postgres:
             storage: 200Gi
       name: pgha1
       replicas: ${var.az_count}
-    resources:
-      requests:
-        cpu: 1000m
-        memory: 3000Mi
-    tolerations:
-      - effect: NoSchedule
-        key: indico.io/crunchy
-        operator: Exists
+      resources:
+        requests:
+          cpu: 1000m
+          memory: 3000Mi
+      tolerations:
+        - effect: NoSchedule
+          key: indico.io/crunchy
+          operator: Exists
   pgBackRestConfig:
     global:
       archive-timeout: '10000'
