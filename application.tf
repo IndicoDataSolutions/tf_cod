@@ -1004,54 +1004,52 @@ celery-backend:
       repository: ${var.image_registry}/docker.dragonflydb.io/dragonflydb/dragonfly
 crunchy-postgres:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
-  postgres-data:
-    enabled: true
+  metadata:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
+  service:
+    metadata:
+      labels:
+        mirror.linkerd.io/exported: "remote-discovery"
+  instances:
+  - affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node_group
+              operator: In
+              values:
+              - pgo-workers
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: postgres-operator.crunchydata.com/cluster
+              operator: In
+              values:
+              - postgres-data
+            - key: postgres-operator.crunchydata.com/instance-set
+              operator: In
+              values:
+              - pgha1
+          topologyKey: kubernetes.io/hostname
     metadata:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
         reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
         reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
-    service:
-      metadata:
-        labels:
-          mirror.linkerd.io/exported: "remote-discovery"
-    instances:
-    - affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node_group
-                operator: In
-                values:
-                - pgo-workers
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: postgres-operator.crunchydata.com/cluster
-                operator: In
-                values:
-                - postgres-data
-              - key: postgres-operator.crunchydata.com/instance-set
-                operator: In
-                values:
-                - pgha1
-            topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
-      dataVolumeClaimSpec:
-        storageClassName: ${local.storage_class}
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 200Gi
-      name: pgha1
-      replicas: ${var.az_count}
+    dataVolumeClaimSpec:
+      storageClassName: ${local.storage_class}
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 200Gi
+    name: pgha1
+    replicas: ${var.az_count}
     resources:
       requests:
         cpu: 1000m
