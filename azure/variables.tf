@@ -993,8 +993,8 @@ variable "harbor_customer_robot_username" {
 }
 
 variable "harbor_customer_robot_password" {
-  type        = string
-  default     = ""
+  type    = string
+  default = ""
 }
 
 variable "dev_computer_vision_api_key" {
@@ -1031,7 +1031,7 @@ variable "prod_computer_vision_api_url" {
   type        = string
   default     = ""
   description = "readapi computer vision api url"
-} 
+}
 
 variable "prod_form_recognizer_api_key" {
   type        = string
@@ -1043,7 +1043,7 @@ variable "prod_form_recognizer_api_url" {
   type        = string
   default     = ""
   description = "readapi form recognizer api url"
-} 
+}
 
 variable "dev_apikey" {
   type        = string
@@ -1126,4 +1126,10 @@ variable "install_local_insights_chart" {
   type        = bool
   default     = false
   description = "Toggle for installing the local insights chart"
+}
+
+variable "postgres_volume_size" {
+  type        = string
+  default     = "100Gi"
+  description = "Size of the postgres volume"
 }
