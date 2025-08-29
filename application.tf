@@ -1047,7 +1047,7 @@ crunchy-postgres:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 200Gi
+          storage: ${var.postgres_volume_size}
     name: pgha1
     replicas: ${var.az_count}
     resources:
@@ -1357,7 +1357,7 @@ crunchy-postgres:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 200Gi
+          storage: ${var.postgres_volume_size}
     name: pgha2
     replicas: ${var.az_count}
     resources:

@@ -1713,3 +1713,9 @@ variable "install_local_insights_chart" {
   default     = false
   description = "Toggle for installing the local insights chart"
 }
+
+variable "postgres_volume_size" {
+  type        = string
+  default     = "100Gi"
+  description = "Size of the postgres volume"
+}

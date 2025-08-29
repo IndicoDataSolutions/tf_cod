@@ -505,7 +505,7 @@ resource "helm_release" "crunchy-postgres" {
         - ReadWriteOnce
         resources:
           requests:
-            storage: 200Gi
+            storage: ${var.postgres_volume_size}
       name: pgha1
       replicas: 1
       resources:
@@ -528,7 +528,7 @@ resource "helm_release" "crunchy-postgres" {
             - ReadWriteOnce
             resources:
               requests:
-                storage: 200Gi
+                storage: ${var.postgres_volume_size}
         schedules:
           full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
           differential: 0 0 * * * # Diff backup daily at midnight
@@ -705,7 +705,7 @@ crunchy-postgres:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 200Gi
+          storage: ${var.postgres_volume_size}
     name: pgha1
     replicas: 1
     resources:
@@ -905,7 +905,7 @@ crunchy-postgres:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 200Gi
+          storage: ${var.postgres_volume_size}
     name: pgha2
     replicas: 1
     resources:
