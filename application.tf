@@ -530,6 +530,11 @@ external-secrets:
       repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
 rabbitmq-operator:
   enabled: ${var.ipa_enabled || var.insights_enabled}
+dragonfly-operator:
+  enabled: ${var.ipa_enabled || var.insights_enabled}
+  manager:
+    image:
+      repository: ${var.image_registry}/docker.dragonflydb.io/dragonflydb/operator
   EOF
   ]
 
@@ -999,9 +1004,8 @@ secrets:
     create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
 celery-backend:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
-  dragonfly:
-    image:
-      repository: ${var.image_registry}/docker.dragonflydb.io/dragonflydb/dragonfly
+  image:
+    repository: ${var.image_registry}/docker.dragonflydb.io/dragonflydb/dragonfly
 crunchy-postgres:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   metadata:

@@ -180,6 +180,11 @@ external-secrets:
       repository: ${var.image_registry}/ghcr.io/external-secrets/external-secrets
 rabbitmq-operator:
   enabled: ${var.ipa_enabled || var.insights_enabled}
+dragonfly-operator:
+  enabled: ${var.ipa_enabled || var.insights_enabled}
+  manager:
+    image:
+      repository: ${var.image_registry}/docker.dragonflydb.io/dragonflydb/operator
   EOF
   ]
 
