@@ -3,4 +3,4 @@ appVersion: 1.0.0
 description: A Helm chart for restore COD snapshots
 name: cod-snapshot-restore
 type: application
-version: 0.4.3-dev-13724-062eed1d
+version: 0.4.3-main-7ae7b707
