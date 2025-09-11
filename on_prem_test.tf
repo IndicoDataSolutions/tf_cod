@@ -1,9 +1,73 @@
-#To DO:
-# Install nfs server
-# get ip of service
-# install nfs driver with IP
-# make nfs sc the default
-# install pre-reqs etc.
+# To do:
+# - [ ] Setup hostpath storage class
+# - [ ] Create Hostpath PVs to support 2 crunchy instances
+# - [ ] Install NFS server
+# - [ ] Get IP of service
+# - [ ] Install NFS driver with IP
+# - [ ] Make NFS SC the default
+# - [ ] Install pre-reqs etc.
+
+resource "kubectl_manifest" "hostpath_storage_class" {
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
+  count     = var.on_prem_test == true ? 1 : 0
+  yaml_body = <<YAML
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+spec:
+  provisioner: kubernetes.io/no-provisioner
+  volumeBindingMode: WaitForFirstConsumer
+YAML
+}
+
+
+resource "kubectl_manifest" "postgres_data_pgha1_pv" {
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
+  count     = var.on_prem_test == true ? 1 : 0
+  yaml_body = <<YAML
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres_data_pgha1
+spec:
+  storageClassName: local-storage
+  capacity:
+    storage: var.postgres_volume_size
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/postgres-data
+YAML
+}
+
+resource "kubectl_manifest" "postgres_data_pgha2_pv" {
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
+  count     = var.on_prem_test == true ? 1 : 0
+  yaml_body = <<YAML
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres_data_pgha2
+spec:
+  storageClassName: local-storage
+  capacity:
+    storage: var.postgres_volume_size
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/postgres-data
+YAML
+}
 
 resource "kubectl_manifest" "nfs_volume" {
   depends_on = [

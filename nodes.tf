@@ -194,5 +194,20 @@ locals {
 
   variable_node_pools = var.node_groups != null ? var.node_groups : tomap(null)
 
-  node_pools = merge(local.default_node_pools_logic, local.variable_node_pools)
+  # Override pgo-workers configuration when on_prem_test is true
+  on_prem_pgo_workers_override = var.on_prem_test == true ? {
+    pgo-workers = {
+      min_size               = 2
+      max_size               = 4
+      instance_types         = ["m6a.large"]
+      type                   = "cpu"
+      spot                   = false
+      desired_capacity       = "2"
+      taints                 = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
+      additional_node_labels = ""
+      postgres_volume_size   = var.postgres_volume_size
+    }
+  } : {}
+
+  node_pools = merge(local.default_node_pools_logic, local.variable_node_pools, local.on_prem_pgo_workers_override)
 }
