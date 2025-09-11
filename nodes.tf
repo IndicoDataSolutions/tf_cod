@@ -1,4 +1,6 @@
 locals {
+
+
   intake_default_node_groups = {
     gpu-workers = {
       min_size               = 0
@@ -69,7 +71,7 @@ locals {
       desired_capacity       = "1"
       taints                 = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
       additional_node_labels = ""
-    },
+    }
     readapi-servers = {
       min_size               = 0
       max_size               = 3
@@ -104,12 +106,12 @@ locals {
       taints                 = ""
     },
     pgo-workers = {
+      min_size               = 1
+      max_size               = 4
+      instance_types         = ["m6a.large"]
       type                   = "cpu"
       spot                   = false
-      instance_types         = ["m6a.large"]
-      min_size               = 1
-      max_size               = 2
-      desired_capacity       = "2"
+      desired_capacity       = "1"
       taints                 = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
       additional_node_labels = ""
     },
@@ -179,23 +181,7 @@ locals {
     )
   )
 
-  # This is to avoid terraform errors when the node groups variable is set,
-  # as different keys make the objects incompatible for a ternary function. 
-  # To solve this, we set it to null which matches all types
-  default_node_groups_logic = var.node_groups == null && var.karpenter_enabled == false ? local.default_node_groups : tomap(null)
-
-  variable_node_groups = var.node_groups != null && var.karpenter_enabled == false ? var.node_groups : tomap(null)
-
-  karpenter_node_group_logic = var.karpenter_enabled ? local.karpenter_node_group : tomap(null)
-
-  node_groups = merge(local.default_node_groups_logic, local.variable_node_groups, local.karpenter_node_group_logic)
-
-  default_node_pools_logic = var.node_groups == null ? local.default_node_groups : tomap(null)
-
-  variable_node_pools = var.node_groups != null ? var.node_groups : tomap(null)
-
-  # Override pgo-workers configuration when on_prem_test is true
-  on_prem_pgo_workers_override = var.on_prem_test == true ? {
+  on_prem_test_node_groups = var.on_prem_test == true ? {
     pgo-workers = {
       min_size               = 2
       max_size               = 4
@@ -207,7 +193,22 @@ locals {
       additional_node_labels = ""
       postgres_volume_size   = var.postgres_volume_size
     }
-  } : {}
+  } : tomap(null)
 
-  node_pools = merge(local.default_node_pools_logic, local.variable_node_pools, local.on_prem_pgo_workers_override)
+  # This is to avoid terraform errors when the node groups variable is set,
+  # as different keys make the objects incompatible for a ternary function. 
+  # To solve this, we set it to null which matches all types
+  default_node_groups_logic = var.node_groups == null && var.karpenter_enabled == false ? local.default_node_groups : tomap(null)
+
+  variable_node_groups = var.node_groups != null && var.karpenter_enabled == false ? var.node_groups : tomap(null)
+
+  karpenter_node_group_logic = var.karpenter_enabled ? local.karpenter_node_group : tomap(null)
+
+  node_groups = merge(local.default_node_groups_logic, local.variable_node_groups, local.karpenter_node_group_logic, local.on_prem_test_node_groups)
+
+  default_node_pools_logic = var.node_groups == null ? local.default_node_groups : tomap(null)
+
+  variable_node_pools = var.node_groups != null ? var.node_groups : tomap(null)
+
+  node_pools = merge(local.default_node_pools_logic, local.variable_node_pools)
 }
