@@ -44,14 +44,6 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: /mnt/postgres-data
-  nodeAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: node_group
-              operator: In
-              values:
-                - pgo-workers
 YAML
 }
 
@@ -75,14 +67,6 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: /mnt/postgres-data
-  nodeAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: node_group
-              operator: In
-              values:
-                - pgo-workers
 YAML
 }
 
