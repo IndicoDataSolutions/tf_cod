@@ -28,7 +28,8 @@ YAML
 resource "kubectl_manifest" "postgres_data_pgha1_pv" {
   depends_on = [
     module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
+    time_sleep.wait_1_minutes_after_cluster,
+    kubectl_manifest.hostpath_storage_class
   ]
   count     = var.on_prem_test == true ? 1 : 0
   yaml_body = <<YAML
@@ -39,18 +40,27 @@ metadata:
 spec:
   storageClassName: local-storage
   capacity:
-    storage: var.postgres_volume_size
+    storage: ${var.postgres_volume_size}
   accessModes:
     - ReadWriteOnce
   hostPath:
     path: /mnt/postgres-data
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node_group
+              operator: In
+              values:
+                - pgo-workers
 YAML
 }
 
 resource "kubectl_manifest" "postgres_data_pgha2_pv" {
   depends_on = [
     module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
+    time_sleep.wait_1_minutes_after_cluster,
+    kubectl_manifest.hostpath_storage_class
   ]
   count     = var.on_prem_test == true ? 1 : 0
   yaml_body = <<YAML
@@ -61,18 +71,28 @@ metadata:
 spec:
   storageClassName: local-storage
   capacity:
-    storage: var.postgres_volume_size
+    storage: ${var.postgres_volume_size}
   accessModes:
     - ReadWriteOnce
   hostPath:
     path: /mnt/postgres-data
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node_group
+              operator: In
+              values:
+                - pgo-workers
 YAML
 }
 
 resource "kubectl_manifest" "nfs_volume" {
   depends_on = [
     module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
+    time_sleep.wait_1_minutes_after_cluster,
+    kubectl_manifest.postgres_data_pgha1_pv,
+    kubectl_manifest.postgres_data_pgha2_pv
   ]
   count     = var.on_prem_test == true ? 1 : 0
   yaml_body = <<YAML
