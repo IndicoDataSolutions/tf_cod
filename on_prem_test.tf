@@ -35,7 +35,7 @@ resource "kubectl_manifest" "postgres_data_pgha1_pv" {
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: postgres_data_pgha1
+  name: postgres-data-pgha1
 spec:
   storageClassName: local-storage
   capacity:
@@ -57,7 +57,7 @@ resource "kubectl_manifest" "postgres_data_pgha2_pv" {
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: postgres_data_pgha2
+  name: postgres-data-pgha2
 spec:
   storageClassName: local-storage
   capacity:
