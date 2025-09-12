@@ -191,7 +191,7 @@ locals {
       desired_capacity       = "2"
       taints                 = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
       additional_node_labels = ""
-      postgres_volume_size   = var.postgres_volume_size
+      postgres_volume_size   = substr(var.postgres_volume_size, 0, length(var.postgres_volume_size) - 2)
     }
   } : tomap(null)
 
