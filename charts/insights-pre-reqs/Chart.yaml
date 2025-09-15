@@ -2,4 +2,4 @@ apiVersion: v2
 description: A Helm chart for Kubernetes
 name: insights-pre-reqs
 type: application
-version: 2.1.6-dev-14189-10c6e381
+version: 2.1.6-dev-14189-b313069a
