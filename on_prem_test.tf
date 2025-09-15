@@ -221,16 +221,16 @@ resource "helm_release" "nfs-provider" {
   # }
 
   values = [<<EOF
-    feature:
-      enableFSGroupPolicy: true
-    image:
-      baseRepo: ${var.image_registry}
-    storageClass:
-      create: true
-      name: nfs-client
-      parameters:
-        server: nfs-service.default.svc.cluster.local
-        share: /nfs-storage
+  feature:
+    enableFSGroupPolicy: true
+  image:
+    baseRepo: ${var.image_registry}
+  storageClass:
+    create: true
+    name: nfs-client
+    parameters:
+      server: nfs-service.default.svc.cluster.local
+      share: /nfs-storage
   EOF
   ]
 }
