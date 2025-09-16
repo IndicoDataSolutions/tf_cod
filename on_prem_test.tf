@@ -1,14 +1,81 @@
-#To DO:
-# Install nfs server
-# get ip of service
-# install nfs driver with IP
-# make nfs sc the default
-# install pre-reqs etc.
+# To do:
+# - [ ] Setup hostpath storage class
+# - [ ] Create Hostpath PVs to support 2 crunchy instances
+# - [ ] Install NFS server
+# - [ ] Get IP of service
+# - [ ] Install NFS driver with IP
+# - [ ] Make NFS SC the default
+# - [ ] Install pre-reqs etc.
+
+resource "kubectl_manifest" "hostpath_storage_class" {
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
+  count     = var.on_prem_test == true ? 1 : 0
+  yaml_body = <<YAML
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+YAML
+}
+
+
+resource "kubectl_manifest" "postgres_data_pgha1_pv" {
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster,
+    kubectl_manifest.hostpath_storage_class
+  ]
+  count     = var.on_prem_test == true ? 1 : 0
+  yaml_body = <<YAML
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-data-pgha1
+spec:
+  storageClassName: local-storage
+  capacity:
+    storage: ${var.postgres_volume_size}
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/postgres-data
+YAML
+}
+
+resource "kubectl_manifest" "postgres_data_pgha2_pv" {
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster,
+    kubectl_manifest.hostpath_storage_class
+  ]
+  count     = var.on_prem_test == true ? 1 : 0
+  yaml_body = <<YAML
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-data-pgha2
+spec:
+  storageClassName: local-storage
+  capacity:
+    storage: ${var.postgres_volume_size}
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/postgres-data
+YAML
+}
 
 resource "kubectl_manifest" "nfs_volume" {
   depends_on = [
     module.cluster,
-    time_sleep.wait_1_minutes_after_cluster
+    time_sleep.wait_1_minutes_after_cluster,
+    kubectl_manifest.postgres_data_pgha1_pv,
+    kubectl_manifest.postgres_data_pgha2_pv
   ]
   count     = var.on_prem_test == true ? 1 : 0
   yaml_body = <<YAML
@@ -124,11 +191,11 @@ resource "null_resource" "get_nfs_server_ip" {
   }
 
   provisioner "local-exec" {
-    command = "./kubectl get service nfs-service -o jsonpath='{.spec.clusterIP}' > ${path.module}/nfs_server_ip.txt"
+    command = "./kubectl -n default get service nfs-service -o jsonpath='{.spec.clusterIP}' > ${path.module}/nfs_server_ip.txt"
   }
 
   provisioner "local-exec" {
-    command = "./kubectl get pods --no-headers | grep nfs-server | awk '{print $1}'| xargs -I {} sh -c './kubectl exec {} -- sh -c \"mkdir -p /exports/nfs-storage\"'"
+    command = "./kubectl -n default get pods --no-headers | grep nfs-server | awk '{print $1}'| xargs -I {} sh -c './kubectl -n default exec {} -- sh -c \"mkdir -p /exports/nfs-storage\"'"
   }
 
 }
@@ -154,18 +221,16 @@ resource "helm_release" "nfs-provider" {
   # }
 
   values = [<<EOF
-    csi-driver-nfs:
-      enabled: true
-      feature:
-        enableFSGroupPolicy: true
-      image:
-        baseRepo: ${var.image_registry}
-      storageClass:
-        create: true
-        name: nfs-client
-        parameters:
-          server: nfs-service.default.svc.cluster.local
-          share: /nfs-storage
+  feature:
+    enableFSGroupPolicy: true
+  image:
+    baseRepo: ${var.image_registry}
+  storageClass:
+    create: true
+    name: nfs-client
+    parameters:
+      server: nfs-service.default.svc.cluster.local
+      share: /nfs-storage
   EOF
   ]
 }

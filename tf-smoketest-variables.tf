@@ -281,6 +281,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     use_local_helm_charts = "${jsonencode(var.use_local_helm_charts)}"
     install_local_intake_chart = "${jsonencode(var.install_local_intake_chart)}"
     install_local_insights_chart = "${jsonencode(var.install_local_insights_chart)}"
+    postgres_volume_size = "${jsonencode(var.postgres_volume_size)}"
 
     }
   }

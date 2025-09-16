@@ -1,4 +1,6 @@
 locals {
+
+
   intake_default_node_groups = {
     gpu-workers = {
       min_size               = 0
@@ -69,7 +71,7 @@ locals {
       desired_capacity       = "1"
       taints                 = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
       additional_node_labels = ""
-    },
+    }
     readapi-servers = {
       min_size               = 0
       max_size               = 3
@@ -104,12 +106,12 @@ locals {
       taints                 = ""
     },
     pgo-workers = {
+      min_size               = 1
+      max_size               = 4
+      instance_types         = ["m6a.large"]
       type                   = "cpu"
       spot                   = false
-      instance_types         = ["m6a.large"]
-      min_size               = 1
-      max_size               = 2
-      desired_capacity       = "2"
+      desired_capacity       = "1"
       taints                 = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
       additional_node_labels = ""
     },
@@ -179,6 +181,20 @@ locals {
     )
   )
 
+  on_prem_test_node_groups = var.on_prem_test == true ? {
+    pgo-workers = {
+      min_size               = 2
+      max_size               = 4
+      instance_types         = ["m6a.large"]
+      type                   = "cpu"
+      spot                   = false
+      desired_capacity       = "2"
+      taints                 = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
+      additional_node_labels = ""
+      postgres_volume_size   = substr(var.postgres_volume_size, 0, length(var.postgres_volume_size) - 2)
+    }
+  } : tomap(null)
+
   # This is to avoid terraform errors when the node groups variable is set,
   # as different keys make the objects incompatible for a ternary function. 
   # To solve this, we set it to null which matches all types
@@ -188,7 +204,7 @@ locals {
 
   karpenter_node_group_logic = var.karpenter_enabled ? local.karpenter_node_group : tomap(null)
 
-  node_groups = merge(local.default_node_groups_logic, local.variable_node_groups, local.karpenter_node_group_logic)
+  node_groups = merge(local.default_node_groups_logic, local.variable_node_groups, local.karpenter_node_group_logic, local.on_prem_test_node_groups)
 
   default_node_pools_logic = var.node_groups == null ? local.default_node_groups : tomap(null)
 

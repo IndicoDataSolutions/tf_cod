@@ -257,6 +257,145 @@ EOT
   dns01RecursiveNameserversOnly = var.network_allow_public == true ? false : true
   dns01RecursiveNameservers     = var.network_allow_public == true ? "" : "kube-dns.kube-system.svc.cluster.local:53"
 
+  crunchy_instances_values = var.on_prem_test == true ? (<<EOT
+    - affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node_group
+                operator: In
+                values:
+                - pgo-workers
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: postgres-operator.crunchydata.com/cluster
+                operator: In
+                values:
+                - postgres-insights
+              - key: postgres-operator.crunchydata.com/instance-set
+                operator: In
+                values:
+                - pgha1
+            topologyKey: kubernetes.io/hostname
+      metadata:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
+      dataVolumeClaimSpec:
+        storageClassName: local-storage
+        volumeName: postgres-data-pgha1
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: ${var.postgres_volume_size}
+      name: pgha1
+      replicas: 1
+      resources:
+        requests:
+          cpu: 1000m
+          memory: 3000Mi
+      tolerations:
+        - effect: NoSchedule
+          key: indico.io/crunchy
+          operator: Exists
+    - affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node_group
+                operator: In
+                values:
+                - pgo-workers
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: postgres-operator.crunchydata.com/cluster
+                operator: In
+                values:
+                - postgres-insights
+              - key: postgres-operator.crunchydata.com/instance-set
+                operator: In
+                values:
+                - pgha1
+            topologyKey: kubernetes.io/hostname
+      metadata:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
+      dataVolumeClaimSpec:
+        storageClassName: local-storage
+        volumeName: postgres-data-pgha2
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: ${var.postgres_volume_size}
+      name: pgha2
+      replicas: 1
+      resources:
+        requests:
+          cpu: 1000m
+          memory: 3000Mi
+      tolerations:
+        - effect: NoSchedule
+          key: indico.io/crunchy
+          operator: Exists
+EOT
+  ) : (<<EOT
+    - affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node_group
+                operator: In
+                values:
+                - pgo-workers
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: postgres-operator.crunchydata.com/cluster
+                operator: In
+                values:
+                - postgres-insights
+              - key: postgres-operator.crunchydata.com/instance-set
+                operator: In
+                values:
+                - pgha2
+            topologyKey: kubernetes.io/hostname
+      metadata:
+        annotations:
+          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
+      dataVolumeClaimSpec:
+        storageClassName: ${local.storage_class}
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: ${var.postgres_volume_size}
+      name: pgha2
+      replicas: ${var.az_count}
+      resources:
+        requests:
+          cpu: 1000m
+          memory: 3000Mi
+      tolerations:
+        - effect: NoSchedule
+          key: indico.io/crunchy
+          operator: Exists
+EOT
+  )
 
 }
 
@@ -1018,50 +1157,7 @@ crunchy-postgres:
       labels:
         mirror.linkerd.io/exported: "remote-discovery"
   instances:
-  - affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-          - matchExpressions:
-            - key: node_group
-              operator: In
-              values:
-              - pgo-workers
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-            - key: postgres-operator.crunchydata.com/cluster
-              operator: In
-              values:
-              - postgres-data
-            - key: postgres-operator.crunchydata.com/instance-set
-              operator: In
-              values:
-              - pgha1
-          topologyKey: kubernetes.io/hostname
-    metadata:
-      annotations:
-        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
-    dataVolumeClaimSpec:
-      storageClassName: ${local.storage_class}
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: ${var.postgres_volume_size}
-    name: pgha1
-    replicas: ${var.az_count}
-    resources:
-      requests:
-        cpu: 1000m
-        memory: 3000Mi
-    tolerations:
-      - effect: NoSchedule
-        key: indico.io/crunchy
-        operator: Exists
+${local.crunchy_instances_values}
   pgBackRestConfig:
     global:
       archive-timeout: '10000'

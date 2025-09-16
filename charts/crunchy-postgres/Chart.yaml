@@ -3,4 +3,4 @@ maintainers:
 - email: devops@indico.io
   name: indico devops
 name: crunchy-postgres
-version: 0.8.0-dev-13724-062eed1d
+version: 0.8.0-dev-14189-b313069a
