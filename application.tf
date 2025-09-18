@@ -760,13 +760,13 @@ aws-efs-csi-driver:
   sidecars:
     livenessProbe:
       image:
-        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/livenessprobe
+        repository: ${var.image_registry}/public.ecr.aws/csi-components/livenessprobe
     nodeDriverRegistrar:
       image:
-        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
+        repository: ${var.image_registry}/public.ecr.aws/csi-components/csi-node-driver-registrar
     csiProvisioner:
       image:
-        repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
+        repository: ${var.image_registry}/public.ecr.aws/csi-components/csi-provisioner
 aws-fsx-csi-driver:
   enabled: ${var.include_fsx}
   image:  
