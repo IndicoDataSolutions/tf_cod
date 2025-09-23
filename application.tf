@@ -1214,8 +1214,8 @@ runtime-scanner:
 llmConfig:
   providers:
     AZURE:
-      azure_endpoint: ${local.openai_api_url_variable}
-      api_key: ${local.openai_api_key_variable}
+      azure_endpoint: <path:customer-${var.aws_account}/data/${local.openai_path}#openai_api_url>
+      api_key: <path:customer-${var.aws_account}/data/${local.openai_path}#openai_api_key>
 celery-flower:
   image:
     repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/flower

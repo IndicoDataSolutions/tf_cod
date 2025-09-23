@@ -392,8 +392,7 @@ locals {
   readapi_form_recognizer_key_variable = local.readapi_environment == "production" ? var.prod_form_recognizer_api_key : local.readapi_environment == "development" ? var.dev_form_recognizer_api_key : var.backup_form_recognizer_api_key
 
 
-  openai_api_key_variable = local.openai_environment == "production" ? var.prod_openai_api_key : local.openai_environment == "development" ? var.dev_openai_api_key : var.backup_openai_api_key
-  openai_api_url_variable = local.openai_environment == "production" ? var.prod_openai_api_url : local.openai_environment == "development" ? var.dev_openai_api_url : var.backup_openai_api_url
+  openai_path = local.openai_environment == "production" ? "prod-openai" : local.openai_environment == "development" ? "dev-openai" : "backup-openai"
 }
 
 
