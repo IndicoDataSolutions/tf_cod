@@ -349,7 +349,7 @@ EOT
           key: indico.io/crunchy
           operator: Exists
 EOT
-  ) : (<<EOT
+    ) : (<<EOT
     - affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -1211,6 +1211,11 @@ runtime-scanner:
     ingressUser: monitoring
     ingressPassword: ${random_password.monitoring-password.result}
     ${indent(4, local.runtime_scanner_ingress_values)}
+llmConfig:
+  providers:
+    AZURE:
+      azure_endpoint: ${local.openai_api_url_variable}
+      api_key: ${local.openai_api_key_variable}
 celery-flower:
   image:
     repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico/flower

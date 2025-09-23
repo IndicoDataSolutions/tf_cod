@@ -747,6 +747,11 @@ crunchy-postgres:
 nvidia-device-plugin:
   nvidia-device-plugin:
     compatWithCPUManager: True
+llmConfig:
+  providers:
+    AZURE:
+      azure_endpoint: ${local.openai_api_url_variable}
+      api_key: ${local.openai_api_key_variable}
 readapi:
   annotations:
     reloader.stakater.com/auto: "true"
