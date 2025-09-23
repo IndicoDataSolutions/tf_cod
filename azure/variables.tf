@@ -1117,42 +1117,6 @@ variable "backup_billing" {
   description = "This is the billing url for readapi and has the same value as backup_computer_vision_api_url"
 }
 
-variable "dev_openai_api_key" {
-  type        = string
-  default     = ""
-  description = "openai api key"
-}
-
-variable "dev_openai_api_url" {
-  type        = string
-  default     = ""
-  description = "openai api url"
-}
-
-variable "prod_openai_api_key" {
-  type        = string
-  default     = ""
-  description = "openai api key"
-}
-
-variable "prod_openai_api_url" {
-  type        = string
-  default     = ""
-  description = "openai api url"
-}
-
-variable "backup_openai_api_key" {
-  type        = string
-  default     = ""
-  description = "openai api key"
-}
-
-variable "backup_openai_api_url" {
-  type        = string
-  default     = ""
-  description = "openai api url"
-}
-
 variable "load_environment" {
   type        = string
   default     = ""
