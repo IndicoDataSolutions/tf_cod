@@ -21,6 +21,18 @@ variable "environment" {
   description = "The environment of the cluster, determines which account readapi to use, options production/development"
 }
 
+variable "readapi_environment" {
+  type        = string
+  default     = null
+  description = "The environment of readapi to use, options include production/development/backup"
+}
+
+variable "openai_environment" {
+  type        = string
+  default     = null
+  description = "The environment of openai to use, options include production/development/backup"
+}
+
 variable "message" {
   type        = string
   default     = "Managed by Terraform"
@@ -1660,6 +1672,30 @@ variable "prod_form_recognizer_api_url" {
   description = "readapi form recognizer api url"
 }
 
+variable "backup_computer_vision_api_key" {
+  type        = string
+  default     = ""
+  description = "readapi computer vision api key"
+}
+
+variable "backup_computer_vision_api_url" {
+  type        = string
+  default     = ""
+  description = "readapi computer vision api url"
+}
+
+variable "backup_form_recognizer_api_key" {
+  type        = string
+  default     = ""
+  description = "readapi form recognizer api key"
+}
+
+variable "backup_form_recognizer_api_url" {
+  type        = string
+  default     = ""
+  description = "readapi form recognizer api url"
+}
+
 variable "dev_apikey" {
   type        = string
   default     = ""
@@ -1672,6 +1708,12 @@ variable "prod_apikey" {
   description = "this has the same value as prod_computer_vision_api_key"
 }
 
+variable "backup_apikey" {
+  type        = string
+  default     = ""
+  description = "this has the same value as backup_computer_vision_api_key"
+}
+
 variable "dev_billing" {
   type        = string
   default     = ""
@@ -1682,6 +1724,12 @@ variable "prod_billing" {
   type        = string
   default     = ""
   description = "This is the billing url for readapi and has the same value as prod_computer_vision_api_url "
+}
+
+variable "backup_billing" {
+  type        = string
+  default     = ""
+  description = "This is the billing url for readapi and has the same value as backup_computer_vision_api_url"
 }
 
 variable "enable_loki_logging" {

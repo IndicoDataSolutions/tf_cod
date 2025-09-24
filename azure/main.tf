@@ -329,13 +329,20 @@ module "readapi_queue" {
 locals {
   customer_vault_mount_path = "customer-${coalesce(var.vault_mount_path, var.account)}"
 }
+
 locals {
-  readapi_billing_variable = var.environment == "production" ? var.prod_billing : var.dev_billing
-  readapi_api_key_variable = var.environment == "production" ? var.prod_apikey : var.dev_apikey
-  readapi_computer_vision_variable = var.environment == "production" ? var.prod_computer_vision_api_url : var.dev_computer_vision_api_url
-  readapi_computer_vision_key_variable = var.environment == "production" ? var.prod_computer_vision_api_key : var.dev_computer_vision_api_key
-  readapi_form_recognizer_variable = var.environment == "production" ? var.prod_form_recognizer_api_url : var.dev_form_recognizer_api_url
-  readapi_form_recognizer_key_variable = var.environment == "production" ? var.prod_form_recognizer_api_key : var.dev_form_recognizer_api_key
+  readapi_environment = var.readapi_environment == null ? var.environment : var.readapi_environment
+  openai_environment  = var.openai_environment == null ? var.environment : var.openai_environment
+
+  readapi_billing_variable             = local.readapi_environment == "production" ? var.prod_billing : local.readapi_environment == "development" ? var.dev_billing : var.backup_billing
+  readapi_api_key_variable             = local.readapi_environment == "production" ? var.prod_apikey : local.readapi_environment == "development" ? var.dev_apikey : var.backup_apikey
+  readapi_computer_vision_variable     = local.readapi_environment == "production" ? var.prod_computer_vision_api_url : local.readapi_environment == "development" ? var.dev_computer_vision_api_url : var.backup_computer_vision_api_url
+  readapi_computer_vision_key_variable = local.readapi_environment == "production" ? var.prod_computer_vision_api_key : local.readapi_environment == "development" ? var.dev_computer_vision_api_key : var.backup_computer_vision_api_key
+  readapi_form_recognizer_variable     = local.readapi_environment == "production" ? var.prod_form_recognizer_api_url : local.readapi_environment == "development" ? var.dev_form_recognizer_api_url : var.backup_form_recognizer_api_url
+  readapi_form_recognizer_key_variable = local.readapi_environment == "production" ? var.prod_form_recognizer_api_key : local.readapi_environment == "development" ? var.dev_form_recognizer_api_key : var.backup_form_recognizer_api_key
+
+
+  openai_path = local.openai_environment == "production" ? "prod-openai" : local.openai_environment == "development" ? "dev-openai" : "backup-openai"
 }
 
 
