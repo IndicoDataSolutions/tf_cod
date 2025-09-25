@@ -1767,3 +1767,17 @@ variable "postgres_volume_size" {
   default     = "100Gi"
   description = "Size of the postgres volume"
 }
+
+variable "custom_prometheus_alert_rules" {
+  type = list(object({}))
+  default     = []
+  description = "List of custom alert rules for Prometheus"
+}
+
+variable "custom_fluentbit_filters" {
+  type = list(object({}))
+  default     = []
+  description = "List of custom Fluent Bit filter configurations"
+}
+
+

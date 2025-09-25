@@ -856,6 +856,7 @@ authentication:
   ingressUsername: monitoring
   ingressPassword: ${random_password.monitoring-password.result}
 ${local.alerting_configuration_values}
+${local.custom_prometheus_alert_rules_values}
 keda:
   enabled: ${var.monitoring_enabled}
   global:
@@ -1080,6 +1081,23 @@ annotations: {}
           service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}"
   EOT
   )
+  custom_prometheus_alert_rules_values = var.custom_prometheus_alert_rules != [] ? (<<EOT
+  customRules:
+    ${join("\n", [for rule in var.custom_prometheus_alert_rules : <<EOT
+    - alert: ${rule.alert}
+      expr: ${rule.expr}
+      for: ${rule.for}
+      labels:
+        severity: ${rule.labels.severity}
+      annotations:
+        description: ${rule.annotations.description}
+        summary: ${rule.annotations.summary}
+        dashboard: ${rule.annotations.dashboard}
+  EOT
+])}
+EOT
+  ) : ""
+
   alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
 noExtraConfigs: true
   EOT
