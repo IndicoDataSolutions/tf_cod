@@ -22,17 +22,19 @@ locals {
 
   fluent_bit_filters = var.custom_fluentbit_filters != "[]" ? (<<EOT
 config:
-  filters: "${join("\\n", [for filter in jsondecode(var.custom_fluentbit_filters) : join("\\n", [
-    "[FILTER]",
-    "    name ${filter.name}",
-    "    match ${filter.match}",
-    "    metric_mode ${filter.metric_mode}",
-    "    metric_name ${filter.metric_name}",
-    "    metric_description ${filter.metric_description}",
-    "    regex log ${replace(replace(filter.regex, "\"", "\\\""), "\\", "\\\\")}",
-    "    tag ${filter.tag}",
-    "    kubernetes_mode ${filter.kubernetes_mode}"
-])])}"
+  filters: |
+    ${join("\n", [for filter in jsondecode(var.custom_fluentbit_filters) : <<-EOT
+    [FILTER]
+        name ${filter.name}
+        match ${filter.match}
+        metric_mode ${filter.metric_mode}
+        metric_name ${filter.metric_name}
+        metric_description ${filter.metric_description}
+        regex log *.error
+        tag ${filter.tag}
+        kubernetes_mode ${filter.kubernetes_mode}
+EOT
+])}
 EOT
 ) : ""
 
