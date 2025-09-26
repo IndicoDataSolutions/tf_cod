@@ -856,7 +856,6 @@ authentication:
   ingressUsername: monitoring
   ingressPassword: ${random_password.monitoring-password.result}
 ${local.alerting_configuration_values}
-${local.custom_prometheus_alert_rules_values}
 keda:
   enabled: ${var.monitoring_enabled}
   global:
@@ -1096,12 +1095,12 @@ annotations: {}
   EOT
 ])}
 EOT
-  ) : ""
+) : ""
 
-  alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
+alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
 noExtraConfigs: true
   EOT
-    ) : (<<EOT
+  ) : (<<EOT
 alerting:
   enabled: true
   email:
@@ -1120,17 +1119,18 @@ alerting:
     integrationKey: ${var.alerting_pagerduty_integration_key}
     integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
 ${local.standard_rules}
+${local.custom_prometheus_alert_rules_values}
 EOT
-  )
-  standard_rules = var.alerting_standard_rules != "" ? (<<EOT
+)
+standard_rules = var.alerting_standard_rules != "" ? (<<EOT
   standardRules:
     ${indent(4, base64decode(var.alerting_standard_rules))}
 EOT
-    ) : (<<EOT
+  ) : (<<EOT
   noExtraConfigs: true
   EOT
-  )
-  ipa_pre_reqs_values = concat(local.storage_spec, [<<EOF
+)
+ipa_pre_reqs_values = concat(local.storage_spec, [<<EOF
 global:
   image:
     registry: ${var.image_registry}
@@ -1214,9 +1214,9 @@ externalSecretStore:
     enabled: ${var.load_environment == "" ? "false" : "true"}
     environment: ${var.load_environment == "" ? local.environment : lower(var.load_environment)}
   EOF
-  ])
+])
 
-  intake_values = <<EOF
+intake_values = <<EOF
 global:
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
@@ -1300,7 +1300,7 @@ externalSecretStore:
     environment: ${var.load_environment == "" ? local.environment : lower(var.load_environment)}
   EOF
 
-  faust_worker_settings = var.enable_data_application_cluster_separation ? var.load_environment == "" ? (<<EOF
+faust_worker_settings = var.enable_data_application_cluster_separation ? var.load_environment == "" ? (<<EOF
 faust-worker:
   enabled: true
   volumeMounts:
@@ -1349,15 +1349,15 @@ faust-worker:
         DOCTOR_HOST: 'http://doctor-application-cluster:5000'
         NOCT_HOST: 'http://noct-application-cluster:5000'
 EOF
-    ) : (<<EOF
+  ) : (<<EOF
 faust-worker:
   enabled: false
 EOF
-    ) : (<<EOF
+  ) : (<<EOF
 faust-worker:
   enabled: true
 EOF
-  )
+)
 }
 
 module "intake" {
