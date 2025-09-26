@@ -19,10 +19,11 @@ locals {
       thanos: {}
   EOT
   )
-  
-loki_config = var.enable_loki_logging == true ? (<<EOT
+
+  loki_config = var.enable_loki_logging == true ? (<<EOT
 fluent-bit:
   enabled: true
+${var.custom_fluentbit_filters != "" ? indent(2, base64decode(var.custom_fluentbit_filters)) : ""}
 loki:
   enabled: true
   loki:
@@ -40,45 +41,45 @@ loki:
         region: ${var.region}
   
 EOT
-  ) : (<<EOT
+    ) : (<<EOT
 fluent-bit:
   enabled: false
 EOT
-)
+  )
 
 
 
-alertmanager_tls = var.acm_arn == "" ? (<<EOT
+  alertmanager_tls = var.acm_arn == "" ? (<<EOT
       tls:
         - secretName: ${var.ssl_static_secret_name}
           hosts:
             - alertmanager-${local.monitoring_domain_name}
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
       tls: []
   EOT
-)
-grafana_tls = var.acm_arn == "" ? (<<EOT
+  )
+  grafana_tls = var.acm_arn == "" ? (<<EOT
       tls:
         - secretName: ${var.ssl_static_secret_name}
           hosts:
             - grafana-${local.monitoring_domain_name}
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
       tls: []
   EOT
-)
-prometheus_tls = var.acm_arn == "" ? (<<EOT
+  )
+  prometheus_tls = var.acm_arn == "" ? (<<EOT
       tls:
         - secretName: ${var.ssl_static_secret_name}
           hosts:
             - prometheus-${local.monitoring_domain_name}
   EOT
-  ) : (<<EOT
+    ) : (<<EOT
       tls: []
   EOT
-)
-kube_prometheus_stack_values = var.use_static_ssl_certificates == true || var.acm_arn != "" ? (<<EOT
+  )
+  kube_prometheus_stack_values = var.use_static_ssl_certificates == true || var.acm_arn != "" ? (<<EOT
   prometheus-node-exporter:
     image:
       registry: ${var.image_registry}/quay.io
@@ -174,7 +175,7 @@ ${var.enable_loki_logging == true ? (<<EOT
         jsonData:
           httpHeaderName1: "X-Scope-OrgID"
 EOT
-  ) : (<<EOT
+    ) : (<<EOT
     additionalDataSources: []
 EOT
 )}

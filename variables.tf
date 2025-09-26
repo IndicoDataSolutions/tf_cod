@@ -1770,9 +1770,14 @@ variable "postgres_volume_size" {
 
 variable "custom_prometheus_alert_rules" {
   type        = string
-  default     = "[]"
+  default     = ""
   description = "JSON string containing list of custom alert rules for Prometheus"
 }
 
+variable "custom_fluentbit_filters" {
+  type        = string
+  default     = ""
+  description = "JSON string containing list of custom Fluent Bit filter configurations"
+}
 
 
