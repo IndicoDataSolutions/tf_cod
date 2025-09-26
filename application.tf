@@ -1087,7 +1087,7 @@ annotations: {}
       expr: '${rule.expr}'
       for: '${rule.for}'
       labels:
-        severity: ${rule.labels.severity}
+        severity: '${rule.labels.severity}'
       annotations:
         description: '${rule.annotations.description}'
         summary: '${rule.annotations.summary}'
