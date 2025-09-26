@@ -1080,7 +1080,7 @@ annotations: {}
           service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}"
   EOT
   )
-  custom_prometheus_alert_rules_values = var.custom_prometheus_alert_rules != [] ? (<<EOT
+  custom_prometheus_alert_rules_values = length(var.custom_prometheus_alert_rules) > 0 ? (<<EOT
   customRules:
     ${join("\n", [for rule in var.custom_prometheus_alert_rules : <<EOT
     - alert: ${rule.alert}

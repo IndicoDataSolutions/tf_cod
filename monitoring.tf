@@ -20,7 +20,7 @@ locals {
   EOT
   )
 
-  fluent_bit_filters = var.custom_fluentbit_filters != [] ? (<<EOT
+  fluent_bit_filters = length(var.custom_fluentbit_filters) > 0 ? (<<EOT
     config:
       inputs: |
   ${join("\n", [for filter in var.custom_fluentbit_filters : <<-EOT
