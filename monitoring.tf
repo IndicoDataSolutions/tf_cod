@@ -23,7 +23,7 @@ locals {
   loki_config = var.enable_loki_logging == true ? (<<EOT
 fluent-bit:
   enabled: true
-${var.custom_fluentbit_filters != "" ? indent(2, base64decode(var.custom_fluentbit_filters)) : ""}
+  ${var.custom_fluentbit_filters != "" ? indent(2, base64decode(var.custom_fluentbit_filters)) : ""}
 loki:
   enabled: true
   loki:
