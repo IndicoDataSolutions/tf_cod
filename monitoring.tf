@@ -20,10 +20,10 @@ locals {
   EOT
   )
 
-  fluent_bit_filters = length(var.custom_fluentbit_filters) > 0 ? (<<EOT
+  fluent_bit_filters = var.custom_fluentbit_filters != "[]" ? (<<EOT
     config:
       inputs: |
-  ${join("\n", [for filter in var.custom_fluentbit_filters : <<-EOT
+${join("\n", [for filter in jsondecode(var.custom_fluentbit_filters) : <<-EOT
         [FILTER]
             name ${filter.name}
             match ${filter.match}
@@ -38,7 +38,7 @@ EOT
 EOT
 ) : ""
 
-  loki_config = var.enable_loki_logging == true ? (<<EOT
+loki_config = var.enable_loki_logging == true ? (<<EOT
 fluent-bit:
   enabled: true
 ${local.fluent_bit_filters}
@@ -59,11 +59,11 @@ loki:
         region: ${var.region}
   
 EOT
-    ) : (<<EOT
+  ) : (<<EOT
 fluent-bit:
   enabled: false
 EOT
-  )
+)
 
 
 

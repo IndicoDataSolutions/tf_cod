@@ -1769,15 +1769,15 @@ variable "postgres_volume_size" {
 }
 
 variable "custom_prometheus_alert_rules" {
-  type = list(object({}))
-  default     = []
-  description = "List of custom alert rules for Prometheus"
+  type        = string
+  default     = "[]"
+  description = "JSON string containing list of custom alert rules for Prometheus"
 }
 
 variable "custom_fluentbit_filters" {
-  type = list(object({}))
-  default     = []
-  description = "List of custom Fluent Bit filter configurations"
+  type        = string
+  default     = "[]"
+  description = "JSON string containing list of custom Fluent Bit filter configurations"
 }
 
 
