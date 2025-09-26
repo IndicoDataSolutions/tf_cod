@@ -41,7 +41,17 @@ EOT
 loki_config = var.enable_loki_logging == true ? (<<EOT
 fluent-bit:
   enabled: true
-${local.fluent_bit_filters}
+  config:
+    filters: |
+      [FILTER]
+          name log_to_metrics
+          match kube.*
+          metric_mode counter
+          metric_name metrics_status_code_2xx
+          metric_description "Total number of metrics status code 2xx"
+          regex log '" (?<status_code>(2\d{2}))'
+          tag metrics.status.code.2xx
+          kubernetes_mode on
 loki:
   enabled: true
   loki:
