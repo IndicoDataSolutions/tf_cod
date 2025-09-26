@@ -41,7 +41,7 @@ EOT
 loki_config = var.enable_loki_logging == true ? (<<EOT
 fluent-bit:
   enabled: true
-  ${local.fluent_bit_filters}
+${local.fluent_bit_filters}
 loki:
   enabled: true
   loki:
