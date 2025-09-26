@@ -47,10 +47,10 @@ fluent-bit:
           name log_to_metrics
           match kube.*
           metric_mode counter
-          metric_name metrics_status_code_2xx
-          metric_description "Total number of metrics status code 2xx"
-          regex log '" (?<status_code>(2\d{2}))'
-          tag metrics.status.code.2xx
+          metric_name metrics_status_code_6xx
+          metric_description "Total number of metrics status code 6xx"
+          regex log '" (?<status_code>(6\d{2}))'
+          tag metrics.status.code.6xx
           kubernetes_mode on
 loki:
   enabled: true
