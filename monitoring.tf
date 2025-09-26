@@ -29,7 +29,7 @@ config:
     "    metric_mode ${filter.metric_mode}",
     "    metric_name ${filter.metric_name}",
     "    metric_description ${filter.metric_description}",
-    "    regex log ${replace(filter.regex, "\"", "\\\"")}",
+    "    regex log ${replace(replace(filter.regex, "\"", "\\\""), "\\", "\\\\")}",
     "    tag ${filter.tag}",
     "    kubernetes_mode ${filter.kubernetes_mode}"
 ])])}"
