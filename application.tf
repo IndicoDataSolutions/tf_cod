@@ -1083,15 +1083,15 @@ annotations: {}
   custom_prometheus_alert_rules_values = var.custom_prometheus_alert_rules != "[]" ? (<<EOT
   customRules:
     ${join("\n", [for rule in jsondecode(var.custom_prometheus_alert_rules) : <<EOT
-    - alert: ${rule.alert}
-      expr: ${rule.expr}
-      for: ${rule.for}
+    - alert: '${rule.alert}'
+      expr: '${rule.expr}'
+      for: '${rule.for}'
       labels:
         severity: ${rule.labels.severity}
       annotations:
-        description: ${rule.annotations.description}
-        summary: ${rule.annotations.summary}
-        dashboard: ${rule.annotations.dashboard}
+        description: '${rule.annotations.description}'
+        summary: '${rule.annotations.summary}'
+        dashboard: '${rule.annotations.dashboard}'
   EOT
 ])}
 EOT
