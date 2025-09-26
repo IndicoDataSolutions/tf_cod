@@ -23,7 +23,7 @@ locals {
   fluent_bit_filters = var.custom_fluentbit_filters != "[]" ? (<<EOT
     config:
       filters: |
-${join("\n", [for filter in jsondecode(var.custom_fluentbit_filters) : <<-EOT
+        ${join("\n", [for filter in jsondecode(var.custom_fluentbit_filters) : <<-EOT
         [FILTER]
             name ${filter.name}
             match ${filter.match}
