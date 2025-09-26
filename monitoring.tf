@@ -19,39 +19,10 @@ locals {
       thanos: {}
   EOT
   )
-
-  fluent_bit_filters = var.custom_fluentbit_filters != "[]" ? (<<EOT
-    config:
-      filters: |
-        ${join("\n", [for filter in jsondecode(var.custom_fluentbit_filters) : <<-EOT
-        [FILTER]
-            name ${filter.name}
-            match ${filter.match}
-            metric_mode ${filter.metric_mode}
-            metric_name ${filter.metric_name}
-            metric_description ${filter.metric_description}
-            regex log *.error
-            tag ${filter.tag}
-            kubernetes_mode ${filter.kubernetes_mode}
-EOT
-])}
-EOT
-) : ""
-
+  
 loki_config = var.enable_loki_logging == true ? (<<EOT
 fluent-bit:
   enabled: true
-  config:
-    filters: |
-      [FILTER]
-          name log_to_metrics
-          match kube.*
-          metric_mode counter
-          metric_name metrics_status_code_6xx
-          metric_description "Total number of metrics status code 6xx"
-          regex log '" (?<status_code>(6\d{2}))'
-          tag metrics.status.code.6xx
-          kubernetes_mode on
 loki:
   enabled: true
   loki:

@@ -1774,10 +1774,5 @@ variable "custom_prometheus_alert_rules" {
   description = "JSON string containing list of custom alert rules for Prometheus"
 }
 
-variable "custom_fluentbit_filters" {
-  type        = string
-  default     = "[]"
-  description = "JSON string containing list of custom Fluent Bit filter configurations"
-}
 
 
