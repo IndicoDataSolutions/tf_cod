@@ -29,7 +29,7 @@ ${join("\n", [for filter in jsondecode(var.custom_fluentbit_filters) : <<-EOT
             match ${filter.match}
             metric_mode ${filter.metric_mode}
             metric_name ${filter.metric_name}
-            metric_description ${filter.metric_description}
+            metric_description "${filter.metric_description}"
             regex log ${filter.regex}
             tag ${filter.tag}
             kubernetes_mode ${filter.kubernetes_mode}
