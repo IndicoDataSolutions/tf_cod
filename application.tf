@@ -1080,6 +1080,7 @@ annotations: {}
           service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}"
   EOT
   )
+
   alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
 noExtraConfigs: true
   EOT
@@ -1102,6 +1103,7 @@ alerting:
     integrationKey: ${var.alerting_pagerduty_integration_key}
     integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
 ${local.standard_rules}
+  ${var.custom_prometheus_alert_rules != "" ? indent(2, base64decode(var.custom_prometheus_alert_rules)) : ""}
 EOT
   )
   standard_rules = var.alerting_standard_rules != "" ? (<<EOT
