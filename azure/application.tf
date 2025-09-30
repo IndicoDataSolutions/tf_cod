@@ -666,6 +666,8 @@ rabbitmq:
       enabled: true
       serviceMonitor:
         enabled: true
+    persistence:
+      storageClass: default
 
 apiModels:
   enabled: true
