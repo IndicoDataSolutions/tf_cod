@@ -54,10 +54,7 @@ locals {
   storage_spec = var.on_prem_test == true ? local.on_prem_values : var.include_fsx == true ? local.fsx_values : local.efs_values
 
   alb_ipa_values = var.enable_waf == true ? (<<EOT
-app-edge:
-  service:
-    labels:
-      mirror.linkerd.io/exported: remote-discovery
+app-edge:    
   applicationCluster:
     enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
   backendServiceName: ${var.enable_data_application_cluster_separation ? "app-edge-application-cluster" : "app-edge"}
@@ -68,6 +65,8 @@ app-edge:
     - ${local.environment_data_s3_bucket_name}.s3.${var.region}.amazonaws.com
     - ${local.environment_data_s3_bucket_name}.s3.amazonaws.com
   service:
+    labels:
+      mirror.linkerd.io/exported: remote-discovery
     type: "NodePort"
     ports:
       http_port: 31755
@@ -119,10 +118,9 @@ app-edge:
   alternateDomain: ""
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
-    ingress:
-      useStaticCertificate: ${var.use_static_ssl_certificates}
   ingress:
     enabled: ${var.load_environment == "" ? true : false}
+    useStaticCertificate: ${var.use_static_ssl_certificates}
     annotations:
       nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "true" : "false"}
 EOT
@@ -1271,10 +1269,6 @@ cronjob:
       enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
     meteor-refresh:
       enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
-    rainbow-cleaner-submissions:
-      enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
-    rainbow-cleaner-uploads:
-      enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"} 
     service-account-generator:
       enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
 externalSecretStore:
