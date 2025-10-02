@@ -6,4 +6,4 @@ maintainers:
   url: https://indicodata.ai
 name: linkerd-control-plane
 type: application
-version: 0.2.1-dev-13724-062eed1d
+version: 0.3.0-IPA-7.5.1
