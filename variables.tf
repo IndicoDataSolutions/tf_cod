@@ -724,6 +724,24 @@ variable "alerting_standard_rules" {
   description = "alerting_standard_rules"
 }
 
+variable "alerting_email_severity" {
+  type        = string
+  default     = "indico-high|indico-critical"
+  description = "alerting_email_severity"
+}
+
+variable "alerting_slack_severity" {
+  type        = string
+  default     = "indico.*|slack"
+  description = "alerting_slack_severity"
+}
+
+variable "alerting_pagerduty_severity" {
+  type        = string
+  default     = "indico-critical"
+  description = "alerting_pagerduty_severity"
+}
+
 variable "eks_addon_version_guardduty" {
   type        = bool
   default     = true
