@@ -42,14 +42,17 @@ alerting:
     auth_username: '${var.alerting_email_username}'
     auth_password: '${var.alerting_email_password}'
     targetEmail: "${var.alerting_email_to}"
+    severity: "${var.alerting_email_severity}"
   slack:
     enabled: ${var.alerting_slack_enabled}
     apiUrl: ${var.alerting_slack_token}
     channel: ${var.alerting_slack_channel}
+    severity: "${var.alerting_slack_severity}"
   pagerDuty:
     enabled: ${var.alerting_pagerduty_enabled}
     integrationKey: ${var.alerting_pagerduty_integration_key}
     integrationUrl: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
+    severity: "${var.alerting_pagerduty_severity}"
 EOT
   )
 
