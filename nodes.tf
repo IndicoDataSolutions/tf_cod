@@ -91,6 +91,16 @@ locals {
       desired_capacity       = "1"
       taints                 = "--register-with-taints=indico.io/azurite=true:NoSchedule"
       additional_node_labels = ""
+    },
+    celery-backend = {
+      min_size               = 1
+      max_size               = 1
+      instance_types         = ["m6a.large"]
+      type                   = "cpu"
+      spot                   = false
+      desired_capacity       = "1"
+      taints                 = "--register-with-taints=indico.io/celery-backend=true:NoSchedule"
+      additional_node_labels = ""
     }
   }
 
@@ -143,6 +153,16 @@ locals {
       spot                   = false
       desired_capacity       = "1"
       taints                 = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
+      additional_node_labels = ""
+    },
+    celery-backend = {
+      min_size               = 1
+      max_size               = 1
+      instance_types         = ["m6a.large"]
+      type                   = "cpu"
+      spot                   = false
+      desired_capacity       = "1"
+      taints                 = "--register-with-taints=indico.io/celery-backend=true:NoSchedule"
       additional_node_labels = ""
     }
   }
