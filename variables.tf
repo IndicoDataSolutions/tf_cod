@@ -724,6 +724,24 @@ variable "alerting_standard_rules" {
   description = "alerting_standard_rules"
 }
 
+variable "alerting_email_severity" {
+  type        = string
+  default     = "indico-high|indico-critical"
+  description = "alerting_email_severity"
+}
+
+variable "alerting_slack_severity" {
+  type        = string
+  default     = "indico.*|slack"
+  description = "alerting_slack_severity"
+}
+
+variable "alerting_pagerduty_severity" {
+  type        = string
+  default     = "indico-critical"
+  description = "alerting_pagerduty_severity"
+}
+
 variable "eks_addon_version_guardduty" {
   type        = bool
   default     = true
@@ -1766,4 +1784,16 @@ variable "postgres_volume_size" {
   type        = string
   default     = "100Gi"
   description = "Size of the postgres volume"
+}
+
+variable "custom_prometheus_alert_rules" {
+  type        = string
+  default     = ""
+  description = "JSON string containing list of custom alert rules for Prometheus"
+}
+
+variable "custom_fluentbit_filters" {
+  type        = string
+  default     = ""
+  description = "JSON string containing list of custom Fluent Bit filter configurations"
 }

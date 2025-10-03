@@ -121,6 +121,9 @@ resource "kubernetes_config_map" "terraform-variables" {
     alerting_email_username = "${jsonencode(var.alerting_email_username)}"
     alerting_email_password = "${jsonencode(var.alerting_email_password)}"
     alerting_standard_rules = "${jsonencode(var.alerting_standard_rules)}"
+    alerting_email_severity = "${jsonencode(var.alerting_email_severity)}"
+    alerting_slack_severity = "${jsonencode(var.alerting_slack_severity)}"
+    alerting_pagerduty_severity = "${jsonencode(var.alerting_pagerduty_severity)}"
     eks_addon_version_guardduty = "${jsonencode(var.eks_addon_version_guardduty)}"
     use_static_ssl_certificates = "${jsonencode(var.use_static_ssl_certificates)}"
     ssl_static_secret_name = "${jsonencode(var.ssl_static_secret_name)}"
@@ -290,6 +293,8 @@ resource "kubernetes_config_map" "terraform-variables" {
     install_local_intake_chart = "${jsonencode(var.install_local_intake_chart)}"
     install_local_insights_chart = "${jsonencode(var.install_local_insights_chart)}"
     postgres_volume_size = "${jsonencode(var.postgres_volume_size)}"
+    custom_prometheus_alert_rules = "${jsonencode(var.custom_prometheus_alert_rules)}"
+    custom_fluentbit_filters = "${jsonencode(var.custom_fluentbit_filters)}"
 
     }
   }

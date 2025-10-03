@@ -238,7 +238,8 @@ resource "helm_release" "nfs-provider" {
 resource "null_resource" "update_storage_class" {
   count = var.on_prem_test == true ? 1 : 0
   depends_on = [
-    helm_release.nfs-provider
+    helm_release.nfs-provider,
+    null_resource.get_nfs_server_ip
   ]
 
   triggers = {
