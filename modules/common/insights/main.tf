@@ -104,5 +104,5 @@ resource "helm_release" "insights" {
   disable_webhooks = false
   max_history      = 10
 
-  values = [indent(0, trimspace(base64decode(var.insights_values_overrides)))]
+  values = [indent(12, trimspace(base64decode(var.insights_values_overrides)))]
 }
