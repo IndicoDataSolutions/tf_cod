@@ -97,7 +97,7 @@ resource "helm_release" "insights" {
 
   name             = "insights"
   create_namespace = true
-  namespace        = "default"
+  namespace        = var.namespace
   chart            = "./charts/insights"
   wait             = false
   timeout          = "1800" # 30 minutes
