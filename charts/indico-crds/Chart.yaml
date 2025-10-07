@@ -3,4 +3,4 @@ appVersion: 1.16.0
 description: A Helm chart for deploying CRDS and Operators into indico clusters
 name: indico-crds
 type: application
-version: 6.2.0-IPA-7.5.1
+version: 6.2.0-IPA-7.5.2
