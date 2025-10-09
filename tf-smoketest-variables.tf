@@ -295,6 +295,7 @@ resource "kubernetes_config_map" "terraform-variables" {
     postgres_volume_size = "${jsonencode(var.postgres_volume_size)}"
     custom_prometheus_alert_rules = "${jsonencode(var.custom_prometheus_alert_rules)}"
     custom_fluentbit_filters = "${jsonencode(var.custom_fluentbit_filters)}"
+    insights_namespace = "${jsonencode(var.insights_namespace)}"
 
     }
   }
