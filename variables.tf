@@ -1798,4 +1798,8 @@ variable "custom_fluentbit_filters" {
   description = "JSON string containing list of custom Fluent Bit filter configurations"
 }
 
-
+variable "insights_namespace" {
+  type        = string
+  default     = "insights"
+  description = "Namespace for the insights application"
+}

@@ -1549,7 +1549,7 @@ module "insights" {
   github_file_path                    = var.argo_path
   github_commit_message               = var.message
   helm_registry                       = var.ipa_repo
-  namespace                           = "insights"
+  namespace                           = var.insights_namespace
   ins_pre_reqs_version                = var.insights_pre_reqs_version
   pre_reqs_values_yaml_b64            = var.insights-pre-reqs-values-yaml-b64
   ins_pre_reqs_values_overrides       = local.insights_pre_reqs_values
