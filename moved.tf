@@ -94,3 +94,174 @@ moved {
   to   = module.sqs_sns[0]
 }
 
+# Move statements for module.cluster.module.indico_cluster resources
+moved {
+  from = module.cluster.module.indico_cluster.data.aws_caller_identity.current[0]
+  to   = module.cluster.module.indico_cluster[0].data.aws_caller_identity.current
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.data.aws_eks_addon_version.this["coredns"]
+  to   = module.cluster.module.indico_cluster[0].data.aws_eks_addon_version.this["coredns"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.data.aws_eks_addon_version.this["kube-proxy"]
+  to   = module.cluster.module.indico_cluster[0].data.aws_eks_addon_version.this["kube-proxy"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.data.aws_eks_addon_version.this["vpc-cni"]
+  to   = module.cluster.module.indico_cluster[0].data.aws_eks_addon_version.this["vpc-cni"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.data.aws_iam_session_context.current[0]
+  to   = module.cluster.module.indico_cluster[0].data.aws_iam_session_context.current
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.data.aws_partition.current[0]
+  to   = module.cluster.module.indico_cluster[0].data.aws_partition.current
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_ec2_tag.cluster_primary_security_group["indico/argo_branch"]
+  to   = module.cluster.module.indico_cluster[0].aws_ec2_tag.cluster_primary_security_group["indico/argo_branch"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_ec2_tag.cluster_primary_security_group["indico/argo_path"]
+  to   = module.cluster.module.indico_cluster[0].aws_ec2_tag.cluster_primary_security_group["indico/argo_path"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_ec2_tag.cluster_primary_security_group["indico/argo_repo"]
+  to   = module.cluster.module.indico_cluster[0].aws_ec2_tag.cluster_primary_security_group["indico/argo_repo"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_ec2_tag.cluster_primary_security_group["indico/cluster"]
+  to   = module.cluster.module.indico_cluster[0].aws_ec2_tag.cluster_primary_security_group["indico/cluster"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_ec2_tag.cluster_primary_security_group["indico/cod"]
+  to   = module.cluster.module.indico_cluster[0].aws_ec2_tag.cluster_primary_security_group["indico/cod"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_ec2_tag.cluster_primary_security_group["indico/customer"]
+  to   = module.cluster.module.indico_cluster[0].aws_ec2_tag.cluster_primary_security_group["indico/customer"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_ec2_tag.cluster_primary_security_group["indico/environment"]
+  to   = module.cluster.module.indico_cluster[0].aws_ec2_tag.cluster_primary_security_group["indico/environment"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_eks_addon.this["coredns"]
+  to   = module.cluster.module.indico_cluster[0].aws_eks_addon.this["coredns"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_eks_addon.this["kube-proxy"]
+  to   = module.cluster.module.indico_cluster[0].aws_eks_addon.this["kube-proxy"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_eks_addon.this["vpc-cni"]
+  to   = module.cluster.module.indico_cluster[0].aws_eks_addon.this["vpc-cni"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_eks_cluster.this[0]
+  to   = module.cluster.module.indico_cluster[0].aws_eks_cluster.this
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group.cluster[0]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group.cluster
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group.node[0]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group.node
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group_rule.cluster["egress_nodes_ephemeral_ports_tcp"]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group_rule.cluster["egress_nodes_ephemeral_ports_tcp"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group_rule.cluster["ingress_nodes_443"]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group_rule.cluster["ingress_nodes_443"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group_rule.node["egress_all"]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group_rule.node["egress_all"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group_rule.node["ingress_cluster_443"]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group_rule.node["ingress_cluster_443"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group_rule.node["ingress_cluster_4443_webhook"]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group_rule.node["ingress_cluster_4443_webhook"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group_rule.node["ingress_cluster_6443_webhook"]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group_rule.node["ingress_cluster_6443_webhook"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group_rule.node["ingress_cluster_8443_webhook"]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group_rule.node["ingress_cluster_8443_webhook"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group_rule.node["ingress_cluster_9443_webhook"]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group_rule.node["ingress_cluster_9443_webhook"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group_rule.node["ingress_cluster_kubelet"]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group_rule.node["ingress_cluster_kubelet"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group_rule.node["ingress_cluster_to_node_all_traffic"]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group_rule.node["ingress_cluster_to_node_all_traffic"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group_rule.node["ingress_nodes_ephemeral"]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group_rule.node["ingress_nodes_ephemeral"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group_rule.node["ingress_self_all"]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group_rule.node["ingress_self_all"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group_rule.node["ingress_self_coredns_tcp"]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group_rule.node["ingress_self_coredns_tcp"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.aws_security_group_rule.node["ingress_self_coredns_udp"]
+  to   = module.cluster.module.indico_cluster[0].aws_security_group_rule.node["ingress_self_coredns_udp"]
+}
+
+moved {
+  from = module.cluster.module.indico_cluster.time_sleep.this[0]
+  to   = module.cluster.module.indico_cluster[0].time_sleep.this
+}
+
