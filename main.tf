@@ -351,6 +351,7 @@ module "cluster" {
   cluster_iam_role_arn = local.environment_cluster_role_arn == "null" ? null : local.environment_cluster_role_arn
   generate_kms_key     = var.create_eks_cluster_role ? false : true #Once the cluster is created, we cannot change the kms key.
   kms_key_arn          = local.environment_kms_key_arn
+  cluster_type         = var.cluster_type
 
   vpc_id     = local.environment_indico_vpc_id
   az_count   = var.az_count
