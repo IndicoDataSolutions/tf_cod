@@ -208,13 +208,13 @@ variable "k8s_version" {
   description = "The EKS version to use"
 }
 
-variable "cluster_type" {
+variable "create_load_cluster" {
   type    = string
   default = "create"
 
   validation {
-    condition     = var.cluster_type == "create" || var.cluster_type == "load"
-    error_message = "${var.cluster_type} not valid. Type must be either create or load"
+    condition     = var.create_load_cluster == "create" || var.create_load_cluster == "load"
+    error_message = "${var.create_load_cluster} not valid. Type must be either create or load"
   }
 }
 
