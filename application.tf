@@ -901,9 +901,11 @@ opentelemetry-collector:
 tempo:
   tempo:
     storage:
-      s3:
-        bucketName: ${module.s3-storage[0].loki_s3_bucket_name}
-        endpoint: s3.${var.region}.amazonaws.com
+      trace:
+        backend: s3
+        s3:
+          bucket: ${module.s3-storage[0].loki_s3_bucket_name}
+          endpoint: s3.${var.region}.amazonaws.com
   EOF
   ] : []
 
