@@ -332,64 +332,10 @@ kube-prometheus-stack:
 ${local.kube_prometheus_stack_values}
 metrics-server:
   enabled: false
-opentelemetry-operator:
-  enabled: ${var.monitoring_enabled}
-  testFramework:
-    image:
-      repository: ${var.image_registry}/docker.io/library/busybox
-  kubeRBACProxy:
-    image:
-      repository: ${var.image_registry}/quay.io/brancz/kube-rbac-proxy
-  manager:
-    image:
-      repository: ${var.image_registry}/ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator
-    collectorImage:
-      repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
 opentelemetry-collector:
   enabled: true
-  imagePullSecrets:
-    - name: harbor-pull-secret
   image:
     repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
-  fullnameOverride: "collector-collector"
-  mode: deployment
-  tolerations:
-  - effect: NoSchedule
-    key: indico.io/monitoring
-    operator: Exists
-  nodeSelector:
-    node_group: monitoring-workers
-  ports:
-    jaeger-compact:
-      enabled: false
-    jaeger-thrift:
-      enabled: false
-    jaeger-grpc:
-      enabled: false
-    zipkin:
-      enabled: false
-
-  config:
-    receivers:
-      jaeger: null
-      prometheus: null
-      zipkin: null
-    exporters:
-      otlp:
-        endpoint: monitoring-tempo.monitoring.svc:4317
-        tls:
-          insecure: true
-    service:
-      pipelines:
-        traces:
-          receivers:
-            - otlp
-          processors:
-            - batch
-          exporters:
-            - otlp
-        metrics: null
-        logs: null
 sql-exporter:
   enabled: ${var.ipa_enabled}
   image:
