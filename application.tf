@@ -898,6 +898,12 @@ opentelemetry-collector:
   enabled: true
   image:
     repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
+tempo:
+  tempo:
+    storage:
+      s3:
+        bucketName: ${module.s3-storage[0].loki_s3_bucket_name}
+        endpoint: s3.${var.region}.amazonaws.com
   EOF
   ] : []
 
