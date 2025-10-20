@@ -1803,3 +1803,15 @@ variable "insights_namespace" {
   default     = "insights"
   description = "Namespace for the insights application"
 }
+
+variable "use_alb" {
+  type        = bool
+  default     = false
+  description = "Toggle for using ALB instead of NLB"
+}
+
+variable "waf_arn" {
+  type        = string
+  default     = ""
+  description = "arn of the wafv2 acl"
+}

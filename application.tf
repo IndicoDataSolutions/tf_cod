@@ -7,7 +7,19 @@ locals {
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
   enable_external_dns   = var.use_static_ssl_certificates == false ? true : false
   storage_class         = var.on_prem_test == false ? "encrypted-gp3" : "nfs-client"
-  acm_arn               = var.acm_arn == "" && var.enable_waf == true ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
+  acm_arn               = var.acm_arn == "" ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
+  waf_arn               = var.waf_arn == "" ? aws_wafv2_web_acl.wafv2-acl[0].arn : var.waf_arn
+  alb_annotations       = <<EOF
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/scheme: ${var.network_allow_public == true ? "internet-facing" : "internal"}
+    alb.ingress.kubernetes.io/subnets: ${var.network_allow_public ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}
+    ${local.waf_arn != "" ? "alb.ingress.kubernetes.io/wafv2-acl-arn: ${local.waf_arn}" : ""}
+    ${local.acm_arn != "" ? "alb.ingress.kubernetes.io/certificate-arn: ${local.acm_arn}" : ""}
+    ${var.use_static_ssl_certificates ? "" : "cert-manager.io/cluster-issuer: zerossl"}
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-policy: "ELBSecurityPolicy-TLS-1-2-2017-01"
+  EOF
   efs_values = var.include_efs == true ? [<<EOF
   storage:
     volumeSetup:
@@ -53,7 +65,7 @@ locals {
   #storage_spec = var.include_fsx == true ? local.fsx_values : local.efs_values
   storage_spec = var.on_prem_test == true ? local.on_prem_values : var.include_fsx == true ? local.fsx_values : local.efs_values
 
-  alb_ipa_values = var.enable_waf == true ? (<<EOT
+  alb_ipa_values = var.use_alb == true ? (<<EOT
 app-edge:    
   applicationCluster:
     enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
@@ -75,34 +87,10 @@ app-edge:
     httpPort: 8080
   ingress:
     enabled: ${var.load_environment == "" ? true : false}
+    name: alb-app-edge-ingress
     annotations:
       nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "true" : "false"}
-  aws-load-balancer-controller:
-    enabled: true
-    aws-load-balancer-controller:
-      enabled: true
-      clusterName: ${var.label}
-    ingress:
-      enabled: true
-      useStaticCertificate: ${var.use_static_ssl_certificates}
-      labels:
-        indico.io/cluster: ${var.label}
-      tls:
-        - secretName: ${var.ssl_static_secret_name}
-          hosts:
-            - ${local.dns_name}
-      alb:
-        publicSubnets: ${join(",", local.environment_public_subnet_ids)}
-        wafArn: ${aws_wafv2_web_acl.wafv2-acl[0].arn}
-        acmArn: ${local.acm_arn}
-      service:
-        name: ${var.enable_data_application_cluster_separation ? "app-edge-application-cluster" : "app-edge"}
-        port: 8080
-      hosts:
-        - host: ${local.dns_name}
-          paths:
-            - path: /
-              pathType: Prefix
+    ${local.alb_annotations}
   EOT
     ) : (<<EOT
 app-edge:
@@ -786,7 +774,7 @@ aws-fsx-csi-driver:
       image:
         repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-resizer
 aws-load-balancer-controller:
-  enabled: ${var.use_acm}
+  enabled: ${var.use_alb}
   aws-load-balancer-controller:
     clusterName: ${var.label}
     vpcId: ${local.environment_indico_vpc_id}
@@ -804,7 +792,7 @@ cluster-autoscaler:
       aws-use-static-instance-list: true
 ${local.dns_configuration_values}
 ingress-nginx:
-  enabled: true
+  enabled: ${var.use_alb == true ? false : true}
   controller:
     podAnnotations:
       linkerd.io/inject: ${var.enable_service_mesh ? "enabled" : "false"}
@@ -1774,32 +1762,7 @@ resource "helm_release" "local-registry" {
 cert-manager:
   enabled: false
 ingress-nginx:
-  enabled: true
-  
-  controller:
-    ingressClass: nginx-internal
-    ingressClassResource:
-      controllerValue: "k8s.io/ingress-nginx-internal"
-      name: nginx-internal
-    admissionWebhooks:
-      enabled: false
-    autoscaling:
-      enabled: true
-      maxReplicas: 12
-      minReplicas: 6
-      targetCPUUtilizationPercentage: 50
-      targetMemoryUtilizationPercentage: 50
-    resources:
-      requests:
-        cpu: 1
-        memory: 2Gi
-    service:
-      external:
-        enabled: false
-      internal:
-        annotations:
-          service.beta.kubernetes.io/aws-load-balancer-internal: "true"
-        enabled: true
+  enabled: false
 docker-registry:
   image:
     repository: ${var.image_registry}/docker.io/library/registry
