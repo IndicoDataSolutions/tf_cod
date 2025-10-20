@@ -8,7 +8,7 @@ locals {
   enable_external_dns   = var.use_static_ssl_certificates == false ? true : false
   storage_class         = var.on_prem_test == false ? "encrypted-gp3" : "nfs-client"
   acm_arn               = var.acm_arn == "" ? aws_acm_certificate_validation.acm[0].certificate_arn : var.acm_arn
-  waf_arn               = var.waf_arn == "" ? aws_wafv2_web_acl.wafv2-acl[0].arn : var.waf_arn
+  waf_arn               = var.waf_arn == "" && var.enable_waf == true ? aws_wafv2_web_acl.wafv2-acl[0].arn : var.waf_arn
   alb_annotations       = <<EOF
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/scheme: ${var.network_allow_public == true ? "internet-facing" : "internal"}
