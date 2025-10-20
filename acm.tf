@@ -4,7 +4,7 @@ output "acm_arn" {
 }
 
 resource "aws_acm_certificate" "acm" {
-  count             = var.use_acm && var.acm_arn == "" ? 0 : 1
+  count             = var.use_acm && var.acm_arn == "" ? 1 : 0
   domain_name       = local.dns_name
   validation_method = "DNS"
   depends_on = [
@@ -31,7 +31,7 @@ resource "aws_route53_record" "acm_validation" {
 }
 
 resource "aws_acm_certificate_validation" "acm" {
-  count                   = var.use_acm && var.acm_arn == "" ? 0 : 1
+  count                   = var.use_acm && var.acm_arn == "" ? 1 : 0
   certificate_arn         = aws_acm_certificate.acm[0].arn
   validation_record_fqdns = [for record in aws_route53_record.acm_validation : record.fqdn]
   depends_on = [
