@@ -15,7 +15,7 @@ locals {
     alb.ingress.kubernetes.io/subnets: ${var.network_allow_public ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}
     ${local.waf_arn != "" ? "alb.ingress.kubernetes.io/wafv2-acl-arn: ${local.waf_arn}" : ""}
     ${local.acm_arn != "" ? "alb.ingress.kubernetes.io/certificate-arn: ${local.acm_arn}" : ""}
-    ${var.use_static_ssl_certificates ? "" : "cert-manager.io/cluster-issuer: zerossl"}
+    ${var.use_static_ssl_certificates == false ? "cert-manager.io/cluster-issuer: zerossl" : ""}
     alb.ingress.kubernetes.io/ssl-redirect: "443"
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
     alb.ingress.kubernetes.io/ssl-policy: "ELBSecurityPolicy-TLS-1-2-2017-01"
