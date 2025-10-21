@@ -99,10 +99,6 @@ moved {
   to   = module.cluster[0]
 }
 
-moved {
-  from = module.cluster.module.indico_cluster
-  to   = module.cluster.module.indico_cluster[0]
-}
 
 
 
