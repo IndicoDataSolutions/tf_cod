@@ -13,12 +13,12 @@ locals {
   alb.ingress.kubernetes.io/target-type: ip
   alb.ingress.kubernetes.io/scheme: ${var.network_allow_public == true ? "internet-facing" : "internal"}
   alb.ingress.kubernetes.io/subnets: ${var.network_allow_public ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}
-  ${local.waf_arn != "" ? "alb.ingress.kubernetes.io/wafv2-acl-arn: ${local.waf_arn}" : ""}
-  ${local.acm_arn != "" ? "alb.ingress.kubernetes.io/certificate-arn: ${local.acm_arn}" : ""}
-  ${var.use_static_ssl_certificates == false ? "cert-manager.io/cluster-issuer: zerossl" : ""}
   alb.ingress.kubernetes.io/ssl-redirect: "443"
   alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
   alb.ingress.kubernetes.io/ssl-policy: "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ${local.waf_arn != "" ? "alb.ingress.kubernetes.io/wafv2-acl-arn: ${local.waf_arn}" : ""}
+  ${local.acm_arn != "" ? "alb.ingress.kubernetes.io/certificate-arn: ${local.acm_arn}" : ""}
+  ${var.use_static_ssl_certificates == false ? "cert-manager.io/cluster-issuer: zerossl" : ""}
   EOF
   efs_values = var.include_efs == true ? [<<EOF
   storage:
@@ -91,7 +91,7 @@ app-edge:
     ingressClassName: alb
     annotations:
       nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "true" : "false"}
-      ${indent(4, local.alb_annotations)}
+      ${trimspace(indent(4, local.alb_annotations))}
   EOT
     ) : (<<EOT
 app-edge:
