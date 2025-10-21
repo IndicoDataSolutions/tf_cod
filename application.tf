@@ -17,7 +17,7 @@ locals {
   alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
   alb.ingress.kubernetes.io/ssl-policy: "ELBSecurityPolicy-TLS-1-2-2017-01"
   alb.ingress.kubernetes.io/certificate-arn: ${local.acm_arn}
-  ${local.waf_arn != "" ? "alb.ingress.kubernetes.io/wafv2-acl-arn: ${local.waf_arn}" : ""}
+  alb.ingress.kubernetes.io/wafv2-acl-arn: ${local.waf_arn}
   EOF
   efs_values = var.include_efs == true ? [<<EOF
   storage:
@@ -78,18 +78,14 @@ app-edge:
   service:
     labels:
       mirror.linkerd.io/exported: remote-discovery
-    type: "NodePort"
-    ports:
-      http_port: 31755
-      http_api_port: 31270
-  nginx:
-    httpPort: 8080
   ingress:
     enabled: ${var.load_environment == "" ? true : false}
     name: alb-app-edge-ingress
     ingressClassName: alb
+    pathType: Prefix
     annotations:
-      nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "\"true\"" : "\"false\""}
+      nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "'true'" : "'false'"}
+      alb.ingress.kubernetes.io/healthcheck-path: /api/ping
       ${trimspace(indent(4, local.alb_annotations))}
   EOT
     ) : (<<EOT
