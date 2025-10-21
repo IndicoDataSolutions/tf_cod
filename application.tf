@@ -661,6 +661,8 @@ dragonfly-operator:
   manager:
     image:
       repository: ${var.image_registry}/docker.dragonflydb.io/dragonflydb/operator
+aws-load-balancer-controller:
+  enabled: ${var.use_alb}
   EOF
   ]
 
