@@ -1,10 +1,10 @@
 output "acm_arn" {
   description = "arn of the acm"
-  value       = var.use_acm && var.acm_arn == "" ? aws_acm_certificate_validation.acm[0].certificate_arn : var.acm_arn
+  value       = var.use_alb && var.acm_arn == "" ? aws_acm_certificate_validation.acm[0].certificate_arn : var.acm_arn
 }
 
 resource "aws_acm_certificate" "acm" {
-  count             = var.use_acm && var.acm_arn == "" ? 1 : 0
+  count             = var.use_alb && var.acm_arn == "" ? 1 : 0
   domain_name       = local.dns_name
   validation_method = "DNS"
   depends_on = [
@@ -13,7 +13,7 @@ resource "aws_acm_certificate" "acm" {
 }
 
 resource "aws_route53_record" "acm_validation" {
-  for_each = var.use_acm && var.acm_arn == "" ? {
+  for_each = var.use_alb && var.acm_arn == "" ? {
     for dvo in aws_acm_certificate.acm[0].domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
@@ -31,7 +31,7 @@ resource "aws_route53_record" "acm_validation" {
 }
 
 resource "aws_acm_certificate_validation" "acm" {
-  count                   = var.use_acm && var.acm_arn == "" ? 1 : 0
+  count                   = var.use_alb && var.acm_arn == "" ? 1 : 0
   certificate_arn         = aws_acm_certificate.acm[0].arn
   validation_record_fqdns = [for record in aws_route53_record.acm_validation : record.fqdn]
   depends_on = [

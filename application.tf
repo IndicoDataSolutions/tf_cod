@@ -7,7 +7,7 @@ locals {
   alternate_domain_root = join(".", [local.the_domain, local.the_tld])
   enable_external_dns   = var.use_static_ssl_certificates == false ? true : false
   storage_class         = var.on_prem_test == false ? "encrypted-gp3" : "nfs-client"
-  acm_arn               = var.use_acm && var.acm_arn == "" ? aws_acm_certificate_validation.acm[0].certificate_arn : var.acm_arn
+  acm_arn               = var.use_alb && var.acm_arn == "" ? aws_acm_certificate_validation.acm[0].certificate_arn : var.acm_arn
   waf_arn               = var.enable_waf == true && var.waf_arn == "" ? aws_wafv2_web_acl.wafv2-acl[0].arn : var.waf_arn
   alb_annotations       = <<EOF
   alb.ingress.kubernetes.io/target-type: ip
@@ -16,9 +16,8 @@ locals {
   alb.ingress.kubernetes.io/ssl-redirect: "443"
   alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
   alb.ingress.kubernetes.io/ssl-policy: "ELBSecurityPolicy-TLS-1-2-2017-01"
+  alb.ingress.kubernetes.io/certificate-arn: ${local.acm_arn}
   ${local.waf_arn != "" ? "alb.ingress.kubernetes.io/wafv2-acl-arn: ${local.waf_arn}" : ""}
-  ${local.acm_arn != "" ? "alb.ingress.kubernetes.io/certificate-arn: ${local.acm_arn}" : ""}
-  ${var.use_static_ssl_certificates == false ? "cert-manager.io/cluster-issuer: zerossl" : ""}
   EOF
   efs_values = var.include_efs == true ? [<<EOF
   storage:
