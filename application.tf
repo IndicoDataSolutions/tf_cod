@@ -776,10 +776,9 @@ aws-fsx-csi-driver:
         repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-resizer
 aws-load-balancer-controller:
   enabled: ${var.use_alb}
-  aws-load-balancer-controller:
-    clusterName: ${var.label}
-    vpcId: ${local.environment_indico_vpc_id}
-    region: ${var.region}
+  clusterName: ${var.label}
+  vpcId: ${local.environment_indico_vpc_id}
+  region: ${var.region}
 cluster-autoscaler:
   enabled: ${var.karpenter_enabled == false ? true : false}
   cluster-autoscaler:
