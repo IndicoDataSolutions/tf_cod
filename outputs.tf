@@ -5,7 +5,7 @@ output "key_pem" {
 }
 
 output "cluster_name" {
-  value = var.label
+  value = local.environment_cluster_cluster_name
 }
 
 output "cluster_region" {
@@ -27,6 +27,22 @@ output "kube_ca_certificate" {
 output "kube_token" {
   sensitive = true
   value     = local.environment_cluster_kubernetes_token
+}
+
+output "cluster_node_security_group_id" {
+  value = local.environment_cluster_node_security_group_id
+}
+
+output "cluster_security_group_id" {
+  value = local.environment_cluster_cluster_security_group_id
+}
+
+output "cluster_endpoint" {
+  value = local.environment_cluster_cluster_endpoint
+}
+
+output "cluster_node_groups" {
+  value = local.environment_cluster_node_groups
 }
 
 output "harness_delegate_name" {
