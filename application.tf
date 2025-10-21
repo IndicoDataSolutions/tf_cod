@@ -89,7 +89,7 @@ app-edge:
     name: alb-app-edge-ingress
     ingressClassName: alb
     annotations:
-      nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "true" : "false"}
+      nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "\"true\"" : "\"false\""}
       ${trimspace(indent(4, local.alb_annotations))}
   EOT
     ) : (<<EOT
