@@ -358,7 +358,7 @@ module "cluster" {
   az_count   = var.az_count
   subnet_ids = flatten([local.environment_private_subnet_ids])
 
-  node_groups          = local.node_groups
+  node_groups          = var.multitenant_enabled ? null : local.node_groups
   node_role_name       = local.environment_node_role_name
   node_role_arn        = local.environment_node_role_arn
   instance_volume_size = var.instance_volume_size
