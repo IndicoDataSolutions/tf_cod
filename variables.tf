@@ -208,16 +208,6 @@ variable "k8s_version" {
   description = "The EKS version to use"
 }
 
-variable "create_load_cluster" {
-  type    = string
-  default = "create"
-
-  validation {
-    condition     = var.create_load_cluster == "create" || var.create_load_cluster == "load"
-    error_message = "${var.create_load_cluster} not valid. Type must be either create or load"
-  }
-}
-
 variable "node_groups" {
   default     = null
   description = "Override for the node groups assigned to the cluster. If not supplied, the node groups will be determined from intake and insights defaults"

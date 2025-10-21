@@ -31,7 +31,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     name = "${jsonencode(var.name)}"
     cluster_name = "${jsonencode(var.cluster_name)}"
     k8s_version = "${jsonencode(var.k8s_version)}"
-    create_load_cluster = "${jsonencode(var.create_load_cluster)}"
     node_groups = "${jsonencode(var.node_groups)}"
     node_bootstrap_arguments = "${jsonencode(var.node_bootstrap_arguments)}"
     node_user_data = "${jsonencode(var.node_user_data)}"
