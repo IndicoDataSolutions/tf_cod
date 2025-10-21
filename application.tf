@@ -443,13 +443,12 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 # sure their credentials only have access to create <account>-* k8s auth methods
 # Note: this module is used to pull secrets from hashicorp vault. It is also used by the external-secrets operator to push secrets to hashicorp vault.
 module "secrets-operator-setup" {
-  count = var.multitenant_enabled == false ? 1 : 0
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
     kubernetes_secret.harbor-pull-secret
   ]
-  count           = var.secrets_operator_enabled == true ? 1 : 0
+  count           = var.secrets_operator_enabled == true && var.multitenant_enabled == false ? 1 : 0
   source          = "./modules/common/vault-secrets-operator-setup"
   vault_address   = var.vault_address
   account         = var.aws_account
