@@ -49,4 +49,14 @@ locals {
   environment_nginx_ingress_security_group_id = var.load_environment == "" ? (var.create_nginx_ingress_security_group && var.network_module == "networking" && var.network_type == "create" ? local.network[0].nginx_ingress_security_group_id : "null") : data.terraform_remote_state.environment[0].outputs.nginx_ingress_security_group_id
   environment_nat_gateway_eips                = var.load_environment == "" ? (var.network_module == "networking" && var.network_type == "create" ? local.network[0].nat_gateway_eips : ["null"]) : data.terraform_remote_state.environment[0].outputs.nat_gateway_eips
   environment_nginx_ingress_allowed_cidrs     = var.load_environment == "" ? (var.nginx_ingress_allowed_cidrs) : data.terraform_remote_state.environment[0].outputs.nginx_ingress_allowed_cidrs
+
+  # Cluster module outputs - AWS
+  environment_cluster_kubernetes_host                   = var.load_environment == "" ? module.cluster[0].kubernetes_host : data.terraform_remote_state.environment[0].outputs.cluster_kubernetes_host
+  environment_cluster_kubernetes_cluster_ca_certificate = var.load_environment == "" ? module.cluster[0].kubernetes_cluster_ca_certificate : data.terraform_remote_state.environment[0].outputs.cluster_kubernetes_cluster_ca_certificate
+  environment_cluster_kubernetes_token                  = var.load_environment == "" ? module.cluster[0].kubernetes_token : data.terraform_remote_state.environment[0].outputs.cluster_kubernetes_token
+  environment_cluster_node_security_group_id            = var.load_environment == "" ? module.cluster[0].node_security_group_id : data.terraform_remote_state.environment[0].outputs.cluster_node_security_group_id
+  environment_cluster_cluster_security_group_id         = var.load_environment == "" ? module.cluster[0].cluster_security_group_id : data.terraform_remote_state.environment[0].outputs.cluster_cluster_security_group_id
+  environment_cluster_cluster_name                      = var.load_environment == "" ? module.cluster[0].cluster_name : data.terraform_remote_state.environment[0].outputs.cluster_cluster_name
+  environment_cluster_cluster_endpoint                  = var.load_environment == "" ? module.cluster[0].cluster_endpoint : data.terraform_remote_state.environment[0].outputs.cluster_cluster_endpoint
+  environment_cluster_node_groups                       = var.load_environment == "" ? module.cluster[0].node_groups : data.terraform_remote_state.environment[0].outputs.cluster_node_groups
 }

@@ -454,7 +454,7 @@ module "secrets-operator-setup" {
   account         = var.aws_account
   region          = var.region
   name            = var.label
-  kubernetes_host = module.cluster.kubernetes_host
+  kubernetes_host = local.environment_cluster_kubernetes_host
   vault_username  = var.vault_username
   vault_password  = var.vault_password
   audience        = ""
@@ -474,7 +474,7 @@ module "karpenter" {
   k8s_version           = var.k8s_version
   az_count              = var.az_count
   subnet_ids            = flatten([local.environment_private_subnet_ids])
-  security_group_ids    = distinct(compact(concat([module.cluster.node_security_group_id], var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : [], [module.cluster.cluster_security_group_id])))
+  security_group_ids    = distinct(compact(concat([local.environment_cluster_node_security_group_id], var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : [], [local.environment_cluster_cluster_security_group_id])))
   helm_registry         = var.ipa_repo
   karpenter_version     = var.karpenter_version
   default_tags          = var.default_tags
@@ -1364,7 +1364,7 @@ module "intake" {
   label                             = var.label
   argo_application_name             = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
   vault_path                        = "tools/argo/data/ipa-deploy"
-  argo_server                       = module.cluster.kubernetes_host
+  argo_server                       = local.environment_cluster_kubernetes_host
   argo_project_name                 = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
   intake_version                    = var.ipa_version
   k8s_version                       = var.k8s_version
@@ -1404,7 +1404,7 @@ module "intake_smoketests" {
   github_commit_message  = var.message
   argo_application_name  = local.argo_smoketest_app_name
   argo_vault_plugin_path = "tools/argo/data/ipa-deploy"
-  argo_server            = module.cluster.kubernetes_host
+  argo_server            = local.environment_cluster_kubernetes_host
   argo_project_name      = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
   chart_name             = "cod-smoketests"
   chart_repo             = var.ipa_smoketest_repo
@@ -1560,7 +1560,7 @@ module "insights" {
   label                               = var.label
   argo_application_name               = lower("${var.aws_account}.${var.region}.${var.label}-insights")
   vault_path                          = "tools/argo/data/ipa-deploy"
-  argo_server                         = module.cluster.kubernetes_host
+  argo_server                         = local.environment_cluster_kubernetes_host
   argo_project_name                   = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
   insights_version                    = var.insights_version
   k8s_version                         = var.k8s_version
@@ -1590,7 +1590,7 @@ module "additional_application" {
   github_commit_message  = var.message
   argo_application_name  = lower("${var.aws_account}-${var.region}-${var.label}-${each.value.name}")
   argo_vault_plugin_path = each.value.vaultPath
-  argo_server            = module.cluster.kubernetes_host
+  argo_server            = local.environment_cluster_kubernetes_host
   argo_project_name      = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
   chart_name             = each.value.chart
   chart_repo             = each.value.repo

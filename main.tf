@@ -186,7 +186,7 @@ module "lambda-sns-forwarder" {
 }
 
 module "kms_key" {
-  count            = var.load_environment == ""  && var.multitenant_enabled == false ? 1 : 0
+  count            = var.load_environment == "" ? 1 : 0
   source           = "app.terraform.io/indico/indico-aws-kms/mod"
   version          = "2.1.2"
   label            = var.label
@@ -342,6 +342,7 @@ module "iam" {
 }
 
 module "cluster" {
+  count                = var.multitenant_enabled == false ? 1 : 0
   source               = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
   version              = "10.0.0"
   label                = var.multitenant_enabled ? var.tenant_cluster_name : var.label
@@ -351,14 +352,14 @@ module "cluster" {
   cluster_iam_role_arn = local.environment_cluster_role_arn == "null" ? null : local.environment_cluster_role_arn
   generate_kms_key     = var.create_eks_cluster_role ? false : true #Once the cluster is created, we cannot change the kms key.
   kms_key_arn          = local.environment_kms_key_arn
-  cluster_type         = var.multitenant_enabled ? "load" : "create"
+  cluster_type         = "create"
 
 
   vpc_id     = local.environment_indico_vpc_id
   az_count   = var.az_count
   subnet_ids = flatten([local.environment_private_subnet_ids])
 
-  node_groups          = var.multitenant_enabled ? tomap(null) : local.node_groups
+  node_groups          = local.node_groups
   node_role_name       = local.environment_node_role_name
   node_role_arn        = local.environment_node_role_arn
   instance_volume_size = var.instance_volume_size
@@ -426,8 +427,8 @@ provider "argocd" {
 }
 
 provider "kubernetes" {
-  host                   = module.cluster.kubernetes_host
-  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+  host                   = local.environment_cluster_kubernetes_host
+  cluster_ca_certificate = local.environment_cluster_kubernetes_cluster_ca_certificate
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     args        = ["eks", "get-token", "--cluster-name", var.label]
@@ -436,8 +437,8 @@ provider "kubernetes" {
 }
 
 provider "kubectl" {
-  host                   = module.cluster.kubernetes_host
-  cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
+  host                   = local.environment_cluster_kubernetes_host
+  cluster_ca_certificate = local.environment_cluster_kubernetes_cluster_ca_certificate
   load_config_file       = false
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
@@ -449,9 +450,9 @@ provider "kubectl" {
 provider "helm" {
   debug = true
   kubernetes {
-    host                   = module.cluster.kubernetes_host
-    cluster_ca_certificate = module.cluster.kubernetes_cluster_ca_certificate
-    #token                  = module.cluster.kubernetes_token
+    host                   = local.environment_cluster_kubernetes_host
+    cluster_ca_certificate = local.environment_cluster_kubernetes_cluster_ca_certificate
+    #token                  = local.environment_cluster_kubernetes_token
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
       args        = ["eks", "get-token", "--cluster-name", var.label]
@@ -485,8 +486,8 @@ module "argo-registration" {
   account                      = var.aws_account
   cloud_provider               = "aws"
   argo_github_team_admin_group = var.argo_github_team_owner
-  endpoint                     = module.cluster.kubernetes_host
-  ca_data                      = module.cluster.kubernetes_cluster_ca_certificate
+  endpoint                     = local.environment_cluster_kubernetes_host
+  ca_data                      = local.environment_cluster_kubernetes_cluster_ca_certificate
   indico_dev_cluster           = var.aws_account == "Indico-Dev"
 }
 

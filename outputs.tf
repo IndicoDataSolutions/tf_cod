@@ -17,16 +17,16 @@ output "dns_name" {
 }
 
 output "kube_host" {
-  value = module.cluster.kubernetes_host
+  value = local.environment_cluster_kubernetes_host
 }
 
 output "kube_ca_certificate" {
-  value = base64encode(module.cluster.kubernetes_cluster_ca_certificate)
+  value = base64encode(local.environment_cluster_kubernetes_cluster_ca_certificate)
 
 }
 output "kube_token" {
   sensitive = true
-  value     = module.cluster.kubernetes_token
+  value     = local.environment_cluster_kubernetes_token
 }
 
 output "harness_delegate_name" {
