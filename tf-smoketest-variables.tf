@@ -252,6 +252,8 @@ resource "kubernetes_config_map" "terraform-variables" {
     include_miniobkp = "${jsonencode(var.include_miniobkp)}"
     miniobkp_s3_bucket_name_override = "${jsonencode(var.miniobkp_s3_bucket_name_override)}"
     load_environment = "${jsonencode(var.load_environment)}"
+    tenant_cluster_name = "${jsonencode(var.tenant_cluster_name)}"
+    multitenant_enabled = "${jsonencode(var.multitenant_enabled)}"
     indico_storage_class_name = "${jsonencode(var.indico_storage_class_name)}"
     karpenter_enabled = "${jsonencode(var.karpenter_enabled)}"
     karpenter_version = "${jsonencode(var.karpenter_version)}"

@@ -1541,6 +1541,18 @@ variable "load_environment" {
   description = "The environment to load the cluster from"
 }
 
+variable "tenant_cluster_name" {
+  type        = string
+  default     = ""
+  description = "The name of the cluster to load the tenant cluster from"
+}
+
+variable "multitenant_enabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling multitenant deployment"
+}
+
 variable "indico_storage_class_name" {
   type        = string
   default     = "indico-sc"

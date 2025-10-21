@@ -186,7 +186,7 @@ module "lambda-sns-forwarder" {
 }
 
 module "kms_key" {
-  count            = var.load_environment == "" ? 1 : 0
+  count            = var.load_environment == ""  && var.multitenant_enabled == false ? 1 : 0
   source           = "app.terraform.io/indico/indico-aws-kms/mod"
   version          = "2.1.2"
   label            = var.label
@@ -344,14 +344,15 @@ module "iam" {
 module "cluster" {
   source               = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
   version              = "10.0.0"
-  label                = var.label
+  label                = var.multitenant_enabled ? var.tenant_cluster_name : var.label
   region               = var.region
   cluster_version      = var.k8s_version
   default_tags         = merge(coalesce(var.default_tags, {}), coalesce(var.additional_tags, {}))
   cluster_iam_role_arn = local.environment_cluster_role_arn == "null" ? null : local.environment_cluster_role_arn
   generate_kms_key     = var.create_eks_cluster_role ? false : true #Once the cluster is created, we cannot change the kms key.
   kms_key_arn          = local.environment_kms_key_arn
-  cluster_type         = var.create_load_cluster
+  cluster_type         = var.multitenant_enabled ? "load" : "create"
+
 
   vpc_id     = local.environment_indico_vpc_id
   az_count   = var.az_count
@@ -507,7 +508,7 @@ data "aws_route53_zone" "primary" {
 
 
 resource "aws_route53_record" "ipa-app-caa" {
-  count   = var.is_alternate_account_domain == "true" || var.use_static_ssl_certificates || var.load_environment != "" ? 0 : 1
+  count   = var.is_alternate_account_domain == "true" || var.use_static_ssl_certificates || var.load_environment != "" || var.multitenant_enabled == false ? 0 : 1
   zone_id = data.aws_route53_zone.primary[0].zone_id
   name    = local.dns_name
   type    = "CAA"

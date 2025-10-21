@@ -414,6 +414,7 @@ resource "kubernetes_namespace" "indico" {
 
 # Need to make sure the pull secret is in first, so that all of our images can be pulled from harbor
 resource "kubernetes_secret" "harbor-pull-secret" {
+  count = var.multitenant_enabled == false ? 1 : 0
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
@@ -442,6 +443,7 @@ resource "kubernetes_secret" "harbor-pull-secret" {
 # sure their credentials only have access to create <account>-* k8s auth methods
 # Note: this module is used to pull secrets from hashicorp vault. It is also used by the external-secrets operator to push secrets to hashicorp vault.
 module "secrets-operator-setup" {
+  count = var.multitenant_enabled == false ? 1 : 0
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
@@ -958,6 +960,7 @@ opentelemetry-collector:
 }
 
 module "indico-common" {
+  count = var.multitenant_enabled == false ? 1 : 0
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
