@@ -1,6 +1,6 @@
 output "acm_arn" {
   description = "arn of the acm"
-  value       = var.acm_arn == "" ? aws_acm_certificate_validation.acm[0].certificate_arn : var.acm_arn
+  value       = var.use_acm && var.acm_arn == "" ? aws_acm_certificate_validation.acm[0].certificate_arn : var.acm_arn
 }
 
 resource "aws_acm_certificate" "acm" {
