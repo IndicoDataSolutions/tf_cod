@@ -88,6 +88,7 @@ app-edge:
   ingress:
     enabled: ${var.load_environment == "" ? true : false}
     name: alb-app-edge-ingress
+    ingressClassName: alb
     annotations:
       nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "true" : "false"}
     ${local.alb_annotations}
