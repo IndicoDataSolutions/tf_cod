@@ -138,6 +138,11 @@ output "miniobkp_s3_bucket_name" {
   value       = local.environment_miniobkp_s3_bucket_name
 }
 
+output "loki_s3_bucket_name" {
+  description = "Name of the loki s3 bucket"
+  value       = local.environment_loki_s3_bucket_name
+}
+
 ## EFS outputs
 
 output "efs_filesystem_id" {
