@@ -9,16 +9,6 @@ locals {
   storage_class         = var.on_prem_test == false ? "encrypted-gp3" : "nfs-client"
   acm_arn               = var.use_alb && var.acm_arn == "" ? aws_acm_certificate_validation.acm[0].certificate_arn : var.acm_arn
   waf_arn               = var.enable_waf == true && var.waf_arn == "" ? aws_wafv2_web_acl.wafv2-acl[0].arn : var.waf_arn
-  alb_annotations       = <<EOF
-  alb.ingress.kubernetes.io/target-type: ip
-  alb.ingress.kubernetes.io/scheme: ${var.network_allow_public == true ? "internet-facing" : "internal"}
-  alb.ingress.kubernetes.io/subnets: ${var.network_allow_public ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}
-  alb.ingress.kubernetes.io/ssl-redirect: "443"
-  alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
-  alb.ingress.kubernetes.io/ssl-policy: "ELBSecurityPolicy-TLS-1-2-2017-01"
-  alb.ingress.kubernetes.io/certificate-arn: ${local.acm_arn}
-  alb.ingress.kubernetes.io/wafv2-acl-arn: ${local.waf_arn}
-  EOF
   efs_values = var.include_efs == true ? [<<EOF
   storage:
     volumeSetup:
@@ -86,7 +76,14 @@ app-edge:
     annotations:
       nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "'true'" : "'false'"}
       alb.ingress.kubernetes.io/healthcheck-path: /api/ping
-      ${trimspace(indent(4, local.alb_annotations))}
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/scheme: ${var.network_allow_public == true ? "internet-facing" : "internal"}
+      alb.ingress.kubernetes.io/subnets: ${var.network_allow_public ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+      alb.ingress.kubernetes.io/ssl-policy: "ELBSecurityPolicy-TLS-1-2-2017-01"
+      alb.ingress.kubernetes.io/certificate-arn: ${local.acm_arn}
+      alb.ingress.kubernetes.io/wafv2-acl-arn: ${local.waf_arn}
   EOT
     ) : (<<EOT
 app-edge:
