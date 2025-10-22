@@ -106,7 +106,7 @@ app-edge:
     enabled: ${var.load_environment == "" ? true : false}
     useStaticCertificate: ${var.use_static_ssl_certificates}
     annotations:
-      nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "true" : "false"}
+      nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "'true'" : "'false'"}
 EOT
   )
   dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT
@@ -789,7 +789,7 @@ cluster-autoscaler:
       aws-use-static-instance-list: true
 ${local.dns_configuration_values}
 ingress-nginx:
-  enabled: ${var.use_alb == true ? false : true}
+  enabled: ${var.use_alb && var.disable_nginx_ingress ? false : true}
   controller:
     podAnnotations:
       linkerd.io/inject: ${var.enable_service_mesh ? "enabled" : "false"}
@@ -1756,10 +1756,6 @@ resource "helm_release" "local-registry" {
   max_history      = 10
   disable_webhooks = false
   values = [<<EOF
-cert-manager:
-  enabled: false
-ingress-nginx:
-  enabled: false
 docker-registry:
   image:
     repository: ${var.image_registry}/docker.io/library/registry
@@ -1804,10 +1800,6 @@ localPullSecret:
   password: ${random_password.password.result}
   secretName: local-pull-secret
   username: local-user
-metrics-server:
-  apiService:
-    create: true
-  enabled: false
 proxyRegistryAccess:
   proxyPassword: ${var.local_registry_enabled == true ? var.harbor_customer_robot_password : ""}
   proxyPullSecretName: remote-access

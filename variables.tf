@@ -1815,3 +1815,9 @@ variable "waf_arn" {
   default     = ""
   description = "arn of the wafv2 acl"
 }
+
+variable "disable_nginx_ingress" {
+  type        = bool
+  default     = false
+  description = "Toggle for disabling Nginx Ingress"
+}
