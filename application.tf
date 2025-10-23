@@ -407,6 +407,7 @@ resource "kubernetes_namespace" "indico" {
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster
   ]
+  count = var.multitenant_enabled == false ? 1 : 0
   metadata {
     name = "indico"
   }
@@ -1924,6 +1925,8 @@ resource "kubernetes_secret" "issuer-secret" {
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster
   ]
+
+  count = var.multitenant_enabled == false ? 1 : 0
 
   metadata {
     name      = "acme-route53"
