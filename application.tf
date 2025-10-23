@@ -640,11 +640,11 @@ vault-secrets-operator:
     enabled: true
     namespace: default
     method: kubernetes
-    mount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+    mount: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
     kubernetes:
-      role: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+      role: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
       tokenAudiences: [""]
-      serviceAccount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+      serviceAccount: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
   defaultVaultConnection:
     enabled: true
     address: ${var.vault_address}
@@ -840,10 +840,10 @@ reflector:
 externalSecretStore:
   enabled: ${var.secrets_operator_enabled}
   vaultAddress: ${var.vault_address}
-  vaultMountPath: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+  vaultMountPath: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
   vaultPath: customer-${var.aws_account}
-  vaultRole: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
-  vaultServiceAccount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+  vaultRole: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+  vaultServiceAccount: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
   vaultSecretName: "vault-auth"
   EOF
   ])
