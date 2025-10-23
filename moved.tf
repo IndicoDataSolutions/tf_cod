@@ -99,6 +99,14 @@ moved {
   to   = module.cluster[0]
 }
 
+# Moved blocks for modules that had count added in application.tf
+
+moved {
+  from = module.indico-common
+  to   = module.indico-common[0]
+}
+
+
 
 
 
