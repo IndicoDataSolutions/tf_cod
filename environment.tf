@@ -52,7 +52,7 @@ locals {
 
   # Cluster module outputs - AWS
   environment_cluster_kubernetes_host                   = var.load_environment == "" ? module.cluster[0].kubernetes_host : data.terraform_remote_state.environment[0].outputs.kube_host
-  environment_cluster_kubernetes_cluster_ca_certificate = var.load_environment == "" ? module.cluster[0].kubernetes_cluster_ca_certificate : data.terraform_remote_state.environment[0].outputs.kube_ca_certificate
+  environment_cluster_kubernetes_cluster_ca_certificate = var.load_environment == "" ? base64encode(module.cluster[0].kubernetes_cluster_ca_certificate) : base64encode(data.terraform_remote_state.environment[0].outputs.kube_ca_certificate)
   environment_cluster_kubernetes_token                  = var.load_environment == "" ? module.cluster[0].kubernetes_token : data.terraform_remote_state.environment[0].outputs.kube_token
   environment_cluster_node_security_group_id            = var.load_environment == "" ? module.cluster[0].node_security_group_id : data.terraform_remote_state.environment[0].outputs.cluster_node_security_group_id
   environment_cluster_cluster_security_group_id         = var.load_environment == "" ? module.cluster[0].cluster_security_group_id : data.terraform_remote_state.environment[0].outputs.cluster_security_group_id

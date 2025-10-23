@@ -21,7 +21,7 @@ output "kube_host" {
 }
 
 output "kube_ca_certificate" {
-  value = base64encode(local.environment_cluster_kubernetes_cluster_ca_certificate)
+  value = local.environment_cluster_kubernetes_cluster_ca_certificate
 
 }
 output "kube_token" {
