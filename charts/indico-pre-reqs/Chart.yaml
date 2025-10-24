@@ -3,4 +3,4 @@ appVersion: 1.16.0
 description: A Helm chart for Kubernetes
 name: indico-pre-reqs
 type: application
-version: 1.13.0-dev-14189-b313069a
+version: 1.13.2-IPA-7.6.0

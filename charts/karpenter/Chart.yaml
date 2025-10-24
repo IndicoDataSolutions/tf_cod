@@ -3,4 +3,4 @@ appVersion: 1.3.2
 description: A Helm chart for Kubernetes
 name: karpenter
 type: application
-version: 1.3.3-dev-14189-b313069a
+version: 1.4.1-IPA-7.6.0
