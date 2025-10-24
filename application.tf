@@ -1366,7 +1366,7 @@ module "intake" {
   argo_application_name             = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
   vault_path                        = "tools/argo/data/ipa-deploy"
   argo_server                       = local.environment_cluster_kubernetes_host
-  argo_project_name                 = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
+  argo_project_name                 = var.argo_enabled ? local.environment_argo_project_name : ""
   intake_version                    = var.ipa_version
   k8s_version                       = var.k8s_version
   intake_values_terraform_overrides = local.intake_values
@@ -1406,7 +1406,7 @@ module "intake_smoketests" {
   argo_application_name  = local.argo_smoketest_app_name
   argo_vault_plugin_path = "tools/argo/data/ipa-deploy"
   argo_server            = local.environment_cluster_kubernetes_host
-  argo_project_name      = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
+  argo_project_name      = var.argo_enabled ? local.environment_argo_project_name : ""
   chart_name             = "cod-smoketests"
   chart_repo             = var.ipa_smoketest_repo
   chart_version          = var.ipa_smoketest_version
@@ -1562,7 +1562,7 @@ module "insights" {
   argo_application_name               = lower("${var.aws_account}.${var.region}.${var.label}-${var.insights_namespace}")
   vault_path                          = "tools/argo/data/ipa-deploy"
   argo_server                         = local.environment_cluster_kubernetes_host
-  argo_project_name                   = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
+  argo_project_name                   = var.argo_enabled ? local.environment_argo_project_name : ""
   insights_version                    = var.insights_version
   k8s_version                         = var.k8s_version
   insights_values_terraform_overrides = local.insights_values
@@ -1592,7 +1592,7 @@ module "additional_application" {
   argo_application_name  = lower("${var.aws_account}-${var.region}-${var.label}-${each.value.name}")
   argo_vault_plugin_path = each.value.vaultPath
   argo_server            = local.environment_cluster_kubernetes_host
-  argo_project_name      = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
+  argo_project_name      = var.argo_enabled ? local.environment_argo_project_name : ""
   chart_name             = each.value.chart
   chart_repo             = each.value.repo
   chart_version          = each.value.version
@@ -1625,7 +1625,7 @@ resource "argocd_application" "ipa" {
   }
 
   spec {
-    project = module.argo-registration[0].argo_project_name
+    project = local.environment_argo_project_name
 
     source {
       repo_url        = "https://github.com/IndicoDataSolutions/${var.argo_repo}.git"
