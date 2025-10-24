@@ -1559,7 +1559,7 @@ module "insights" {
   account                             = var.aws_account
   region                              = var.region
   label                               = var.label
-  argo_application_name               = lower("${var.aws_account}.${var.region}.${var.label}-insights")
+  argo_application_name               = lower("${var.aws_account}.${var.region}.${var.label}-${var.insights_namespace}")
   vault_path                          = "tools/argo/data/ipa-deploy"
   argo_server                         = local.environment_cluster_kubernetes_host
   argo_project_name                   = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""

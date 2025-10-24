@@ -65,6 +65,10 @@ output "argo_repo" {
   value = var.argo_repo
 }
 
+output "argo_project_name" {
+  value = local.environment_argo_project_name
+}
+
 output "monitoring_enabled" {
   value = var.monitoring_enabled
 }

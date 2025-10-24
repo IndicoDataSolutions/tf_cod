@@ -59,4 +59,5 @@ locals {
   environment_cluster_cluster_name                      = var.load_environment == "" ? module.cluster[0].cluster_name : data.terraform_remote_state.environment[0].outputs.cluster_name
   environment_cluster_cluster_endpoint                  = var.load_environment == "" ? module.cluster[0].cluster_endpoint : data.terraform_remote_state.environment[0].outputs.cluster_endpoint
   environment_cluster_node_groups                       = var.load_environment == "" ? module.cluster[0].node_groups : data.terraform_remote_state.environment[0].outputs.cluster_node_groups
+  environment_argo_project_name                         = var.load_environment == "" ? var.argo_enabled == true ? module.argo-registration[0].argo_project_name : "null" : data.terraform_remote_state.environment[0].outputs.argo_project_name
 }
