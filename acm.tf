@@ -1,10 +1,10 @@
 output "acm_arn" {
   description = "arn of the acm"
-  value       = var.enable_waf == true && var.acm_arn == "" ? aws_acm_certificate_validation.alb[0].certificate_arn : var.acm_arn
+  value       = var.use_alb && var.acm_arn == "" ? aws_acm_certificate_validation.acm[0].certificate_arn : var.acm_arn
 }
 
-resource "aws_acm_certificate" "alb" {
-  count             = var.enable_waf == true && var.acm_arn == "" ? 1 : 0
+resource "aws_acm_certificate" "acm" {
+  count             = var.use_alb && var.acm_arn == "" ? 1 : 0
   domain_name       = local.dns_name
   validation_method = "DNS"
   depends_on = [
@@ -12,10 +12,9 @@ resource "aws_acm_certificate" "alb" {
   ]
 }
 
-
-resource "aws_route53_record" "alb" {
-  for_each = var.enable_waf && var.acm_arn == "" ? {
-    for dvo in aws_acm_certificate.alb[0].domain_validation_options : dvo.domain_name => {
+resource "aws_route53_record" "acm_validation" {
+  for_each = var.use_alb && var.acm_arn == "" ? {
+    for dvo in aws_acm_certificate.acm[0].domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -31,12 +30,11 @@ resource "aws_route53_record" "alb" {
   provider        = aws.dns-control
 }
 
-
-resource "aws_acm_certificate_validation" "alb" {
-  count                   = var.enable_waf == true && var.acm_arn == "" ? 1 : 0
-  certificate_arn         = aws_acm_certificate.alb[0].arn
-  validation_record_fqdns = [for record in aws_route53_record.alb : record.fqdn]
+resource "aws_acm_certificate_validation" "acm" {
+  count                   = var.use_alb && var.acm_arn == "" ? 1 : 0
+  certificate_arn         = aws_acm_certificate.acm[0].arn
+  validation_record_fqdns = [for record in aws_route53_record.acm_validation : record.fqdn]
   depends_on = [
-    aws_acm_certificate.alb[0]
+    aws_acm_certificate.acm[0]
   ]
 }

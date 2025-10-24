@@ -81,8 +81,7 @@ resource "aws_wafv2_web_acl" "wafv2-acl" {
   }
 }
 
-
 output "wafv2_arn" {
   description = "arn of the wafv2 acl"
-  value       = var.enable_waf == true ? aws_wafv2_web_acl.wafv2-acl[0].arn : ""
+  value       = var.enable_waf == true ? aws_wafv2_web_acl.wafv2-acl[0].arn : var.waf_arn
 }

@@ -1089,7 +1089,7 @@ variable "create_guardduty_vpc_endpoint" {
 
 variable "use_nlb" {
   type        = bool
-  default     = false
+  default     = true
   description = "If true this will create a NLB loadbalancer instead of a classic VPC ELB"
 }
 
@@ -1802,4 +1802,22 @@ variable "insights_namespace" {
   type        = string
   default     = "insights"
   description = "Namespace for the insights application"
+}
+
+variable "use_alb" {
+  type        = bool
+  default     = false
+  description = "Toggle for using ALB instead of NLB"
+}
+
+variable "waf_arn" {
+  type        = string
+  default     = ""
+  description = "arn of the wafv2 acl"
+}
+
+variable "disable_nginx_ingress" {
+  type        = bool
+  default     = false
+  description = "Toggle for disabling Nginx Ingress"
 }
