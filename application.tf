@@ -388,6 +388,7 @@ resource "kubernetes_namespace" "indico" {
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster
   ]
+  count = var.multitenant_enabled == false ? 1 : 0
   metadata {
     name = "indico"
   }
@@ -395,6 +396,7 @@ resource "kubernetes_namespace" "indico" {
 
 # Need to make sure the pull secret is in first, so that all of our images can be pulled from harbor
 resource "kubernetes_secret" "harbor-pull-secret" {
+  count = var.multitenant_enabled == false ? 1 : 0
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
@@ -428,13 +430,13 @@ module "secrets-operator-setup" {
     time_sleep.wait_1_minutes_after_cluster,
     kubernetes_secret.harbor-pull-secret
   ]
-  count           = var.secrets_operator_enabled == true ? 1 : 0
+  count           = var.secrets_operator_enabled == true && var.multitenant_enabled == false ? 1 : 0
   source          = "./modules/common/vault-secrets-operator-setup"
   vault_address   = var.vault_address
   account         = var.aws_account
   region          = var.region
   name            = var.label
-  kubernetes_host = module.cluster.kubernetes_host
+  kubernetes_host = local.environment_cluster_kubernetes_host
   vault_username  = var.vault_username
   vault_password  = var.vault_password
   audience        = ""
@@ -454,7 +456,7 @@ module "karpenter" {
   k8s_version           = var.k8s_version
   az_count              = var.az_count
   subnet_ids            = flatten([local.environment_private_subnet_ids])
-  security_group_ids    = distinct(compact(concat([module.cluster.node_security_group_id], var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : [], [module.cluster.cluster_security_group_id])))
+  security_group_ids    = distinct(compact(concat([local.environment_cluster_node_security_group_id], var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : [], [local.environment_cluster_cluster_security_group_id])))
   helm_registry         = var.ipa_repo
   karpenter_version     = var.karpenter_version
   default_tags          = var.default_tags
@@ -620,11 +622,11 @@ vault-secrets-operator:
     enabled: true
     namespace: default
     method: kubernetes
-    mount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+    mount: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
     kubernetes:
-      role: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+      role: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
       tokenAudiences: [""]
-      serviceAccount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+      serviceAccount: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
   defaultVaultConnection:
     enabled: true
     address: ${var.vault_address}
@@ -821,10 +823,10 @@ reflector:
 externalSecretStore:
   enabled: ${var.secrets_operator_enabled}
   vaultAddress: ${var.vault_address}
-  vaultMountPath: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+  vaultMountPath: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
   vaultPath: customer-${var.aws_account}
-  vaultRole: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
-  vaultServiceAccount: ${var.secrets_operator_enabled == true ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+  vaultRole: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+  vaultServiceAccount: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
   vaultSecretName: "vault-auth"
   EOF
   ])
@@ -894,6 +896,7 @@ tempo:
 }
 
 module "indico-common" {
+  count = var.multitenant_enabled == false ? 1 : 0
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
@@ -1298,8 +1301,8 @@ module "intake" {
   label                             = var.label
   argo_application_name             = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
   vault_path                        = "tools/argo/data/ipa-deploy"
-  argo_server                       = module.cluster.kubernetes_host
-  argo_project_name                 = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
+  argo_server                       = local.environment_cluster_kubernetes_host
+  argo_project_name                 = var.argo_enabled ? local.environment_argo_project_name : ""
   intake_version                    = var.ipa_version
   k8s_version                       = var.k8s_version
   intake_values_terraform_overrides = local.intake_values
@@ -1338,8 +1341,8 @@ module "intake_smoketests" {
   github_commit_message  = var.message
   argo_application_name  = local.argo_smoketest_app_name
   argo_vault_plugin_path = "tools/argo/data/ipa-deploy"
-  argo_server            = module.cluster.kubernetes_host
-  argo_project_name      = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
+  argo_server            = local.environment_cluster_kubernetes_host
+  argo_project_name      = var.argo_enabled ? local.environment_argo_project_name : ""
   chart_name             = "cod-smoketests"
   chart_repo             = var.ipa_smoketest_repo
   chart_version          = var.ipa_smoketest_version
@@ -1411,7 +1414,7 @@ crunchy-postgres:
   pgBackRestConfig:
     global:
       archive-timeout: '10000'
-      repo2-path: /pgbackrest/postgres-insights/repo2
+      repo2-path: /pgbackrest/postgres-${var.insights_namespace}/repo2
       repo2-retention-full: '5'
       repo2-s3-key-type: auto
       repo2-s3-kms-key-id: "${local.environment_kms_key_arn}"
@@ -1442,6 +1445,7 @@ ingress:
   useStaticCertificate: false
   secretName: indico-ssl-static-cert
 minio:
+  createStorageClass: ${var.multitenant_enabled == false ? "true" : "false"}
   storage:
     accessKey: insights
     secretKey: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
@@ -1492,10 +1496,10 @@ module "insights" {
   account                             = var.aws_account
   region                              = var.region
   label                               = var.label
-  argo_application_name               = lower("${var.aws_account}.${var.region}.${var.label}-insights")
+  argo_application_name               = lower("${var.aws_account}.${var.region}.${var.label}-${var.insights_namespace}")
   vault_path                          = "tools/argo/data/ipa-deploy"
-  argo_server                         = module.cluster.kubernetes_host
-  argo_project_name                   = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
+  argo_server                         = local.environment_cluster_kubernetes_host
+  argo_project_name                   = var.argo_enabled ? local.environment_argo_project_name : ""
   insights_version                    = var.insights_version
   k8s_version                         = var.k8s_version
   insights_values_terraform_overrides = local.insights_values
@@ -1524,8 +1528,8 @@ module "additional_application" {
   github_commit_message  = var.message
   argo_application_name  = lower("${var.aws_account}-${var.region}-${var.label}-${each.value.name}")
   argo_vault_plugin_path = each.value.vaultPath
-  argo_server            = module.cluster.kubernetes_host
-  argo_project_name      = var.argo_enabled ? module.argo-registration[0].argo_project_name : ""
+  argo_server            = local.environment_cluster_kubernetes_host
+  argo_project_name      = var.argo_enabled ? local.environment_argo_project_name : ""
   chart_name             = each.value.chart
   chart_repo             = each.value.repo
   chart_version          = each.value.version
@@ -1558,7 +1562,7 @@ resource "argocd_application" "ipa" {
   }
 
   spec {
-    project = module.argo-registration[0].argo_project_name
+    project = local.environment_argo_project_name
 
     source {
       repo_url        = "https://github.com/IndicoDataSolutions/${var.argo_repo}.git"
@@ -1825,6 +1829,8 @@ resource "kubernetes_secret" "issuer-secret" {
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster
   ]
+
+  count = var.multitenant_enabled == false ? 1 : 0
 
   metadata {
     name      = "acme-route53"

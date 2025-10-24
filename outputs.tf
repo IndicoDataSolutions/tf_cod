@@ -5,7 +5,7 @@ output "key_pem" {
 }
 
 output "cluster_name" {
-  value = var.label
+  value = local.environment_cluster_cluster_name
 }
 
 output "cluster_region" {
@@ -17,16 +17,32 @@ output "dns_name" {
 }
 
 output "kube_host" {
-  value = module.cluster.kubernetes_host
+  value = local.environment_cluster_kubernetes_host
 }
 
 output "kube_ca_certificate" {
-  value = base64encode(module.cluster.kubernetes_cluster_ca_certificate)
+  value = local.environment_cluster_kubernetes_cluster_ca_certificate
 
 }
 output "kube_token" {
   sensitive = true
-  value     = module.cluster.kubernetes_token
+  value     = local.environment_cluster_kubernetes_token
+}
+
+output "cluster_node_security_group_id" {
+  value = local.environment_cluster_node_security_group_id
+}
+
+output "cluster_security_group_id" {
+  value = local.environment_cluster_cluster_security_group_id
+}
+
+output "cluster_endpoint" {
+  value = local.environment_cluster_cluster_endpoint
+}
+
+output "cluster_node_groups" {
+  value = local.environment_cluster_node_groups
 }
 
 output "harness_delegate_name" {
@@ -47,6 +63,10 @@ output "argo_path" {
 
 output "argo_repo" {
   value = var.argo_repo
+}
+
+output "argo_project_name" {
+  value = local.environment_argo_project_name
 }
 
 output "monitoring_enabled" {
@@ -136,6 +156,11 @@ output "pgbackup_s3_bucket_name" {
 output "miniobkp_s3_bucket_name" {
   description = "Name of the miniobkp s3 bucket"
   value       = local.environment_miniobkp_s3_bucket_name
+}
+
+output "loki_s3_bucket_name" {
+  description = "Name of the loki s3 bucket"
+  value       = local.environment_loki_s3_bucket_name
 }
 
 ## EFS outputs
