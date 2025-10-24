@@ -29,6 +29,7 @@ def generate_variables(working_dir='.'):
     metadata {{
       name = "terraform-variables"
     }}
+    count = var.multitenant_enabled == false ? 1 : 0
     data = {{
   {var_rows}
     }}
