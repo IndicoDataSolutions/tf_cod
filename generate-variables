@@ -26,10 +26,10 @@ def generate_variables(working_dir='.'):
     config_map = f"""resource "kubernetes_config_map" "terraform-variables" {{
   # this file is generated via pre-commit, DO NOT EDIT !
     depends_on = [null_resource.wait-for-tf-cod-chart-build]
+    count = var.multitenant_enabled == false ? 1 : 0
     metadata {{
       name = "terraform-variables"
     }}
-    count = var.multitenant_enabled == false ? 1 : 0
     data = {{
   {var_rows}
     }}
