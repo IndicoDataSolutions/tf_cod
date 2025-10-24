@@ -430,7 +430,7 @@ provider "kubernetes" {
   cluster_ca_certificate = local.environment_cluster_kubernetes_cluster_ca_certificate
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--cluster-name", var.label]
+    args        = ["eks", "get-token", "--cluster-name", var.multitenant_enabled ? var.tenant_cluster_name : var.label]
     command     = "aws"
   }
 }
@@ -441,7 +441,7 @@ provider "kubectl" {
   load_config_file       = false
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--cluster-name", var.label]
+    args        = ["eks", "get-token", "--cluster-name",  var.multitenant_enabled ? var.tenant_cluster_name : var.label]
     command     = "aws"
   }
 }
@@ -454,7 +454,7 @@ provider "helm" {
     #token                  = local.environment_cluster_kubernetes_token
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
-      args        = ["eks", "get-token", "--cluster-name", var.label]
+      args        = ["eks", "get-token", "--cluster-name",  var.multitenant_enabled ? var.tenant_cluster_name : var.label]
       command     = "aws"
     }
   }
@@ -462,7 +462,7 @@ provider "helm" {
 
 
 module "argo-registration" {
-  count = var.argo_enabled == true ? 1 : 0
+  count = var.argo_enabled == true && var.multitenant_enabled == false ? 1 : 0
 
   depends_on = [
     module.cluster,
