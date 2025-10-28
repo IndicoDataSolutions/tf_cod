@@ -30,13 +30,13 @@ loki:
     storage_config:
       aws:
         region: ${var.region}
-        bucketnames: ${module.s3-storage[0].loki_s3_bucket_name}
+        bucketnames: ${local.environment_loki_s3_bucket_name}
         s3forcepathstyle: false
     storage:
       type: s3
       bucketNames:
-        chunks: ${module.s3-storage[0].loki_s3_bucket_name}
-        ruler: ${module.s3-storage[0].loki_s3_bucket_name}
+        chunks: ${local.environment_loki_s3_bucket_name}
+        ruler: ${local.environment_loki_s3_bucket_name}
       s3:
         region: ${var.region}
   
@@ -294,7 +294,7 @@ EOT
 
 
 resource "aws_route53_record" "grafana-caa" {
-  count   = var.monitoring_enabled == true && var.use_static_ssl_certificates == false ? 1 : 0
+  count   = var.monitoring_enabled == true && var.use_static_ssl_certificates == false && var.multitenant_enabled == false ? 1 : 0
   zone_id = data.aws_route53_zone.primary[0].zone_id
   name    = lower("grafana.${local.monitoring_domain_name}")
   type    = "CAA"
@@ -307,7 +307,7 @@ resource "aws_route53_record" "grafana-caa" {
 
 
 resource "aws_route53_record" "prometheus-caa" {
-  count   = var.monitoring_enabled == true && var.use_static_ssl_certificates == false ? 1 : 0
+  count   = var.monitoring_enabled == true && var.use_static_ssl_certificates == false && var.multitenant_enabled == false ? 1 : 0
   zone_id = data.aws_route53_zone.primary[0].zone_id
   name    = lower("prometheus.${local.monitoring_domain_name}")
   type    = "CAA"
@@ -319,7 +319,7 @@ resource "aws_route53_record" "prometheus-caa" {
 }
 
 resource "aws_route53_record" "alertmanager-caa" {
-  count   = var.monitoring_enabled == true && var.use_static_ssl_certificates == false ? 1 : 0
+  count   = var.monitoring_enabled == true && var.use_static_ssl_certificates == false && var.multitenant_enabled == false ? 1 : 0
   zone_id = data.aws_route53_zone.primary[0].zone_id
   name    = lower("alertmanager.${local.monitoring_domain_name}")
   type    = "CAA"

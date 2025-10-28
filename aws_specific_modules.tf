@@ -2,7 +2,7 @@
 # Include modules only installed on AWS here.
 #
 module "keycloak" {
-  count = var.keycloak_enabled == true ? 1 : 0
+  count = var.keycloak_enabled == true && var.multitenant_enabled == false ? 1 : 0
   depends_on = [
     module.cluster,
     module.intake
@@ -95,12 +95,12 @@ resource "aws_eks_addon" "guardduty" {
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster
   ]
-  count = var.eks_addon_version_guardduty != null ? 1 : 0
+  count = var.eks_addon_version_guardduty != null && var.multitenant_enabled == false ? 1 : 0
 
-  cluster_name      = var.label
-  addon_name        = "aws-guardduty-agent"
-  addon_version     = "v1.10.0-eksbuild.2"
-  resolve_conflicts = "OVERWRITE"
+  cluster_name                = var.label
+  addon_name                  = "aws-guardduty-agent"
+  addon_version               = "v1.10.0-eksbuild.2"
+  resolve_conflicts_on_update = "OVERWRITE"
 
   preserve = true
 
