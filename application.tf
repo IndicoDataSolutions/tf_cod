@@ -259,11 +259,6 @@ EOT
                 values:
                 - pgha1
             topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
       dataVolumeClaimSpec:
         storageClassName: local-storage
         volumeName: postgres-data-pgha1
@@ -304,11 +299,6 @@ EOT
                 values:
                 - pgha1
             topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
       dataVolumeClaimSpec:
         storageClassName: local-storage
         volumeName: postgres-data-pgha2
@@ -351,11 +341,6 @@ EOT
                 values:
                 - pgha2
             topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
       dataVolumeClaimSpec:
         storageClassName: ${local.storage_class}
         accessModes:
