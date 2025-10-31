@@ -11,6 +11,9 @@ locals {
   waf_arn               = var.enable_waf == true && var.waf_arn == "" ? aws_wafv2_web_acl.wafv2-acl[0].arn : var.waf_arn
   efs_values = var.include_efs == true ? [<<EOF
   storage:
+    existingPVC: false
+    multitenant:
+      enabled: ${var.multitenant_enabled == true ? "true" : "false"}
     volumeSetup:
       image:
         registry: "${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}"
@@ -1088,7 +1091,7 @@ ${local.crunchy_instances_values}
   pgBackRestConfig:
     global:
       archive-timeout: '10000'
-      repo1-path: /pgbackrest/postgres-data/repo1
+      repo1-path: ${var.intake_namespace == "default" ? "/pgbackrest/postgres-data/repo1" : "/pgbackrest/postgres-data-${var.intake_namespace}/repo1"}
       repo1-retention-full: '5'
       repo1-s3-key-type: auto
       repo1-s3-kms-key-id: "${local.environment_kms_key_arn}"
@@ -1120,13 +1123,18 @@ rabbitmq:
 externalSecretStore:
   enabled: ${var.secrets_operator_enabled}
   loadEnvironment:
-    enabled: ${var.load_environment == "" ? "false" : "true"}
-    environment: ${var.load_environment == "" ? local.environment : lower(var.load_environment)}
+    enabled: ${var.load_environment == "" && var.multitenant_enabled == false ? "false" : "true"}
+    environment: ${var.load_environment == "" && var.multitenant_enabled == false ? local.environment : lower(var.load_environment)}
   EOF
   ])
 
   intake_values = <<EOF
 global:
+  configs:
+    storage:
+      blob:
+        s3:
+          prefix: ${var.intake_namespace == "default" ? "blob" : "blob/${var.intake_namespace}"}
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
 ${local.local_registry_tf_cod_values}

@@ -1816,6 +1816,12 @@ variable "insights_namespace" {
   description = "Namespace for the insights application"
 }
 
+variable "intake_namespace" {
+  type        = string
+  default     = "default"
+  description = "Namespace for the intake application"
+}
+
 variable "use_alb" {
   type        = bool
   default     = false
