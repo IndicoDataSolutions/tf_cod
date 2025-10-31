@@ -2,38 +2,43 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.38.0"
+      version = "6.16.0"
     }
     time = {
       source  = "hashicorp/time"
-      version = "0.7.2"
+      version = "0.9.1"
     }
     keycloak = {
       source  = "mrparkers/keycloak"
-      version = "4.0.1"
+      version = "4.3.1"
     }
     argocd = {
       source  = "oboukili/argocd"
-      version = "3.1.0"
+      version = "6.0.2"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.12.1"
+      version = "2.38.0"
     }
     kubectl = {
-      source = "gavinbunney/kubectl"
+      source  = "gavinbunney/kubectl"
+      version = "1.14.0"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.6.0"
+      version = "2.17.0"
     }
     random = {
       source  = "hashicorp/random"
-      version = "~>3.3.0"
+      version = "3.7.2"
     }
     github = {
       source  = "integrations/github"
-      version = "4.26.0"
+      version = "5.34.0"
+    }
+    htpasswd = {
+      source  = "loafoe/htpasswd"
+      version = "1.0.4"
     }
     vault = {
       source  = "hashicorp/vault"
