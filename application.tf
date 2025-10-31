@@ -72,7 +72,7 @@ app-edge:
     labels:
       mirror.linkerd.io/exported: remote-discovery
   ingress:
-    enabled: ${var.load_environment == "" ? true : false}
+    enabled: ${var.load_environment == "" || var.multitenant_enabled == true ? true : false}
     name: alb-app-edge-ingress
     ingressClassName: alb
     pathType: Prefix
@@ -103,7 +103,7 @@ app-edge:
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
   ingress:
-    enabled: ${var.load_environment == "" ? true : false}
+    enabled: ${var.load_environment == "" || var.multitenant_enabled == true ? true : false}
     useStaticCertificate: ${var.use_static_ssl_certificates}
     annotations:
       nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "'true'" : "'false'"}
@@ -1159,7 +1159,7 @@ aws-node-termination:
     image:
       repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/public.ecr.aws/aws-ec2/aws-node-termination-handler
 nvidia-device-plugin:
-  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : var.multitenant_enabled == true ? "false" : "true" : "true"}
   nvidia-device-plugin:
     image:
       repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/public-nvcr-proxy/nvidia/k8s-device-plugin
@@ -1170,7 +1170,7 @@ reloader:
         image:
           name: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/stakater/reloader
 kafka-strimzi:
-  enabled: ${var.load_environment == "" ? "true" : "false"}
+  enabled: ${var.load_environment == "" || var.multitenant_enabled == true ? "true" : "false"}
   strimzi-kafka-operator: 
     defaultImageRegistry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/strimzi-proxy
   kafkacat:
@@ -1901,7 +1901,7 @@ linkerd-multicluster:
   controllers:
     - link:
         ref:
-          name: ${var.load_environment == "" ? "application-cluster" : "data-cluster"}
+          name: ${var.load_environment == "" || var.multitenant_enabled == true ? "application-cluster" : "data-cluster"}
       logLevel: debug
       gateway:
         enabled: false
