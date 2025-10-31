@@ -9,11 +9,6 @@ output "data_s3_bucket_name" {
   value       = module.s3-storage.data_s3_bucket_name
 }
 
-output "cluster_manager_ip" {
-  description = "IP of the cluster manager instance"
-  value       = module.cluster-manager.cluster_manager_ip
-}
-
 
 output "s3_role_id" {
   description = "ID of the S3 role"
