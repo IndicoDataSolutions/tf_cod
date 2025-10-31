@@ -243,7 +243,7 @@ module "cluster" {
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
-  map_roles                  = [{ rolearn = module.cluster-manager.cluster_manager_iam_role_arn, username = "admin", groups = ["system:masters"] }]
+  map_roles                  = []
   map_users                  = values(local.eks_users)
   vpc_id                     = local.network[0].indico_vpc_id
   security_group_id          = module.security-group.all_subnets_sg_id
@@ -261,7 +261,7 @@ module "cluster" {
   s3_buckets                 = [module.s3-storage.data_s3_bucket_name, var.include_pgbackup ? module.s3-storage.pgbackup_s3_bucket_name : "", var.include_rox ? module.s3-storage.api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots")]
   cluster_version            = var.cluster_version
   efs_filesystem_id          = [var.include_efs == true ? module.efs-storage[0].efs_filesystem_id : ""]
-  access_security_group      = module.cluster-manager.cluster_manager_sg
+  access_security_group      = ""
 }
 
 resource "aws_security_group" "indico_allow_access" {
