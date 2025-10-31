@@ -60,6 +60,13 @@ variable "aws_secret_key" {
   sensitive   = true
 }
 
+variable "aws_session_token" {
+  type        = string
+  description = "The AWS session token to use for deployment"
+  sensitive   = true
+  default     = null
+}
+
 variable "direct_connect" {
   type        = bool
   default     = false

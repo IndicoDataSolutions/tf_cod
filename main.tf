@@ -76,6 +76,7 @@ provider "random" {}
 provider "aws" {
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
+  token      = var.aws_session_token
   region     = var.region
   default_tags {
     tags = var.default_tags
@@ -140,23 +141,6 @@ module "sqs_sns" {
   version = "1.1.1"
   region  = var.region
   label   = var.label
-}
-
-module "cluster-manager" {
-  source                   = "app.terraform.io/indico/indico-aws-cluster-manager/mod"
-  version                  = "1.1.1"
-  label                    = var.label
-  additional_tags          = var.additional_tags
-  vpc_id                   = local.network[0].indico_vpc_id
-  subnet_id                = var.direct_connect == true ? local.network[0].private_subnet_ids[0] : local.network[0].public_subnet_ids[0]
-  user_ip                  = var.user_ip
-  key_pair                 = aws_key_pair.kp.key_name
-  public_ip                = !var.direct_connect # if using direct connect setup, do not provision public ip
-  region                   = var.region
-  cluster_name             = var.cluster_name
-  cluster_manager_iam_role = var.cluster_manager_iam_role
-  kms_key_arn              = module.kms_key.key_arn
-  assumed_roles            = var.assumed_roles
 }
 
 module "kms_key" {
