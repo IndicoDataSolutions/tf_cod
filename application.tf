@@ -1077,11 +1077,6 @@ celery-backend:
     repository: ${var.image_registry}/docker.dragonflydb.io/dragonflydb/dragonfly
 crunchy-postgres:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
-  metadata:
-    annotations:
-      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
   service:
     metadata:
       labels:
