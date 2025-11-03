@@ -876,7 +876,7 @@ tempo:
       trace:
         backend: s3
         s3:
-          bucket: ${module.s3-storage[0].loki_s3_bucket_name}
+          bucket: ${local.environment_loki_s3_bucket_name}
           endpoint: s3.${var.region}.amazonaws.com
   EOF
   ] : []
