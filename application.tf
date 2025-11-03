@@ -1290,7 +1290,7 @@ module "intake" {
   account                           = var.aws_account
   region                            = var.region
   label                             = var.label
-  argo_application_name             = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
+  argo_application_name             = var.multitenant_enabled == false ? lower("${var.aws_account}.${var.region}.${var.label}-ipa") : lower("${var.aws_account}.${var.region}.${var.label}-${var.intake_namespace}-ipa")
   vault_path                        = "tools/argo/data/ipa-deploy"
   argo_server                       = local.environment_cluster_kubernetes_host
   argo_project_name                 = var.argo_enabled ? local.environment_argo_project_name : ""
@@ -1324,13 +1324,13 @@ module "intake_smoketests" {
   account                = var.aws_account
   region                 = var.region
   label                  = var.label
-  namespace              = "default"
+  namespace              = var.intake_namespace
   argo_enabled           = var.argo_enabled
   github_repo_name       = var.argo_repo
   github_repo_branch     = var.argo_branch
   github_file_path       = "${var.argo_path}/ipa_smoketest.yaml"
   github_commit_message  = var.message
-  argo_application_name  = local.argo_smoketest_app_name
+  argo_application_name  = var.multitenant_enabled == false ? local.argo_smoketest_app_name : lower("${var.aws_account}.${var.region}.${var.label}-${var.intake_namespace}-smoketests")
   argo_vault_plugin_path = "tools/argo/data/ipa-deploy"
   argo_server            = local.environment_cluster_kubernetes_host
   argo_project_name      = var.argo_enabled ? local.environment_argo_project_name : ""
