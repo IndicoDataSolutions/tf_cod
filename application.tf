@@ -11,7 +11,7 @@ locals {
   waf_arn               = var.enable_waf == true && var.waf_arn == "" ? aws_wafv2_web_acl.wafv2-acl[0].arn : var.waf_arn
   efs_values = var.include_efs == true ? [<<EOF
   storage:
-    existingPVC: false
+    existingPVC: ${var.multitenant_enabled == false ? "false" : "true"}
     multitenant:
       enabled: ${var.multitenant_enabled == true ? "true" : "false"}
     volumeSetup:
