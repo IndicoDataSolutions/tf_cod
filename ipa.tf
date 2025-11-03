@@ -482,7 +482,7 @@ aws-load-balancer-controller:
 EOF
     ,
     <<EOT
-${data.github_repository_file.data-pre-reqs-values[0].content}
+${var.argo_enabled == true ? data.github_repository_file.data-pre-reqs-values[0].content : ""}
 EOT
   ])
 }
