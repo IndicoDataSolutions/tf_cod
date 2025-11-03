@@ -1058,7 +1058,10 @@ cluster:
   ipaVersion: ${var.ipa_version}
   ipaPreReqsVersion: ${var.ipa_pre_reqs_version}
   ipaCrdsVersion: ${var.ipa_crds_version}
+migrationsOperator:
+  enabled: ${var.multitenant_enabled == false ? "true" : "false"}
 ipaConfig:
+  createServiceAccount: ${var.multitenant_enabled == false ? "true" : "false"}
   image:
     registry: ${var.image_registry}
 apiModels:
