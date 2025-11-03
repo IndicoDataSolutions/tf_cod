@@ -291,6 +291,12 @@ variable "aws_account" {
   description = "The Name of the AWS Acccount this cluster lives in"
 }
 
+
+variable "argo_enabled" {
+  type    = bool
+  default = true
+}
+
 variable "argo_host" {
   type    = string
   default = "argo.devops.indico.io"
