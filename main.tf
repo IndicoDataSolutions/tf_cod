@@ -40,10 +40,6 @@ terraform {
       source  = "loafoe/htpasswd"
       version = "1.0.4"
     }
-    vault = {
-      source  = "hashicorp/vault"
-      version = "3.8.0"
-    }
   }
 }
 
@@ -52,18 +48,6 @@ provider "time" {}
 provider "keycloak" {
   initial_login = false
   # these values are provided by the keycloak varset from terraform cloud
-}
-
-provider "vault" {
-  address          = var.vault_address
-  skip_child_token = true
-  auth_login {
-    method = "github"
-    path   = "auth/github/login"
-    parameters = {
-      token = var.git_pat
-    }
-  }
 }
 
 

@@ -415,9 +415,16 @@ variable "git_pat" {
   default   = ""
 }
 
-variable "vault_address" {
-  type    = string
-  default = "https://vault.devops.indico.io"
+variable "zerossl_hmac_base64" {
+  type        = string
+  default     = ""
+  description = "ZeroSSL HMAC base64"
+}
+
+variable "zerossl_key_id" {
+  type        = string
+  default     = ""
+  description = "ZeroSSL key id"
 }
 
 variable "sqs_sns" {

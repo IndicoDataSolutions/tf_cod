@@ -241,7 +241,6 @@ resource "helm_release" "ipa-pre-requisites" {
     module.cluster,
     module.fsx-storage,
     helm_release.ipa-crds,
-    data.vault_kv_secret_v2.zerossl_data,
     data.github_repository_file.data-pre-reqs-values
   ]
 
@@ -275,8 +274,8 @@ secrets:
     zerossl:
       create: true
       eabEmail: devops-sa@indico.io
-      eabKid: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_KID"]}"
-      eabHmacKey: "${jsondecode(data.vault_kv_secret_v2.zerossl_data.data_json)["EAB_HMAC_KEY"]}"
+      eabKid: "${var.zerossl_key_id}"
+      eabHmacKey: "${var.zerossl_hmac_base64}"
      
 monitoring:
   enabled: true
@@ -663,16 +662,6 @@ EOT
 #   filename = "${path.module}/module.kubeconfig"
 # }
 
-
-data "vault_kv_secret_v2" "zerossl_data" {
-  mount = "tools/argo"
-  name  = "zerossl"
-}
-
-output "zerossl" {
-  sensitive = true
-  value     = data.vault_kv_secret_v2.zerossl_data.data_json
-}
 
 resource "argocd_application" "ipa" {
   depends_on = [
