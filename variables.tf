@@ -291,8 +291,12 @@ variable "aws_account" {
   description = "The Name of the AWS Acccount this cluster lives in"
 }
 
-
 variable "argo_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "keycloak_enabled" {
   type    = bool
   default = true
 }

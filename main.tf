@@ -50,6 +50,7 @@ terraform {
 provider "time" {}
 
 provider "keycloak" {
+  initial_login = false
   # these values are provided by the keycloak varset from terraform cloud
 }
 
