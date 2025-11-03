@@ -674,7 +674,7 @@ resource "argocd_application" "ipa" {
     helm_release.monitoring
   ]
 
-  count = var.ipa_enabled == true ? 1 : 0
+  count = var.ipa_enabled == true && var.argo_enabled == true ? 1 : 0
 
   wait = true
 
