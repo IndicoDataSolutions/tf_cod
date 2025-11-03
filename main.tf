@@ -221,7 +221,7 @@ module "s3-storage" {
   api_models_s3_bucket_name_override = var.api_models_s3_bucket_name_override
   pgbackup_s3_bucket_name_override   = var.pgbackup_s3_bucket_name_override
   miniobkp_s3_bucket_name_override   = var.miniobkp_s3_bucket_name_override
-  include_miniobkp                   = var.include_miniobkp && var.insights_enabled ? true : false
+  include_miniobkp                   = var.include_miniobkp ? true : false
   allowed_origins                    = ["https://${local.dns_name}"]
   loki_s3_bucket_name_override       = var.loki_s3_bucket_name_override
   enable_loki_logging                = var.enable_loki_logging
@@ -259,6 +259,23 @@ resource "null_resource" "s3-delete-data-pgbackup-bucket" {
   provisioner "local-exec" {
     when    = destroy
     command = "aws s3 rm \"s3://${self.triggers.pg_backup_bucket_name}/\" --recursive --only-show-errors || echo \"WARNING: S3 rm ${self.triggers.pg_backup_bucket_name} reported errors\" >&2"
+  }
+}
+
+resource "null_resource" "s3-delete-data-miniobkp-bucket" {
+  count = var.include_miniobkp == true && var.load_environment == "" ? 1 : 0
+
+  depends_on = [
+    module.s3-storage
+  ]
+
+  triggers = {
+    miniobkp_bucket_name = local.environment_miniobkp_s3_bucket_name
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "aws s3 rm \"s3://${self.triggers.miniobkp_bucket_name}/\" --recursive --only-show-errors || echo \"WARNING: S3 rm ${self.triggers.miniobkp_bucket_name} reported errors\" >&2"
   }
 }
 
