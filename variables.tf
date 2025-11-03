@@ -103,7 +103,6 @@ variable "user_ip" {
   description = "The IP address to allow SSH access for"
 }
 
-
 variable "vpc_name" {
   type        = string
   default     = "indico_vpc"
@@ -133,6 +132,12 @@ variable "storage_gateway_size" {
 }
 
 ### database
+variable "include_database" {
+  type        = bool
+  default     = true
+  description = "Enable database deployment"
+}
+
 variable "bucket_versioning" {
   type        = bool
   default     = true

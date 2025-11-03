@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "6.16.0"
+      version = "3.56.0"
     }
     time = {
       source  = "hashicorp/time"
@@ -233,6 +233,21 @@ module "fsx-storage" {
   include_rox                 = var.include_rox
 }
 
+module "database" {
+  count                       = var.include_database == true ? 1 : 0
+  source                      = "app.terraform.io/indico/indico-aws-database/mod"
+  version                     = "4.0.1"
+  label                       = var.label
+  additional_tags             = var.additional_tags
+  private_subnets             = local.network[0].private_subnet_ids
+  security_group_id           = module.security-group.all_subnets_sg_id
+  subnet_az_zones             = var.subnet_az_zones
+  multi_az                    = var.multi_az
+  password                    = var.password
+  skip_final_snapshot         = var.skip_final_snapshot
+  deletion_protection_enabled = var.deletion_protection_enabled
+}
+
 module "cluster" {
   cod_snapshots_enabled      = true
   allow_dns_management       = true
@@ -314,7 +329,6 @@ provider "kubectl" {
     command     = "aws"
   }
 }
-
 
 provider "helm" {
   debug = true
