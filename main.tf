@@ -353,6 +353,8 @@ module "argo-registration" {
     kubernetes = kubernetes,
     argocd     = argocd
   }
+
+  count                        = var.argo_enabled == true ? 1 : 0
   source                       = "app.terraform.io/indico/indico-argo-registration/mod"
   version                      = "0.0.1"
   label                        = var.label

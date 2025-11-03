@@ -137,6 +137,7 @@ output "ns" {
 
 
 resource "github_repository_file" "pre-reqs-values-yaml" {
+  count               = var.argo_enabled == true ? 1 : 0
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/pre-reqs-values.values"
@@ -153,6 +154,7 @@ resource "github_repository_file" "pre-reqs-values-yaml" {
 
 
 resource "github_repository_file" "crds-values-yaml" {
+  count               = var.argo_enabled == true ? 1 : 0
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/crds-values.values"
@@ -171,6 +173,7 @@ data "github_repository_file" "data-crds-values" {
   depends_on = [
     github_repository_file.crds-values-yaml
   ]
+  count      = var.argo_enabled == true ? 1 : 0
   repository = data.github_repository.argo-github-repo.name
   branch     = var.argo_branch
   file       = var.argo_path == "." ? "helm/crds-values.values" : "${var.argo_path}/helm/crds-values.values"
@@ -181,6 +184,7 @@ data "github_repository_file" "data-pre-reqs-values" {
   depends_on = [
     github_repository_file.pre-reqs-values-yaml
   ]
+  count      = var.argo_enabled == true ? 1 : 0
   repository = data.github_repository.argo-github-repo.name
   branch     = var.argo_branch
   file       = var.argo_path == "." ? "helm/pre-reqs-values.values" : "${var.argo_path}/helm/pre-reqs-values.values"
@@ -495,7 +499,7 @@ data "github_repository" "argo-github-repo" {
 }
 
 resource "github_repository_file" "smoketest-application-yaml" {
-  count = var.ipa_smoketest_enabled == true ? 1 : 0
+  count = var.argo_enabled == true && var.ipa_smoketest_enabled == true ? 1 : 0
 
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
@@ -567,6 +571,7 @@ EOT
 }
 
 resource "github_repository_file" "alb-values-yaml" {
+  count               = var.argo_enabled == true ? 1 : 0
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
   file                = "${var.argo_path}/helm/alb.values"
@@ -587,6 +592,7 @@ resource "github_repository_file" "alb-values-yaml" {
 }
 
 resource "github_repository_file" "argocd-application-yaml" {
+  count               = var.argo_enabled == true ? 1 : 0
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
   file                = "${var.argo_path}/ipa_application.yaml"
@@ -734,7 +740,7 @@ resource "argocd_application" "ipa" {
 
 resource "github_repository_file" "custom-application-yaml" {
 
-  for_each = var.applications
+  for_each = var.argo_enabled == true ? var.applications : {}
 
   repository          = data.github_repository.argo-github-repo.name
   branch              = var.argo_branch
