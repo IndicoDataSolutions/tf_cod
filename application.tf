@@ -1285,7 +1285,7 @@ module "intake" {
   github_file_path                  = var.argo_path
   github_commit_message             = var.message
   helm_registry                     = var.ipa_repo
-  namespace                         = "default"
+  namespace                         = var.intake_namespace
   ipa_pre_reqs_version              = var.ipa_pre_reqs_version
   pre_reqs_values_yaml_b64          = var.pre-reqs-values-yaml-b64
   ipa_pre_reqs_values_overrides     = local.ipa_pre_reqs_values
@@ -1356,9 +1356,6 @@ locals {
 crunchy-postgres:
   enabled: true
   name: postgres-insights
-  metadata:
-    annotations:
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
   instances:
   - affinity:
       nodeAffinity:
@@ -1382,11 +1379,6 @@ crunchy-postgres:
               values:
               - pgha2
           topologyKey: kubernetes.io/hostname
-    metadata:
-      annotations:
-        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
     dataVolumeClaimSpec:
       storageClassName: ${local.storage_class}
       accessModes:
