@@ -138,6 +138,13 @@ variable "include_database" {
   description = "Enable database deployment"
 }
 
+variable "password" {
+  type        = string
+  default     = "password"
+  sensitive   = true
+  description = "The password for the database"
+}
+
 variable "bucket_versioning" {
   type        = bool
   default     = true
