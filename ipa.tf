@@ -224,7 +224,7 @@ resource "helm_release" "ipa-crds" {
 EOF
     ,
     <<EOT
-${data.github_repository_file.data-crds-values.content}
+${data.github_repository_file.data-crds-values[0].content}
 EOT
   ]
 }
@@ -483,7 +483,7 @@ aws-load-balancer-controller:
 EOF
     ,
     <<EOT
-${data.github_repository_file.data-pre-reqs-values.content}
+${data.github_repository_file.data-pre-reqs-values[0].content}
 EOT
   ])
 }
@@ -532,7 +532,7 @@ spec:
   destination:
     server: ${module.cluster.kubernetes_host}
     namespace: default
-  project: ${module.argo-registration.argo_project_name}
+  project: ${module.argo-registration[0].argo_project_name}
   syncPolicy:
     automated:
       prune: true
@@ -628,7 +628,7 @@ spec:
   destination:
     server: ${module.cluster.kubernetes_host}
     namespace: default
-  project: ${module.argo-registration.argo_project_name}
+  project: ${module.argo-registration[0].argo_project_name}
   syncPolicy:
     automated:
       prune: true
@@ -699,7 +699,7 @@ resource "argocd_application" "ipa" {
 
   spec {
 
-    project = module.argo-registration.argo_project_name
+    project = module.argo-registration[0].argo_project_name
 
     source {
       plugin {
@@ -774,7 +774,7 @@ spec:
   destination:
     server: ${module.cluster.kubernetes_host}
     namespace: ${each.value.namespace}
-  project: ${module.argo-registration.argo_project_name}
+  project: ${module.argo-registration[0].argo_project_name}
   syncPolicy:
     automated:
       prune: true
