@@ -221,7 +221,7 @@ module "fsx-storage" {
 module "database" {
   count                       = var.include_database == true ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-database/mod"
-  version                     = "4.0.1"
+  version                     = "0.1.0"
   label                       = var.label
   additional_tags             = var.additional_tags
   private_subnets             = local.network[0].private_subnet_ids
@@ -239,7 +239,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "7.2.2"
+  version                    = "0.1.1"
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
