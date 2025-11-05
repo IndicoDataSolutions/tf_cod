@@ -221,7 +221,7 @@ module "fsx-storage" {
 module "database" {
   count                       = var.include_database == true ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-database/mod"
-  version                     = "0.1.0"
+  version                     = "0.1.1"
   label                       = var.label
   additional_tags             = var.additional_tags
   private_subnets             = local.network[0].private_subnet_ids
