@@ -1,6 +1,0 @@
-apiVersion: v2
-maintainers:
-- email: devops@indico.io
-  name: indico devops
-name: monitoring
-version: 16.7.0-dev-14308-b1f444a8

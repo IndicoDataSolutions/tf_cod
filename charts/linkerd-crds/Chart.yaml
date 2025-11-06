@@ -1,9 +1,0 @@
-apiVersion: v2
-description: A Helm chart to deploy Linkerd CRDs to Kubernetes
-maintainers:
-- email: devops@indico.io
-  name: indico-devops
-  url: https://indicodata.ai
-name: linkerd-crds
-type: application
-version: 0.4.3-dev-14308-b1f444a8
