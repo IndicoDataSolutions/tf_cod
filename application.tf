@@ -1121,7 +1121,7 @@ rabbitmq:
 externalSecretStore:
   enabled: ${var.secrets_operator_enabled}
   loadEnvironment:
-    enabled: ${var.load_environment == "" && var.multitenant_enabled == false ? "false" : "true"}
+    enabled: ${var.load_environment == "" || var.multitenant_enabled == true ? "false" : "true"}
     environment: ${var.load_environment == "" && var.multitenant_enabled == false ? local.environment : lower(var.load_environment)}
   EOF
   ])
@@ -1207,7 +1207,7 @@ cronjob:
 externalSecretStore:
   enabled: ${var.secrets_operator_enabled}
   loadEnvironment:
-    enabled: ${var.load_environment == "" ? "false" : "true"}
+    enabled: ${var.load_environment == "" || var.multitenant_enabled == true ? "false" : "true"}
     environment: ${var.load_environment == "" ? local.environment : lower(var.load_environment)}
   EOF
 
