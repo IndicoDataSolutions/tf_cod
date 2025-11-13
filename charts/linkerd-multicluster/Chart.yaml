@@ -6,4 +6,4 @@ maintainers:
   url: https://indicodata.ai
 name: linkerd-multicluster
 type: application
-version: 0.4.3-dev-14308-b1f444a8
+version: 0.5.4-INS-2.0.2

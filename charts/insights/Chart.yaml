@@ -1,6 +1,6 @@
 apiVersion: v2
-appVersion: INS-0.1.0
+appVersion: INS-2.0.1
 description: Insights application chart
 name: insights
 type: application
-version: 1.4.36-dev-14308-b1f444a8
+version: 1.4.87-INS-2.0.2
