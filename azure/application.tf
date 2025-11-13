@@ -111,7 +111,7 @@ cert-manager:
   cainjector:
     nodeSelector:
       kubernetes.io/os: linux
-migrations-operator:
+migration-operator:
   enabled: ${var.ipa_enabled || var.insights_enabled}
   image:
     repository: ${var.image_registry}/indico/migrations-operator
