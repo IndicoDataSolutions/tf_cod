@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "6.16.0"
+      version = "3.72.0"
     }
     time = {
       source  = "hashicorp/time"
@@ -239,7 +239,7 @@ module "cluster" {
   aws_account_name           = var.aws_account
   oidc_enabled               = false
   source                     = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version                    = "10.0.1"
+  version                    = "0.1.4"
   label                      = var.label
   additional_tags            = var.additional_tags
   region                     = var.region
