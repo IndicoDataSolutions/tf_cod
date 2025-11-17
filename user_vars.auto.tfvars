@@ -82,9 +82,9 @@ node_groups = {
 #   baz = "qux"
 # }
 default_tags = {
-  "indico/customer"    = "indico-dev", #This maps pretty much to which AWS account
-  "indico/cluster"     = "dop-832",    #This should match the label variable
-  "indico/environment" = "dev"         # Choices are dev , stage , prod
+  "indico/customer"    = "acme",   #This maps pretty much to which AWS account
+  "indico/cluster"     = "indico", #This should match the label variable
+  "indico/environment" = "dev"     # Choices are dev , stage , prod
 }
 user_ip           = "" # set this to the external IP address if deployment server has no outbound access; else, leave as empty string or remove
 submission_expiry = 30 # days
