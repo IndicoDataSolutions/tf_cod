@@ -361,7 +361,7 @@ module "iam" {
 module "cluster" {
   count                = var.multitenant_enabled == false ? 1 : 0
   source               = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version              = "10.0.0"
+  version              = "10.0.1"
   label                = var.multitenant_enabled ? var.tenant_cluster_name : var.label
   region               = var.region
   cluster_version      = var.k8s_version
@@ -458,7 +458,7 @@ provider "kubectl" {
   load_config_file       = false
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--cluster-name",  var.multitenant_enabled ? var.tenant_cluster_name : var.label]
+    args        = ["eks", "get-token", "--cluster-name", var.multitenant_enabled ? var.tenant_cluster_name : var.label]
     command     = "aws"
   }
 }
@@ -471,7 +471,7 @@ provider "helm" {
     #token                  = local.environment_cluster_kubernetes_token
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
-      args        = ["eks", "get-token", "--cluster-name",  var.multitenant_enabled ? var.tenant_cluster_name : var.label]
+      args        = ["eks", "get-token", "--cluster-name", var.multitenant_enabled ? var.tenant_cluster_name : var.label]
       command     = "aws"
     }
   }
