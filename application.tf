@@ -1061,7 +1061,7 @@ cluster:
 migrationsOperator:
   createServiceAccount: ${var.multitenant_enabled == false ? "true" : "false"}
 ipaConfig:
-  createServiceAccount: ${var.multitenant_enabled == false ? "true" : "false"}
+  createRoleAndBinding: ${var.multitenant_enabled == false ? "true" : "false"}
   image:
     registry: ${var.image_registry}
 apiModels:
