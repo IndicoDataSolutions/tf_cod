@@ -361,7 +361,7 @@ module "iam" {
 module "cluster" {
   count                = var.multitenant_enabled == false ? 1 : 0
   source               = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version              = "10.0.1"
+  version              = "10.0.2"
   label                = var.multitenant_enabled ? var.tenant_cluster_name : var.label
   region               = var.region
   cluster_version      = var.k8s_version
