@@ -1128,13 +1128,13 @@ externalSecretStore:
 
   intake_values = <<EOF
 global:
-  configs:
-    storage:
-      blob:
-        s3:
-          prefix: ${var.intake_namespace == "default" ? "blob" : "blob/${var.intake_namespace}"}
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
+configs:
+  storage:
+    blob:
+      s3:
+        prefix: ${var.intake_namespace == "default" ? "blob" : "blob/${var.intake_namespace}"}
 ${local.local_registry_tf_cod_values}
 runtime-scanner:
   enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
