@@ -399,7 +399,7 @@ locals {
 
 
 resource "kubernetes_secret" "readapi" {
-  count = var.enable_readapi && var.multitenant_enabled == false ? 1 : 0
+  count = var.enable_readapi && var.indico_disabled == false ? 1 : 0
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster
@@ -462,7 +462,7 @@ provider "helm" {
 
 
 module "argo-registration" {
-  count = var.argo_enabled == true && var.multitenant_enabled == false ? 1 : 0
+  count = var.argo_enabled == true && var.indico_disabled == false ? 1 : 0
 
   depends_on = [
     module.cluster,

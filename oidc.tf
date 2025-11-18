@@ -4,7 +4,7 @@ resource "null_resource" "enable-oidc" {
     module.fsx-storage
   ]
 
-  count = var.multitenant_enabled == false ? 1 : 0
+  count = var.indico_disabled == false ? 1 : 0
 
   provisioner "local-exec" {
     command = "aws --region ${var.region} eks associate-identity-provider-config --cluster-name ${var.label} --oidc identityProviderConfigName=google-ws,issuerUrl=https://keycloak.devops.indico.io/auth/realms/GoogleAuth,clientId=kube-oidc-proxy,usernameClaim=sub,usernamePrefix=oidcuser:,groupsClaim=groups,groupsPrefix=oidcgroup:"
@@ -18,7 +18,7 @@ resource "kubernetes_cluster_role_binding" "cod-role-bindings" {
     time_sleep.wait_1_minutes_after_cluster
   ]
 
-  count = var.oidc_enabled == true && strcontains(lower(var.aws_account), "indico-") && var.multitenant_enabled == false ? 1 : 0
+  count = var.oidc_enabled == true && strcontains(lower(var.aws_account), "indico-") && var.indico_disabled == false ? 1 : 0
 
   metadata {
     name = "oidc-cod-admins"
@@ -55,7 +55,7 @@ resource "kubernetes_cluster_role_binding" "eng-qa-rbac-bindings" {
     time_sleep.wait_1_minutes_after_cluster
   ]
 
-  count = var.oidc_enabled == true && strcontains(lower(var.aws_account), "indico-") && var.multitenant_enabled == false ? 1 : 0
+  count = var.oidc_enabled == true && strcontains(lower(var.aws_account), "indico-") && var.indico_disabled == false ? 1 : 0
 
   metadata {
     name = "oidc-cod-eng-qa-admins"
@@ -86,7 +86,7 @@ resource "kubernetes_cluster_role_binding" "devops-rbac-bindings" {
     time_sleep.wait_1_minutes_after_cluster
   ]
 
-  count = var.oidc_enabled == true && var.multitenant_enabled == false ? 1 : 0
+  count = var.oidc_enabled == true && var.indico_disabled == false ? 1 : 0
 
   metadata {
     name = "oidc-cod-devops-admins"
