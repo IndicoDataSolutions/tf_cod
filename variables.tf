@@ -1543,6 +1543,12 @@ variable "multitenant_enabled" {
   description = "Toggle for enabling multitenant deployment"
 }
 
+variable "indico_disabled" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling multitenant deployment"
+}
+
 variable "indico_storage_class_name" {
   type        = string
   default     = "indico-sc"

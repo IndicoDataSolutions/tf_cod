@@ -388,7 +388,7 @@ resource "kubernetes_namespace" "indico" {
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster
   ]
-  count = var.multitenant_enabled == false ? 1 : 0
+  count = var.indico_disabled == false ? 1 : 0
   metadata {
     name = "indico"
   }
@@ -396,7 +396,7 @@ resource "kubernetes_namespace" "indico" {
 
 # Need to make sure the pull secret is in first, so that all of our images can be pulled from harbor
 resource "kubernetes_secret" "harbor-pull-secret" {
-  count = var.multitenant_enabled == false ? 1 : 0
+  count = var.indico_disabled == false ? 1 : 0
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
@@ -430,7 +430,7 @@ module "secrets-operator-setup" {
     time_sleep.wait_1_minutes_after_cluster,
     kubernetes_secret.harbor-pull-secret
   ]
-  count           = var.secrets_operator_enabled == true && var.multitenant_enabled == false ? 1 : 0
+  count           = var.secrets_operator_enabled == true && var.indico_disabled == false ? 1 : 0
   source          = "./modules/common/vault-secrets-operator-setup"
   vault_address   = var.vault_address
   account         = var.aws_account
@@ -622,11 +622,11 @@ vault-secrets-operator:
     enabled: true
     namespace: default
     method: kubernetes
-    mount: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+    mount: ${var.secrets_operator_enabled == true && var.indico_disabled == false ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
     kubernetes:
-      role: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+      role: ${var.secrets_operator_enabled == true && var.indico_disabled == false ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
       tokenAudiences: [""]
-      serviceAccount: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+      serviceAccount: ${var.secrets_operator_enabled == true && var.indico_disabled == false ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
   defaultVaultConnection:
     enabled: true
     address: ${var.vault_address}
@@ -823,10 +823,10 @@ reflector:
 externalSecretStore:
   enabled: ${var.secrets_operator_enabled}
   vaultAddress: ${var.vault_address}
-  vaultMountPath: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
+  vaultMountPath: ${var.secrets_operator_enabled == true && var.indico_disabled == false ? module.secrets-operator-setup[0].vault_mount_path : "unused-mount"}
   vaultPath: customer-${var.aws_account}
-  vaultRole: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
-  vaultServiceAccount: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
+  vaultRole: ${var.secrets_operator_enabled == true && var.indico_disabled == false ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
+  vaultServiceAccount: ${var.secrets_operator_enabled == true && var.indico_disabled == false ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
   vaultSecretName: "vault-auth"
   EOF
   ])
@@ -896,7 +896,7 @@ tempo:
 }
 
 module "indico-common" {
-  count = var.multitenant_enabled == false ? 1 : 0
+  count = var.indico_disabled == false ? 1 : 0
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
@@ -1445,7 +1445,7 @@ ingress:
   useStaticCertificate: false
   secretName: indico-ssl-static-cert
 minio:
-  createStorageClass: ${var.multitenant_enabled == false ? "true" : "false"}
+  createStorageClass: ${var.indico_disabled == false ? "true" : "false"}
   storage:
     accessKey: insights
     secretKey: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
@@ -1830,7 +1830,7 @@ resource "kubernetes_secret" "issuer-secret" {
     time_sleep.wait_1_minutes_after_cluster
   ]
 
-  count = var.multitenant_enabled == false ? 1 : 0
+  count = var.indico_disabled == false ? 1 : 0
 
   metadata {
     name      = "acme-route53"
