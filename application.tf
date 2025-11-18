@@ -1180,6 +1180,15 @@ kafka-strimzi:
   kafkaConnect:
     image:
       registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
+  postgres:
+    app:
+      # -- By default, this points to the crunchy-postgres service for the application database
+      host: postgres-data-primary.${var.intake_namespace}.svc
+      user: indico
+    metrics:
+      # -- By default, this points to the crunchy-postgres service for the metrics database
+      host: postgres-data-primary.${var.intake_namespace}.svc
+      user: indico
 worker:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
 server:
