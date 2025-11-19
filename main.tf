@@ -395,7 +395,8 @@ module "database" {
 }
 
 output "database_password" {
-  value = random_password.database_password.result
+  value     = random_password.database_password.result
+  sensitive = true
 }
 
 resource "time_sleep" "wait_1_minutes_after_cluster" {
