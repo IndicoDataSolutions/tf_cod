@@ -374,6 +374,11 @@ module "cluster" {
   http_tokens                           = var.http_tokens
 }
 
+resource "random_password" "database_password" {
+  length  = 16
+  special = false
+}
+
 module "database" {
   count                       = var.include_database == true ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-database/mod"
@@ -383,10 +388,14 @@ module "database" {
   private_subnets             = local.network[0].private_subnet_ids
   security_group_id           = module.security-group.all_subnets_sg_id
   subnet_az_zones             = var.subnet_az_zones
-  multi_az                    = var.multi_az
-  password                    = var.password
+  multi_az                    = var.az_count > 1
+  password                    = random_password.database_password.result
   skip_final_snapshot         = var.skip_final_snapshot
   deletion_protection_enabled = var.deletion_protection_enabled
+}
+
+output "database_password" {
+  value = random_password.database_password.result
 }
 
 resource "time_sleep" "wait_1_minutes_after_cluster" {
