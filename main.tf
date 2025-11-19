@@ -386,7 +386,7 @@ module "database" {
   label                       = var.label
   additional_tags             = var.additional_tags
   private_subnets             = local.network[0].private_subnet_ids
-  security_group_id           = module.security-group.all_subnets_sg_id
+  security_group_id           = var.network_module == "networking" ? local.environment_all_subnets_sg_id : module.security-group.all_subnets_sg_id
   subnet_az_zones             = var.subnet_az_zones
   multi_az                    = var.az_count > 1
   password                    = random_password.database_password.result
