@@ -1155,6 +1155,13 @@ variable "enable_additional_access_entries" {
   description = "If true this will create additional access entries for the cluster"
 }
 
+
+variable "include_database" {
+  type        = bool
+  default     = true
+  description = "If true this will create a database for the cluster"
+}
+
 ## Unused variables
 
 variable "aws_account_name" {

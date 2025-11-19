@@ -374,6 +374,21 @@ module "cluster" {
   http_tokens                           = var.http_tokens
 }
 
+module "database" {
+  count                       = var.include_database == true ? 1 : 0
+  source                      = "app.terraform.io/indico/indico-aws-database/mod"
+  version                     = "0.1.1"
+  label                       = var.label
+  additional_tags             = var.additional_tags
+  private_subnets             = local.network[0].private_subnet_ids
+  security_group_id           = module.security-group.all_subnets_sg_id
+  subnet_az_zones             = var.subnet_az_zones
+  multi_az                    = var.multi_az
+  password                    = var.password
+  skip_final_snapshot         = var.skip_final_snapshot
+  deletion_protection_enabled = var.deletion_protection_enabled
+}
+
 resource "time_sleep" "wait_1_minutes_after_cluster" {
   depends_on = [module.cluster]
 
