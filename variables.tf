@@ -1149,12 +1149,11 @@ variable "indico_sqs_sns_policy_name" {
   default     = null
 }
 
-variable "additional_users" {
-  type        = list(string)
-  default     = []
-  description = "The names of additional AWS users to provide admin access to the cluster"
+variable "enable_additional_access_entries" {
+  type        = bool
+  default     = true
+  description = "If true this will create additional access entries for the cluster"
 }
-
 
 ## Unused variables
 

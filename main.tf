@@ -344,7 +344,7 @@ module "iam" {
 module "cluster" {
   count                = var.multitenant_enabled == false ? 1 : 0
   source               = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version              = "10.0.2"
+  version              = "10.0.3"
   label                = var.multitenant_enabled ? var.tenant_cluster_name : var.label
   region               = var.region
   cluster_version      = var.k8s_version
@@ -364,7 +364,7 @@ module "cluster" {
   instance_volume_size = var.instance_volume_size
   instance_volume_type = var.instance_volume_type
 
-  additional_users = var.additional_users
+  enable_additional_access_entries = var.enable_additional_access_entries
 
   public_endpoint_enabled  = var.cluster_api_endpoint_public == true ? true : false
   private_endpoint_enabled = var.network_allow_public == true ? false : true
