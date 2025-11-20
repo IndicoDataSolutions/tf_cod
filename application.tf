@@ -710,7 +710,7 @@ secrets:
     selfSigned:
       create: true
 localPullSecret:
-  password: "${random_password.password[0].result}"
+  password: "${local.password}"
   secretName: local-pull-secret
   username: local-user
 proxyRegistryAccess:
@@ -824,7 +824,7 @@ global:
   host: "${local.monitoring_domain_name}"
 authentication:
   ingressUsername: monitoring
-  ingressPassword: ${random_password.monitoring-password[0].result}
+  ingressPassword: ${local.monitoring_password}
 ${local.alerting_configuration_values}
 keda:
   enabled: ${var.monitoring_enabled}
@@ -1142,7 +1142,7 @@ runtime-scanner:
     repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico-devops/runtime-scanner
   authentication:
     ingressUser: monitoring
-    ingressPassword: ${random_password.monitoring-password[0].result}
+    ingressPassword: ${local.monitoring_password}
     ${indent(4, local.runtime_scanner_ingress_values)}
 llmConfig:
   providers:
@@ -1729,8 +1729,8 @@ resource "random_password" "salt" {
 
 resource "htpasswd_password" "hash" {
   count = var.multitenant_enabled == false ? 1 : 0
-  password = random_password.password[0].result
-  salt     = random_password.salt[0].result
+  password = local.password == ""
+  salt     = local.salt == "" 
 }
 
 resource "helm_release" "local-registry" {
@@ -1791,9 +1791,9 @@ docker-registry:
     secretRef: remote-access
   replicaCount: 3
   secrets:
-    htpasswd: local-user:${htpasswd_password.hash[0].bcrypt}
+    htpasswd: local-user:${local.hash}
 localPullSecret:
-  password: ${random_password.password[0].result}
+  password: ${local.password}
   secretName: local-pull-secret
   username: local-user
 proxyRegistryAccess:
