@@ -1812,7 +1812,7 @@ restartCronjob:
 }
 
 output "local_registry_password" {
-  value = htpasswd_password.hash[0].bcrypt
+  value = local.hash
 }
 
 output "local_registry_username" {
