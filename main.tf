@@ -98,13 +98,15 @@ locals {
 }
 
 resource "tls_private_key" "pk" {
+  count     = var.multitenant_enabled == false ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "aws_key_pair" "kp" {
+  count      = var.multitenant_enabled == false ? 1 : 0
   key_name   = var.name
-  public_key = tls_private_key.pk.public_key_openssh
+  public_key = tls_private_key.pk[0].public_key_openssh
 }
 
 module "public_networking" {
@@ -393,6 +395,7 @@ module "cluster" {
 
 resource "time_sleep" "wait_1_minutes_after_cluster" {
   depends_on = [module.cluster]
+  count = var.multitenant_enabled == false ? 1 : 0
 
   create_duration = "1m"
 }
@@ -418,7 +421,8 @@ locals {
 resource "kubernetes_secret" "readapi" {
   count = var.enable_readapi ? 1 : 0
   depends_on = [
-    module.cluster,
+    module.cluster,,
+    kubernetes_namespace.intake,
     time_sleep.wait_1_minutes_after_cluster
   ]
   metadata {
@@ -433,6 +437,17 @@ resource "kubernetes_secret" "readapi" {
     READAPI_COMPUTER_VISION_KEY   = local.readapi_computer_vision_key_variable
     READAPI_FORM_RECOGNITION_HOST = local.readapi_form_recognizer_variable
     READAPI_FORM_RECOGNITION_KEY  = local.readapi_form_recognizer_key_variable
+  }
+}
+
+resource "kubernetes_namespace" "intake" {
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
+  count = var.multitenant_enabled == true && var.intake_namespace != "default" ? 1 : 0
+  metadata {
+    name = var.intake_namespace
   }
 }
 

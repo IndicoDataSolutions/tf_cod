@@ -332,6 +332,7 @@ resource "aws_route53_record" "alertmanager-caa" {
 
 
 resource "random_password" "monitoring-password" {
+  count   = var.multitenant_enabled == false ? 1 : 0
   length  = 16
   special = false
 }
@@ -342,5 +343,5 @@ output "monitoring-username" {
 
 output "monitoring-password" {
   sensitive = true
-  value     = random_password.monitoring-password.result
+  value     = var.multitenant_enabled == false ? random_password.monitoring-password[0].result : ""
 }

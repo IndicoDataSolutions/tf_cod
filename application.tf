@@ -710,7 +710,7 @@ secrets:
     selfSigned:
       create: true
 localPullSecret:
-  password: "${random_password.password.result}"
+  password: "${random_password.password[0].result}"
   secretName: local-pull-secret
   username: local-user
 proxyRegistryAccess:
@@ -824,7 +824,7 @@ global:
   host: "${local.monitoring_domain_name}"
 authentication:
   ingressUsername: monitoring
-  ingressPassword: ${random_password.monitoring-password.result}
+  ingressPassword: ${random_password.monitoring-password[0].result}
 ${local.alerting_configuration_values}
 keda:
   enabled: ${var.monitoring_enabled}
@@ -1142,7 +1142,7 @@ runtime-scanner:
     repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico-devops/runtime-scanner
   authentication:
     ingressUser: monitoring
-    ingressPassword: ${random_password.monitoring-password.result}
+    ingressPassword: ${random_password.monitoring-password[0].result}
     ${indent(4, local.runtime_scanner_ingress_values)}
 llmConfig:
   providers:
@@ -1718,16 +1718,19 @@ resource "kubernetes_persistent_volume" "local-registry" {
 
 
 resource "random_password" "password" {
+  count = var.multitenant_enabled == false ? 1 : 0
   length = 12
 }
 
 resource "random_password" "salt" {
+  count = var.multitenant_enabled == false ? 1 : 0
   length = 8
 }
 
 resource "htpasswd_password" "hash" {
-  password = random_password.password.result
-  salt     = random_password.salt.result
+  count = var.multitenant_enabled == false ? 1 : 0
+  password = random_password.password[0].result
+  salt     = random_password.salt[0].result
 }
 
 resource "helm_release" "local-registry" {
@@ -1788,9 +1791,9 @@ docker-registry:
     secretRef: remote-access
   replicaCount: 3
   secrets:
-    htpasswd: local-user:${htpasswd_password.hash.bcrypt}
+    htpasswd: local-user:${htpasswd_password.hash[0].bcrypt}
 localPullSecret:
-  password: ${random_password.password.result}
+  password: ${random_password.password[0].result}
   secretName: local-pull-secret
   username: local-user
 proxyRegistryAccess:
@@ -1809,7 +1812,7 @@ restartCronjob:
 }
 
 output "local_registry_password" {
-  value = htpasswd_password.hash.bcrypt
+  value = htpasswd_password.hash[0].bcrypt
 }
 
 output "local_registry_username" {
