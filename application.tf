@@ -1137,7 +1137,7 @@ configs:
         prefix: ${var.intake_namespace == "default" ? "blob" : "blob/${var.intake_namespace}"}
 ${local.local_registry_tf_cod_values}
 runtime-scanner:
-  enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
+  enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : var.multitenant_enabled == true ? "false" : "true"}
   image:
     repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico-devops/runtime-scanner
   authentication:
@@ -1171,7 +1171,6 @@ kafka-strimzi:
   enabled: ${var.load_environment == "" || var.multitenant_enabled == true ? "true" : "false"}
   strimzi-kafka-operator: 
     defaultImageRegistry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/strimzi-proxy
-    enabled: ${var.multitenant_enabled == false ? "true" : "false"}
   kafkacat:
     image:
       registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/confluentinc
