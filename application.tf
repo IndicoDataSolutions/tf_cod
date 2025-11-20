@@ -1171,6 +1171,7 @@ kafka-strimzi:
   enabled: ${var.load_environment == "" || var.multitenant_enabled == true ? "true" : "false"}
   strimzi-kafka-operator: 
     defaultImageRegistry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/strimzi-proxy
+    enabled: var.multitenant_enabled == false ? true : false
   kafkacat:
     image:
       registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/confluentinc
