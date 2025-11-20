@@ -60,7 +60,7 @@ locals {
       provisioner: fsx.csi.aws.com
       parameters:
         securityGroupIds: ${local.security_group_id}
-        subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids}
+        subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids[0]}
  EOF
   ] : []
   pre_reqs_storage_spec = var.include_fsx == true ? local.pre_reqs_fsx_values : local.pre_reqs_efs_values
