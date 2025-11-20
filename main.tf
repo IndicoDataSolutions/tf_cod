@@ -421,8 +421,8 @@ locals {
 resource "kubernetes_secret" "readapi" {
   count = var.enable_readapi ? 1 : 0
   depends_on = [
-    module.cluster,,
-    kubernetes_namespace.intake,
+    module.cluster,
+    kubernetes_namespace.intake[0],
     time_sleep.wait_1_minutes_after_cluster
   ]
   metadata {
