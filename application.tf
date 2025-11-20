@@ -1729,8 +1729,8 @@ resource "random_password" "salt" {
 
 resource "htpasswd_password" "hash" {
   count = var.multitenant_enabled == false ? 1 : 0
-  password = local.password == ""
-  salt     = local.salt == "" 
+  password = local.password
+  salt     = local.salt
 }
 
 resource "helm_release" "local-registry" {
