@@ -51,16 +51,16 @@ locals {
       csi:
         driver: fsx.csi.aws.com
         volumeAttributes:
-          dnsname: ${module.fsx-storage[0].fsx-rwx.dns_name}
-          mountname: ${module.fsx-storage[0].fsx-rwx.mount_name}
-        volumeHandle: ${module.fsx-storage[0].fsx-rwx.id}
+          dnsname: ${module.fsx-storage[0].fsx_rwx_dns_name}
+          mountname: ${module.fsx-storage[0].fsx_rwx_mount_name}
+        volumeHandle: ${module.fsx-storage[0].fsx_rwx_id}
     indicoStorageClass:
       enabled: true
       name: indico-sc
       provisioner: fsx.csi.aws.com
       parameters:
         securityGroupIds: ${local.security_group_id}
-        subnetId: ${module.fsx-storage[0].fsx-rwx.subnet_ids[0]}
+        subnetId: ${module.fsx-storage[0].fsx_rwx_subnet_ids}
  EOF
   ] : []
   pre_reqs_storage_spec = var.include_fsx == true ? local.pre_reqs_fsx_values : local.pre_reqs_efs_values
