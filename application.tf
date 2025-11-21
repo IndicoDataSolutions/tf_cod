@@ -1437,7 +1437,7 @@ ingress:
   useStaticCertificate: false
   secretName: indico-ssl-static-cert
 minio:
-  createStorageClass: ${var.multitenant_enabled == false ? "true" : "false"}
+  createStorageClass: ${var.multitenant_enabled == false || var.minio_create_storage_class_multitenant == true ? "true" : "false"}
   storage:
     accessKey: insights
     secretKey: ${var.insights_enabled ? random_password.minio-password[0].result : ""}

@@ -1505,6 +1505,12 @@ variable "minio_enabled" {
   description = "Toggle for enabling minio deployment"
 }
 
+variable "minio_create_storage_class_multitenant" {
+  type        = bool
+  default     = false
+  description = "Toggle for creating a storage class for minio"
+}
+
 variable "indico-crds-values-yaml-b64" {
   default = "Cg=="
 }
