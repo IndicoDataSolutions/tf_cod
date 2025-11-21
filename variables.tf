@@ -1505,6 +1505,12 @@ variable "minio_enabled" {
   description = "Toggle for enabling minio deployment"
 }
 
+variable "minio_create_storage_class_multitenant" {
+  type        = bool
+  default     = false
+  description = "Toggle for creating a storage class for minio"
+}
+
 variable "indico-crds-values-yaml-b64" {
   default = "Cg=="
 }
@@ -1814,6 +1820,12 @@ variable "insights_namespace" {
   type        = string
   default     = "insights"
   description = "Namespace for the insights application"
+}
+
+variable "intake_namespace" {
+  type        = string
+  default     = "default"
+  description = "Namespace for the intake application"
 }
 
 variable "use_alb" {
