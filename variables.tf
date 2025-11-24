@@ -1155,7 +1155,6 @@ variable "enable_additional_access_entries" {
   description = "If true this will create additional access entries for the cluster"
 }
 
-
 variable "include_database" {
   type        = bool
   default     = true
@@ -1254,6 +1253,12 @@ variable "create_s3_backup_role" {
   type        = bool
   default     = true
   description = "Flag to create or load s3 backup role"
+}
+
+variable "s3_enable_public_access_block" {
+  type        = bool
+  default     = true
+  description = "If true this will enable public access block on the s3 buckets"
 }
 
 variable "create_vpc_flow_logs_role" {
