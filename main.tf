@@ -225,6 +225,7 @@ module "s3-storage" {
   allowed_origins                    = ["https://${local.dns_name}"]
   loki_s3_bucket_name_override       = var.loki_s3_bucket_name_override
   enable_loki_logging                = var.enable_loki_logging
+  include_pgbackup                   = var.include_pgbackup
 }
 
 
