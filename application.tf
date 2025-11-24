@@ -1549,8 +1549,7 @@ resource "argocd_application" "ipa" {
     name      = lower("${var.aws_account}-${var.region}-${var.label}-deploy-ipa")
     namespace = var.argo_namespace
     labels = {
-      test = "true"
-      tenant_name = var.multitenant_enabled ? var.label: ""
+      tenant_name = var.multitenant_enabled ? var.label: "host"
     }
   }
 
