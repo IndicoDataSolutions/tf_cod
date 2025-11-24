@@ -1550,6 +1550,7 @@ resource "argocd_application" "ipa" {
     namespace = var.argo_namespace
     labels = {
       test = "true"
+      tenant_name = var.multitenant_enabled ? var.label: ""
     }
   }
 
