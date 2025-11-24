@@ -779,7 +779,7 @@ runtime-scanner:
   authentication:
     ingressUser: monitoring
     ingressPassword: ${random_password.monitoring-password.result}
-cronjobs:
+cronjob:
   enabled: true
   services:
     sunbow-cleaner:
