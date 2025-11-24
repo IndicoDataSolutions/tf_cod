@@ -419,7 +419,7 @@ locals {
 
 
 resource "kubernetes_secret" "readapi" {
-  count = var.enable_readapi && var.insights_namespace == "default" ? 1 : 0
+  count = var.enable_readapi && var.insights_namespace == "insights" ? 1 : 0
   depends_on = [
     module.cluster,
     kubernetes_namespace.intake[0],
