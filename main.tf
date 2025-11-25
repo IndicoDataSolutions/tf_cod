@@ -280,7 +280,7 @@ module "efs-storage" {
 module "fsx-storage" {
   count                       = var.include_fsx == true && var.load_environment == "" ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-fsx/mod"
-  version                     = "2.0.0"
+  version                     = "2.0.1"
   label                       = var.label
   additional_tags             = var.additional_tags
   region                      = var.region
@@ -302,6 +302,7 @@ module "fsx-storage" {
   fsx_rwx_arn                 = var.fsx_rwx_arn
   fsx_rox_id                  = var.fsx_rox_id
   fsx_rox_arn                 = var.fsx_rox_arn
+  enable_backup_lambda        = var.enable_backup_lambda
 }
 
 module "iam" {
@@ -346,7 +347,7 @@ module "iam" {
 module "cluster" {
   count                = var.multitenant_enabled == false ? 1 : 0
   source               = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version              = "10.0.5"
+  version              = "10.0.6"
   label                = var.multitenant_enabled ? var.tenant_cluster_name : var.label
   region               = var.region
   cluster_version      = var.k8s_version
@@ -371,8 +372,11 @@ module "cluster" {
   public_endpoint_enabled  = var.cluster_api_endpoint_public == true ? true : false
   private_endpoint_enabled = var.network_allow_public == true ? false : true
 
+  create_cluster_security_group         = var.create_cluster_security_group
   cluster_security_group_id             = local.environment_all_subnets_sg_id
   cluster_additional_security_group_ids = var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : []
+  create_node_security_group            = var.create_node_security_group
+  node_security_group_id                = local.environment_all_subnets_sg_id
   http_tokens                           = var.http_tokens
 }
 

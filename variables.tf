@@ -1303,6 +1303,18 @@ variable "pgbackup_s3_bucket_name_override" {
   description = "The name of the existing S3 bucket to be created/loaded and used as the postgres backup bucket"
 }
 
+variable "create_cluster_security_group" {
+  type        = bool
+  default     = true
+  description = "Flag to create or load cluster security group"
+}
+
+variable "create_node_security_group" {
+  type        = bool
+  default     = true
+  description = "Flag to create or load node security group"
+}
+
 # Additional variables
 variable "enable_s3_replication" {
   type        = bool
