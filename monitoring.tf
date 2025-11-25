@@ -330,8 +330,15 @@ resource "aws_route53_record" "alertmanager-caa" {
   provider = aws.dns-control
 }
 
+locals {
+  monitoring_password = var.multitenant_enabled == false ? random_password.monitoring-password[0].result : ""
+  password = var.multitenant_enabled == false ? random_password.password[0].result : ""
+  salt = var.multitenant_enabled == false ? random_password.salt[0].result : ""
+  hash = var.multitenant_enabled == false ? htpasswd_password.hash[0].bcrypt : ""
+}
 
 resource "random_password" "monitoring-password" {
+  count   = var.multitenant_enabled == false ? 1 : 0
   length  = 16
   special = false
 }
@@ -342,5 +349,5 @@ output "monitoring-username" {
 
 output "monitoring-password" {
   sensitive = true
-  value     = random_password.monitoring-password.result
+  value     = var.multitenant_enabled == false ? random_password.monitoring-password[0].result : ""
 }

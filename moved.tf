@@ -106,6 +106,31 @@ moved {
   to   = module.indico-common[0]
 }
 
+#changes for multitenant
+moved {
+  from = random_password.password
+  to   = random_password.password[0]
+}
+
+moved {
+  from = random_password.salt
+  to   = random_password.salt[0]
+}
+
+moved {
+  from = random_password.hash
+  to   = random_password.hash[0]
+}
+
+moved {
+  from = htpasswd_password.hash
+  to   = htpasswd_password.hash[0]
+}
+
+moved {
+  from = random_password.monitoring-password
+  to   = random_password.monitoring-password[0]
+}
 
 
 

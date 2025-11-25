@@ -11,6 +11,9 @@ locals {
   waf_arn               = var.enable_waf == true && var.waf_arn == "" ? aws_wafv2_web_acl.wafv2-acl[0].arn : var.waf_arn
   efs_values = var.include_efs == true ? [<<EOF
   storage:
+    existingPVC: ${var.multitenant_enabled == false ? "false" : "true"}
+    multitenant:
+      enabled: ${var.multitenant_enabled == true ? "true" : "false"}
     volumeSetup:
       image:
         registry: "${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}"
@@ -69,7 +72,7 @@ app-edge:
     labels:
       mirror.linkerd.io/exported: remote-discovery
   ingress:
-    enabled: ${var.load_environment == "" ? true : false}
+    enabled: ${var.load_environment == "" || var.multitenant_enabled == true ? true : false}
     name: alb-app-edge-ingress
     ingressClassName: alb
     pathType: Prefix
@@ -100,7 +103,7 @@ app-edge:
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
   ingress:
-    enabled: ${var.load_environment == "" ? true : false}
+    enabled: ${var.load_environment == "" || var.multitenant_enabled == true ? true : false}
     useStaticCertificate: ${var.use_static_ssl_certificates}
     annotations:
       nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "'true'" : "'false'"}
@@ -259,11 +262,6 @@ EOT
                 values:
                 - pgha1
             topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
       dataVolumeClaimSpec:
         storageClassName: local-storage
         volumeName: postgres-data-pgha1
@@ -304,11 +302,6 @@ EOT
                 values:
                 - pgha1
             topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
       dataVolumeClaimSpec:
         storageClassName: local-storage
         volumeName: postgres-data-pgha2
@@ -351,11 +344,6 @@ EOT
                 values:
                 - pgha2
             topologyKey: kubernetes.io/hostname
-      metadata:
-        annotations:
-          reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-          reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-          reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
       dataVolumeClaimSpec:
         storageClassName: ${local.storage_class}
         accessModes:
@@ -722,7 +710,7 @@ secrets:
     selfSigned:
       create: true
 localPullSecret:
-  password: "${random_password.password.result}"
+  password: "${local.password}"
   secretName: local-pull-secret
   username: local-user
 proxyRegistryAccess:
@@ -836,7 +824,7 @@ global:
   host: "${local.monitoring_domain_name}"
 authentication:
   ingressUsername: monitoring
-  ingressPassword: ${random_password.monitoring-password.result}
+  ingressPassword: ${local.monitoring_password}
 ${local.alerting_configuration_values}
 keda:
   enabled: ${var.monitoring_enabled}
@@ -888,7 +876,7 @@ tempo:
       trace:
         backend: s3
         s3:
-          bucket: ${module.s3-storage[0].loki_s3_bucket_name}
+          bucket: ${local.environment_loki_s3_bucket_name}
           endpoint: s3.${var.region}.amazonaws.com
   EOF
   ] : []
@@ -1070,7 +1058,10 @@ cluster:
   ipaVersion: ${var.ipa_version}
   ipaPreReqsVersion: ${var.ipa_pre_reqs_version}
   ipaCrdsVersion: ${var.ipa_crds_version}
+migrationsOperator:
+  createServiceAccount: ${var.multitenant_enabled == false ? "true" : "false"}
 ipaConfig:
+  createRoleAndBinding: ${var.multitenant_enabled == false ? "true" : "false"}
   image:
     registry: ${var.image_registry}
 apiModels:
@@ -1089,11 +1080,6 @@ celery-backend:
     repository: ${var.image_registry}/docker.dragonflydb.io/dragonflydb/dragonfly
 crunchy-postgres:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
-  metadata:
-    annotations:
-      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,indico,monitoring"
   service:
     metadata:
       labels:
@@ -1103,7 +1089,7 @@ ${local.crunchy_instances_values}
   pgBackRestConfig:
     global:
       archive-timeout: '10000'
-      repo1-path: /pgbackrest/postgres-data/repo1
+      repo1-path: ${var.intake_namespace == "default" ? "/pgbackrest/postgres-data/repo1" : "/pgbackrest/postgres-data-${var.intake_namespace}/repo1"}
       repo1-retention-full: '5'
       repo1-s3-key-type: auto
       repo1-s3-kms-key-id: "${local.environment_kms_key_arn}"
@@ -1135,8 +1121,8 @@ rabbitmq:
 externalSecretStore:
   enabled: ${var.secrets_operator_enabled}
   loadEnvironment:
-    enabled: ${var.load_environment == "" ? "false" : "true"}
-    environment: ${var.load_environment == "" ? local.environment : lower(var.load_environment)}
+    enabled: ${var.load_environment == "" || var.multitenant_enabled == true ? "false" : "true"}
+    environment: ${var.load_environment == "" && var.multitenant_enabled == false ? local.environment : lower(var.load_environment)}
   EOF
   ])
 
@@ -1144,14 +1130,19 @@ externalSecretStore:
 global:
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
+configs:
+  storage:
+    blob:
+      s3:
+        prefix: ${var.intake_namespace == "default" ? "blob" : "blob/${var.intake_namespace}"}
 ${local.local_registry_tf_cod_values}
 runtime-scanner:
-  enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : "true"}
+  enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : var.multitenant_enabled == true ? "false" : "true"}
   image:
     repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico-devops/runtime-scanner
   authentication:
     ingressUser: monitoring
-    ingressPassword: ${random_password.monitoring-password.result}
+    ingressPassword: ${local.monitoring_password}
     ${indent(4, local.runtime_scanner_ingress_values)}
 llmConfig:
   providers:
@@ -1166,7 +1157,7 @@ aws-node-termination:
     image:
       repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/public.ecr.aws/aws-ec2/aws-node-termination-handler
 nvidia-device-plugin:
-  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : var.multitenant_enabled == true ? "false" : "true" : "true"}
   nvidia-device-plugin:
     image:
       repository: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/public-nvcr-proxy/nvidia/k8s-device-plugin
@@ -1177,7 +1168,7 @@ reloader:
         image:
           name: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/stakater/reloader
 kafka-strimzi:
-  enabled: ${var.load_environment == "" ? "true" : "false"}
+  enabled: ${var.load_environment == "" || var.multitenant_enabled == true ? "true" : "false"}
   strimzi-kafka-operator: 
     defaultImageRegistry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/strimzi-proxy
   kafkacat:
@@ -1189,6 +1180,15 @@ kafka-strimzi:
   kafkaConnect:
     image:
       registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
+  postgres:
+    app:
+      # -- By default, this points to the crunchy-postgres service for the application database
+      host: postgres-data-primary.${var.intake_namespace}.svc
+      user: indico
+    metrics:
+      # -- By default, this points to the crunchy-postgres service for the metrics database
+      host: postgres-data-primary.${var.intake_namespace}.svc
+      user: indico
 worker:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
 server:
@@ -1216,7 +1216,7 @@ cronjob:
 externalSecretStore:
   enabled: ${var.secrets_operator_enabled}
   loadEnvironment:
-    enabled: ${var.load_environment == "" ? "false" : "true"}
+    enabled: ${var.load_environment == "" || var.multitenant_enabled == true ? "false" : "true"}
     environment: ${var.load_environment == "" ? local.environment : lower(var.load_environment)}
   EOF
 
@@ -1292,14 +1292,14 @@ module "intake" {
   github_file_path                  = var.argo_path
   github_commit_message             = var.message
   helm_registry                     = var.ipa_repo
-  namespace                         = "default"
+  namespace                         = var.intake_namespace
   ipa_pre_reqs_version              = var.ipa_pre_reqs_version
   pre_reqs_values_yaml_b64          = var.pre-reqs-values-yaml-b64
   ipa_pre_reqs_values_overrides     = local.ipa_pre_reqs_values
   account                           = var.aws_account
   region                            = var.region
   label                             = var.label
-  argo_application_name             = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
+  argo_application_name             = var.multitenant_enabled == false ? lower("${var.aws_account}.${var.region}.${var.label}-ipa") : lower("${var.aws_account}.${var.region}.${var.label}-${var.intake_namespace}-ipa")
   vault_path                        = "tools/argo/data/ipa-deploy"
   argo_server                       = local.environment_cluster_kubernetes_host
   argo_project_name                 = var.argo_enabled ? local.environment_argo_project_name : ""
@@ -1333,13 +1333,13 @@ module "intake_smoketests" {
   account                = var.aws_account
   region                 = var.region
   label                  = var.label
-  namespace              = "default"
+  namespace              = var.intake_namespace
   argo_enabled           = var.argo_enabled
   github_repo_name       = var.argo_repo
   github_repo_branch     = var.argo_branch
   github_file_path       = "${var.argo_path}/ipa_smoketest.yaml"
   github_commit_message  = var.message
-  argo_application_name  = local.argo_smoketest_app_name
+  argo_application_name  = var.multitenant_enabled == false ? local.argo_smoketest_app_name : lower("${var.aws_account}.${var.region}.${var.label}-${var.intake_namespace}-smoketests")
   argo_vault_plugin_path = "tools/argo/data/ipa-deploy"
   argo_server            = local.environment_cluster_kubernetes_host
   argo_project_name      = var.argo_enabled ? local.environment_argo_project_name : ""
@@ -1363,9 +1363,6 @@ locals {
 crunchy-postgres:
   enabled: true
   name: postgres-insights
-  metadata:
-    annotations:
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
   instances:
   - affinity:
       nodeAffinity:
@@ -1389,11 +1386,6 @@ crunchy-postgres:
               values:
               - pgha2
           topologyKey: kubernetes.io/hostname
-    metadata:
-      annotations:
-        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "insights,indico,monitoring"
     dataVolumeClaimSpec:
       storageClassName: ${local.storage_class}
       accessModes:
@@ -1445,7 +1437,7 @@ ingress:
   useStaticCertificate: false
   secretName: indico-ssl-static-cert
 minio:
-  createStorageClass: ${var.multitenant_enabled == false ? "true" : "false"}
+  createStorageClass: ${var.multitenant_enabled == false || var.minio_create_storage_class_multitenant == true ? "true" : "false"}
   storage:
     accessKey: insights
     secretKey: ${var.insights_enabled ? random_password.minio-password[0].result : ""}
@@ -1557,7 +1549,7 @@ resource "argocd_application" "ipa" {
     name      = lower("${var.aws_account}-${var.region}-${var.label}-deploy-ipa")
     namespace = var.argo_namespace
     labels = {
-      test = "true"
+      tenant_name = var.multitenant_enabled ? var.label: "host"
     }
   }
 
@@ -1726,16 +1718,19 @@ resource "kubernetes_persistent_volume" "local-registry" {
 
 
 resource "random_password" "password" {
+  count = var.multitenant_enabled == false ? 1 : 0
   length = 12
 }
 
 resource "random_password" "salt" {
+  count = var.multitenant_enabled == false ? 1 : 0
   length = 8
 }
 
 resource "htpasswd_password" "hash" {
-  password = random_password.password.result
-  salt     = random_password.salt.result
+  count = var.multitenant_enabled == false ? 1 : 0
+  password = local.password
+  salt     = local.salt
 }
 
 resource "helm_release" "local-registry" {
@@ -1796,9 +1791,9 @@ docker-registry:
     secretRef: remote-access
   replicaCount: 3
   secrets:
-    htpasswd: local-user:${htpasswd_password.hash.bcrypt}
+    htpasswd: local-user:${local.hash}
 localPullSecret:
-  password: ${random_password.password.result}
+  password: ${local.password}
   secretName: local-pull-secret
   username: local-user
 proxyRegistryAccess:
@@ -1817,7 +1812,7 @@ restartCronjob:
 }
 
 output "local_registry_password" {
-  value = htpasswd_password.hash.bcrypt
+  value = local.hash
 }
 
 output "local_registry_username" {
@@ -1908,7 +1903,7 @@ linkerd-multicluster:
   controllers:
     - link:
         ref:
-          name: ${var.load_environment == "" ? "application-cluster" : "data-cluster"}
+          name: ${var.load_environment == "" || var.multitenant_enabled == true ? "application-cluster" : "data-cluster"}
       logLevel: debug
       gateway:
         enabled: false

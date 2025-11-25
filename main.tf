@@ -98,13 +98,15 @@ locals {
 }
 
 resource "tls_private_key" "pk" {
+  count     = var.multitenant_enabled == false ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "aws_key_pair" "kp" {
+  count      = var.multitenant_enabled == false ? 1 : 0
   key_name   = var.name
-  public_key = tls_private_key.pk.public_key_openssh
+  public_key = tls_private_key.pk[0].public_key_openssh
 }
 
 module "public_networking" {
@@ -221,7 +223,7 @@ module "s3-storage" {
   api_models_s3_bucket_name_override = var.api_models_s3_bucket_name_override
   pgbackup_s3_bucket_name_override   = var.pgbackup_s3_bucket_name_override
   miniobkp_s3_bucket_name_override   = var.miniobkp_s3_bucket_name_override
-  include_miniobkp                   = var.include_miniobkp && var.insights_enabled ? true : false
+  include_miniobkp                   = var.include_miniobkp ? true : false
   allowed_origins                    = ["https://${local.dns_name}"]
   loki_s3_bucket_name_override       = var.loki_s3_bucket_name_override
   enable_loki_logging                = var.enable_loki_logging
@@ -259,6 +261,23 @@ resource "null_resource" "s3-delete-data-pgbackup-bucket" {
   provisioner "local-exec" {
     when    = destroy
     command = "aws s3 rm \"s3://${self.triggers.pg_backup_bucket_name}/\" --recursive --only-show-errors || echo \"WARNING: S3 rm ${self.triggers.pg_backup_bucket_name} reported errors\" >&2"
+  }
+}
+
+resource "null_resource" "s3-delete-data-miniobkp-bucket" {
+  count = var.include_miniobkp == true && var.load_environment == "" ? 1 : 0
+
+  depends_on = [
+    module.s3-storage
+  ]
+
+  triggers = {
+    miniobkp_bucket_name = local.environment_miniobkp_s3_bucket_name
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "aws s3 rm \"s3://${self.triggers.miniobkp_bucket_name}/\" --recursive --only-show-errors || echo \"WARNING: S3 rm ${self.triggers.miniobkp_bucket_name} reported errors\" >&2"
   }
 }
 
@@ -316,7 +335,7 @@ module "iam" {
   aws_primary_dns_role_arn   = var.aws_primary_dns_role_arn
   efs_filesystem_id          = [var.include_efs == true ? local.environment_efs_filesystem_id : ""]
   fsx_arns                   = [var.include_rox ? local.environment_fsx_rox_arn : "", var.include_fsx == true ? local.environment_fsx_rwx_arn : ""]
-  s3_buckets                 = compact([local.environment_data_s3_bucket_name, var.include_pgbackup ? local.environment_pgbackup_s3_bucket_name : "", var.include_rox ? local.environment_api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "", var.include_miniobkp && var.insights_enabled ? local.environment_miniobkp_s3_bucket_name : "", var.enable_loki_logging ? local.environment_loki_s3_bucket_name : ""])
+  s3_buckets                 = compact([local.environment_data_s3_bucket_name, var.include_pgbackup ? local.environment_pgbackup_s3_bucket_name : "", var.include_rox ? local.environment_api_models_s3_bucket_name : "", lower("${var.aws_account}-aws-cod-snapshots"), var.performance_bucket ? "indico-locust-benchmark-test-results" : "", var.include_miniobkp ? local.environment_miniobkp_s3_bucket_name : "", var.enable_loki_logging ? local.environment_loki_s3_bucket_name : ""])
   kms_key_arn                = local.environment_kms_key_arn
   # EKS cluster role
   create_cluster_iam_role = var.create_eks_cluster_role
@@ -376,6 +395,7 @@ module "cluster" {
 
 resource "time_sleep" "wait_1_minutes_after_cluster" {
   depends_on = [module.cluster]
+  count = var.multitenant_enabled == false ? 1 : 0
 
   create_duration = "1m"
 }
@@ -399,13 +419,15 @@ locals {
 
 
 resource "kubernetes_secret" "readapi" {
-  count = var.enable_readapi && var.multitenant_enabled == false ? 1 : 0
+  count = var.enable_readapi && var.insights_namespace == "insights" ? 1 : 0
   depends_on = [
     module.cluster,
+    kubernetes_namespace.intake[0],
     time_sleep.wait_1_minutes_after_cluster
   ]
   metadata {
     name = "readapi-secret"
+    namespace = var.intake_namespace
   }
 
   data = {
@@ -415,6 +437,17 @@ resource "kubernetes_secret" "readapi" {
     READAPI_COMPUTER_VISION_KEY   = local.readapi_computer_vision_key_variable
     READAPI_FORM_RECOGNITION_HOST = local.readapi_form_recognizer_variable
     READAPI_FORM_RECOGNITION_KEY  = local.readapi_form_recognizer_key_variable
+  }
+}
+
+resource "kubernetes_namespace" "intake" {
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster
+  ]
+  count = var.multitenant_enabled == true && var.intake_namespace != "default" ? 1 : 0
+  metadata {
+    name = var.intake_namespace
   }
 }
 

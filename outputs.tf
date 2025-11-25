@@ -1,5 +1,5 @@
 output "key_pem" {
-  value       = tls_private_key.pk.private_key_pem
+  value       = var.multitenant_enabled == false ? tls_private_key.pk[0].private_key_pem : ""
   description = "Generated private key for key pair"
   sensitive   = true
 }
