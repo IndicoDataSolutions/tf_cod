@@ -1359,6 +1359,12 @@ variable "fsx_deployment_type" {
   description = "The deployment type to launch"
 }
 
+variable "enable_backup_lambda" {
+  type        = bool
+  default     = true
+  description = "If true this will enable the backup lambda for fsx"
+}
+
 variable "fsx_type" {
   type    = string
   default = "create"
