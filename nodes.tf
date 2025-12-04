@@ -34,6 +34,16 @@ locals {
       desired_capacity       = "1"
       additional_node_labels = ""
       taints                 = ""
+    },
+    minio = {
+      type                   = "cpu"
+      spot                   = false
+      instance_types         = ["m6a.xlarge"]
+      min_size               = 1
+      max_size               = 4
+      desired_capacity       = "4"
+      taints                 = "--register-with-taints=indico.io/minio=true:NoSchedule"
+      additional_node_labels = ""
     }
   }
 
