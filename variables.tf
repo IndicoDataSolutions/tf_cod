@@ -1701,3 +1701,9 @@ variable "install_local_insights_chart" {
   default     = false
   description = "Toggle for installing the local insights chart"
 }
+
+variable "s3_enable_public_access_block" {
+  type        = bool
+  default     = true
+  description = "If true this will enable public access block on the s3 buckets"
+}
