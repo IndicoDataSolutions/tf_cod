@@ -3,4 +3,4 @@ maintainers:
 - email: devops@indico.io
   name: indico devops
 name: local-registry
-version: 1.0.2-IPA-7.6.0
+version: 1.0.2-IPA-7.6.1
