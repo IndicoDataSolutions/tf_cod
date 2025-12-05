@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "6.16.0"
+      version = "5.100.0"
     }
     time = {
       source  = "hashicorp/time"
@@ -346,7 +346,7 @@ module "iam" {
 
 module "cluster" {
   source               = "app.terraform.io/indico/indico-aws-eks-cluster/mod"
-  version              = "10.0.6"
+  version              = "9.0.40"
   label                = var.label
   region               = var.region
   cluster_version      = var.k8s_version
