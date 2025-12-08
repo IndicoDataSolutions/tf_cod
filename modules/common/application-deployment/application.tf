@@ -46,6 +46,11 @@ spec:
       kind: Deployment
       jqPathExpressions:
       - .spec.template.spec.containers[].env[] | select((.name | contains("STAKATER_")))
+    - group: ""
+      kind: Secret
+      name: runtime-scanner-auth
+      jqPathExpressions:
+      - '.data.auth'
   destination:
     server: ${var.argo_server}
     namespace: ${var.namespace}
