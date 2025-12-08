@@ -1112,7 +1112,7 @@ variable "vpc_flow_logs_iam_role_arn" {
 }
 variable "instance_volume_size" {
   type        = number
-  default     = 60
+  default     = 100
   description = "The size of EBS volume to attach to the cluster nodes"
 }
 

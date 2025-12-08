@@ -12,85 +12,15 @@ locals {
       additional_node_labels = "group=gpu-enabled"
       taints                 = "--register-with-taints=nvidia.com/gpu=true:NoSchedule"
     },
-    celery-workers = {
-      min_size               = 0
-      max_size               = 20
-      instance_types         = ["m6a.xlarge"]
-      type                   = "cpu"
-      spot                   = false
-      desired_capacity       = "0"
-      taints                 = "--register-with-taints=indico.io/celery=true:NoSchedule"
-      additional_node_labels = ""
-    },
     static-workers = {
       min_size               = 1
       max_size               = 20
-      instance_types         = ["m6a.xlarge"]
+      instance_types         = ["m6a.4xlarge"]
       type                   = "cpu"
       spot                   = false
       desired_capacity       = "0"
       additional_node_labels = ""
       taints                 = ""
-    },
-    pdf-workers = {
-      min_size               = 0
-      max_size               = 3
-      instance_types         = ["m6a.xlarge"]
-      type                   = "cpu"
-      spot                   = false
-      desired_capacity       = "1"
-      taints                 = "--register-with-taints=indico.io/pdfextraction=true:NoSchedule"
-      additional_node_labels = ""
-    },
-    highmem-workers = {
-      min_size               = 0
-      max_size               = 3
-      instance_types         = ["m6a.2xlarge"]
-      type                   = "cpu"
-      spot                   = false
-      desired_capacity       = "0"
-      taints                 = "--register-with-taints=indico.io/highmem=true:NoSchedule"
-      additional_node_labels = ""
-    },
-    monitoring-workers = {
-      min_size               = 1
-      max_size               = 4
-      instance_types         = ["m6a.large"]
-      type                   = "cpu"
-      spot                   = false
-      desired_capacity       = "1"
-      taints                 = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
-      additional_node_labels = ""
-    },
-    pgo-workers = {
-      min_size               = 1
-      max_size               = 4
-      instance_types         = ["m6a.large"]
-      type                   = "cpu"
-      spot                   = false
-      desired_capacity       = "1"
-      taints                 = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
-      additional_node_labels = ""
-    }
-    readapi-servers = {
-      min_size               = 0
-      max_size               = 3
-      instance_types         = ["m6a.2xlarge"]
-      type                   = "cpu"
-      spot                   = false
-      desired_capacity       = "0"
-      taints                 = "--register-with-taints=indico.io/readapi-server=true:NoSchedule"
-      additional_node_labels = ""
-    },
-    readapi-azurite = {
-      min_size               = 0
-      max_size               = 1
-      instance_types         = ["m6a.xlarge"]
-      type                   = "cpu"
-      spot                   = false
-      desired_capacity       = "1"
-      taints                 = "--register-with-taints=indico.io/azurite=true:NoSchedule"
-      additional_node_labels = ""
     }
   }
 
@@ -98,32 +28,12 @@ locals {
     static-workers = {
       type                   = "cpu"
       spot                   = false
-      instance_types         = ["m6a.xlarge"]
+      instance_types         = ["m6a.4xlarge"]
       min_size               = 1
       max_size               = 10
-      desired_capacity       = "3"
+      desired_capacity       = "1"
       additional_node_labels = ""
       taints                 = ""
-    },
-    pgo-workers = {
-      min_size               = 1
-      max_size               = 4
-      instance_types         = ["m6a.large"]
-      type                   = "cpu"
-      spot                   = false
-      desired_capacity       = "1"
-      taints                 = "--register-with-taints=indico.io/crunchy=true:NoSchedule"
-      additional_node_labels = ""
-    },
-    celery-workers = {
-      type                   = "cpu"
-      spot                   = false
-      instance_types         = ["m6a.xlarge"]
-      min_size               = 1
-      max_size               = 3
-      desired_capacity       = "1"
-      taints                 = "--register-with-taints=indico.io/celery-workers=true:NoSchedule"
-      additional_node_labels = ""
     },
     minio = {
       type                   = "cpu"
@@ -133,16 +43,6 @@ locals {
       max_size               = 4
       desired_capacity       = "4"
       taints                 = "--register-with-taints=indico.io/minio=true:NoSchedule"
-      additional_node_labels = ""
-    },
-    monitoring-workers = {
-      min_size               = 1
-      max_size               = 4
-      instance_types         = ["m6a.large"]
-      type                   = "cpu"
-      spot                   = false
-      desired_capacity       = "1"
-      taints                 = "--register-with-taints=indico.io/monitoring=true:NoSchedule"
       additional_node_labels = ""
     }
   }
