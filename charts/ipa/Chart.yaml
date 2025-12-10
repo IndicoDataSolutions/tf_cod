@@ -1,7 +1,7 @@
 apiVersion: v2
-appVersion: IPA-7.5.3
+appVersion: IPA-7.5.4
 maintainers:
 - email: devops@indico.io
   name: indico devops
 name: ipa
-version: 1.7.53-IPA-7.5.3
+version: 1.7.53-IPA-7.5.4

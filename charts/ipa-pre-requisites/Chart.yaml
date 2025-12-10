@@ -3,4 +3,4 @@ appVersion: 0.2.1
 description: A Helm chart for installing prerequisites for the ipa helm chart
 name: ipa-pre-requisites
 type: application
-version: 9.2.5-IPA-7.5.3
+version: 9.2.5-IPA-7.5.4
