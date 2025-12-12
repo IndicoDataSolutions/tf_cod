@@ -210,7 +210,7 @@ EOT
   )
   local_registry_tf_cod_values = var.local_registry_enabled == true ? (<<EOT
 global:
-  imagePullSecrets: 
+  imagePullSecrets:
     - name: local-pull-secret
     - name: harbor-pull-secret
   image:
@@ -233,7 +233,7 @@ ingress:
     nginx.ingress.kubernetes.io/auth-type: basic
     nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - alternate'
     nginx.ingress.kubernetes.io/auth-secret: runtime-scanner-auth
-  
+
   useDefaultResolver: true
   labels: {}
   hosts:
@@ -241,7 +241,7 @@ ingress:
       paths:
         - path: /
           pathType: ImplementationSpecific
-  tls: 
+  tls:
     - secretName: ${var.ssl_static_secret_name}
       hosts:
         - scan
@@ -299,9 +299,9 @@ resource "kubernetes_secret" "harbor-pull-secret" {
   }
 }
 
-# Then set up the secrets operator authentication with vault 
-# (what level of permission does this require? Are we giving customers admin credentials?) 
-# The auth backend they create is named <account>-<region>-<cluster-name>, so we can make 
+# Then set up the secrets operator authentication with vault
+# (what level of permission does this require? Are we giving customers admin credentials?)
+# The auth backend they create is named <account>-<region>-<cluster-name>, so we can make
 # sure their credentials only have access to create <account>-* k8s auth methods
 # Note: this module is used to pull secrets from hashicorp vault. It is also used by the external-secrets operator to push secrets to hashicorp vault.
 module "secrets-operator-setup" {
@@ -418,9 +418,9 @@ cert-manager:
       value: 'aws-global'
 crunchy-pgo:
   enabled: ${var.ipa_enabled || var.insights_enabled}
-  updateCRDs: 
+  updateCRDs:
     enabled: true
-  pgo: 
+  pgo:
     controllerImages:
       cluster: ${var.image_registry}/registry.crunchydata.com/crunchydata/postgres-operator:ubi9-5.8.2-0
     relatedImages:
@@ -475,7 +475,7 @@ minio:
   enabled: ${var.insights_enabled || var.minio_enabled}
 vault-secrets-operator:
   enabled: ${var.secrets_operator_enabled}
-  controller: 
+  controller:
     imagePullSecrets:
       - name: harbor-pull-secret
     kubeRbacProxy:
@@ -623,7 +623,7 @@ aws-efs-csi-driver:
         repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
 aws-fsx-csi-driver:
   enabled: ${var.include_fsx}
-  image:  
+  image:
     repository: ${var.image_registry}/public.ecr.aws/fsx-csi-driver/aws-fsx-csi-driver
     pullPolicy: IfNotPresent
   imagePullSecrets:
@@ -725,13 +725,13 @@ keda:
         memory: 4Gi
   crds:
     install: true
-  
+
   podAnnotations:
     keda:
       prometheus.io/scrape: "true"
       prometheus.io/path: "/metrics"
       prometheus.io/port: "8080"
-    metricsAdapter: 
+    metricsAdapter:
       prometheus.io/scrape: "true"
       prometheus.io/path: "/metrics"
       prometheus.io/port: "9022"
@@ -1131,7 +1131,7 @@ reloader:
           name: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/dockerhub-proxy/stakater/reloader
 kafka-strimzi:
   enabled: ${var.load_environment == "" ? "true" : "false"}
-  strimzi-kafka-operator: 
+  strimzi-kafka-operator:
     defaultImageRegistry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/strimzi-proxy
   kafkacat:
     image:
@@ -1164,10 +1164,6 @@ cronjob:
       enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
     meteor-refresh:
       enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
-    rainbow-cleaner-submissions:
-      enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
-    rainbow-cleaner-uploads:
-      enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"} 
     service-account-generator:
       enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
 externalSecretStore:
@@ -1717,7 +1713,7 @@ cert-manager:
   enabled: false
 ingress-nginx:
   enabled: true
-  
+
   controller:
     ingressClass: nginx-internal
     ingressClassResource:
@@ -1748,7 +1744,7 @@ docker-registry:
     imagePullSecrets:
       - name: harbor-pull-secret
   service:
-    annotations: 
+    annotations:
       external-dns.alpha.kubernetes.io/hostname: "local-registry.${local.dns_name}"
   extraEnvVars:
   - name: GOGC
@@ -1760,7 +1756,7 @@ docker-registry:
       cert-manager.io/cluster-issuer: zerossl
       kubernetes.io/ingress.class: nginx-internal
       service.beta.kubernetes.io/aws-load-balancer-internal: "true"
-    labels: 
+    labels:
       acme.cert-manager.io/dns01-solver: "true"
     hosts:
     - local-registry.${local.dns_name}
@@ -1768,7 +1764,7 @@ docker-registry:
     - hosts:
       - local-registry.${local.dns_name}
       secretName: registry-tls
-  
+
   persistence:
     deleteEnabled: true
     enabled: true
@@ -1795,7 +1791,7 @@ proxyRegistryAccess:
   proxyPullSecretName: remote-access
   proxyUrl: https://${var.image_registry}
   proxyUsername: ${var.local_registry_enabled == true ? var.harbor_customer_robot_username : ""}
-  
+
 registryUrl: local-registry.${local.dns_name}
 restartCronjob:
   cronSchedule: 0 0 */3 * *

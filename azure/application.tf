@@ -99,10 +99,10 @@ migrations:
     updateCRDs: ${var.secrets_operator_enabled}
 aws-ebs-csi-driver:
   enabled: false
-cert-manager: 
+cert-manager:
   enabled: true
   crds:
-    enabled: true   
+    enabled: true
   nodeSelector:
     kubernetes.io/os: linux
   webhook:
@@ -124,7 +124,7 @@ minio:
   enabled: ${var.insights_enabled || var.minio_enabled}
 vault-secrets-operator:
   enabled: ${var.secrets_operator_enabled}
-  controller: 
+  controller:
     imagePullSecrets:
       - name: harbor-pull-secret
     kubeRbacProxy:
@@ -237,13 +237,13 @@ external-dns:
 
   provider:
     name: azure
-  
-  extraVolumes: 
+
+  extraVolumes:
     - name: azure-config
       configMap:
         name: dns-credentials-config
 
-  extraVolumeMounts: 
+  extraVolumeMounts:
     - name: azure-config
       mountPath: /etc/kubernetes/azure.json
       subPath: azure.json
@@ -302,13 +302,13 @@ keda:
         memory: 4Gi
   crds:
     install: true
-  
+
   podAnnotations:
     keda:
       prometheus.io/scrape: "true"
       prometheus.io/path: "/metrics"
       prometheus.io/port: "8080"
-    metricsAdapter: 
+    metricsAdapter:
       prometheus.io/scrape: "true"
       prometheus.io/path: "/metrics"
       prometheus.io/port: "9022"
@@ -609,7 +609,7 @@ resource "kubectl_manifest" "custom-cluster-issuer" {
     metadata:
       name: zerossl
     spec:
-      ${indent(6, var.custom_cluster_issuer_spec)} 
+      ${indent(6, var.custom_cluster_issuer_spec)}
   YAML
 }
 
@@ -752,7 +752,7 @@ readapi:
     - rabbitmq
     - azure-storage-key
 aws-node-termination:
-  enabled: false 
+  enabled: false
 app-edge:
   cspApprovedSources:
     - ${module.storage.storage_account_name}.blob.core.windows.net
@@ -768,12 +768,9 @@ runtime-scanner:
 cronjob:
   enabled: true
   services:
-    rainbow-cleaner-submissions:
+    sunbow-cleaner:
       enabled: true
       serviceAccountName: ${var.use_workload_identity ? "workload-identity-storage-account" : "default"}
-    rainbow-cleaner-uploads:
-      enabled: true
-      serviceAccountName: ${var.use_workload_identity ? "workload-identity-storage-account" : "default"}  
   EOF
 }
 
