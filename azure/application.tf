@@ -241,24 +241,17 @@ external-dns:
   txtOwnerId: "${var.label}-${var.region}"
   domainFilters:
     - ${var.account}.${var.domain_suffix}.
-
   provider:
     name: azure
-
   extraVolumes:
     - name: azure-config
       configMap:
         name: dns-credentials-config
-
   extraVolumeMounts:
     - name: azure-config
       mountPath: /etc/kubernetes/azure.json
       subPath: azure.json
-
   policy: sync
-  sources:
-    - service
-    - ingress
 ingress-nginx:
   enabled: ${local.kube_prometheus_stack_enabled}
   rbac:

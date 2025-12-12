@@ -127,16 +127,12 @@ external-dns:
   txtOwnerId: "${var.load_environment == "" ? local.dns_name : local.monitoring_domain_name}"
   domainFilters:
     - ${local.dns_zone_name}
-
   provider:
     name: aws
   env:
     - name: AWS_DEFAULT_REGION
       value: ${var.region}
   policy: sync
-  sources:
-    - service
-    - ingress
   EOT
     ) : (<<EOT
 clusterIssuer:
@@ -157,16 +153,12 @@ external-dns:
   txtOwnerId: "${var.load_environment == "" ? local.dns_name : local.monitoring_domain_name}"
   domainFilters:
     - ${local.dns_zone_name}
-
   provider:
     name: aws
   env:
     - name: AWS_DEFAULT_REGION
       value: ${var.region}
   policy: sync
-  sources:
-    - service
-    - ingress
 alternate-external-dns:
   enabled: ${local.enable_external_dns}
   image:
@@ -186,8 +178,6 @@ alternate-external-dns:
     - name: AWS_DEFAULT_REGION
       value: ${var.region}
   policy: sync
-  sources:
-    - ingress
 EOT
   )
   local_registry_tf_cod_values = var.local_registry_enabled == true ? (<<EOT
@@ -1501,7 +1491,7 @@ resource "argocd_application" "ipa" {
     name      = lower("${var.aws_account}-${var.region}-${var.label}-deploy-ipa")
     namespace = var.argo_namespace
     labels = {
-      tenant_name = var.multitenant_enabled ? var.label: "host"
+      tenant_name = var.multitenant_enabled ? var.label : "host"
     }
   }
 
@@ -1670,17 +1660,17 @@ resource "kubernetes_persistent_volume" "local-registry" {
 
 
 resource "random_password" "password" {
-  count = var.multitenant_enabled == false ? 1 : 0
+  count  = var.multitenant_enabled == false ? 1 : 0
   length = 12
 }
 
 resource "random_password" "salt" {
-  count = var.multitenant_enabled == false ? 1 : 0
+  count  = var.multitenant_enabled == false ? 1 : 0
   length = 8
 }
 
 resource "htpasswd_password" "hash" {
-  count = var.multitenant_enabled == false ? 1 : 0
+  count    = var.multitenant_enabled == false ? 1 : 0
   password = local.password
   salt     = local.salt
 }
