@@ -765,6 +765,13 @@ runtime-scanner:
   authentication:
     ingressUser: monitoring
     ingressPassword: ${random_password.monitoring-password.result}
+cronjob:
+  enabled: true
+  services:
+    sunbow-cleaner:
+      enabled: true
+      serviceAccountName: ${var.use_workload_identity ? "workload-identity-storage-account" : "default"}
+  EOF
 }
 
 module "intake" {
