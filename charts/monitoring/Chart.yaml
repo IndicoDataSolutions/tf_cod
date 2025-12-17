@@ -3,4 +3,4 @@ maintainers:
 - email: devops@indico.io
   name: indico devops
 name: monitoring
-version: 14.7.0-IPA-7.5.4
+version: 14.7.0-IPA-7.5.5
