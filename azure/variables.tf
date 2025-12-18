@@ -682,12 +682,6 @@ variable "ssl_static_secret_name" {
 
 # Log analytics
 
-variable "enable_diagnostic_settings" {
-  type        = bool
-  default     = true
-  description = "Enable diagnostic settings for the cluster"
-}
-
 variable "sentinel_workspace_name" {
   type    = string
   default = null # "${var.account}-sentinel-workspace"
