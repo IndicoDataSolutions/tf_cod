@@ -241,6 +241,14 @@ EOT
 
   crunchy_instances_values = var.on_prem_test == true ? (<<EOT
     - affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node_group
+                operator: In
+                values:
+                - pgo-workers
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
@@ -268,7 +276,19 @@ EOT
         requests:
           cpu: 1000m
           memory: 3000Mi
+      tolerations:
+        - effect: NoSchedule
+          key: indico.io/crunchy
+          operator: Exists
     - affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node_group
+                operator: In
+                values:
+                - pgo-workers
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
@@ -296,9 +316,21 @@ EOT
         requests:
           cpu: 1000m
           memory: 3000Mi
+      tolerations:
+        - effect: NoSchedule
+          key: indico.io/crunchy
+          operator: Exists
 EOT
     ) : (<<EOT
     - affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node_group
+                operator: In
+                values:
+                - pgo-workers
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
@@ -325,6 +357,10 @@ EOT
         requests:
           cpu: 1000m
           memory: 3000Mi
+      tolerations:
+        - effect: NoSchedule
+          key: indico.io/crunchy
+          operator: Exists
 EOT
   )
 
@@ -1329,6 +1365,14 @@ crunchy-postgres:
   name: postgres-insights
   instances:
   - affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node_group
+              operator: In
+              values:
+              - pgo-workers
       podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
         - labelSelector:
@@ -1355,6 +1399,10 @@ crunchy-postgres:
       requests:
         cpu: 1000m
         memory: 3000Mi
+    tolerations:
+      - effect: NoSchedule
+        key: indico.io/crunchy
+        operator: Exists
   pgBackRestConfig:
     global:
       archive-timeout: '10000'
