@@ -169,7 +169,8 @@ module "sqs_sns" {
 module "lambda-sns-forwarder" {
   count                = var.lambda_sns_forwarder_enabled == true && var.load_environment == "" ? 1 : 0
   source               = "app.terraform.io/indico/indico-lambda-sns-forwarder/mod"
-  version              = "2.0.2"
+  version              = "2.0.3"
+  account              = var.aws_account
   region               = var.region
   label                = var.label
   subnet_ids           = flatten([local.environment_private_subnet_ids])
@@ -185,6 +186,7 @@ module "lambda-sns-forwarder" {
   git_zip_path         = var.lambda_sns_forwarder_github_zip_path
   git_pat              = var.git_pat
   function_variables   = var.lambda_sns_forwarder_function_variables
+  vault_address        = var.vault_address
 }
 
 module "kms_key" {
@@ -395,7 +397,7 @@ module "cluster" {
 
 resource "time_sleep" "wait_1_minutes_after_cluster" {
   depends_on = [module.cluster]
-  count = var.multitenant_enabled == false ? 1 : 0
+  count      = var.multitenant_enabled == false ? 1 : 0
 
   create_duration = "1m"
 }
@@ -426,7 +428,7 @@ resource "kubernetes_secret" "readapi" {
     time_sleep.wait_1_minutes_after_cluster
   ]
   metadata {
-    name = "readapi-secret"
+    name      = "readapi-secret"
     namespace = var.intake_namespace
   }
 

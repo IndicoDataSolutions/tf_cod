@@ -418,17 +418,21 @@ module "secrets-operator-setup" {
     time_sleep.wait_1_minutes_after_cluster,
     kubernetes_secret.harbor-pull-secret
   ]
-  count           = var.secrets_operator_enabled == true && var.multitenant_enabled == false ? 1 : 0
-  source          = "./modules/common/vault-secrets-operator-setup"
-  vault_address   = var.vault_address
-  account         = var.aws_account
-  region          = var.region
-  name            = var.label
-  kubernetes_host = local.environment_cluster_kubernetes_host
-  vault_username  = var.vault_username
-  vault_password  = var.vault_password
-  audience        = ""
-  environment     = var.load_environment == "" ? local.environment : lower(var.load_environment)
+  count                                  = var.secrets_operator_enabled == true && var.multitenant_enabled == false ? 1 : 0
+  source                                 = "./modules/common/vault-secrets-operator-setup"
+  vault_address                          = var.vault_address
+  account                                = var.aws_account
+  region                                 = var.region
+  name                                   = var.label
+  kubernetes_host                        = local.environment_cluster_kubernetes_host
+  vault_username                         = var.vault_username
+  vault_password                         = var.vault_password
+  audience                               = ""
+  environment                            = var.load_environment == "" ? local.environment : lower(var.load_environment)
+  lambda_sns_forwarder_enabled           = var.lambda_sns_forwarder_enabled
+  lambda_sns_forwarder_iam_principal_arn = local.environment_lambda_sns_forwarder_iam_principal_arn
+  aws_access_key                         = var.aws_access_key
+  aws_secret_key                         = var.aws_secret_key
 }
 
 module "karpenter" {
@@ -1549,7 +1553,7 @@ resource "argocd_application" "ipa" {
     name      = lower("${var.aws_account}-${var.region}-${var.label}-deploy-ipa")
     namespace = var.argo_namespace
     labels = {
-      tenant_name = var.multitenant_enabled ? var.label: "host"
+      tenant_name = var.multitenant_enabled ? var.label : "host"
     }
   }
 
@@ -1718,17 +1722,17 @@ resource "kubernetes_persistent_volume" "local-registry" {
 
 
 resource "random_password" "password" {
-  count = var.multitenant_enabled == false ? 1 : 0
+  count  = var.multitenant_enabled == false ? 1 : 0
   length = 12
 }
 
 resource "random_password" "salt" {
-  count = var.multitenant_enabled == false ? 1 : 0
+  count  = var.multitenant_enabled == false ? 1 : 0
   length = 8
 }
 
 resource "htpasswd_password" "hash" {
-  count = var.multitenant_enabled == false ? 1 : 0
+  count    = var.multitenant_enabled == false ? 1 : 0
   password = local.password
   salt     = local.salt
 }
