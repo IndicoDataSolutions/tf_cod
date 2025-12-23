@@ -295,3 +295,7 @@ output "nat_gateway_eips" {
 output "nginx_ingress_allowed_cidrs" {
   value = local.environment_nginx_ingress_allowed_cidrs
 }
+
+output "lambda_sns_forwarder_iam_principal_arn" {
+  value = local.environment_lambda_sns_forwarder_iam_principal_arn
+}
