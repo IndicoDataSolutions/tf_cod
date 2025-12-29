@@ -110,14 +110,6 @@ app-edge:
 EOT
   )
   dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT
-clusterIssuer:
-  additionalSolvers:
-    - dns01:
-        route53:
-          region: ${var.region}
-      selector:
-        matchLabels:
-          "acme.cert-manager.io/dns01-solver": "true"
 external-dns:
   enabled: ${local.enable_external_dns}
   image:
@@ -145,9 +137,6 @@ clusterIssuer:
         route53:
           region: ${var.region}
           role: ${var.aws_primary_dns_role_arn}
-      selector:
-        matchLabels:
-          "acme.cert-manager.io/dns01-solver": "true"
 external-dns:
   enabled: ${local.enable_external_dns}
   image:
@@ -1549,7 +1538,7 @@ resource "argocd_application" "ipa" {
     name      = lower("${var.aws_account}-${var.region}-${var.label}-deploy-ipa")
     namespace = var.argo_namespace
     labels = {
-      tenant_name = var.multitenant_enabled ? var.label: "host"
+      tenant_name = var.multitenant_enabled ? var.label : "host"
     }
   }
 
@@ -1718,17 +1707,17 @@ resource "kubernetes_persistent_volume" "local-registry" {
 
 
 resource "random_password" "password" {
-  count = var.multitenant_enabled == false ? 1 : 0
+  count  = var.multitenant_enabled == false ? 1 : 0
   length = 12
 }
 
 resource "random_password" "salt" {
-  count = var.multitenant_enabled == false ? 1 : 0
+  count  = var.multitenant_enabled == false ? 1 : 0
   length = 8
 }
 
 resource "htpasswd_password" "hash" {
-  count = var.multitenant_enabled == false ? 1 : 0
+  count    = var.multitenant_enabled == false ? 1 : 0
   password = local.password
   salt     = local.salt
 }
