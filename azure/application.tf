@@ -222,10 +222,6 @@ clusterIssuer:
             clientID: ${module.cluster.kubelet_identity.client_id}
           resourceGroupName: ${var.common_resource_group}
           subscriptionID: ${split("/", data.azurerm_subscription.primary.id)[2]}
-      selector:
-        matchLabels:
-          "acme.cert-manager.io/dns01-solver": "true"
-
 aws-efs-csi-driver:
   enabled: false
 aws-fsx-csi-driver:
