@@ -15,9 +15,7 @@ variable "lambda_sns_forwarder_enabled" {
 }
 variable "lambda_sns_forwarder_iam_principal_arn" {}
 
-variable "aws_access_key" {}
-variable "aws_secret_key" {}
-
+variable "account_id" {}
 
 locals {
   account_region_name = lower("${var.account}-${var.region}-${var.name}")

@@ -420,8 +420,7 @@ module "secrets-operator-setup" {
   environment                            = var.load_environment == "" ? local.environment : lower(var.load_environment)
   lambda_sns_forwarder_enabled           = var.lambda_sns_forwarder_enabled
   lambda_sns_forwarder_iam_principal_arn = local.environment_lambda_sns_forwarder_iam_principal_arn
-  aws_access_key                         = var.aws_access_key
-  aws_secret_key                         = var.aws_secret_key
+  account_id                             = data.aws_caller_identity.current.account_id
 }
 
 module "karpenter" {

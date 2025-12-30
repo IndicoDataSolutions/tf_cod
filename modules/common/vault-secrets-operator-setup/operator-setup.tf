@@ -105,7 +105,7 @@ resource "null_resource" "lambda_sns_forwarder_auth_backend" {
     }
   }
   provisioner "local-exec" {
-    command = "./vault write auth/aws/${local.account_region_name}/config/client secret_key=${var.aws_secret_key} access_key=${var.aws_access_key}"
+    command = "./vault write auth/aws/${local.account_region_name}/config/sts/${var.account_id} sts_role='arn:aws:iam::${var.account_id}:role/VaultAuthAssumeRole'"
     environment = {
       VAULT_ADDR = "${var.vault_address}"
     }
