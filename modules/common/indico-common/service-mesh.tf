@@ -167,6 +167,7 @@ resource "kubernetes_annotations" "insights-ns-annotation" {
 
 
 resource "time_sleep" "wait_1_minutes_after_service_mesh" {
+  count           = var.enable_service_mesh ? 1 : 0
   depends_on      = [helm_release.linkerd-crds, helm_release.linkerd-control-plane, helm_release.linkerd-viz, helm_release.linkerd-multicluster]
   create_duration = "1m"
 }

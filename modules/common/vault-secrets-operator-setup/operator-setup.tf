@@ -95,6 +95,31 @@ resource "null_resource" "vault_auth_backend" {
   }
 }
 
+resource "null_resource" "lambda_sns_forwarder_auth_backend" {
+  count      = var.lambda_sns_forwarder_enabled == true ? 1 : 0
+  depends_on = [kubernetes_secret_v1.vault-auth-default, null_resource.download_vault, null_resource.vault_auth_backend]
+  provisioner "local-exec" {
+    command = "./vault auth enable -path=aws/${local.account_region_name} aws"
+    environment = {
+      VAULT_ADDR = "${var.vault_address}"
+    }
+  }
+  provisioner "local-exec" {
+    command = "./vault write auth/aws/${local.account_region_name}/config/sts/${var.account_id} sts_role='arn:aws:iam::${var.account_id}:role/VaultAuthAssumeRole'"
+    environment = {
+      VAULT_ADDR = "${var.vault_address}"
+    }
+    quiet = true
+  }
+
+  provisioner "local-exec" {
+    command = "./vault write auth/aws/${local.account_region_name}/role/vault-lambda-role auth_type=iam bound_iam_principal_arn=${var.lambda_sns_forwarder_iam_principal_arn} policies=${local.account_region_name} ttl=1h"
+    environment = {
+      VAULT_ADDR = "${var.vault_address}"
+    }
+  }
+}
+
 
 locals {
   vault_policies = <<EOT
@@ -114,7 +139,7 @@ path "customer-${var.account}/environments/${var.environment}/*" {
 }
 EOT
 
-kube_ca_cert = <<EOT
+  kube_ca_cert = <<EOT
 ${kubernetes_secret_v1.vault-auth-default.data["ca.crt"]}
 EOT
 }
