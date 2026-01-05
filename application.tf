@@ -455,8 +455,6 @@ migrations:
     registry: ${var.image_registry}
   vaultSecretsOperator:
     updateCRDs: ${var.secrets_operator_enabled}
-  opentelemetryOperator:
-    updateCRDs: ${var.monitoring_enabled}
 aws-ebs-csi-driver:
   image:
     repository: ${var.image_registry}/public.ecr.aws/ebs-csi-driver/aws-ebs-csi-driver
