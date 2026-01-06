@@ -74,6 +74,23 @@ EOT
         - secretName: ${var.ssl_static_secret_name}
           hosts:
             - alertmanager-${local.dns_name}
+  prometheusOperator:
+    thanosImage:
+      registry:  ${var.image_registry}/quay.io
+
+    prometheusConfigReloader:
+      image:
+        registry: ${var.image_registry}/quay.io
+
+    prometheusDefaultBaseImageRegistry: ${var.image_registry}/quay.io 
+    alertmanagerDefaultBaseImageRegistry: ${var.image_registry}/quay.io 
+    image:
+      registry: ${var.image_registry}/quay.io
+
+    admissionWebhooks:
+      patch:
+        image:
+          registry: ${var.image_registry}/ghcr.io
   prometheus:
     annotations:
       reloader.stakater.com/auto: "true"
@@ -132,7 +149,23 @@ ${local.thanos_config}
         cert-manager.io/cluster-issuer: zerossl
       labels:
         acme.cert-manager.io/dns01-solver: "true"
+  prometheusOperator:
+    thanosImage:
+      registry:  ${var.image_registry}/quay.io
 
+    prometheusConfigReloader:
+      image:
+        registry: ${var.image_registry}/quay.io
+
+    prometheusDefaultBaseImageRegistry: ${var.image_registry}/quay.io 
+    alertmanagerDefaultBaseImageRegistry: ${var.image_registry}/quay.io 
+    image:
+      registry: ${var.image_registry}/quay.io
+
+    admissionWebhooks:
+      patch:
+        image:
+          registry: ${var.image_registry}/ghcr.io
   prometheus:
     annotations:
       reloader.stakater.com/auto: "true"
