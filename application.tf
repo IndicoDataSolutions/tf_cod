@@ -769,7 +769,7 @@ nginx-ingress:
   enabled: ${var.use_alb && var.disable_nginx_ingress ? false : true}
   controller:
     annotations:
-      linkerd.io/inject: ${var.enable_service_mesh ? "enabled" : "false"}
+      linkerd.io/inject: ${var.enable_service_mesh ? "\"enabled\"" : "\"disabled\""}
     service:
       httpPort:
         enabled: ${local.enableHttp}
