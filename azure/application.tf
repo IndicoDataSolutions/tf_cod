@@ -255,26 +255,12 @@ external-dns:
   sources:
     - service
     - ingress
-ingress-nginx:
+nginx-ingress:
   enabled: ${local.kube_prometheus_stack_enabled}
-  rbac:
-    create: true
   controller:
     service:
       annotations:
         service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
-  admissionWebhooks:
-    patch:
-      nodeSelector.beta.kubernetes.io/os: linux
-    controller:
-      service:
-        annotations:
-          service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
-  authentication:
-    ingressUsername: monitoring
-    ingressPassword: ${random_password.monitoring-password.result}
-  defaultBackend:
-    nodeSelector.beta.kubernetes.io/os: linux
 reflector:
   image:
     repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector

@@ -765,36 +765,18 @@ cluster-autoscaler:
     extraArgs:
       aws-use-static-instance-list: true
 ${local.dns_configuration_values}
-ingress-nginx:
+nginx-ingress:
   enabled: ${var.use_alb && var.disable_nginx_ingress ? false : true}
   controller:
-    podAnnotations:
+    annotations:
       linkerd.io/inject: ${var.enable_service_mesh ? "enabled" : "false"}
     service:
-      enableHttp: ${local.enableHttp}
-      targetPorts:
-        https: ${local.backend_port}
+      httpPort:
+        enabled: ${local.enableHttp}
+      httpsPort:
+        enabled: ${local.backend_port == "https" ? true : false}
 ${local.lb_config}
-    image:
-      registry: ${var.image_registry}/registry.k8s.io
-      digest: ""
-    admissionWebhooks:
-      patch:
-        image:
-          registry: ${var.image_registry}/registry.k8s.io
-          digest: ""
-  rbac:
-    create: true
 
-  admissionWebhooks:
-    patch:
-      nodeSelector.beta.kubernetes.io/os: linux
-
-  defaultBackend:
-    nodeSelector.beta.kubernetes.io/os: linux
-  service:
-    annotations:
-      service.beta.kubernetes.io/oci-load-balancer-internal: "${local.internal_elb}"
 reflector:
   image:
     repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
