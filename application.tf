@@ -772,9 +772,9 @@ nginx-ingress:
       linkerd.io/inject: ${var.enable_service_mesh ? "\"enabled\"" : "\"disabled\""}
     service:
       httpPort:
-        enabled: ${local.enableHttp}
+        enable: ${local.enableHttp}
       httpsPort:
-        enabled: ${local.backend_port == "https" ? true : false}
+        enable: ${local.backend_port == "https" ? true : false}
 ${local.lb_config}
 
 reflector:
