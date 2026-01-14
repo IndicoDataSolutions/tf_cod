@@ -917,7 +917,7 @@ locals {
   lb_config = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
   loadbalancer_config = var.use_nlb == true ? (<<EOT
       annotations:
-        ${indent(8, local.loadbalancer_annotation_config)}
+        ${indent(10, local.loadbalancer_annotation_config)}
         service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
         service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
         service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
@@ -932,7 +932,7 @@ locals {
   EOT
 ) : (<<EOT
       annotations:
-        ${indent(8, local.loadbalancer_annotation_config)}
+        ${indent(10, local.loadbalancer_annotation_config)}
         ${local.internal_elb == true ? (<<EOT
         service.beta.kubernetes.io/aws-load-balancer-scheme: internal
         service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
@@ -943,7 +943,7 @@ locals {
 )
 acm_loadbalancer_config = (<<EOT
       annotations:
-        ${indent(8, local.loadbalancer_annotation_config)}
+        ${indent(10, local.loadbalancer_annotation_config)}
         service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
         service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
         service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
