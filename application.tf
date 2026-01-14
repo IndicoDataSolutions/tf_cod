@@ -634,7 +634,7 @@ dragonfly-operator:
     image:
       repository: ${var.image_registry}/docker.dragonflydb.io/dragonflydb/operator
 aws-load-balancer-controller:
-  enabled: ${var.use_alb}
+  enabled: true
   EOF
   ]
 
@@ -749,7 +749,7 @@ aws-fsx-csi-driver:
       image:
         repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-resizer
 aws-load-balancer-controller:
-  enabled: ${var.use_alb}
+  enabled: true
   clusterName: ${var.label}
   vpcId: ${local.environment_indico_vpc_id}
   region: ${var.region}
