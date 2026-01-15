@@ -634,7 +634,7 @@ dragonfly-operator:
     image:
       repository: ${var.image_registry}/docker.dragonflydb.io/dragonflydb/operator
 aws-load-balancer-controller:
-  enabled: ${var.use_alb}
+  enabled: true
   EOF
   ]
 
@@ -749,7 +749,7 @@ aws-fsx-csi-driver:
       image:
         repository: ${var.image_registry}/public.ecr.aws/eks-distro/kubernetes-csi/external-resizer
 aws-load-balancer-controller:
-  enabled: ${var.use_alb}
+  enabled: true
   clusterName: ${var.label}
   vpcId: ${local.environment_indico_vpc_id}
   region: ${var.region}
@@ -765,36 +765,18 @@ cluster-autoscaler:
     extraArgs:
       aws-use-static-instance-list: true
 ${local.dns_configuration_values}
-ingress-nginx:
+nginx-ingress:
   enabled: ${var.use_alb && var.disable_nginx_ingress ? false : true}
   controller:
-    podAnnotations:
-      linkerd.io/inject: ${var.enable_service_mesh ? "enabled" : "false"}
-    service:
-      enableHttp: ${local.enableHttp}
-      targetPorts:
-        https: ${local.backend_port}
-${local.lb_config}
-    image:
-      registry: ${var.image_registry}/registry.k8s.io
-      digest: ""
-    admissionWebhooks:
-      patch:
-        image:
-          registry: ${var.image_registry}/registry.k8s.io
-          digest: ""
-  rbac:
-    create: true
-
-  admissionWebhooks:
-    patch:
-      nodeSelector.beta.kubernetes.io/os: linux
-
-  defaultBackend:
-    nodeSelector.beta.kubernetes.io/os: linux
-  service:
     annotations:
-      service.beta.kubernetes.io/oci-load-balancer-internal: "${local.internal_elb}"
+      linkerd.io/inject: ${var.enable_service_mesh ? "\"enabled\"" : "\"disabled\""}
+    service:
+      httpPort:
+        enable: ${local.enableHttp}
+      httpsPort:
+        enable: ${local.backend_port == "https" ? true : false}
+${local.lb_config}
+
 reflector:
   image:
     repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
@@ -925,81 +907,63 @@ module "indico-common" {
 
 # With the common charts are installed, we can then move on to installing intake and/or insights
 locals {
-  internal_elb = var.network_allow_public == false ? true : false
-  backend_port = var.acm_arn != "" ? "http" : "https"
-  enableHttp   = var.acm_arn != "" || var.use_nlb == true ? false : true
-  loadbalancer_annotation_config = var.create_nginx_ingress_security_group == true && local.environment_nginx_ingress_allowed_cidrs != [] ? (<<EOT
-annotations:
-  service.beta.kubernetes.io/aws-load-balancer-security-groups: "${local.environment_nginx_ingress_security_group_id}"
-  EOT
-    ) : (<<EOT
-annotations: {}
-  EOT
-  )
-  lb_config = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
+  internal_elb                   = var.network_allow_public == false ? true : false
+  backend_port                   = var.acm_arn != "" ? "http" : "https"
+  enableHttp                     = var.acm_arn != "" || var.use_nlb == true ? false : true
+  loadbalancer_annotation_config = var.create_nginx_ingress_security_group == true && local.environment_nginx_ingress_allowed_cidrs != [] ? "service.beta.kubernetes.io/aws-load-balancer-security-groups: \"${local.environment_nginx_ingress_security_group_id}\"" : ""
+  lb_config                      = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
   loadbalancer_config = var.use_nlb == true ? (<<EOT
-      ${indent(6, local.loadbalancer_annotation_config)}
-      external:
-        enabled: ${var.network_allow_public}
-      annotations:
+      annotations: 
+        ${local.loadbalancer_annotation_config}
         service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
         service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
         service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
-        service.beta.kubernetes.io/aws-load-balancer-type: nlb
+        service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+        service.beta.kubernetes.io/aws-load-balancer-type: "external"
         service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
-      internal:
-        enabled: ${local.internal_elb}
-        annotations:
-          # Create internal NLB
-          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
-          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
-          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
-          service.beta.kubernetes.io/aws-load-balancer-type: nlb
-          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
-          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}"
+        service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+        ${local.internal_elb == true ? (<<EOT
+        service.beta.kubernetes.io/aws-load-balancer-type: "external"
+        service.beta.kubernetes.io/aws-load-balancer-scheme: internal
+        service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}"
+      EOT
+) : ""}
   EOT
-    ) : (<<EOT
-      ${indent(6, local.loadbalancer_annotation_config)}
-      external:
-        enabled: ${var.network_allow_public}
-      internal:
-        enabled: ${local.internal_elb}
-        annotations:
-          # Create internal ELB
-          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}"
-  EOT
-  )
-  acm_loadbalancer_config = (<<EOT
-      ${indent(6, local.loadbalancer_annotation_config)}
-      external:
-        enabled: ${var.network_allow_public}
+) : (<<EOT
       annotations:
+        ${local.loadbalancer_annotation_config}
+        ${local.internal_elb == true ? (<<EOT
+        service.beta.kubernetes.io/aws-load-balancer-scheme: internal
+        service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
+        service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}"
+      EOT
+) : ""}
+  EOT
+)
+acm_loadbalancer_config = (<<EOT
+      annotations:
+        ${local.loadbalancer_annotation_config}
         service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
         service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
         service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
-        service.beta.kubernetes.io/aws-load-balancer-type: nlb
+        service.beta.kubernetes.io/aws-load-balancer-type: "external"
+        service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+        service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
         service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
-      internal:
-        enabled: ${local.internal_elb}
-        annotations:
-          # Create internal NLB
-          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
-          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
-          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
-          service.beta.kubernetes.io/aws-load-balancer-type: nlb
-          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
-          service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "${var.acm_arn}"
-          service.beta.kubernetes.io/aws-load-balancer-internal: "${local.internal_elb}"
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}"
+        service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "${var.acm_arn}"
+        ${local.internal_elb == true ? (<<EOT
+        service.beta.kubernetes.io/aws-load-balancer-scheme: internal
+        service.beta.kubernetes.io/aws-load-balancer-type: "external"
+        service.beta.kubernetes.io/aws-load-balancer-subnets: "${var.internal_elb_use_public_subnets ? join(", ", local.environment_public_subnet_ids) : join(", ", local.environment_private_subnet_ids)}"
+      EOT
+) : ""}
   EOT
-  )
+)
 
-  alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
+alerting_configuration_values = var.alerting_enabled == false ? (<<EOT
 noExtraConfigs: true
   EOT
-    ) : (<<EOT
+  ) : (<<EOT
 alerting:
   enabled: true
   email:
@@ -1023,16 +987,16 @@ alerting:
 ${local.standard_rules}
   ${var.custom_prometheus_alert_rules != "" ? indent(2, base64decode(var.custom_prometheus_alert_rules)) : ""}
 EOT
-  )
-  standard_rules = var.alerting_standard_rules != "" ? (<<EOT
+)
+standard_rules = var.alerting_standard_rules != "" ? (<<EOT
   standardRules:
     ${indent(4, base64decode(var.alerting_standard_rules))}
 EOT
-    ) : (<<EOT
+  ) : (<<EOT
   noExtraConfigs: true
   EOT
-  )
-  ipa_pre_reqs_values = concat(local.storage_spec, [<<EOF
+)
+ipa_pre_reqs_values = concat(local.storage_spec, [<<EOF
 global:
   image:
     registry: ${var.image_registry}
@@ -1114,9 +1078,9 @@ externalSecretStore:
     enabled: ${var.load_environment == "" || var.multitenant_enabled == true ? "false" : "true"}
     environment: ${var.load_environment == "" && var.multitenant_enabled == false ? local.environment : lower(var.load_environment)}
   EOF
-  ])
+])
 
-  intake_values = <<EOF
+intake_values = <<EOF
 global:
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
@@ -1210,7 +1174,7 @@ externalSecretStore:
     environment: ${var.load_environment == "" ? local.environment : lower(var.load_environment)}
   EOF
 
-  faust_worker_settings = var.enable_data_application_cluster_separation ? var.load_environment == "" ? (<<EOF
+faust_worker_settings = var.enable_data_application_cluster_separation ? var.load_environment == "" ? (<<EOF
 faust-worker:
   enabled: true
   volumeMounts:
@@ -1259,15 +1223,15 @@ faust-worker:
         DOCTOR_HOST: 'http://doctor-application-cluster:5000'
         NOCT_HOST: 'http://noct-application-cluster:5000'
 EOF
-    ) : (<<EOF
+  ) : (<<EOF
 faust-worker:
   enabled: false
 EOF
-    ) : (<<EOF
+  ) : (<<EOF
 faust-worker:
   enabled: true
 EOF
-  )
+)
 }
 
 module "intake" {

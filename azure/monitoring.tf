@@ -1,7 +1,7 @@
 locals {
   private_dns_config = var.private_dns_zone == true ? (<<EOT
 
-ingress-nginx:
+nginx-ingress:
   controller:
     service:
       annotations:
