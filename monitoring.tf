@@ -32,13 +32,6 @@ loki:
         region: ${var.region}
         bucketnames: ${local.environment_loki_s3_bucket_name}
         s3forcepathstyle: false
-    storage:
-      type: s3
-      bucketNames:
-        chunks: ${local.environment_loki_s3_bucket_name}
-        ruler: ${local.environment_loki_s3_bucket_name}
-      s3:
-        region: ${var.region}
   
 EOT
     ) : (<<EOT
