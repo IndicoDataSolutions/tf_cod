@@ -111,7 +111,7 @@ ${local.alertmanager_tls}
     admissionWebhooks:
       patch:
         image:
-          registry: ${var.image_registry}/registry.k8s.io
+          registry: ${var.image_registry}/ghcr.io
   kube-state-metrics:
     image:
       registry: ${var.image_registry}/registry.k8s.io
@@ -216,7 +216,7 @@ tempo:
     admissionWebhooks:
       patch:
         image:
-          registry: ${var.image_registry}/registry.k8s.io
+          registry: ${var.image_registry}/ghcr.io
   kube-state-metrics:
     image:
       registry: ${var.image_registry}/registry.k8s.io
