@@ -1,6 +1,0 @@
-apiVersion: v2
-maintainers:
-- email: devops@indico.io
-  name: indico devops
-name: local-registry
-version: 1.0.3-dev-14308-b1f444a8
