@@ -15,8 +15,8 @@ locals {
     instance-family = {
       key       = "karpenter.k8s.aws/instance-family"
       operator  = "In"
-      values    = ["m5", "m6i", "m6a", "m7i", "m7a", "c5", "c6i", "c6a", "c7i", "c7a", "c7i-flex", "r5", "r6i", "r6a", "r7i", "r7a"]
-      minValues = 16
+      values    = ["m6a"]
+      minValues = 1
     }
   }
   gpu_instance_requirements = {
