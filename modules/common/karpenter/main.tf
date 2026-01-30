@@ -173,7 +173,7 @@ EOF
 data "aws_ami" "gpu_eks_node" {
   filter {
     name   = "name"
-    values = ["amazon-eks-gpu-node-${var.k8s_version}-*"]
+    values = ["amazon-eks-node-al2023-x86_64-nvidia-${var.k8s_version}-*"]
   }
 
   most_recent = true
@@ -183,7 +183,7 @@ data "aws_ami" "gpu_eks_node" {
 data "aws_ami" "default_eks_node" {
   filter {
     name   = "name"
-    values = ["amazon-eks-node-${var.k8s_version}-*"]
+    values = ["amazon-eks-node-al2023-x86_64-standard-${var.k8s_version}-*"]
   }
 
   most_recent = true
