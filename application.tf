@@ -1312,6 +1312,12 @@ resource "random_password" "minio-password" {
   special = false
 }
 
+resource "random_password" "ins-svc-admin-password" {
+  count   = var.insights_enabled ? 1 : 0
+  length  = 16
+  special = false
+}
+
 locals {
   insights_pre_reqs_values = [<<EOF
 crunchy-postgres:
@@ -1420,6 +1426,9 @@ insights-edge:
     bucketName: ${local.environment_data_s3_bucket_name}
     endpoint: s3.${var.region}.amazonaws.com
     region: ${var.region}
+insights-health-check:
+  user:
+    password: ${var.insights_enabled ? random_password.ins-svc-admin-password[0].result : ""}
   EOF
 }
 
