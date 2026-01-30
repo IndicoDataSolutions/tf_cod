@@ -74,7 +74,7 @@ karpenter:
 nodeClass:
 ${yamlencode([for k, v in local.node_classes : {
     name             = v.name
-    amiFamily        = "AL2"
+    amiFamily        = "AL2023"
     role             = var.node_role_name
     clusterName      = var.cluster_name
     amiIds           = [v.ami_id]
