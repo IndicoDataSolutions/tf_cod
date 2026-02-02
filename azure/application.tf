@@ -801,6 +801,12 @@ resource "random_password" "minio-password" {
   special = false
 }
 
+resource "random_password" "ins-svc-admin-password" {
+  count   = var.insights_enabled ? 1 : 0
+  length  = 16
+  special = false
+}
+
 locals {
   insights_pre_reqs_values = [<<EOF
 crunchy-postgres:
@@ -897,6 +903,9 @@ minio:
   insights_values = <<EOF
 global:
   host: ${var.label}.${var.region}.indico-dev.indico.io
+insights-health-check:
+  user:
+    password: ${var.insights_enabled ? random_password.ins-svc-admin-password[0].result : ""}
   EOF
 }
 
