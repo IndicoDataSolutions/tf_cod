@@ -1312,7 +1312,7 @@ resource "random_password" "minio-password" {
   special = false
 }
 
-resource "random_password" "ins-svc-admin-password" {
+resource "random_password" "ins-svc-admin-pass" {
   count   = var.insights_enabled ? 1 : 0
   length  = 16
   special = false
@@ -1428,7 +1428,7 @@ insights-edge:
     region: ${var.region}
 insights-health-check:
   user:
-    password: ${var.insights_enabled ? random_password.ins-svc-admin-password[0].result : ""}
+    password: ${var.insights_enabled ? random_password.ins-svc-admin-pass[0].result : ""}
   EOF
 }
 
