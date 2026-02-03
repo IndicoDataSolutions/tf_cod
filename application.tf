@@ -1428,7 +1428,7 @@ insights-edge:
     region: ${var.region}
 insights-health-check:
   user:
-    password: ${var.insights_enabled ? random_password.ins-svc-admin-password[0].result : ""}
+    secret: ${var.insights_enabled ? random_password.ins-svc-admin-password[0].result : ""}
   EOF
 }
 
