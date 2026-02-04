@@ -157,8 +157,8 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
     expireAfter            = "Never"
     terminationGracePeriod = "24h"
     disruption = {
-      consolidationPolicy = "WhenEmptyOrUnderutilized"
-      consolidateAfter    = "15m"
+      consolidationPolicy = "WhenEmpty"
+      consolidateAfter    = "10m"
     }
     limits = {
       cpu    = "1000"
