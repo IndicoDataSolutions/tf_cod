@@ -149,7 +149,7 @@ ${yamlencode([for k, v in local.karpenter_node_pools : {
         {
           key      = "karpenter.k8s.aws/instance-cpu"
           operator = "In"
-          values   = contains(["monitoring-workers", "pgo-workers"], k) ? ["2", "4", "8", "16"] : ["4", "8", "16"]
+          values   = contains(["monitoring-workers", "pgo-workers"], k) ? ["2"] : ["4", "8", "16"]
         }
       ]
     )
