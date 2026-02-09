@@ -90,6 +90,12 @@ data "aws_iam_policy_document" "eks_vpc_guardduty" {
   }
 }
 
+data "aws_eks_addon_version" "guardduty" {
+  addon_name         = "aws-guardduty-agent"
+  kubernetes_version = var.k8s_version
+  most_recent        = true
+}
+
 resource "aws_eks_addon" "guardduty" {
   depends_on = [
     module.cluster,
@@ -99,7 +105,7 @@ resource "aws_eks_addon" "guardduty" {
 
   cluster_name                = var.label
   addon_name                  = "aws-guardduty-agent"
-  addon_version               = "v1.10.0-eksbuild.2"
+  addon_version               = data.aws_eks_addon_version.guardduty.version
   resolve_conflicts_on_update = "OVERWRITE"
 
   preserve = true
