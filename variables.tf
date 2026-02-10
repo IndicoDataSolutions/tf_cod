@@ -1850,4 +1850,4 @@ variable "" {
   type        = bool
   default     = true
   description = "Toggle for enforcing HTTP/2 only on ingress and ingress controller"
-}enforce_http_2_only
+}
