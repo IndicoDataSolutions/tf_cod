@@ -1,10 +1,12 @@
 locals {
   ingress_http2_annotations = var.enforce_http_2_only && var.use_alb == false ? (<<EOT
+
       annotations:
         nginx.org/http2: "true"
 EOT
   ) : ""
   ingress_http2_annotation_line = var.enforce_http_2_only && var.use_alb == false ? (<<EOT
+  
         nginx.org/http2: "true"
 EOT
   ) : ""

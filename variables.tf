@@ -1846,8 +1846,8 @@ variable "disable_nginx_ingress" {
   description = "Toggle for disabling Nginx Ingress"
 }
 
-variable "enforce_http_2_only" {
+variable "" {
   type        = bool
   default     = true
   description = "Toggle for enforcing HTTP/2 only on ingress and ingress controller"
-}
+}enforce_http_2_only

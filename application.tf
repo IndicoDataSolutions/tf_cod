@@ -770,7 +770,7 @@ nginx-ingress:
   controller:
     annotations:
       linkerd.io/inject: ${var.enable_service_mesh ? "\"enabled\"" : "\"disabled\""}
-    ${local.nginx_ingress_configs}
+${local.nginx_ingress_configs}
     service:
       httpPort:
         enable: ${local.enableHttp}
@@ -912,9 +912,10 @@ locals {
   backend_port                   = var.acm_arn != "" ? "http" : "https"
   enableHttp                     = var.enforce_http_2_only ? false : var.acm_arn != "" || var.use_nlb == true ? false : true
   nginx_ingress_configs          = var.enforce_http_2_only ? (<<EOT
+
     config:
       http2: "true"
-  EOT
+EOT
   ) : ""
   loadbalancer_annotation_config = var.create_nginx_ingress_security_group == true && local.environment_nginx_ingress_allowed_cidrs != [] ? "service.beta.kubernetes.io/aws-load-balancer-security-groups: \"${local.environment_nginx_ingress_security_group_id}\"" : ""
   lb_config                      = var.acm_arn != "" ? local.acm_loadbalancer_config : local.loadbalancer_config
