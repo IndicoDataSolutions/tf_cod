@@ -2,7 +2,7 @@ locals {
   aks_default_node_pool = {
     name       = "defaultpool"
     node_count = 3
-    vm_size    = "Standard_D16_v3"
+    vm_size    = "Standard_D16s_v5"
     zones      = ["1", "2"]
     taints     = null
     labels = {
@@ -36,7 +36,7 @@ locals {
     celeryworkers = {
       node_count = 0
       pool_name  = "celery"
-      vm_size    = "Standard_D16_v3"
+      vm_size    = "Standard_D16s_v5"
       node_os    = "Linux"
       zones      = ["1", "2"]
       taints     = ["indico.io/celery=true:NoSchedule"]
@@ -50,7 +50,7 @@ locals {
     staticworkers = {
       node_count = 1
       pool_name  = "static"
-      vm_size    = "Standard_D16_v3"
+      vm_size    = "Standard_D16s_v5"
       node_os    = "Linux"
       zones      = ["1", "2"]
       taints     = []
@@ -64,7 +64,7 @@ locals {
     pdfworkers = {
       node_count = 1
       pool_name  = "pdf"
-      vm_size    = "Standard_D16_v3"
+      vm_size    = "Standard_D16s_v5"
       node_os    = "Linux"
       zones      = ["1", "2"]
       taints     = ["indico.io/pdfextraction=true:NoSchedule"]
@@ -78,7 +78,7 @@ locals {
     highmemworkers = {
       node_count = 0
       pool_name  = "highmem"
-      vm_size    = "Standard_D16_v3"
+      vm_size    = "Standard_D16s_v5"
       node_os    = "Linux"
       zones      = ["1", "2"]
       taints     = ["indico.io/highmem=true:NoSchedule"]
@@ -92,7 +92,7 @@ locals {
     monitoringworkers = {
       node_count = 1
       pool_name  = "monitoring"
-      vm_size    = "Standard_d11_v2"
+      vm_size    = "Standard_D4s_v5"
       node_os    = "Linux"
       zones      = ["1", "2"]
       taints     = ["indico.io/monitoring=true:NoSchedule"]
@@ -106,7 +106,7 @@ locals {
     pgoworkers = {
       node_count = 1
       pool_name  = "pgo"
-      vm_size    = "Standard_D16_v3"
+      vm_size    = "Standard_D16s_v5"
       node_os    = "Linux"
       zones      = ["1", "2"]
       taints     = ["indico.io/crunchy=true:NoSchedule"]
@@ -120,7 +120,7 @@ locals {
     azurite = {
       node_count = 1
       pool_name  = "azurite"
-      vm_size    = "Standard_D16_v3"
+      vm_size    = "Standard_D16s_v5"
       node_os    = "Linux"
       zones      = ["1", "2"]
       taints     = ["indico.io/azurite=true:NoSchedule"]
@@ -137,7 +137,7 @@ locals {
     general = {
       node_count = 3
       pool_name  = "general"
-      vm_size    = "Standard_D16_v3"
+      vm_size    = "Standard_D16s_v5"
       node_os    = "Linux"
       zones      = ["1", "2"]
       taints     = []
@@ -151,7 +151,7 @@ locals {
     pgoworkers = {
       node_count = 1
       pool_name  = "pgo"
-      vm_size    = "Standard_D16_v3"
+      vm_size    = "Standard_D16s_v5"
       node_os    = "Linux"
       zones      = ["1", "2"]
       taints     = ["indico.io/crunchy=true:NoSchedule"]
@@ -165,7 +165,7 @@ locals {
     celeryworkers = {
       node_count = 0
       pool_name  = "celery"
-      vm_size    = "Standard_D16_v3"
+      vm_size    = "Standard_D16s_v5"
       node_os    = "Linux"
       zones      = ["1", "2"]
       taints     = ["indico.io/celery=true:NoSchedule"]
@@ -179,7 +179,7 @@ locals {
     minio = {
       node_count = 0
       pool_name  = "minio"
-      vm_size    = "Standard_D16_v3"
+      vm_size    = "Standard_D16s_v5"
       node_os    = "Linux"
       zones      = ["1", "2"]
       taints     = ["indico.io/minio=true:NoSchedule"]
@@ -193,7 +193,7 @@ locals {
     monitoringworkers = {
       node_count = 1
       pool_name  = "monitoring"
-      vm_size    = "Standard_d11_v2"
+      vm_size    = "Standard_D4s_v5"
       node_os    = "Linux"
       zones      = ["1", "2"]
       taints     = ["indico.io/monitoring=true:NoSchedule"]
