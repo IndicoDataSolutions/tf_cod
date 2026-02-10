@@ -1,4 +1,13 @@
 locals {
+  ingress_http2_annotations = var.enforce_http_2_only && var.use_alb == false ? (<<EOT
+      annotations:
+        nginx.org/http2: "true"
+EOT
+  ) : ""
+  ingress_http2_annotation_line = var.enforce_http_2_only && var.use_alb == false ? (<<EOT
+        nginx.org/http2: "true"
+EOT
+  ) : ""
 
   # thanos_config = var.thanos_enabled == true ? (<<EOT
   #     thanos: # this is the one being used
@@ -83,6 +92,7 @@ EOT
     ingress:
       enabled: true
       ingressClassName: nginx
+${local.ingress_http2_annotations}
       hosts:
         - alertmanager-${local.monitoring_domain_name}
       paths:
@@ -133,6 +143,7 @@ ${local.thanos_config}
     ingress:
       enabled: true
       ingressClassName: nginx
+${local.ingress_http2_annotations}
       hosts:
         - prometheus-${local.monitoring_domain_name}
       paths:
@@ -152,6 +163,7 @@ ${local.prometheus_tls}
     ingress:
       enabled: true
       ingressClassName: nginx
+${local.ingress_http2_annotations}
       hosts:
         - grafana-${local.monitoring_domain_name}
       path: /
@@ -191,6 +203,7 @@ tempo:
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
+${local.ingress_http2_annotation_line}
       labels:
         acme.cert-manager.io/dns01-solver: "true"
   prometheusOperator:
@@ -238,6 +251,7 @@ ${local.thanos_config}
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
+${local.ingress_http2_annotation_line}
       labels:
         acme.cert-manager.io/dns01-solver: "true"
   grafana:
@@ -254,6 +268,7 @@ ${local.thanos_config}
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
+${local.ingress_http2_annotation_line}
       labels:
         acme.cert-manager.io/dns01-solver: "true"
 ${var.enable_loki_logging == true ? (<<EOT
