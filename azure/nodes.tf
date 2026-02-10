@@ -1,10 +1,11 @@
 locals {
   aks_default_node_pool = {
-    name       = "defaultpool"
-    node_count = 3
-    vm_size    = "Standard_D16s_v5"
-    zones      = ["1", "2"]
-    taints     = null
+    name                        = "defaultpool"
+    node_count                  = 3
+    vm_size                     = "Standard_D16s_v5"
+    zones                       = ["1", "2"]
+    taints                      = null
+    temporary_name_for_rotation = "temppool"
     labels = {
       "node_group" : "default-workers"
     }
