@@ -52,6 +52,10 @@ locals {
   debug_env_names             = [for e in local.env_list : trimspace(tostring(try(e["name"], e.name)))]
   debug_helm_values_from_file_length = length(local.helm_values_from_file)
   debug_helm_values_source    = local.existing_exists && local.helm_values_from_file != "" ? "file" : "var"
+
+  # indent() only indents lines 2+; prepend 12 spaces so first line (e.g. "global:") is also indented under "value: |"
+  value_indent                = repeat(" ", 12)
+  indented_helm_values_to_use  = local.value_indent + replace(trimspace(local.helm_values_to_use), "\n", "\n" + local.value_indent)
 }
 
 resource "github_repository_file" "argocd-application-yaml" {
@@ -130,6 +134,6 @@ spec:
             ${var.terraform_helm_values}
         - name: HELM_VALUES
           value: |
-${indent(12, local.helm_values_to_use)}
+${local.indented_helm_values_to_use}
 ARGO_APPLICATION_YAML_END
 }
