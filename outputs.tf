@@ -301,47 +301,47 @@ output "lambda_sns_forwarder_iam_principal_arn" {
 }
 
 ## Argo HELM_VALUES debug outputs (application-deployment module)
-# IPA uses module.intake[0] because intake has count = var.ipa_enabled ? 1 : 0
+# IPA uses module.intake[0] (intake has count); try() returns null when IPA disabled
 
 # IPA (intake) application
 output "argo_debug_ipa_fetch_exists" {
   description = "[Debug] IPA: whether argocd-application file was found in GitHub"
-  value       = length(module.intake) > 0 ? module.intake[0].module.intake_application.argo_debug_fetch_exists : null
+  value       = try(module.intake[0].module.intake_application.argo_debug_fetch_exists, null)
 }
 
 output "argo_debug_ipa_content_base64_length" {
   description = "[Debug] IPA: base64 content length from GitHub"
-  value       = length(module.intake) > 0 ? module.intake[0].module.intake_application.argo_debug_content_base64_length : null
+  value       = try(module.intake[0].module.intake_application.argo_debug_content_base64_length, null)
 }
 
 output "argo_debug_ipa_yaml_top_level_keys" {
   description = "[Debug] IPA: top-level keys in decoded YAML"
-  value       = length(module.intake) > 0 ? module.intake[0].module.intake_application.argo_debug_yaml_top_level_keys : null
+  value       = try(module.intake[0].module.intake_application.argo_debug_yaml_top_level_keys, null)
 }
 
 output "argo_debug_ipa_has_spec_source_plugin" {
   description = "[Debug] IPA: has spec.source.plugin"
-  value       = length(module.intake) > 0 ? module.intake[0].module.intake_application.argo_debug_has_spec_source_plugin : null
+  value       = try(module.intake[0].module.intake_application.argo_debug_has_spec_source_plugin, null)
 }
 
 output "argo_debug_ipa_env_list_length" {
   description = "[Debug] IPA: number of env entries"
-  value       = length(module.intake) > 0 ? module.intake[0].module.intake_application.argo_debug_env_list_length : null
+  value       = try(module.intake[0].module.intake_application.argo_debug_env_list_length, null)
 }
 
 output "argo_debug_ipa_env_names" {
   description = "[Debug] IPA: env entry names (should include HELM_VALUES)"
-  value       = length(module.intake) > 0 ? module.intake[0].module.intake_application.argo_debug_env_names : null
+  value       = try(module.intake[0].module.intake_application.argo_debug_env_names, null)
 }
 
 output "argo_debug_ipa_helm_values_from_file_length" {
   description = "[Debug] IPA: length of extracted HELM_VALUES from file"
-  value       = length(module.intake) > 0 ? module.intake[0].module.intake_application.argo_debug_helm_values_from_file_length : null
+  value       = try(module.intake[0].module.intake_application.argo_debug_helm_values_from_file_length, null)
 }
 
 output "argo_debug_ipa_helm_values_source" {
   description = "[Debug] IPA: which source is used for HELM_VALUES (file or var)"
-  value       = length(module.intake) > 0 ? module.intake[0].module.intake_application.argo_debug_helm_values_source : null
+  value       = try(module.intake[0].module.intake_application.argo_debug_helm_values_source, null)
 }
 
 # Smoketests application (when enabled)
