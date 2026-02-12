@@ -15,11 +15,11 @@ resource "github_repository_file" "argocd-application-yaml" {
   commit_message      = var.github_commit_message
   overwrite_on_create = true
 
-  lifecycle {
-    ignore_changes = [
-      content
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     content
+  #   ]
+  # }
 
   content = <<EOT
 apiVersion: argoproj.io/v1alpha1
