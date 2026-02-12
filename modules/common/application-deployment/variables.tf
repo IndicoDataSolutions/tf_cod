@@ -132,3 +132,9 @@ variable "github_token" {
   sensitive   = true
   description = "Optional GitHub token for reading existing argocd-application file from private repos (e.g. pass var.git_pat from root)"
 }
+
+variable "github_repo_owner" {
+  type        = string
+  default     = "IndicoDataSolutions"
+  description = "GitHub org/owner used to qualify repository name when github_repo_name is just the repo (e.g. tf_cod -> IndicoDataSolutions/tf_cod)"
+}

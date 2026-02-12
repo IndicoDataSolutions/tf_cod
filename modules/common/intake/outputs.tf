@@ -38,3 +38,24 @@ output "argo_debug_helm_values_source" {
   description = "Which source is used for HELM_VALUES (file or var)"
   value       = module.intake_application.argo_debug_helm_values_source
 }
+
+# When fetch fails, these show why (HTTP status, path, repo, etc.)
+output "argo_debug_fetch_http_status" {
+  value = module.intake_application.argo_debug_fetch_http_status
+}
+
+output "argo_debug_fetch_message" {
+  value = module.intake_application.argo_debug_fetch_message
+}
+
+output "argo_debug_fetch_repo" {
+  value = module.intake_application.argo_debug_fetch_repo
+}
+
+output "argo_debug_fetch_path" {
+  value = module.intake_application.argo_debug_fetch_path
+}
+
+output "argo_debug_fetch_branch" {
+  value = module.intake_application.argo_debug_fetch_branch
+}

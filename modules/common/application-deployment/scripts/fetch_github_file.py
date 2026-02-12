@@ -1,33 +1,55 @@
 #!/usr/bin/env python3
 """
 Fetches a file from GitHub repository via API.
-Reads query from stdin (JSON: repository, branch, path, token).
-Outputs JSON to stdout: { "content_base64": "<base64>", "exists": "true"|"false" }.
-Used by Terraform external data source to optionally load argocd-application YAML.
+Reads query from stdin (JSON: repository, branch, path, token, owner).
+Outputs JSON to stdout: { "content_base64": "<base64>", "exists": "true"|"false" }
+When exists is false, also returns fetch_debug_* keys for Terraform output.
 """
 import json
-import os
 import sys
 import urllib.request
 import urllib.parse
 import base64
 
 
+def _fail(out_extra=None):
+    out = {"content_base64": "", "exists": "false"}
+    if out_extra:
+        out.update(out_extra)
+    print(json.dumps(out))
+
+
 def main():
     try:
         query = json.load(sys.stdin)
     except json.JSONDecodeError as e:
-        print(f"Invalid JSON on stdin: {e}", file=sys.stderr)
-        sys.exit(1)
+        _fail({"fetch_debug_http_status": "0", "fetch_debug_message": f"Invalid JSON: {e}"})
+        sys.exit(0)
 
-    repository = query.get("repository", "")
-    branch = query.get("branch", "")
-    path = query.get("path", "")
-    token = query.get("token", "")
+    repository = (query.get("repository") or "").strip()
+    branch = (query.get("branch") or "").strip()
+    path = (query.get("path") or "").strip()
+    token = (query.get("token") or "").strip()
+    owner = (query.get("owner") or "IndicoDataSolutions").strip()
+
+    # GitHub API requires "owner/repo"; if repo is just name, qualify it
+    if repository and "/" not in repository and owner:
+        repository = f"{owner}/{repository}"
+
+    # Normalize path: "./foo/bar" -> "foo/bar", "." alone stays (will be fixed below)
+    if path.startswith("./"):
+        path = path[2:]
+    if path == ".":
+        path = ""
 
     if not repository or not path:
-        out = {"content_base64": "", "exists": "false"}
-        print(json.dumps(out))
+        _fail({
+            "fetch_debug_http_status": "0",
+            "fetch_debug_message": "repository or path empty",
+            "fetch_debug_repo": repository or "(empty)",
+            "fetch_debug_path": path or "(empty)",
+            "fetch_debug_branch": branch or "(empty)",
+        })
         return
 
     # GitHub API: GET /repos/{owner}/{repo}/contents/{path}?ref={branch}
@@ -39,26 +61,37 @@ def main():
     if token:
         req.add_header("Authorization", f"token {token}")
 
+    debug_base = {
+        "fetch_debug_repo": repository,
+        "fetch_debug_path": path,
+        "fetch_debug_branch": branch,
+    }
+
     try:
         with urllib.request.urlopen(req, timeout=10) as resp:
             if resp.status != 200:
-                print(json.dumps({"content_base64": "", "exists": "false"}))
+                _fail({**debug_base, "fetch_debug_http_status": str(resp.status), "fetch_debug_message": "Non-200 response"})
                 return
             data = json.loads(resp.read().decode())
             content_b64 = data.get("content", "")
             if content_b64:
-                # API returns base64 with newlines; strip for single-line output
                 content_b64 = content_b64.replace("\n", "")
             print(json.dumps({"content_base64": content_b64, "exists": "true"}))
     except urllib.error.HTTPError as e:
-        if e.code == 404:
-            print(json.dumps({"content_base64": "", "exists": "false"}))
-        else:
-            print(f"GitHub API error: {e.code}", file=sys.stderr)
+        msg = e.read().decode()[:200] if e.fp else str(e.code)
+        _fail({
+            **debug_base,
+            "fetch_debug_http_status": str(e.code),
+            "fetch_debug_message": msg or f"HTTP {e.code}",
+        })
+        if e.code != 404:
             sys.exit(1)
     except Exception as e:
-        print(f"Error fetching file: {e}", file=sys.stderr)
-        print(json.dumps({"content_base64": "", "exists": "false"}))
+        _fail({
+            **debug_base,
+            "fetch_debug_http_status": "0",
+            "fetch_debug_message": str(e)[:200],
+        })
 
 
 if __name__ == "__main__":

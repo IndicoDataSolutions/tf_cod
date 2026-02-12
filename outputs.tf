@@ -344,6 +344,32 @@ output "argo_debug_ipa_helm_values_source" {
   value       = try(module.intake[0].argo_debug_helm_values_source, null)
 }
 
+# When IPA fetch fails: why file was not found
+output "argo_debug_ipa_fetch_http_status" {
+  description = "[Debug] IPA: GitHub API HTTP status when fetching file (e.g. 404)"
+  value       = try(module.intake[0].argo_debug_fetch_http_status, null)
+}
+
+output "argo_debug_ipa_fetch_message" {
+  description = "[Debug] IPA: error message when file not found"
+  value       = try(module.intake[0].argo_debug_fetch_message, null)
+}
+
+output "argo_debug_ipa_fetch_repo" {
+  description = "[Debug] IPA: repo used for fetch (owner/repo)"
+  value       = try(module.intake[0].argo_debug_fetch_repo, null)
+}
+
+output "argo_debug_ipa_fetch_path" {
+  description = "[Debug] IPA: file path used for fetch"
+  value       = try(module.intake[0].argo_debug_fetch_path, null)
+}
+
+output "argo_debug_ipa_fetch_branch" {
+  description = "[Debug] IPA: branch used for fetch"
+  value       = try(module.intake[0].argo_debug_fetch_branch, null)
+}
+
 # Smoketests application (when enabled)
 output "argo_debug_smoketests_fetch_exists" {
   description = "[Debug] Smoketests: whether argocd-application file was found"

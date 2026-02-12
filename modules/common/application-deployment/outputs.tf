@@ -45,3 +45,29 @@ output "argo_debug_helm_values_source" {
   description = "Which source is used for HELM_VALUES: 'file' or 'var'"
   value       = local.debug_helm_values_source
 }
+
+# When file is not found, the fetch script returns these (see fetch_github_file.py)
+output "argo_debug_fetch_http_status" {
+  description = "HTTP status from GitHub API when fetching file (e.g. 404 = not found; empty when file exists)"
+  value       = try(data.external.fetch_argo_application.result["fetch_debug_http_status"], null)
+}
+
+output "argo_debug_fetch_message" {
+  description = "Error or status message when file not found"
+  value       = try(data.external.fetch_argo_application.result["fetch_debug_message"], null)
+}
+
+output "argo_debug_fetch_repo" {
+  description = "Repository used for the fetch (owner/repo)"
+  value       = try(data.external.fetch_argo_application.result["fetch_debug_repo"], null)
+}
+
+output "argo_debug_fetch_path" {
+  description = "File path used for the fetch"
+  value       = try(data.external.fetch_argo_application.result["fetch_debug_path"], null)
+}
+
+output "argo_debug_fetch_branch" {
+  description = "Branch used for the fetch"
+  value       = try(data.external.fetch_argo_application.result["fetch_debug_branch"], null)
+}

@@ -18,6 +18,7 @@ data "external" "fetch_argo_application" {
     branch     = var.github_repo_branch
     path       = var.github_file_path
     token      = var.github_token
+    owner      = var.github_repo_owner
   }
 }
 
