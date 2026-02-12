@@ -125,3 +125,10 @@ variable "use_local_helm_charts" {
   default     = false
   description = "Toggle for using local helm charts"
 }
+
+variable "github_token" {
+  type        = string
+  default     = ""
+  sensitive   = true
+  description = "Optional GitHub token for reading existing argocd-application file from private repos (e.g. pass var.git_pat from root)"
+}

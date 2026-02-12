@@ -40,6 +40,10 @@ terraform {
       source  = "loafoe/htpasswd"
       version = "1.0.4"
     }
+    external = {
+      source  = "hashicorp/external"
+      version = "2.3.4"
+    }
   }
 }
 

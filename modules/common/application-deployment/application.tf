@@ -2,9 +2,36 @@ terraform {
   required_providers {
     github = {
       source  = "integrations/github"
-      version = "5.34.0"
+    }
+    external = {
+      source  = "hashicorp/external"
     }
   }
+}
+
+# Optionally load existing argocd-application YAML from GitHub to preserve HELM_VALUES
+data "external" "fetch_argo_application" {
+  program = ["python3", "${path.module}/scripts/fetch_github_file.py"]
+
+  query = {
+    repository = var.github_repo_name
+    branch     = var.github_repo_branch
+    path       = var.github_file_path
+    token      = var.github_token
+  }
+}
+
+locals {
+  existing_exists = data.external.fetch_argo_application.result.exists == "true"
+  existing_yaml = local.existing_exists ? (
+    try(yamldecode(base64decode(data.external.fetch_argo_application.result.content_base64)), {})
+  ) : {}
+  env_list = try(local.existing_yaml.spec.source.plugin.env, [])
+  helm_values_from_file = try(
+    [for e in local.env_list : e.value if e.name == "HELM_VALUES"][0],
+    ""
+  )
+  helm_values_to_use = local.existing_exists && local.helm_values_from_file != "" ? local.helm_values_from_file : var.helm_values
 }
 
 resource "github_repository_file" "argocd-application-yaml" {
@@ -14,6 +41,9 @@ resource "github_repository_file" "argocd-application-yaml" {
   file                = var.github_file_path
   commit_message      = var.github_commit_message
   overwrite_on_create = true
+  depends_on = [
+    data.external.fetch_argo_application
+  ]
 
   # lifecycle {
   #   ignore_changes = [
@@ -79,6 +109,6 @@ spec:
             ${var.terraform_helm_values}
         - name: HELM_VALUES
           value: |
-            ${var.helm_values}
+            ${local.helm_values_to_use}
 EOT
 }
