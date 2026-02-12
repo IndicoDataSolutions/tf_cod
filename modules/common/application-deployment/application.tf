@@ -24,9 +24,11 @@ data "external" "fetch_argo_application" {
 
 locals {
   existing_exists = data.external.fetch_argo_application.result.exists == "true"
-  existing_yaml = local.existing_exists ? (
-    try(yamldecode(base64decode(data.external.fetch_argo_application.result.content_base64)), {})
-  ) : {}
+  # Single try() avoids ternary type mismatch (true branch = object with keys, false = {})
+  existing_yaml = try(
+    yamldecode(base64decode(data.external.fetch_argo_application.result.content_base64)),
+    {}
+  )
   # Navigate spec.source.plugin.env (list of {name, value}) using bracket notation for reliable map access
   env_list = try(
     local.existing_yaml["spec"]["source"]["plugin"]["env"],
@@ -42,7 +44,7 @@ locals {
   # --- Debug: inspect what was fetched/parsed (use outputs below to view) ---
   debug_fetch_exists          = data.external.fetch_argo_application.result.exists
   debug_content_base64_length = length(data.external.fetch_argo_application.result.content_base64)
-  debug_yaml_keys             = local.existing_exists ? keys(local.existing_yaml) : []
+  debug_yaml_keys             = try(keys(local.existing_yaml), [])
   debug_has_spec              = local.existing_exists && try(length(local.existing_yaml["spec"]), 0) > 0
   debug_has_spec_source       = local.existing_exists && try(length(local.existing_yaml["spec"]["source"]), 0) > 0
   debug_has_plugin            = local.existing_exists && try(length(local.existing_yaml["spec"]["source"]["plugin"]), 0) > 0
