@@ -130,6 +130,6 @@ spec:
             ${var.terraform_helm_values}
         - name: HELM_VALUES
           value: |
-            ${local.helm_values_to_use}
+${indent(12, local.helm_values_to_use)}
 ARGO_APPLICATION_YAML_END
 }
