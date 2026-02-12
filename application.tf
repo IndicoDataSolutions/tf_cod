@@ -107,8 +107,7 @@ app-edge:
     useStaticCertificate: ${var.use_static_ssl_certificates}
     annotations:
       nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "'true'" : "'false'"}
-      where.am.i: "debug"
-${local.ingress_http2_annotation_line}
+${indent(6, local.ingress_http2_annotation_line)}
 EOT
   )
   dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT

@@ -7,7 +7,7 @@ EOT
   ) : ""
   ingress_http2_annotation_line = var.enforce_http_2_only && var.use_alb == false ? (<<EOT
   
-        nginx.org/http2: "true"
+nginx.org/http2: "true"
 EOT
   ) : ""
 
@@ -205,7 +205,7 @@ tempo:
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
-${local.ingress_http2_annotation_line}
+${indent(8, local.ingress_http2_annotation_line)}
       labels:
         acme.cert-manager.io/dns01-solver: "true"
   prometheusOperator:
@@ -253,7 +253,7 @@ ${local.thanos_config}
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
-${local.ingress_http2_annotation_line}
+${indent(8, local.ingress_http2_annotation_line)}
       labels:
         acme.cert-manager.io/dns01-solver: "true"
   grafana:
@@ -270,7 +270,7 @@ ${local.ingress_http2_annotation_line}
     ingress:
       annotations:
         cert-manager.io/cluster-issuer: zerossl
-${local.ingress_http2_annotation_line}
+${indent(8, local.ingress_http2_annotation_line)}
       labels:
         acme.cert-manager.io/dns01-solver: "true"
 ${var.enable_loki_logging == true ? (<<EOT
@@ -342,9 +342,9 @@ resource "aws_route53_record" "alertmanager-caa" {
 
 locals {
   monitoring_password = var.multitenant_enabled == false ? random_password.monitoring-password[0].result : ""
-  password = var.multitenant_enabled == false ? random_password.password[0].result : ""
-  salt = var.multitenant_enabled == false ? random_password.salt[0].result : ""
-  hash = var.multitenant_enabled == false ? htpasswd_password.hash[0].bcrypt : ""
+  password            = var.multitenant_enabled == false ? random_password.password[0].result : ""
+  salt                = var.multitenant_enabled == false ? random_password.salt[0].result : ""
+  hash                = var.multitenant_enabled == false ? htpasswd_password.hash[0].bcrypt : ""
 }
 
 resource "random_password" "monitoring-password" {
