@@ -107,7 +107,6 @@ app-edge:
     useStaticCertificate: ${var.use_static_ssl_certificates}
     annotations:
       nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "'true'" : "'false'"}
-      this.is.a.test: "debug"
 ${indent(6, local.ingress_http2_annotation_line)}
 EOT
   )

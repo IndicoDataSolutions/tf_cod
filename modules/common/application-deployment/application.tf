@@ -26,9 +26,14 @@ locals {
   existing_yaml = local.existing_exists ? (
     try(yamldecode(base64decode(data.external.fetch_argo_application.result.content_base64)), {})
   ) : {}
-  env_list = try(local.existing_yaml.spec.source.plugin.env, [])
+  # Navigate spec.source.plugin.env (list of {name, value}) using bracket notation for reliable map access
+  env_list = try(
+    local.existing_yaml["spec"]["source"]["plugin"]["env"],
+    try(local.existing_yaml.spec.source.plugin.env, [])
+  )
+  # Find env entry with name "HELM_VALUES"; use bracket notation and trimspace for robustness
   helm_values_from_file = try(
-    [for e in local.env_list : e.value if e.name == "HELM_VALUES"][0],
+    [for e in local.env_list : try(e["value"], e.value) if trimspace(tostring(try(e["name"], e.name))) == "HELM_VALUES"][0],
     ""
   )
   helm_values_to_use = local.existing_exists && local.helm_values_from_file != "" ? local.helm_values_from_file : var.helm_values
