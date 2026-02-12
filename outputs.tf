@@ -299,3 +299,78 @@ output "nginx_ingress_allowed_cidrs" {
 output "lambda_sns_forwarder_iam_principal_arn" {
   value = local.environment_lambda_sns_forwarder_iam_principal_arn
 }
+
+## Argo HELM_VALUES debug outputs (application-deployment module)
+
+# IPA (intake) application
+output "argo_debug_ipa_fetch_exists" {
+  description = "[Debug] IPA: whether argocd-application file was found in GitHub"
+  value       = try(module.intake.module.intake_application.argo_debug_fetch_exists, null)
+}
+
+output "argo_debug_ipa_content_base64_length" {
+  description = "[Debug] IPA: base64 content length from GitHub"
+  value       = try(module.intake.module.intake_application.argo_debug_content_base64_length, null)
+}
+
+output "argo_debug_ipa_yaml_top_level_keys" {
+  description = "[Debug] IPA: top-level keys in decoded YAML"
+  value       = try(module.intake.module.intake_application.argo_debug_yaml_top_level_keys, null)
+}
+
+output "argo_debug_ipa_has_spec_source_plugin" {
+  description = "[Debug] IPA: has spec.source.plugin"
+  value       = try(module.intake.module.intake_application.argo_debug_has_spec_source_plugin, null)
+}
+
+output "argo_debug_ipa_env_list_length" {
+  description = "[Debug] IPA: number of env entries"
+  value       = try(module.intake.module.intake_application.argo_debug_env_list_length, null)
+}
+
+output "argo_debug_ipa_env_names" {
+  description = "[Debug] IPA: env entry names (should include HELM_VALUES)"
+  value       = try(module.intake.module.intake_application.argo_debug_env_names, null)
+}
+
+output "argo_debug_ipa_helm_values_from_file_length" {
+  description = "[Debug] IPA: length of extracted HELM_VALUES from file"
+  value       = try(module.intake.module.intake_application.argo_debug_helm_values_from_file_length, null)
+}
+
+output "argo_debug_ipa_helm_values_source" {
+  description = "[Debug] IPA: which source is used for HELM_VALUES (file or var)"
+  value       = try(module.intake.module.intake_application.argo_debug_helm_values_source, null)
+}
+
+# Smoketests application (when enabled)
+output "argo_debug_smoketests_fetch_exists" {
+  description = "[Debug] Smoketests: whether argocd-application file was found"
+  value       = length(try(module.intake_smoketests, [])) > 0 ? module.intake_smoketests[0].argo_debug_fetch_exists : null
+}
+
+output "argo_debug_smoketests_env_names" {
+  description = "[Debug] Smoketests: env entry names"
+  value       = length(try(module.intake_smoketests, [])) > 0 ? module.intake_smoketests[0].argo_debug_env_names : null
+}
+
+output "argo_debug_smoketests_helm_values_source" {
+  description = "[Debug] Smoketests: HELM_VALUES source (file or var)"
+  value       = length(try(module.intake_smoketests, [])) > 0 ? module.intake_smoketests[0].argo_debug_helm_values_source : null
+}
+
+# Additional applications (for_each)
+output "argo_debug_additional_fetch_exists" {
+  description = "[Debug] Additional apps: whether file was found, by app key"
+  value       = { for k, v in try(module.additional_application, {}) : k => v.argo_debug_fetch_exists }
+}
+
+output "argo_debug_additional_env_names" {
+  description = "[Debug] Additional apps: env names, by app key"
+  value       = { for k, v in try(module.additional_application, {}) : k => v.argo_debug_env_names }
+}
+
+output "argo_debug_additional_helm_values_source" {
+  description = "[Debug] Additional apps: HELM_VALUES source (file or var), by app key"
+  value       = { for k, v in try(module.additional_application, {}) : k => v.argo_debug_helm_values_source }
+}
