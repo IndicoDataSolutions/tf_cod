@@ -384,7 +384,7 @@ variable "argo_namespace" {
 }
 
 variable "argo_path" {
-  description = "Path within the argo_repo containing yaml"
+  description = "Path within the argo_repo containing yaml. Use '.' for repo root, or a directory (e.g. 'dev-14834') if your application files live under a subpath (e.g. dev-14834/ipa_application.yaml). Must match where the file exists in GitHub for fetch_argo_application to find it."
   default     = "."
 }
 

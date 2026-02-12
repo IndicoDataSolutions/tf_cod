@@ -143,3 +143,10 @@ variable "ipa_version" {
   type    = string
   default = "0.12.1"
 }
+
+variable "github_token" {
+  type        = string
+  default     = ""
+  sensitive   = true
+  description = "GitHub token for reading existing argocd-application file from private repos (e.g. pass var.git_pat from root)"
+}

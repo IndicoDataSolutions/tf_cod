@@ -1271,6 +1271,7 @@ module "intake" {
   intake_values_overrides           = var.ipa_values
   use_local_helm_charts             = var.use_local_helm_charts
   install_local_intake_chart        = var.install_local_intake_chart
+  github_token                      = var.git_pat
 }
 
 locals {

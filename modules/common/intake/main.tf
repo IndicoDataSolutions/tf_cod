@@ -89,6 +89,7 @@ module "intake_application" {
   release_name           = "ipa"
   terraform_helm_values  = indent(12, trimspace(var.intake_values_terraform_overrides))
   helm_values            = trimspace(base64decode(var.intake_values_overrides))
+  github_token           = var.github_token
 }
 
 resource "helm_release" "intake" {
