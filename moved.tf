@@ -138,3 +138,106 @@ moved {
   from = module.public_networking[0].aws_vpc.indico
   to   = module.networking[0].module.create_network[0].aws_vpc.indico
 }
+moved {
+  from = module.public_networking[0].aws_eip.indico_elastic_ip
+  to   = module.networking[0].module.create_network[0].aws_eip.indico_elastic_ip
+}
+moved {
+  from = module.public_networking[0].aws_subnet.indico_private_subnets
+  to   = module.networking[0].module.create_network[0].aws_subnet.indico_private_subnets
+}
+moved {
+  from = module.public_networking[0].aws_subnet.indico_public_subnets
+  to   = module.networking[0].module.create_network[0].aws_subnet.indico_public_subnets
+}
+moved {
+  from = module.public_networking[0].aws_subnet.indico_firewall_subnets
+  to   = module.networking[0].module.create_network[0].aws_subnet.indico_firewall_subnets
+}
+moved {
+  from = module.public_networking[0].aws_internet_gateway.indico_igw
+  to   = module.networking[0].module.create_network[0].aws_internet_gateway.indico_igw[0]
+}
+moved {
+  from = module.public_networking[0].aws_route_table.public_route_table
+  to   = module.networking[0].module.create_network[0].aws_route_table.public_route_table
+}
+moved {
+  from = module.public_networking[0].aws_route_table.private_route_table
+  to   = module.networking[0].module.create_network[0].aws_route_table.private_route_table
+}
+moved {
+  from = module.public_networking[0].aws_route_table.firewall_route_table
+  to   = module.networking[0].module.create_network[0].aws_route_table.firewall_route_table
+}
+moved {
+  from = module.public_networking[0].aws_route_table.igw_route_table
+  to   = module.networking[0].module.create_network[0].aws_route_table.igw_route_table
+}
+moved {
+  from = module.public_networking[0].aws_route_table_association.public_rt_associations
+  to   = module.networking[0].module.create_network[0].aws_route_table_association.public_rt_associations
+}
+moved {
+  from = module.public_networking[0].aws_route_table_association.firewall_rt_associations
+  to   = module.networking[0].module.create_network[0].aws_route_table_association.firewall_rt_associations
+}
+moved {
+  from = module.public_networking[0].aws_route_table_association.private_associations
+  to   = module.networking[0].module.create_network[0].aws_route_table_association.private_associations
+}
+moved {
+  from = module.public_networking[0].aws_route_table_association.igw_rt_associations
+  to   = module.networking[0].module.create_network[0].aws_route_table_association.igw_rt_associations
+}
+moved {
+  from = module.public_networking[0].aws_nat_gateway.nat_gw
+  to   = module.networking[0].module.create_network[0].aws_nat_gateway.nat_gw
+}
+moved {
+  from = module.public_networking[0].aws_vpc_endpoint.gateway-endpoints
+  to   = module.networking[0].module.create_network[0].aws_vpc_endpoint.gateway-endpoints
+}
+moved {
+  from = module.public_networking[0].aws_vpc_endpoint.s3-endpoint
+  to   = module.networking[0].module.create_network[0].aws_vpc_endpoint.s3-endpoint
+}
+moved {
+  from = module.public_networking[0].null_resource.region_validation
+  to   = module.networking[0].module.create_network[0].null_resource.region_validation
+}
+moved {
+  from = module.public_networking[0].aws_default_security_group.default
+  to   = module.networking[0].module.create_network[0].aws_default_security_group.default
+}
+moved {
+  from = module.public_networking[0].aws_security_group.indico_all_subnets
+  to   = module.networking[0].module.create_network[0].aws_security_group.indico_all_subnets
+}
+moved {
+  from = module.public_networking[0].aws_networkfirewall_firewall.firewall
+  to   = module.networking[0].module.create_network[0].aws_networkfirewall_firewall.firewall
+}
+moved {
+  from = module.public_networking[0].aws_networkfirewall_firewall_policy.firewall-policy
+  to   = module.networking[0].module.create_network[0].aws_networkfirewall_firewall_policy.firewall-policy
+}
+moved {
+  from = module.public_networking[0].aws_networkfirewall_rule_group.allow_domains
+  to   = module.networking[0].module.create_network[0].aws_networkfirewall_rule_group.allow_domains
+}
+moved {
+  from = module.public_networking[0].aws_flow_log.indico_flow_logs
+  to   = module.networking[0].module.create_network[0].aws_flow_log.indico_flow_logs
+}
+moved {
+  from = module.public_networking[0].aws_cloudwatch_log_group.indico_flow_logs
+  to   = module.networking[0].module.create_network[0].aws_cloudwatch_log_group.indico_flow_logs
+}
+moved {
+  from = module.public_networking[0].aws_security_group.indico_allow_nginx_ingress_access
+  to   = module.networking[0].module.create_network[0].aws_security_group.indico_allow_nginx_ingress_access
+}
+
+
+
