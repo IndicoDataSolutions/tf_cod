@@ -40,7 +40,7 @@ locals {
     ""
   )
   
-  helm_values_to_use            = local.existing_exists && local.helm_values_from_file != "" ? indent(12, local.helm_values_from_file) : var.helm_values
+  helm_values_to_use            = local.existing_exists && local.helm_values_from_file != "" ? local.helm_values_from_file : var.helm_values
 
   # --- Debug: inspect what was fetched/parsed (use outputs below to view) ---
   debug_fetch_exists                 = data.external.fetch_argo_application.result.exists
@@ -129,9 +129,9 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
-            ${var.terraform_helm_values}
+            ${indent(12, var.terraform_helm_values)}
         - name: HELM_VALUES
           value: |
-            ${local.helm_values_to_use}
+            ${indent(12, local.helm_values_to_use)}
 ARGO_APPLICATION_YAML_END
 }
