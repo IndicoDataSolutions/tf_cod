@@ -39,7 +39,10 @@ locals {
     [for e in local.env_list : try(e["value"], e.value) if trimspace(tostring(try(e["name"], e.name))) == "HELM_VALUES"][0],
     ""
   )
-  helm_values_to_use = local.existing_exists && local.helm_values_from_file != "" ? local.helm_values_from_file : var.helm_values
+  # Strip first line if it is just "|" (YAML block indicator sometimes stored as content)
+  helm_values_from_file_lines = split("\n", local.helm_values_from_file)
+  helm_values_from_file_trimmed = length(local.helm_values_from_file_lines) > 0 && trimspace(local.helm_values_from_file_lines[0]) == "|" ? join("\n", slice(local.helm_values_from_file_lines, 1, length(local.helm_values_from_file_lines))) : local.helm_values_from_file
+  helm_values_to_use = local.existing_exists && local.helm_values_from_file != "" ? local.helm_values_from_file_trimmed : var.helm_values
 
   # --- Debug: inspect what was fetched/parsed (use outputs below to view) ---
   debug_fetch_exists                 = data.external.fetch_argo_application.result.exists
