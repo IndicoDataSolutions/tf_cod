@@ -138,7 +138,3 @@ moved {
   from = module.public_networking[0].aws_vpc.indico
   to   = module.networking[0].module.create_network[0].aws_vpc.indico
 }
-moved {
-  from = module.public_networking[0].aws_internet_gateway.indico_igw
-  to   = module.networking[0].module.create_network[0].aws_internet_gateway.indico_igw[0]
-}
