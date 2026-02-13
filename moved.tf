@@ -141,26 +141,10 @@ moved {
 
 # Subnets: public_networking -> networking create_network (avoid CIDR conflict on create)
 moved {
-  from = module.public_networking[0].aws_subnet.indico_private_subnets["10.0.0.0/19"]
-  to   = module.networking[0].module.create_network[0].aws_subnet.indico_private_subnets["10.0.0.0/19"]
+  from = module.public_networking[0].aws_subnet.indico_private_subnets
+  to   = module.networking[0].module.create_network[0].aws_subnet.indico_private_subnets
 }
 moved {
-  from = module.public_networking[0].aws_subnet.indico_private_subnets["10.0.32.0/19"]
-  to   = module.networking[0].module.create_network[0].aws_subnet.indico_private_subnets["10.0.32.0/19"]
-}
-moved {
-  from = module.public_networking[0].aws_subnet.indico_private_subnets["10.0.64.0/19"]
-  to   = module.networking[0].module.create_network[0].aws_subnet.indico_private_subnets["10.0.64.0/19"]
-}
-moved {
-  from = module.public_networking[0].aws_subnet.indico_public_subnets["10.0.96.0/27"]
-  to   = module.networking[0].module.create_network[0].aws_subnet.indico_public_subnets["10.0.96.0/27"]
-}
-moved {
-  from = module.public_networking[0].aws_subnet.indico_public_subnets["10.0.97.0/27"]
-  to   = module.networking[0].module.create_network[0].aws_subnet.indico_public_subnets["10.0.97.0/27"]
-}
-moved {
-  from = module.public_networking[0].aws_subnet.indico_public_subnets["10.0.98.0/27"]
-  to   = module.networking[0].module.create_network[0].aws_subnet.indico_public_subnets["10.0.98.0/27"]
+  from = module.public_networking[0].aws_subnet.indico_public_subnets
+  to   = module.networking[0].module.create_network[0].aws_subnet.indico_public_subnets
 }
