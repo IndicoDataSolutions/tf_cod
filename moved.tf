@@ -148,15 +148,3 @@ moved {
   from = module.public_networking[0].aws_subnet.indico_public_subnets
   to   = module.networking[0].module.create_network[0].aws_subnet.indico_public_subnets
 }
-moved {
-  from = module.public_networking[0].aws_route_table_association.public_rt_associations
-  to   = module.networking[0].module.create_network[0].aws_route_table_association.public_rt_associations
-}
-moved {
-  from = module.public_networking[0].aws_route_table_association.private_associations
-  to   = module.networking[0].module.create_network[0].aws_route_table_association.private_associations
-}
-moved {
-  from = module.public_networking[0].aws_route_table_association.igw_rt_associations
-  to   = module.networking[0].module.create_network[0].aws_route_table_association.igw_rt_associations
-}
