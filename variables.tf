@@ -972,8 +972,8 @@ variable "network_module" {
   default = "networking"
 
   validation {
-    condition     = var.network_module == "public_networking" || var.network_module == "networking"
-    error_message = "${var.network_module} not valid. Type must be either public_networking or networking"
+    condition     = var.network_module == "networking"
+    error_message = "${var.network_module} not valid. Type must be networking"
   }
 }
 
