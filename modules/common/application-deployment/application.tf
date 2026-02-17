@@ -40,7 +40,7 @@ locals {
     ""
   )
   
-  helm_values_to_use            = local.existing_exists && local.helm_values_from_file != "" ? indent(0, local.helm_values_from_file) : var.helm_values
+  helm_values_to_use            = local.existing_exists && local.helm_values_from_file != "" ? indent(12, trimspace(local.helm_values_from_file)) : var.helm_values
 
   # --- Debug: inspect what was fetched/parsed (use outputs below to view) ---
   debug_fetch_exists                 = data.external.fetch_argo_application.result.exists
