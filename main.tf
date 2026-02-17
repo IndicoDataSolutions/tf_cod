@@ -85,8 +85,6 @@ data "aws_caller_identity" "current" {}
 
 # define the networking module we're using locally
 locals {
-  network = module.networking
-
   argo_app_name           = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
   argo_smoketest_app_name = lower("${var.aws_account}.${var.region}.${var.label}-smoketest")
   argo_cluster_name       = "${var.aws_account}.${var.region}.${var.label}"
