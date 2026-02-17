@@ -129,9 +129,9 @@ spec:
         
         - name: HELM_TF_COD_VALUES
           value: |
-              ${var.terraform_helm_values}
+            ${var.terraform_helm_values}
         - name: HELM_VALUES
           value: |
-              ${local.helm_values_to_use}
+            ${local.helm_values_to_use}
 ARGO_APPLICATION_YAML_END
 }
