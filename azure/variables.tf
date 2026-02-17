@@ -1200,3 +1200,9 @@ variable "postgres_volume_size" {
   default     = "100Gi"
   description = "Size of the postgres volume"
 }
+
+variable "enforce_http_2_only" {
+  type        = bool
+  default     = true
+  description = "Toggle for enforcing HTTP/2 only on ingress and ingress controller"
+}
