@@ -1180,6 +1180,7 @@ externalSecretStore:
   loadEnvironment:
     enabled: ${var.load_environment == "" || var.multitenant_enabled == true ? "false" : "true"}
     environment: ${var.load_environment == "" ? local.environment : lower(var.load_environment)}
+tempValue: temp
   EOF
 
 faust_worker_settings = var.enable_data_application_cluster_separation ? var.load_environment == "" ? (<<EOF
