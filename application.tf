@@ -917,7 +917,7 @@ locals {
     config:
       entries:
         server-snippets: |
-          if ({{ "$" }}server_protocol != "HTTP/2.0") {
+          if ($server_protocol != "HTTP/2.0") {
             return 426;
           }
 
