@@ -138,3 +138,10 @@ variable "install_local_insights_chart" {
   default     = false
   description = "Toggle for installing the local insights chart"
 }
+
+variable "github_token" {
+  type        = string
+  default     = ""
+  sensitive   = true
+  description = "GitHub token for reading existing argocd-application file from private repos (e.g. pass var.git_pat from root)"
+}
