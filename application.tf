@@ -107,7 +107,6 @@ app-edge:
     useStaticCertificate: ${var.use_static_ssl_certificates}
     annotations:
       nginx.ingress.kubernetes.io/service-upstream: ${var.enable_service_mesh ? "'true'" : "'false'"}
-${indent(6, local.ingress_http2_annotation_line)}
 EOT
   )
   dns_configuration_values = var.is_alternate_account_domain == "false" ? (<<EOT
@@ -769,6 +768,7 @@ ${local.dns_configuration_values}
 nginx-ingress:
   enabled: ${var.use_alb && var.disable_nginx_ingress ? false : true}
   controller:
+    enableSnippets: ${var.enforce_http_2_only ? true : false}
     annotations:
       linkerd.io/inject: ${var.enable_service_mesh ? "\"enabled\"" : "\"disabled\""}
 ${local.nginx_ingress_configs}
@@ -915,7 +915,12 @@ locals {
   nginx_ingress_configs          = var.enforce_http_2_only ? (<<EOT
 
     config:
-      http2: "true"
+      entries:
+        server-snippets: |
+    if ($server_protocol != "HTTP/2.0") {
+      return 426;
+    }
+
 EOT
   ) : ""
   loadbalancer_annotation_config = var.create_nginx_ingress_security_group == true && local.environment_nginx_ingress_allowed_cidrs != [] ? "service.beta.kubernetes.io/aws-load-balancer-security-groups: \"${local.environment_nginx_ingress_security_group_id}\"" : ""
@@ -1180,7 +1185,6 @@ externalSecretStore:
   loadEnvironment:
     enabled: ${var.load_environment == "" || var.multitenant_enabled == true ? "false" : "true"}
     environment: ${var.load_environment == "" ? local.environment : lower(var.load_environment)}
-tempValue: temp
   EOF
 
 faust_worker_settings = var.enable_data_application_cluster_separation ? var.load_environment == "" ? (<<EOF
