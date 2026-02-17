@@ -758,6 +758,7 @@ module "intake" {
   intake_values_overrides           = var.ipa_values
   use_local_helm_charts             = var.use_local_helm_charts
   install_local_intake_chart        = var.install_local_intake_chart
+  github_token                      = var.git_pat
 }
 
 data "github_repository" "argo-github-repo" {
@@ -806,6 +807,7 @@ module "intake_smoketests" {
   release_name           = "run"
   terraform_helm_values  = ""
   helm_values            = indent(10, trimspace(local.smoketests_values))
+  github_token           = var.git_pat
 }
 
 resource "random_password" "minio-password" {
@@ -942,6 +944,7 @@ module "insights" {
   insights_values_overrides           = var.insights_values
   use_local_helm_charts               = var.use_local_helm_charts
   install_local_insights_chart        = var.install_local_insights_chart
+  github_token                        = var.git_pat
 }
 
 # And we can install any additional helm charts at this point as well
@@ -973,6 +976,7 @@ module "additional_application" {
   release_name           = each.value.name
   terraform_helm_values  = ""
   helm_values            = trimspace(base64decode(each.value.values))
+  github_token           = var.git_pat
 }
 
 resource "argocd_application" "ipa" {
