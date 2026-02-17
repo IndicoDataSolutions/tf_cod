@@ -42,18 +42,6 @@ locals {
   
   helm_values_to_use            = local.existing_exists && local.helm_values_from_file != "" ? indent(12, trimspace(local.helm_values_from_file)) : var.helm_values
 
-  # --- Debug: inspect what was fetched/parsed (use outputs below to view) ---
-  debug_fetch_exists                 = data.external.fetch_argo_application.result.exists
-  debug_content_base64_length        = length(data.external.fetch_argo_application.result.content_base64)
-  debug_yaml_keys                    = try(keys(local.existing_yaml), [])
-  debug_has_spec                     = local.existing_exists && try(length(local.existing_yaml["spec"]), 0) > 0
-  debug_has_spec_source              = local.existing_exists && try(length(local.existing_yaml["spec"]["source"]), 0) > 0
-  debug_has_plugin                   = local.existing_exists && try(length(local.existing_yaml["spec"]["source"]["plugin"]), 0) > 0
-  debug_env_list_length              = length(local.env_list)
-  debug_env_names                    = [for e in local.env_list : trimspace(tostring(try(e["name"], e.name)))]
-  debug_helm_values_from_file_length = length(local.helm_values_from_file)
-  debug_helm_values_source           = local.existing_exists && local.helm_values_from_file != "" ? "file" : "var"
-
 }
 
 resource "github_repository_file" "argocd-application-yaml" {
