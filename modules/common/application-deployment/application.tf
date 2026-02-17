@@ -74,7 +74,7 @@ resource "github_repository_file" "argocd-application-yaml" {
   # }
 
   # Unique delimiter so "EOT" (or similar) inside HELM_VALUES doesn't end the heredoc and truncate
-  content = <<-ARGO_APPLICATION_YAML_END
+  content = <<EOT
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -133,5 +133,5 @@ spec:
         - name: HELM_VALUES
           value: |
             ${local.helm_values_to_use}
-ARGO_APPLICATION_YAML_END
+EOT
 }
