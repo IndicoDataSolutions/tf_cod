@@ -967,16 +967,6 @@ variable "internal_elb_use_public_subnets" {
   description = "If enabled, this will use public subnets for the internal elb. Otherwise use the private subnets"
 }
 
-variable "network_module" {
-  type    = string
-  default = "networking"
-
-  validation {
-    condition     = var.network_module == "networking"
-    error_message = "${var.network_module} not valid. Type must be networking"
-  }
-}
-
 variable "network_type" {
   type    = string
   default = "create"
