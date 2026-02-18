@@ -183,12 +183,11 @@ module "kms_key" {
 }
 
 module "security-group" {
-  source         = "app.terraform.io/indico/indico-aws-security-group/mod"
-  version        = "3.0.0"
-  label          = var.label
-  vpc_cidr       = var.vpc_cidr
-  vpc_id         = local.environment_indico_vpc_id
-  network_module = "networking"
+  source   = "app.terraform.io/indico/indico-aws-security-group/mod"
+  version  = "3.0.0"
+  label    = var.label
+  vpc_cidr = var.vpc_cidr
+  vpc_id   = local.environment_indico_vpc_id
 }
 
 module "s3-storage" {
