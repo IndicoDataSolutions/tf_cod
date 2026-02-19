@@ -916,6 +916,7 @@ locals {
 
     config:
       entries:
+        http2: "true"
         server-snippets: |
           if ($server_protocol != "HTTP/2.0") {
             return 426;
