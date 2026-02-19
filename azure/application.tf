@@ -258,9 +258,11 @@ external-dns:
 nginx-ingress:
   enabled: ${local.kube_prometheus_stack_enabled}
   controller:
+    enableSnippets: ${var.enforce_http_2_only ? true : false}
     service:
       annotations:
         service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
+${local.nginx_ingress_configs}
 reflector:
   image:
     repository: ${var.image_registry}/docker.io/emberstack/kubernetes-reflector
@@ -327,6 +329,18 @@ sql-exporter:
 ${local.private_dns_config}
   EOF
   ]) : []
+  nginx_ingress_configs          = var.enforce_http_2_only ? (<<EOT
+
+    config:
+      entries:
+        http2: "true"
+        server-snippets: |
+          if ($server_protocol != "HTTP/2.0") {
+            return 426;
+          }
+
+EOT
+  ) : ""
 }
 
 module "indico-common" {
