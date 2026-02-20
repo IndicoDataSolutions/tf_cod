@@ -132,6 +132,19 @@ moved {
   to   = random_password.monitoring-password[0]
 }
 
+# Migrate from public_networking (v1.2) to networking (v2.x) with network_type = "create"
+# so Terraform moves resources in state instead of destroying/recreating the VPC.
+moved {
+  from = module.public_networking[0].aws_vpc.indico
+  to   = module.networking[0].module.create_network[0].aws_vpc.indico
+}
 
-
-
+# Subnets: public_networking -> networking create_network (avoid CIDR conflict on create)
+moved {
+  from = module.public_networking[0].aws_subnet.indico_private_subnets
+  to   = module.networking[0].module.create_network[0].aws_subnet.indico_private_subnets
+}
+moved {
+  from = module.public_networking[0].aws_subnet.indico_public_subnets
+  to   = module.networking[0].module.create_network[0].aws_subnet.indico_public_subnets
+}

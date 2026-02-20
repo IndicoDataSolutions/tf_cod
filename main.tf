@@ -85,8 +85,6 @@ data "aws_caller_identity" "current" {}
 
 # define the networking module we're using locally
 locals {
-  network = var.network_module == "public_networking" ? module.public_networking : module.networking
-
   argo_app_name           = lower("${var.aws_account}.${var.region}.${var.label}-ipa")
   argo_smoketest_app_name = lower("${var.aws_account}.${var.region}.${var.label}-smoketest")
   argo_cluster_name       = "${var.aws_account}.${var.region}.${var.label}"
@@ -109,22 +107,8 @@ resource "aws_key_pair" "kp" {
   public_key = tls_private_key.pk[0].public_key_openssh
 }
 
-module "public_networking" {
-  count                         = var.direct_connect == false && var.network_module == "public_networking" ? 1 : 0
-  source                        = "app.terraform.io/indico/indico-aws-network/mod"
-  version                       = "1.2.4"
-  label                         = var.label
-  vpc_cidr                      = var.vpc_cidr
-  private_subnet_cidrs          = var.private_subnet_cidrs
-  public_subnet_cidrs           = var.public_subnet_cidrs
-  subnet_az_zones               = var.subnet_az_zones
-  region                        = var.region
-  s3_endpoint_enabled           = var.s3_endpoint_enabled
-  gateway_vpc_endpoints_enabled = var.gateway_vpc_endpoints_enabled
-}
-
 module "networking" {
-  count                               = var.direct_connect == false && var.network_module == "networking" && var.load_environment == "" ? 1 : 0
+  count                               = var.direct_connect == false && var.load_environment == "" ? 1 : 0
   source                              = "app.terraform.io/indico/indico-aws-network/mod"
   version                             = "2.4.0"
   label                               = var.label
@@ -174,7 +158,7 @@ module "lambda-sns-forwarder" {
   region               = var.region
   label                = var.label
   subnet_ids           = flatten([local.environment_private_subnet_ids])
-  security_group_id    = var.network_module == "networking" ? local.environment_all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  security_group_id    = local.environment_all_subnets_sg_id
   lambda_timeout       = var.lambda_sns_forwarder_timeout
   kms_key              = local.environment_kms_key_arn
   sns_arn              = var.lambda_sns_forwarder_topic_arn == "" ? local.environment_indico_ipa_topic_arn : var.lambda_sns_forwarder_topic_arn
@@ -199,12 +183,11 @@ module "kms_key" {
 }
 
 module "security-group" {
-  source         = "app.terraform.io/indico/indico-aws-security-group/mod"
-  version        = "3.0.0"
-  label          = var.label
-  vpc_cidr       = var.vpc_cidr
-  vpc_id         = local.environment_indico_vpc_id
-  network_module = var.network_module
+  source   = "app.terraform.io/indico/indico-aws-security-group/mod"
+  version  = "3.0.0"
+  label    = var.label
+  vpc_cidr = var.vpc_cidr
+  vpc_id   = local.environment_indico_vpc_id
 }
 
 module "s3-storage" {
@@ -290,7 +273,7 @@ module "efs-storage" {
   label              = var.efs_filesystem_name == "" ? var.label : var.efs_filesystem_name
   efs_type           = var.efs_type
   additional_tags    = merge(var.additional_tags, { "type" = "local-efs-storage" })
-  security_groups    = var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : [module.security-group.all_subnets_sg_id]
+  security_groups    = [local.environment_all_subnets_sg_id]
   private_subnet_ids = flatten([local.environment_private_subnet_ids])
   kms_key_arn        = local.environment_kms_key_arn
 
@@ -305,7 +288,7 @@ module "fsx-storage" {
   region                      = var.region
   storage_capacity            = var.storage_capacity
   subnet_id                   = local.environment_private_subnet_ids[0]
-  security_group_id           = var.network_module == "networking" ? local.environment_all_subnets_sg_id : module.security-group.all_subnets_sg_id
+  security_group_id           = local.environment_all_subnets_sg_id
   data_bucket                 = local.environment_data_s3_bucket_name
   api_models_bucket           = local.environment_api_models_s3_bucket_name
   kms_key                     = local.environment_kms_key_key
@@ -391,7 +374,7 @@ module "cluster" {
   private_endpoint_enabled = var.network_allow_public == true ? false : true
 
   cluster_security_group_id             = local.environment_all_subnets_sg_id
-  cluster_additional_security_group_ids = var.network_module == "networking" ? [local.environment_all_subnets_sg_id] : []
+  cluster_additional_security_group_ids = [local.environment_all_subnets_sg_id]
   http_tokens                           = var.http_tokens
 }
 
