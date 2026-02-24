@@ -678,7 +678,93 @@ storage:
     enabled: false
 EOF
   ]
-
+  insights_extra_values =var.insights_enabled == true ? [<<EOF
+crunchy-postgres:
+  enabled: true
+  name: postgres-core
+  service:
+    metadata:
+      labels:
+        mirror.linkerd.io/exported: "remote-discovery"
+      annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+  instances:
+  - affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node_group
+              operator: In
+              values:
+              - core-workers
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: postgres-operator.crunchydata.com/cluster
+              operator: In
+              values:
+              - postgres-core
+            - key: postgres-operator.crunchydata.com/instance-set
+              operator: In
+              values:
+              - pgha2
+          topologyKey: kubernetes.io/hostname
+    dataVolumeClaimSpec:
+      storageClassName: ${local.storage_class}
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: ${var.postgres_volume_size}
+    name: pgha2
+    replicas: ${var.az_count}
+    resources:
+      requests:
+        cpu: 2000m
+        memory: 8000Mi
+    tolerations:
+      - effect: NoSchedule
+        key: indico.io/core
+        operator: Exists
+  pgBackRestConfig:
+    global:
+      archive-timeout: '10000'
+      repo2-path: /pgbackrest/postgres-core/repo2
+      repo2-retention-full: '5'
+      repo2-s3-key-type: auto
+      repo2-s3-kms-key-id: "${local.environment_kms_key_arn}"
+      repo2-s3-role: ${local.environment_node_role_name}
+    repos:
+    - name: repo2
+      s3:
+        bucket: ${local.environment_pgbackup_s3_bucket_name}
+        endpoint: s3.${var.region}.amazonaws.com
+        region: ${var.region}
+      schedules:
+        full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
+        differential: 0 0 * * * # Diff backup daily at midnight
+    jobs:
+      resources:
+        requests:
+          cpu: 1000m
+          memory: 3000Mi
+  users:
+    - name: indico
+      options: "SUPERUSER"
+rabbitmq:
+  enabled: true
+  rabbitmq:
+    image:
+      registry: ${var.image_registry}/dockerhub-proxy	
+    persistence:
+      storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
+celery-backend:
+  enabled: true
+EOF
+  ] : []
 
   indico_pre_reqs_values = concat(local.indico_storage_class_values, [<<EOF
 global:
@@ -790,6 +876,7 @@ externalSecretStore:
   vaultRole: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
   vaultServiceAccount: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
   vaultSecretName: "vault-auth"
+${local.insights_extra_values}
   EOF
   ])
 
@@ -1329,7 +1416,7 @@ resource "random_password" "minio-password" {
 locals {
   insights_pre_reqs_values = [<<EOF
 crunchy-postgres:
-  enabled: true
+  enabled: false
   name: postgres-insights
   instances:
   - affinity:
@@ -1434,6 +1521,12 @@ insights-edge:
     bucketName: ${local.environment_data_s3_bucket_name}
     endpoint: s3.${var.region}.amazonaws.com
     region: ${var.region}
+configs:
+  storage:
+    blob:
+      s3:
+        prefix: blob/${var.insights_namespace}
+        bucket: ${local.environment_data_s3_bucket_name}
   EOF
 }
 

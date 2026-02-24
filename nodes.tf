@@ -32,6 +32,16 @@ locals {
       additional_node_labels = ""
       taints                 = ""
     },
+    core-workers = {
+      type                   = "cpu"
+      spot                   = false
+      instance_types         = ["m6a.xlarge"]
+      min_size               = 0
+      max_size               = 3
+      desired_capacity       = "1"
+      taints                 = "--register-with-taints=indico.io/core=true:NoSchedule"
+      additional_node_labels = ""
+    },
     pdf-workers = {
       min_size               = 0
       max_size               = 3
@@ -104,6 +114,16 @@ locals {
       desired_capacity       = "3"
       additional_node_labels = ""
       taints                 = ""
+    },
+    core-workers = {
+      type                   = "cpu"
+      spot                   = false
+      instance_types         = ["m6a.xlarge"]
+      min_size               = 0
+      max_size               = 3
+      desired_capacity       = "1"
+      taints                 = "--register-with-taints=indico.io/core=true:NoSchedule"
+      additional_node_labels = ""
     },
     pgo-workers = {
       min_size               = 1
