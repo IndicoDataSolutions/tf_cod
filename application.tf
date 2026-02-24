@@ -678,7 +678,7 @@ storage:
     enabled: false
 EOF
   ]
-  insights_extra_values =var.insights_enabled == true ? [<<EOF
+  insights_extra_values =var.insights_enabled == true ? (<<EOF
 crunchy-postgres:
   enabled: true
   name: postgres-core
@@ -764,7 +764,11 @@ rabbitmq:
 celery-backend:
   enabled: true
 EOF
-  ] : []
+  ) : (<<EOF
+celery-backend:
+  enabled: false
+EOF
+)
 
   indico_pre_reqs_values = concat(local.indico_storage_class_values, [<<EOF
 global:
@@ -877,6 +881,7 @@ externalSecretStore:
   vaultServiceAccount: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
   vaultSecretName: "vault-auth"
 ${local.insights_extra_values}
+
   EOF
   ])
 
