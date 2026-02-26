@@ -678,7 +678,7 @@ storage:
     enabled: false
 EOF
   ]
-  indico_core_values = var.insights_enabled == true ? (<<EOF
+  indico_core_values = var.insights_enabled == true ? [<<EOF
 crunchy-postgres:
   enabled: true
   name: postgres-core
@@ -764,11 +764,11 @@ rabbitmq:
 celery-backend:
   enabled: true
 EOF
-    ) : (<<EOF
+    ] : [<<EOF
 celery-backend:
   enabled: false
 EOF
-  )
+  ]
 
   indico_pre_reqs_values = concat(local.indico_storage_class_values, [<<EOF
 global:
