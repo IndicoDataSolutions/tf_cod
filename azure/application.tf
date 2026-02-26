@@ -895,6 +895,7 @@ crunchy-postgres:
         - ask_my_collection
         - lagoon
         - noct
+        - neptune
 ingress:
   useStaticCertificate: false
   secretName: indico-ssl-static-cert
