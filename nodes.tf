@@ -35,7 +35,7 @@ locals {
     core-workers = {
       type                   = "cpu"
       spot                   = false
-      instance_types         = ["m6a.xlarge"]
+      instance_types         = ["m6a.2xlarge"]
       min_size               = 0
       max_size               = 3
       desired_capacity       = "1"
@@ -118,7 +118,7 @@ locals {
     core-workers = {
       type                   = "cpu"
       spot                   = false
-      instance_types         = ["m6a.xlarge"]
+      instance_types         = ["m6a.2xlarge"]
       min_size               = 0
       max_size               = 3
       desired_capacity       = "1"
