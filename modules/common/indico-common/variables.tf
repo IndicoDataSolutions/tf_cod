@@ -79,6 +79,18 @@ variable "indico_pre_reqs_values_overrides" {
   description = "indico-pre-requisites values overrides from the terraform"
 }
 
+variable "indico_core_version" {
+  type        = string
+  default     = ""
+  description = "Version of the indico-core helm chart"
+}
+
+variable "indico_core_values" {
+  type        = list(string)
+  default     = []
+  description = "indico-core values overrides from the terraform"
+}
+
 variable "monitoring_enabled" {
   type        = bool
   default     = true

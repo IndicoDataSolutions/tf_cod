@@ -119,6 +119,24 @@ EOT
   ])
 }
 
+resource "helm_release" "indico_core" {
+  depends_on = [helm_release.indico_pre_requisites, helm_release.monitoring]
+  count = var.insights_enabled == true ? 1 : 0
+
+  verify           = false
+  name             = "indico-core"
+  create_namespace = true
+  namespace        = var.namespace
+  repository       = var.use_local_helm_charts ? null : var.helm_registry
+  chart            = var.use_local_helm_charts ? "./charts/indico-core/" : "indico-core"
+  version          = var.use_local_helm_charts ? null : var.indico_core_version
+  wait             = false
+  timeout          = "1800" # 30 minutes
+  max_history      = 10
+
+  values = var.indico_core_values
+}
+
 resource "helm_release" "monitoring" {
   depends_on = [helm_release.indico_pre_requisites, null_resource.annotate_monitoring_namespace]
 

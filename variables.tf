@@ -1433,6 +1433,12 @@ variable "indico_pre_reqs_version" {
   description = "Version of the indico-pre-reqs helm chart"
 }
 
+variable "indico_core_version" {
+  type        = string
+  default     = ""
+  description = "Version of the indico-core helm chart"
+}
+
 variable "insights-pre-reqs-values-yaml-b64" {
   type        = string
   default     = "Cg=="
