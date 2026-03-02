@@ -686,9 +686,10 @@ crunchy-postgres:
     metadata:
       labels:
         mirror.linkerd.io/exported: "remote-discovery"
-      annotations:
-        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+  metadata:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
   instances:
   - affinity:
       nodeAffinity:
