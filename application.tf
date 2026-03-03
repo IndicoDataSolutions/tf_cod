@@ -1516,6 +1516,13 @@ rabbitmq:
       registry: ${var.image_registry}/dockerhub-proxy	
     persistence:
       storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
+storage:
+  url: "https://${local.environment_miniobkp_s3_bucket_name}.s3.${var.region}.amazonaws.com/"
+  bucket: ${local.environment_miniobkp_s3_bucket_name}
+  useTLS: true
+  verify: false
+  apiVersion: ""
+  regionName: ${var.region}
   EOF
   ]
 
