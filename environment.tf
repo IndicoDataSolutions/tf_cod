@@ -10,10 +10,10 @@ data "terraform_remote_state" "environment" {
 }
 
 locals {
-  environment_indico_vpc_id                          = var.load_environment == "" ? local.network[0].indico_vpc_id : data.terraform_remote_state.environment[0].outputs.indico_vpc_id
-  environment_private_subnet_ids                     = var.load_environment == "" ? local.network[0].private_subnet_ids : data.terraform_remote_state.environment[0].outputs.private_subnet_ids
-  environment_public_subnet_ids                      = var.load_environment == "" ? local.network[0].public_subnet_ids : data.terraform_remote_state.environment[0].outputs.public_subnet_ids
-  environment_all_subnets_sg_id                      = var.load_environment == "" ? (var.network_module == "networking" ? local.network[0].all_subnets_sg_id : module.security-group.all_subnets_sg_id) : data.terraform_remote_state.environment[0].outputs.all_subnets_sg_id
+  environment_indico_vpc_id                          = var.load_environment == "" ? module.networking[0].indico_vpc_id : data.terraform_remote_state.environment[0].outputs.indico_vpc_id
+  environment_private_subnet_ids                     = var.load_environment == "" ? module.networking[0].private_subnet_ids : data.terraform_remote_state.environment[0].outputs.private_subnet_ids
+  environment_public_subnet_ids                      = var.load_environment == "" ? module.networking[0].public_subnet_ids : data.terraform_remote_state.environment[0].outputs.public_subnet_ids
+  environment_all_subnets_sg_id                      = var.load_environment == "" ? module.networking[0].all_subnets_sg_id : data.terraform_remote_state.environment[0].outputs.all_subnets_sg_id
   environment_indico_ipa_topic_arn                   = var.load_environment == "" ? var.sqs_sns == true ? module.sqs_sns[0].indico_ipa_topic_arn : "null" : data.terraform_remote_state.environment[0].outputs.indico_ipa_topic_arn
   environment_indico_ipa_queue_arn                   = var.load_environment == "" ? var.sqs_sns == true ? module.sqs_sns[0].indico_ipa_queue_arn : "null" : data.terraform_remote_state.environment[0].outputs.indico_ipa_queue_arn
   environment_indico_sqs_sns_policy_name             = var.load_environment == "" ? var.sqs_sns == true ? module.sqs_sns[0].indico_sqs_sns_policy_name : "null" : data.terraform_remote_state.environment[0].outputs.indico_sqs_sns_policy_name
@@ -46,8 +46,8 @@ locals {
   environment_s3_replication_role_arn                = var.load_environment == "" ? coalesce(module.iam[0].s3_replication_role_arn, "null") : data.terraform_remote_state.environment[0].outputs.s3_replication_role_arn
   environment_vpc_flow_logs_role_name                = var.load_environment == "" ? coalesce(module.iam[0].vpc_flow_logs_role_name, "null") : data.terraform_remote_state.environment[0].outputs.vpc_flow_logs_role_name
   environment_vpc_flow_logs_role_arn                 = var.load_environment == "" ? coalesce(module.iam[0].vpc_flow_logs_role_arn, "null") : data.terraform_remote_state.environment[0].outputs.vpc_flow_logs_role_arn
-  environment_nginx_ingress_security_group_id        = var.load_environment == "" ? (var.create_nginx_ingress_security_group && var.network_module == "networking" && var.network_type == "create" ? local.network[0].nginx_ingress_security_group_id : "null") : data.terraform_remote_state.environment[0].outputs.nginx_ingress_security_group_id
-  environment_nat_gateway_eips                       = var.load_environment == "" ? (var.network_module == "networking" && var.network_type == "create" ? local.network[0].nat_gateway_eips : ["null"]) : data.terraform_remote_state.environment[0].outputs.nat_gateway_eips
+  environment_nginx_ingress_security_group_id        = var.load_environment == "" ? (var.create_nginx_ingress_security_group && var.network_type == "create" ? module.networking[0].nginx_ingress_security_group_id : "null") : data.terraform_remote_state.environment[0].outputs.nginx_ingress_security_group_id
+  environment_nat_gateway_eips                       = var.load_environment == "" ? (var.network_type == "create" ? module.networking[0].nat_gateway_eips : ["null"]) : data.terraform_remote_state.environment[0].outputs.nat_gateway_eips
   environment_nginx_ingress_allowed_cidrs            = var.load_environment == "" ? (var.nginx_ingress_allowed_cidrs) : data.terraform_remote_state.environment[0].outputs.nginx_ingress_allowed_cidrs
   environment_lambda_sns_forwarder_iam_principal_arn = var.load_environment == "" ? var.lambda_sns_forwarder_enabled == true ? module.lambda-sns-forwarder[0].lambda_sns_forwarder_iam_principal_arn : "null" : data.terraform_remote_state.environment[0].outputs.lambda_sns_forwarder_iam_principal_arn
 
