@@ -21,8 +21,6 @@ default_tags = {
   "indico/cluster"     = "dop-832",    #This should match the label variable
   "indico/environment" = "dev"         # Choices are dev , stage , prod
 }
-submission_expiry = 30 # days
-uploads_expiry    = 30 # days
 #RDS Stuff
 deletion_protection_enabled = false
 skip_final_snapshot         = true
