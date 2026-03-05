@@ -165,18 +165,6 @@ variable "bucket_versioning" {
   description = "Enable bucket object versioning"
 }
 
-variable "submission_expiry" {
-  type        = number
-  description = "The number of days to retain submissions"
-  default     = 30
-}
-
-variable "uploads_expiry" {
-  type        = number
-  description = "The number of days to retain uploads"
-  default     = 30
-}
-
 ### cluster
 variable "name" {
   type        = string
@@ -1700,4 +1688,16 @@ variable "install_local_insights_chart" {
   type        = bool
   default     = false
   description = "Toggle for installing the local insights chart"
+}
+
+variable "s3_cleanup_noncurrent_days" {
+  type        = number
+  default     = 7
+  description = "The number of days to retain non-current versions of S3 objects"
+}
+
+variable "s3_retain_backup_days" {
+  type        = number
+  default     = 7
+  description = "The number of days to retain S3 backups"
 }
