@@ -121,7 +121,6 @@ EOT
 
 resource "helm_release" "indico_core" {
   depends_on = [helm_release.indico_pre_requisites, helm_release.monitoring]
-  count = var.insights_enabled == true ? 1 : 0
 
   verify           = false
   name             = "indico-core"
