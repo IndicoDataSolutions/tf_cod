@@ -237,7 +237,7 @@ EOT
               - key: node_group
                 operator: In
                 values:
-                - pgo-workers
+                - core-workers
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
@@ -245,7 +245,7 @@ EOT
               - key: postgres-operator.crunchydata.com/cluster
                 operator: In
                 values:
-                - postgres-insights
+                - postgres-core
               - key: postgres-operator.crunchydata.com/instance-set
                 operator: In
                 values:
@@ -253,7 +253,7 @@ EOT
             topologyKey: kubernetes.io/hostname
       dataVolumeClaimSpec:
         storageClassName: local-storage
-        volumeName: postgres-data-pgha1
+        volumeName: postgres-core-pgha1
         accessModes:
         - ReadWriteOnce
         resources:
@@ -267,7 +267,7 @@ EOT
           memory: 3000Mi
       tolerations:
         - effect: NoSchedule
-          key: indico.io/crunchy
+          key: indico.io/core
           operator: Exists
     - affinity:
         nodeAffinity:
@@ -277,7 +277,7 @@ EOT
               - key: node_group
                 operator: In
                 values:
-                - pgo-workers
+                - core-workers
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
@@ -285,7 +285,7 @@ EOT
               - key: postgres-operator.crunchydata.com/cluster
                 operator: In
                 values:
-                - postgres-insights
+                - postgres-core
               - key: postgres-operator.crunchydata.com/instance-set
                 operator: In
                 values:
@@ -293,7 +293,7 @@ EOT
             topologyKey: kubernetes.io/hostname
       dataVolumeClaimSpec:
         storageClassName: local-storage
-        volumeName: postgres-data-pgha2
+        volumeName: postgres-core-pgha2
         accessModes:
         - ReadWriteOnce
         resources:
@@ -307,7 +307,7 @@ EOT
           memory: 3000Mi
       tolerations:
         - effect: NoSchedule
-          key: indico.io/crunchy
+          key: indico.io/core
           operator: Exists
 EOT
     ) : (<<EOT
@@ -319,7 +319,7 @@ EOT
               - key: node_group
                 operator: In
                 values:
-                - pgo-workers
+                - core-workers
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
@@ -327,7 +327,7 @@ EOT
               - key: postgres-operator.crunchydata.com/cluster
                 operator: In
                 values:
-                - postgres-insights
+                - postgres-core
               - key: postgres-operator.crunchydata.com/instance-set
                 operator: In
                 values:
@@ -344,11 +344,11 @@ EOT
       replicas: ${var.az_count}
       resources:
         requests:
-          cpu: 1000m
-          memory: 3000Mi
+          cpu: 2000m
+          memory: 8000Mi
       tolerations:
         - effect: NoSchedule
-          key: indico.io/crunchy
+          key: indico.io/core
           operator: Exists
 EOT
   )
@@ -678,9 +678,9 @@ storage:
     enabled: false
 EOF
   ]
-  indico_core_values = var.insights_enabled == true ? [<<EOF
+  indico_core_values = [<<EOF
 crunchy-postgres:
-  enabled: true
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   name: postgres-core
   service:
     metadata:
@@ -691,55 +691,17 @@ crunchy-postgres:
       reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
       reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
   instances:
-  - affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-          - matchExpressions:
-            - key: node_group
-              operator: In
-              values:
-              - core-workers
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-            - key: postgres-operator.crunchydata.com/cluster
-              operator: In
-              values:
-              - postgres-core
-            - key: postgres-operator.crunchydata.com/instance-set
-              operator: In
-              values:
-              - pgha2
-          topologyKey: kubernetes.io/hostname
-    dataVolumeClaimSpec:
-      storageClassName: ${local.storage_class}
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: ${var.postgres_volume_size}
-    name: pgha2
-    replicas: ${var.az_count}
-    resources:
-      requests:
-        cpu: 2000m
-        memory: 8000Mi
-    tolerations:
-      - effect: NoSchedule
-        key: indico.io/core
-        operator: Exists
+${local.crunchy_instances_values}
   pgBackRestConfig:
     global:
       archive-timeout: '10000'
-      repo2-path: /pgbackrest/postgres-core/repo2
-      repo2-retention-full: '5'
-      repo2-s3-key-type: auto
-      repo2-s3-kms-key-id: "${local.environment_kms_key_arn}"
-      repo2-s3-role: ${local.environment_node_role_name}
+      repo1-path:  "/pgbackrest/postgres-core/repo1" 
+      repo1-retention-full: '5'
+      repo1-s3-key-type: auto
+      repo1-s3-kms-key-id: "${local.environment_kms_key_arn}"
+      repo1-s3-role: ${local.environment_node_role_name}
     repos:
-    - name: repo2
+    - name: repo1
       s3:
         bucket: ${local.environment_pgbackup_s3_bucket_name}
         endpoint: s3.${var.region}.amazonaws.com
@@ -752,18 +714,23 @@ crunchy-postgres:
         requests:
           cpu: 1000m
           memory: 3000Mi
-  users:
-    - name: indico
-      options: "SUPERUSER"
+secrets:
+  rabbitmq:
+    create: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
+celery-backend:
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
+  image:
+    repository: ${var.image_registry}/docker.dragonflydb.io/dragonflydb/dragonfly
 rabbitmq:
-  enabled: true
+  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   rabbitmq:
     image:
-      registry: ${var.image_registry}/dockerhub-proxy	
+      registry: ${var.image_registry}/dockerhub-proxy
     persistence:
       storageClass: ${var.include_efs ? var.indico_storage_class_name : ""}
-celery-backend:
-  enabled: true
+    service:
+      labels:
+        mirror.linkerd.io/exported: ${var.enable_service_mesh ? "remote-discovery" : "disabled"}
 EOF
     ] : [<<EOF
 celery-backend:
@@ -1139,36 +1106,6 @@ celery-backend:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
   image:
     repository: ${var.image_registry}/docker.dragonflydb.io/dragonflydb/dragonfly
-crunchy-postgres:
-  enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
-  service:
-    metadata:
-      labels:
-        mirror.linkerd.io/exported: "remote-discovery"
-  instances:
-${local.crunchy_instances_values}
-  pgBackRestConfig:
-    global:
-      archive-timeout: '10000'
-      repo1-path: ${var.intake_namespace == "default" ? "/pgbackrest/postgres-data/repo1" : "/pgbackrest/postgres-data-${var.intake_namespace}/repo1"}
-      repo1-retention-full: '5'
-      repo1-s3-key-type: auto
-      repo1-s3-kms-key-id: "${local.environment_kms_key_arn}"
-      repo1-s3-role: ${local.environment_node_role_name}
-    repos:
-    - name: repo1
-      s3:
-        bucket: ${local.environment_pgbackup_s3_bucket_name}
-        endpoint: s3.${var.region}.amazonaws.com
-        region: ${var.region}
-      schedules:
-        full: 30 4 * * 0 # Full backup weekly at 4:30am Sunday
-        differential: 0 0 * * * # Diff backup daily at midnight
-    jobs:
-      resources:
-        requests:
-          cpu: 1000m
-          memory: 3000Mi
 rabbitmq:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "true" : "false" : "true"}
   rabbitmq:
@@ -1191,11 +1128,6 @@ intake_values = <<EOF
 global:
   image:
     registry: ${var.local_registry_enabled ? "local-registry.${local.dns_name}" : "${var.image_registry}"}/indico
-configs:
-  storage:
-    blob:
-      s3:
-        prefix: ${var.intake_namespace == "default" ? "blob" : "blob/${var.intake_namespace}"}
 ${local.local_registry_tf_cod_values}
 runtime-scanner:
   enabled: ${replace(lower(var.aws_account), "indico", "") == lower(var.aws_account) ? "false" : var.multitenant_enabled == true ? "false" : "true"}
@@ -1244,11 +1176,11 @@ kafka-strimzi:
   postgres:
     app:
       # -- By default, this points to the crunchy-postgres service for the application database
-      host: postgres-data-primary.${var.intake_namespace}.svc
+      host: postgres-core-primary.indico.svc
       user: indico
     metrics:
       # -- By default, this points to the crunchy-postgres service for the metrics database
-      host: postgres-data-primary.${var.intake_namespace}.svc
+      host: postgres-core-primary.indico.svc
       user: indico
 worker:
   enabled: ${var.enable_data_application_cluster_separation ? var.load_environment == "" ? "false" : "true" : "true"}
