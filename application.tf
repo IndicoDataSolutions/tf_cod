@@ -732,11 +732,7 @@ rabbitmq:
       labels:
         mirror.linkerd.io/exported: ${var.enable_service_mesh ? "remote-discovery" : "disabled"}
 EOF
-    ] : [<<EOF
-celery-backend:
-  enabled: false
-EOF
-  ]
+]
 
   indico_pre_reqs_values = concat(local.indico_storage_class_values, [<<EOF
 global:
