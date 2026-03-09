@@ -207,12 +207,10 @@ module "security-group" {
 module "s3-storage" {
   count                              = var.load_environment == "" ? 1 : 0
   source                             = "app.terraform.io/indico/indico-aws-buckets/mod"
-  version                            = "4.5.0"
+  version                            = "4.6.0"
   force_destroy                      = true # allows terraform to destroy non-empty buckets.
   label                              = var.label
   kms_key_arn                        = local.environment_kms_key_arn
-  submission_expiry                  = var.submission_expiry
-  uploads_expiry                     = var.uploads_expiry
   include_rox                        = var.include_rox
   enable_backup                      = var.enable_s3_backup
   backup_role_arn                    = var.enable_s3_backup ? local.environment_s3_backup_role_arn : ""
@@ -226,6 +224,8 @@ module "s3-storage" {
   allowed_origins                    = ["https://${local.dns_name}"]
   loki_s3_bucket_name_override       = var.loki_s3_bucket_name_override
   enable_loki_logging                = var.enable_loki_logging
+  cleanup_noncurrent_days            = var.s3_cleanup_noncurrent_days
+  retain_backup_days                 = var.s3_retain_backup_days
 }
 
 
