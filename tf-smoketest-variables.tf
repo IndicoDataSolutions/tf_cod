@@ -24,8 +24,6 @@ resource "kubernetes_config_map" "terraform-variables" {
     storage_gateway_size = "${jsonencode(var.storage_gateway_size)}"
     existing_kms_key = "${jsonencode(var.existing_kms_key)}"
     bucket_versioning = "${jsonencode(var.bucket_versioning)}"
-    submission_expiry = "${jsonencode(var.submission_expiry)}"
-    uploads_expiry = "${jsonencode(var.uploads_expiry)}"
     name = "${jsonencode(var.name)}"
     cluster_name = "${jsonencode(var.cluster_name)}"
     k8s_version = "${jsonencode(var.k8s_version)}"
