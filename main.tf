@@ -110,7 +110,7 @@ resource "aws_key_pair" "kp" {
 module "networking" {
   count                               = var.direct_connect == false && var.load_environment == "" ? 1 : 0
   source                              = "app.terraform.io/indico/indico-aws-network/mod"
-  version                             = "2.4.0"
+  version                             = "2.5.0"
   label                               = var.label
   vpc_cidr                            = var.vpc_cidr
   private_subnet_cidrs                = var.private_subnet_cidrs
@@ -135,6 +135,7 @@ module "networking" {
   gateway_vpc_endpoints_enabled       = var.gateway_vpc_endpoints_enabled
   create_nginx_ingress_security_group = var.create_nginx_ingress_security_group
   nginx_ingress_allowed_cidrs         = var.nginx_ingress_allowed_cidrs
+  use_nat_instances                   = var.use_nat_instances
 }
 
 module "sqs_sns" {

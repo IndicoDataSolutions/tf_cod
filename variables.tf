@@ -1841,3 +1841,9 @@ variable "s3_retain_backup_days" {
   default     = 7
   description = "The number of days to retain S3 backups"
 }
+
+variable "use_nat_instances" {
+  type        = bool
+  default     = false
+  description = "If enabled this will use NAT instances instead of NAT gateways"
+}
