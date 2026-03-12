@@ -136,7 +136,7 @@ module "networking" {
   create_nginx_ingress_security_group = var.create_nginx_ingress_security_group
   nginx_ingress_allowed_cidrs         = var.nginx_ingress_allowed_cidrs
   use_nat_instances                   = var.use_nat_instances
-  additional_tags                     = var.additional_tags
+  additional_tags                     = merge(coalesce(var.default_tags, {}), coalesce(var.additional_tags, {}))
 }
 
 module "sqs_sns" {
