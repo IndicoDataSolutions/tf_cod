@@ -678,7 +678,7 @@ crunchy-postgres:
         container: " ${module.storage.crunchy_backup_name}"
       schedules:
         full: 30 4 * * *
-        differential: 0 0 * * * # Diff backup daily at midnight
+        differential: 0 */1 * * * # Diff backup hourly
     jobs:
       resources:
         requests:
