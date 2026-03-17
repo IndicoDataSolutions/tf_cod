@@ -1847,3 +1847,9 @@ variable "use_nat_instances" {
   default     = false
   description = "If enabled this will use NAT instances instead of NAT gateways"
 }
+
+variable "nat_instance_type" {
+  type        = string
+  default     = "t4g.micro"
+  description = "Instance type for indico-nat NAT instances"
+}
