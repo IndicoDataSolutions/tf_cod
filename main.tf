@@ -137,7 +137,8 @@ module "networking" {
   nginx_ingress_allowed_cidrs         = var.nginx_ingress_allowed_cidrs
   use_nat_instances                   = var.use_nat_instances
   additional_tags                     = merge(coalesce(var.default_tags, {}), coalesce(var.additional_tags, {}))
-  indico_nat_instance_type            = var.nat_instance_type
+  indico_nat_instance_type            = var.indico_nat_instance_type
+  indico_nat_enable_ssm               = var.indico_nat_enable_ssm
 }
 
 module "sqs_sns" {

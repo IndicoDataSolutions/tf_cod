@@ -1848,8 +1848,14 @@ variable "use_nat_instances" {
   description = "If enabled this will use NAT instances instead of NAT gateways"
 }
 
-variable "nat_instance_type" {
+variable "indico_nat_instance_type" {
   type        = string
   default     = "t4g.micro"
   description = "Instance type for indico-nat NAT instances"
+}
+
+variable "indico_nat_enable_ssm" {
+  type        = bool
+  default     = false
+  description = "When true, install and enable SSM Agent on indico-nat instances for remote shell access"
 }
