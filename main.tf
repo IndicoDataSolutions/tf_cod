@@ -217,7 +217,7 @@ module "s3-storage" {
   cleanup_noncurrent_days            = var.s3_cleanup_noncurrent_days
   retain_backup_days                 = var.s3_retain_backup_days
   include_pgbackup                   = var.include_pgbackup
-  enable_public_access_block         = var.enable_public_access_block
+  enable_public_access_block         = var.s3_enable_public_access_block
 }
 
 
