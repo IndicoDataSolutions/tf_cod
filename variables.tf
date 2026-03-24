@@ -553,7 +553,7 @@ variable "include_fsx" {
 variable "include_pgbackup" {
   type        = bool
   default     = true
-  description = "Create a read only FSx file system"
+  description = "Create a s3 backup for postgres"
 }
 
 variable "include_efs" {
@@ -1127,12 +1127,11 @@ variable "indico_sqs_sns_policy_name" {
   default     = null
 }
 
-variable "additional_users" {
-  type        = list(string)
-  default     = []
-  description = "The names of additional AWS users to provide admin access to the cluster"
+variable "enable_additional_access_entries" {
+  type        = bool
+  default     = true
+  description = "If true this will create additional access entries for the cluster"
 }
-
 
 ## Unused variables
 
@@ -1228,6 +1227,12 @@ variable "create_s3_backup_role" {
   description = "Flag to create or load s3 backup role"
 }
 
+variable "s3_enable_public_access_block" {
+  type        = bool
+  default     = true
+  description = "If true this will enable public access block on the s3 buckets"
+}
+
 variable "create_vpc_flow_logs_role" {
   type        = bool
   default     = true
@@ -1268,6 +1273,18 @@ variable "pgbackup_s3_bucket_name_override" {
   type        = string
   default     = null
   description = "The name of the existing S3 bucket to be created/loaded and used as the postgres backup bucket"
+}
+
+variable "create_cluster_security_group" {
+  type        = bool
+  default     = true
+  description = "Flag to create or load cluster security group"
+}
+
+variable "create_node_security_group" {
+  type        = bool
+  default     = true
+  description = "Flag to create or load node security group"
 }
 
 # Additional variables
@@ -1324,6 +1341,12 @@ variable "fsx_deployment_type" {
   type        = string
   default     = "PERSISTENT_1"
   description = "The deployment type to launch"
+}
+
+variable "enable_backup_lambda" {
+  type        = bool
+  default     = true
+  description = "If true this will enable the backup lambda for fsx"
 }
 
 variable "fsx_type" {
