@@ -197,7 +197,7 @@ module "security-group" {
 module "s3-storage" {
   count                              = var.load_environment == "" ? 1 : 0
   source                             = "app.terraform.io/indico/indico-aws-buckets/mod"
-  version                            = "4.6.1"
+  version                            = "4.6.2"
   force_destroy                      = true # allows terraform to destroy non-empty buckets.
   label                              = var.label
   kms_key_arn                        = local.environment_kms_key_arn
@@ -288,7 +288,7 @@ module "efs-storage" {
 module "fsx-storage" {
   count                       = var.include_fsx == true && var.load_environment == "" ? 1 : 0
   source                      = "app.terraform.io/indico/indico-aws-fsx/mod"
-  version                     = "2.0.3"
+  version                     = "2.0.4"
   label                       = var.label
   additional_tags             = var.additional_tags
   region                      = var.region
