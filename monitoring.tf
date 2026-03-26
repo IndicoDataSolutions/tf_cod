@@ -22,10 +22,10 @@ locals {
 
   loki_config = var.enable_loki_logging == true ? (<<EOT
 fluent-bit:
-  enabled: true
+  enabled: ${var.enable_signoz ? false : true}
   ${var.custom_fluentbit_filters != "" ? indent(2, base64decode(var.custom_fluentbit_filters)) : ""}
 loki:
-  enabled: true
+  enabled: ${var.enable_signoz ? false : true}
   loki:
     storage_config:
       aws:
@@ -325,9 +325,9 @@ resource "aws_route53_record" "alertmanager-caa" {
 
 locals {
   monitoring_password = var.multitenant_enabled == false ? random_password.monitoring-password[0].result : ""
-  password = var.multitenant_enabled == false ? random_password.password[0].result : ""
-  salt = var.multitenant_enabled == false ? random_password.salt[0].result : ""
-  hash = var.multitenant_enabled == false ? htpasswd_password.hash[0].bcrypt : ""
+  password            = var.multitenant_enabled == false ? random_password.password[0].result : ""
+  salt                = var.multitenant_enabled == false ? random_password.salt[0].result : ""
+  hash                = var.multitenant_enabled == false ? htpasswd_password.hash[0].bcrypt : ""
 }
 
 resource "random_password" "monitoring-password" {
