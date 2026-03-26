@@ -863,6 +863,7 @@ signoz:
   clusterName: ${var.label}
   otelCollectorEndpoint: ${var.signoz_otel_collector_endpoint}
   token: ${var.signoz_bearer_token}
+  environment: ${var.environment}
   EOF
   ] : []
 
