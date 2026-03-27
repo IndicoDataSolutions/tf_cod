@@ -126,7 +126,7 @@ resource "time_sleep" "wait_for_indico_pre_requisites" {
 }
 
 resource "helm_release" "monitoring" {
-  depends_on = [helm_release.indico_pre_requisites, null_resource.annotate_monitoring_namespace]
+  depends_on = [helm_release.indico_pre_requisites, null_resource.annotate_monitoring_namespace, time_sleep.wait_for_indico_pre_requisites]
 
   count = var.monitoring_enabled == true ? 1 : 0
 
