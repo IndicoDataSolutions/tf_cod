@@ -113,7 +113,7 @@ spec:
     spec:
       containers:
       - name: nfs-server
-        image: ${var.image_registry}/k8s.gcr.io/volume-nfs:0.8
+        image: ${var.image_registry}/indico/volume-nfs:test
         ports:
         - name: nfs
           containerPort: 2049
