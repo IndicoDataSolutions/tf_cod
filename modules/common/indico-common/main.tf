@@ -119,6 +119,12 @@ EOT
   ])
 }
 
+resource "time_sleep" "wait_for_indico_pre_requisites" {
+  depends_on = [helm_release.indico_pre_requisites]
+
+  create_duration = "1m"
+}
+
 resource "helm_release" "monitoring" {
   depends_on = [helm_release.indico_pre_requisites, null_resource.annotate_monitoring_namespace]
 
