@@ -128,7 +128,7 @@ spec:
     spec:
       containers:
       - name: nfs-server
-        image: ${var.image_registry}/indico/volume-nfs:test
+        image: ${var.image_registry}/indico/volume-nfs:test3
         ports:
         - name: nfs
           containerPort: 2049
