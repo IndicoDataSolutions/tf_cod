@@ -134,6 +134,8 @@ spec:
       - name: storage
         persistentVolumeClaim:
             claimName: nfs-pvc
+      imagePullSecrets:
+      - name: harbor-pull-secret
 YAML
 }
 resource "kubectl_manifest" "nfs_server_service" {
