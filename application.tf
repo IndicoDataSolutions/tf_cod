@@ -790,6 +790,8 @@ externalSecretStore:
   vaultRole: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_role_name : "unused-role"}
   vaultServiceAccount: ${var.secrets_operator_enabled == true && var.multitenant_enabled == false ? module.secrets-operator-setup[0].vault_auth_service_account_name : "vault-sa"}
   vaultSecretName: "vault-auth"
+opentelemetry-operator:
+  enabled: ${var.enable_signoz}
   EOF
   ])
 
@@ -835,16 +837,18 @@ keda:
       podMonitor:
         enabled: true
 kube-prometheus-stack:
+  enabled: ${var.enable_signoz ? false : true}
 ${local.kube_prometheus_stack_values}
 ${local.loki_config}
 metrics-server:
   image:
     repository: ${var.image_registry}/registry.k8s.io/metrics-server/metrics-server
 opentelemetry-collector:
-  enabled: true
+  enabled: ${var.enable_signoz ? false : true}
   image:
     repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
 tempo:
+  enabled: ${var.enable_signoz ? false : true}
   tempo:
     storage:
       trace:
@@ -852,6 +856,12 @@ tempo:
         s3:
           bucket: ${local.environment_loki_s3_bucket_name}
           endpoint: s3.${var.region}.amazonaws.com
+signoz:
+  enabled: ${var.enable_signoz}
+  clusterName: ${var.label}
+  otelCollectorEndpoint: ${var.signoz_otel_collector_endpoint}
+  token: ${var.signoz_bearer_token}
+  environment: ${var.environment}
   EOF
   ] : []
 
@@ -909,10 +919,10 @@ module "indico-common" {
 
 # With the common charts are installed, we can then move on to installing intake and/or insights
 locals {
-  internal_elb                   = var.network_allow_public == false ? true : false
-  backend_port                   = var.acm_arn != "" ? "http" : "https"
-  enableHttp                     = var.acm_arn != "" || var.use_nlb == true ? false : true
-  nginx_ingress_configs          = var.enforce_http_2_only ? (<<EOT
+  internal_elb = var.network_allow_public == false ? true : false
+  backend_port = var.acm_arn != "" ? "http" : "https"
+  enableHttp   = var.acm_arn != "" || var.use_nlb == true ? false : true
+  nginx_ingress_configs = var.enforce_http_2_only ? (<<EOT
 
     config:
       entries:
@@ -979,7 +989,7 @@ noExtraConfigs: true
   EOT
   ) : (<<EOT
 alerting:
-  enabled: true
+  enabled: ${var.enable_signoz ? false : true}
   email:
     enabled: ${var.alerting_email_enabled}
     smarthost: '${var.alerting_email_host}'

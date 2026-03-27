@@ -1882,3 +1882,22 @@ variable "indico_nat_enable_ssm" {
   default     = false
   description = "When true, install and enable SSM Agent on indico-nat instances for remote shell access"
 }
+
+variable "enable_signoz" {
+  type        = bool
+  default     = false
+  description = "Toggle for enabling signoz"
+}
+
+variable "signoz_otel_collector_endpoint" {
+  type        = string
+  default     = "signoz-collector.devops.indico.io:443"
+  description = "OTEL collector endpoint for signoz"
+}
+
+variable "signoz_bearer_token" {
+  type        = string
+  default     = ""
+  description = "Bearer token for signoz"
+  sensitive   = true
+}
