@@ -1,0 +1,9 @@
+# PostgreSQL Migration Assistant
+# Uses Python 3.11+ standard library only (argparse, base64, json, os, pathlib, subprocess, sys, tempfile, time).
+# No pip dependencies required.
+#
+# External tools (must be in PATH):
+# - terraform
+# - kubectl
+# - helm
+# - aws (AWS CLI, for minio-to-s3 step)
