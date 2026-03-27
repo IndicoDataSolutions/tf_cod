@@ -1899,4 +1899,5 @@ variable "signoz_bearer_token" {
   type        = string
   default     = ""
   description = "Bearer token for signoz"
+  sensitive   = true
 }

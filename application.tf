@@ -847,8 +847,6 @@ opentelemetry-collector:
   enabled: ${var.enable_signoz ? false : true}
   image:
     repository: ${var.image_registry}/docker.io/otel/opentelemetry-collector-contrib
-alerting:
-  enabled: ${var.enable_signoz ? false : true}
 tempo:
   enabled: ${var.enable_signoz ? false : true}
   tempo:
