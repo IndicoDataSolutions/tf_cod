@@ -91,10 +91,25 @@ spec:
       storage: 1000Gi
 YAML
 }
-
-resource "kubectl_manifest" "nfs_server" {
+resource "kubectl_manifest" "nfs_server_conf" {
   depends_on = [
     kubectl_manifest.nfs_volume
+  ]
+  count     = var.on_prem_test == true ? 1 : 0
+  yaml_body = <<YAML
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nfs-server-conf
+data:
+  share : |-
+    /exports *(rw,fsid=0,insecure,no_root_squash)
+YAML
+}
+resource "kubectl_manifest" "nfs_server" {
+  depends_on = [
+    kubectl_manifest.nfs_volume,
+    kubectl_manifest.nfs_server_conf
   ]
   count     = var.on_prem_test == true ? 1 : 0
   yaml_body = <<YAML
@@ -126,6 +141,8 @@ spec:
         volumeMounts:
         - name: storage
           mountPath: /exports
+        - name: nfs-server-conf
+          mountPath: /etc/exports.d/
         resources:
           requests:
             cpu: 450m
@@ -134,6 +151,9 @@ spec:
       - name: storage
         persistentVolumeClaim:
             claimName: nfs-pvc
+      - name: nfs-server-conf
+        configMap:
+          name: nfs-server-conf
       imagePullSecrets:
       - name: harbor-pull-secret
 YAML
