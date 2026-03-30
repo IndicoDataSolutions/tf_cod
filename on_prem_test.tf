@@ -8,23 +8,15 @@
 # - [ ] Install pre-reqs etc.
 
 locals {
-  postgres_data_pv_spec_nfs = {
-    storageClassName = "nfs-client"
-    capacity         = { storage = var.postgres_volume_size }
-    accessModes      = ["ReadWriteOnce"]
-  }
-  postgres_data_pgha1_pv_spec = var.on_prem_volume_backing == "local" ? {
-    storageClassName = "local-storage"
-    capacity         = { storage = var.postgres_volume_size }
-    accessModes      = ["ReadWriteOnce"]
-    hostPath         = { path = "/mnt/postgres-data" }
-  } : local.postgres_data_pv_spec_nfs
-  postgres_data_pgha2_pv_spec = var.on_prem_volume_backing == "local" ? {
-    storageClassName = "local-storage"
-    capacity         = { storage = var.postgres_volume_size }
-    accessModes      = ["ReadWriteOnce"]
-    hostPath         = { path = "/mnt/postgres-data" }
-  } : local.postgres_data_pv_spec_nfs
+  # merge + for avoids a ternary between object types that differ (hostPath only on local).
+  postgres_data_pv_spec = merge(
+    {
+      storageClassName = var.on_prem_volume_backing == "local" ? "local-storage" : "nfs-client"
+      capacity         = { storage = var.postgres_volume_size }
+      accessModes      = ["ReadWriteOnce"]
+    },
+    { for _ in var.on_prem_volume_backing == "local" ? [1] : [] : "hostPath" => { path = "/mnt/postgres-data" } }
+  )
 }
 
 resource "kubectl_manifest" "hostpath_storage_class" {
@@ -55,7 +47,7 @@ resource "kubectl_manifest" "postgres_data_pgha1_pv" {
     apiVersion = "v1"
     kind       = "PersistentVolume"
     metadata   = { name = "postgres-data-pgha1" }
-    spec       = local.postgres_data_pgha1_pv_spec
+    spec       = local.postgres_data_pv_spec
   })
 }
 
@@ -70,7 +62,7 @@ resource "kubectl_manifest" "postgres_data_pgha2_pv" {
     apiVersion = "v1"
     kind       = "PersistentVolume"
     metadata   = { name = "postgres-data-pgha2" }
-    spec       = local.postgres_data_pgha2_pv_spec
+    spec       = local.postgres_data_pv_spec
   })
 }
 
