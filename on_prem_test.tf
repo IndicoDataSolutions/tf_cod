@@ -40,7 +40,8 @@ resource "kubectl_manifest" "postgres_data_pgha1_pv" {
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
-    kubectl_manifest.hostpath_storage_class
+    kubectl_manifest.hostpath_storage_class,
+    null_resource.update_storage_class[0]
   ]
   count = var.on_prem_test == true ? 1 : 0
   yaml_body = yamlencode({
@@ -55,7 +56,8 @@ resource "kubectl_manifest" "postgres_data_pgha2_pv" {
   depends_on = [
     module.cluster,
     time_sleep.wait_1_minutes_after_cluster,
-    kubectl_manifest.hostpath_storage_class
+    kubectl_manifest.hostpath_storage_class,
+    null_resource.update_storage_class[0]
   ]
   count = var.on_prem_test == true ? 1 : 0
   yaml_body = yamlencode({
