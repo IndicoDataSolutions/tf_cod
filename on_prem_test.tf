@@ -45,13 +45,11 @@ YAML
 
 
 resource "kubectl_manifest" "postgres_data_pgha1_pv" {
-  depends_on = concat(
-    [
-      module.cluster,
-      time_sleep.wait_1_minutes_after_cluster
-    ],
-    var.on_prem_volume_backing == "local" ? [kubectl_manifest.hostpath_storage_class] : []
-  )
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster,
+    kubectl_manifest.hostpath_storage_class
+  ]
   count = var.on_prem_test == true ? 1 : 0
   yaml_body = yamlencode({
     apiVersion = "v1"
@@ -62,13 +60,11 @@ resource "kubectl_manifest" "postgres_data_pgha1_pv" {
 }
 
 resource "kubectl_manifest" "postgres_data_pgha2_pv" {
-  depends_on = concat(
-    [
-      module.cluster,
-      time_sleep.wait_1_minutes_after_cluster
-    ],
-    var.on_prem_volume_backing == "local" ? [kubectl_manifest.hostpath_storage_class] : []
-  )
+  depends_on = [
+    module.cluster,
+    time_sleep.wait_1_minutes_after_cluster,
+    kubectl_manifest.hostpath_storage_class
+  ]
   count = var.on_prem_test == true ? 1 : 0
   yaml_body = yamlencode({
     apiVersion = "v1"
