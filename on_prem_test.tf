@@ -7,6 +7,26 @@
 # - [ ] Make NFS SC the default
 # - [ ] Install pre-reqs etc.
 
+locals {
+  postgres_data_pv_spec_nfs = {
+    storageClassName = "nfs-client"
+    capacity         = { storage = var.postgres_volume_size }
+    accessModes      = ["ReadWriteOnce"]
+  }
+  postgres_data_pgha1_pv_spec = var.on_prem_volume_backing == "local" ? {
+    storageClassName = "local-storage"
+    capacity         = { storage = var.postgres_volume_size }
+    accessModes      = ["ReadWriteOnce"]
+    hostPath         = { path = "/mnt/postgres-data" }
+  } : local.postgres_data_pv_spec_nfs
+  postgres_data_pgha2_pv_spec = var.on_prem_volume_backing == "local" ? {
+    storageClassName = "local-storage"
+    capacity         = { storage = var.postgres_volume_size }
+    accessModes      = ["ReadWriteOnce"]
+    hostPath         = { path = "/mnt/postgres-data" }
+  } : local.postgres_data_pv_spec_nfs
+}
+
 resource "kubectl_manifest" "hostpath_storage_class" {
   depends_on = [
     module.cluster,
@@ -25,49 +45,37 @@ YAML
 
 
 resource "kubectl_manifest" "postgres_data_pgha1_pv" {
-  depends_on = [
-    module.cluster,
-    time_sleep.wait_1_minutes_after_cluster,
-    kubectl_manifest.hostpath_storage_class
-  ]
-  count     = var.on_prem_test == true ? 1 : 0
-  yaml_body = <<YAML
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: postgres-data-pgha1
-spec:
-  storageClassName: local-storage
-  capacity:
-    storage: ${var.postgres_volume_size}
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: /mnt/postgres-data
-YAML
+  depends_on = concat(
+    [
+      module.cluster,
+      time_sleep.wait_1_minutes_after_cluster
+    ],
+    var.on_prem_volume_backing == "local" ? [kubectl_manifest.hostpath_storage_class] : []
+  )
+  count = var.on_prem_test == true ? 1 : 0
+  yaml_body = yamlencode({
+    apiVersion = "v1"
+    kind       = "PersistentVolume"
+    metadata   = { name = "postgres-data-pgha1" }
+    spec       = local.postgres_data_pgha1_pv_spec
+  })
 }
 
 resource "kubectl_manifest" "postgres_data_pgha2_pv" {
-  depends_on = [
-    module.cluster,
-    time_sleep.wait_1_minutes_after_cluster,
-    kubectl_manifest.hostpath_storage_class
-  ]
-  count     = var.on_prem_test == true ? 1 : 0
-  yaml_body = <<YAML
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: postgres-data-pgha2
-spec:
-  storageClassName: local-storage
-  capacity:
-    storage: ${var.postgres_volume_size}
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: /mnt/postgres-data
-YAML
+  depends_on = concat(
+    [
+      module.cluster,
+      time_sleep.wait_1_minutes_after_cluster
+    ],
+    var.on_prem_volume_backing == "local" ? [kubectl_manifest.hostpath_storage_class] : []
+  )
+  count = var.on_prem_test == true ? 1 : 0
+  yaml_body = yamlencode({
+    apiVersion = "v1"
+    kind       = "PersistentVolume"
+    metadata   = { name = "postgres-data-pgha2" }
+    spec       = local.postgres_data_pgha2_pv_spec
+  })
 }
 
 resource "kubectl_manifest" "nfs_volume" {

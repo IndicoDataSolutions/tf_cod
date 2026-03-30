@@ -843,6 +843,17 @@ variable "on_prem_test" {
   type    = bool
   default = false
 }
+
+variable "on_prem_volume_backing" {
+  type        = string
+  default     = "nfs"
+  description = "How on-prem Postgres PVs are backed: local (hostPath + local-storage) or nfs (nfs-client StorageClass only; volumes provisioned by NFS CSI, no hostPath or in-tree nfs block)."
+
+  validation {
+    condition     = contains(["local", "nfs"], var.on_prem_volume_backing)
+    error_message = "on_prem_volume_backing must be \"local\" or \"nfs\"."
+  }
+}
 variable "harness_delegate" {
   type    = bool
   default = false
